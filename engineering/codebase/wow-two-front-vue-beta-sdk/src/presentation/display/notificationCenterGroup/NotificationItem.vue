@@ -1,5 +1,8 @@
 <script lang="ts">
+import type { Severity } from '../../../foundation/styles';
 export interface NotificationItemProps {
+  /** The semantic severity; supplies a leading glyph when no icon is provided. */
+  readonly severity?: Severity;
   /** The leading icon / avatar. Rich content → the `icon` slot. */
   readonly icon?: string;
 
@@ -23,7 +26,8 @@ export interface NotificationItemProps {
 <script setup lang="ts">
 import { useLocale } from '../../../foundation/i18n';
 import { computed, getCurrentInstance, useAttrs, useSlots, useTemplateRef } from 'vue';
-import { X } from 'lucide-vue-next';
+import { Trash2, X } from 'lucide-vue-next';
+import { Icon, SeverityIcons, SeverityIconClasses } from '../../../foundation/icons';
 import { cn } from '../../../foundation/styles';
 import { Key } from '../../../foundation/dom';
 
@@ -47,6 +51,8 @@ const emit = defineEmits<{
   select: [];
   /** Fires when the reader presses the dismiss button, which renders on hover only when bound. */
   dismiss: [];
+  /** Removes a retained notice; only rendered when this event is bound. */
+  delete: [];
 }>();
 
 defineSlots<{
@@ -73,11 +79,13 @@ const el = useTemplateRef<HTMLDivElement>('el');
  */
 const interactive = () => Boolean(instance?.vnode.props?.onSelect);
 const hasDismiss = () => Boolean(instance?.vnode.props?.onDismiss);
+const hasDelete = () => Boolean(instance?.vnode.props?.onDelete);
+const severityIcon = computed(() => (props.severity ? SeverityIcons[props.severity] : null));
 
-const hasIcon = computed(() => Boolean(props.icon) || Boolean(slots.icon));
-const hasTimestamp = computed(() => Boolean(props.timestamp) || Boolean(slots.timestamp));
-const hasDescription = computed(() => Boolean(props.description) || Boolean(slots.description));
-const hasActions = computed(() => Boolean(props.actions) || Boolean(slots.actions));
+const hasIcon = () => Boolean(props.icon) || Boolean(slots.icon) || Boolean(severityIcon.value);
+const hasTimestamp = () => Boolean(props.timestamp) || Boolean(slots.timestamp);
+const hasDescription = () => Boolean(props.description) || Boolean(slots.description);
+const hasActions = () => Boolean(props.actions) || Boolean(slots.actions);
 
 const classes = computed(() =>
   cn(
@@ -91,7 +99,7 @@ const classes = computed(() =>
 
 const titleClasses = computed(() => cn('truncate text-foreground', props.isUnread ? 'font-semibold' : 'font-medium'));
 
-const bodyClasses = computed(() => cn('min-w-0 flex-1', !hasIcon.value && 'pl-3'));
+const bodyClasses = computed(() => cn('min-w-0 flex-1', !hasIcon() && 'pl-3'));
 
 /** The dismiss button's resting classes — corner placement, box, and the hidden-until-hover opacity. */
 const DismissRestingClasses =
@@ -141,25 +149,37 @@ defineExpose({ el });
       aria-hidden="true"
       class="absolute left-1 top-3 inline-block h-2 w-2 rounded-full bg-primary"
     />
-    <div v-if="hasIcon" class="shrink-0 self-start pl-3">
-      <slot name="icon">{{ props.icon }}</slot>
+    <div v-if="hasIcon()" class="shrink-0 self-start pl-3">
+      <slot name="icon">
+        <template v-if="props.icon">{{ props.icon }}</template>
+        <Icon v-else-if="severityIcon" :icon="severityIcon" :size="16" :class="SeverityIconClasses[props.severity!]" />
+      </slot>
     </div>
     <div :class="bodyClasses">
       <div class="flex items-baseline gap-2">
         <span :class="titleClasses">
           <slot name="title">{{ props.title }}</slot>
         </span>
-        <span v-if="hasTimestamp" class="ml-auto whitespace-nowrap text-xs text-muted-foreground">
+        <span v-if="hasTimestamp()" class="ml-auto whitespace-nowrap text-xs text-muted-foreground">
           <slot name="timestamp">{{ props.timestamp }}</slot>
         </span>
       </div>
-      <div v-if="hasDescription" class="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+      <div v-if="hasDescription()" class="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
         <slot name="description">{{ props.description }}</slot>
       </div>
-      <div v-if="hasActions" class="mt-1.5 flex items-center gap-2">
+      <div v-if="hasActions()" class="mt-1.5 flex items-center gap-2">
         <slot name="actions">{{ props.actions }}</slot>
       </div>
     </div>
+    <button
+      v-if="hasDelete()"
+      type="button"
+      :aria-label="locale.t('NotificationItem.deleteNotification', undefined, 'Delete notification')"
+      class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      @click.stop="emit('delete')"
+    >
+      <Icon :icon="Trash2" :size="14" />
+    </button>
     <button
       v-if="hasDismiss()"
       type="button"

@@ -14,6 +14,8 @@ export interface ToastProps {
   readonly actions?: string;
   /** The accessible label for the close button. Default `"Dismiss"`. */
   readonly closeLabel?: string;
+  /** The accessible label for removing a retained notice. Default "Delete notification". */
+  readonly deleteLabel?: string;
   /**
    * Shows the severity's own glyph when no `icon` is given — a distinct shape per severity, so the meaning
    * never rests on colour alone. `neutral` has none. Default `true`.
@@ -25,7 +27,7 @@ export interface ToastProps {
 <script setup lang="ts">
 import { useLocaleDefaults } from '../../../foundation/i18n';
 import { computed, getCurrentInstance, useAttrs, useSlots, useTemplateRef } from 'vue';
-import { X } from 'lucide-vue-next';
+import { Trash2, X } from 'lucide-vue-next';
 import { cn, Severity as SeverityToken } from '../../../foundation/styles';
 import { Icon, SeverityIconClasses, SeverityIcons } from '../../../foundation/icons';
 import ToastSimple from '../toastSimple/ToastSimple.vue';
@@ -42,12 +44,14 @@ const CloseIcon = X;
 defineOptions({ name: 'Toast', inheritAttrs: false });
 
 const componentProps = withDefaults(defineProps<ToastProps>(), { showSeverityIcon: true });
-const props = useLocaleDefaults(componentProps, 'Toast', { closeLabel: 'Dismiss' });
+const props = useLocaleDefaults(componentProps, 'Toast', { closeLabel: 'Dismiss', deleteLabel: 'Delete notification' });
 
 /** Replaces React's `onClose`; omitting `@close` omits the close button. */
 const emit = defineEmits<{
   /** Fires when the close button is activated. */
   close: [];
+  /** Fires when the delete icon is activated; only rendered when bound for retained notices. */
+  delete: [];
 }>();
 
 defineSlots<{
@@ -76,6 +80,7 @@ const inner = useTemplateRef<InstanceType<typeof ToastSimple>>('inner');
  * `instance.vnode` is replaced on every re-render.
  */
 const hasClose = () => Boolean(instance?.vnode.props?.onClose);
+const hasDelete = () => Boolean(instance?.vnode.props?.onDelete);
 
 /**
  * The glyph standing in for a missing `icon` — `null` when switched off, or for a neutral toast. An `icon`
@@ -134,6 +139,15 @@ defineExpose({ el });
     <span v-if="slots.trailing" class="flex h-5 shrink-0 items-center">
       <slot name="trailing" />
     </span>
+    <button
+      v-if="hasDelete()"
+      type="button"
+      :aria-label="props.deleteLabel"
+      class="grid h-6 w-6 shrink-0 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+      @click="emit('delete')"
+    >
+      <Icon :icon="Trash2" :size="14" />
+    </button>
     <button
       v-if="hasClose()"
       type="button"

@@ -8,6 +8,7 @@ Public import: `import { NotificationItem } from '@wow-two-beta/ui-vue/presentat
 
 ## Contract
 
+- An explicit `severity` supplies its glyph unless an icon is supplied. Binding `delete` renders an accessible icon-only Delete control; omission hides it.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -15,6 +16,7 @@ Public import: `import { NotificationItem } from '@wow-two-beta/ui-vue/presentat
 
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
+| `severity` | `Severity` | no | — | Supplies a leading severity glyph. |
 | `icon` | `string` | no | — | The leading icon / avatar. Rich content → the `icon` slot. |
 | `title` | `string` | no | — | The primary title. Rich content → the `title` slot. Supply this or the slot. |
 | `description` | `string` | no | — | The body / description. Rich content → the `description` slot. |
@@ -27,6 +29,7 @@ Public import: `import { NotificationItem } from '@wow-two-beta/ui-vue/presentat
 | Event | Signature | Meaning |
 |---|---|---|
 | `select` | `select: [];` | Fires when the reader activates the row by click, Enter, or Space; binding it makes the row interactive (`role="button"`, `tabindex="0"`). Declared as an emit even though `select` is also a DOM event name — this is a component action rather than the native selection event. A `@select` binding reaches this emit, not the (never-fired-on-a-div) native event. |
+| `delete` | `delete: [];` | Removes a retained notification; renders only when bound. |
 | `dismiss` | `dismiss: [];` | Fires when the reader presses the dismiss button, which renders on hover only when bound. |
 
 ## Slots

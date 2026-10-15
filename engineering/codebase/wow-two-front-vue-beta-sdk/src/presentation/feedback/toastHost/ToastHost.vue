@@ -60,6 +60,8 @@ export interface ToastOptions {
    * Not fired on a dedup-update. For undo cleanup / analytics.
    */
   onDismiss?: () => void;
+  /** Deletes an explicitly retained notification; omitted for transient toasts. */
+  onDelete?: () => void;
   /**
    * Dedup key — a `toast` whose `key` is already showing updates that toast in place,
    * refreshing its timer instead of stacking a duplicate.
@@ -192,37 +194,14 @@ export function useToastHost() {
   };
 }
 
-const PositionClasses: Record<OverlayPosition, string> = {
-  'top-right': 'top-4 right-4 items-end',
-  'top-left': 'top-4 left-4 items-start',
-  'top-center': 'top-4 left-1/2 -translate-x-1/2 items-center',
-  'bottom-right': 'bottom-4 right-4 items-end',
-  'bottom-left': 'bottom-4 left-4 items-start',
-  'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2 items-center',
-};
+const PositionClasses = 'top-4 right-4 items-end';
 
-/**
- * Enter/exit animation per position, gated on `data-state` (set by `Presence`)
- * and `motion-safe:` so reduced-motion users get an instant swap. Corner
- * toasts slide along their horizontal edge; centered toasts slide along the
- * vertical axis they're anchored to. Exit anims are shorter (`--duration-fast`).
- */
-const MotionClasses: Record<OverlayPosition, string> = {
-  'top-right':
-    'motion-safe:data-[state=open]:animate-(--animate-slide-in-right) motion-safe:data-[state=closed]:animate-(--animate-slide-out-right) motion-reduce:animate-none',
-  'top-left':
-    'motion-safe:data-[state=open]:animate-(--animate-slide-in-left) motion-safe:data-[state=closed]:animate-(--animate-slide-out-left) motion-reduce:animate-none',
-  'top-center':
-    'motion-safe:data-[state=open]:animate-(--animate-slide-in-top) motion-safe:data-[state=closed]:animate-(--animate-slide-out-top) motion-reduce:animate-none',
-  'bottom-right':
-    'motion-safe:data-[state=open]:animate-(--animate-slide-in-right) motion-safe:data-[state=closed]:animate-(--animate-slide-out-right) motion-reduce:animate-none',
-  'bottom-left':
-    'motion-safe:data-[state=open]:animate-(--animate-slide-in-left) motion-safe:data-[state=closed]:animate-(--animate-slide-out-left) motion-reduce:animate-none',
-  'bottom-center':
-    'motion-safe:data-[state=open]:animate-(--animate-slide-in-bottom) motion-safe:data-[state=closed]:animate-(--animate-slide-out-bottom) motion-reduce:animate-none',
-};
+/** Toasts enter from the right; reduced-motion users get an instant swap. */
+const MotionClasses =
+  'motion-safe:data-[state=open]:animate-(--animate-slide-in-right) motion-safe:data-[state=closed]:animate-(--animate-slide-out-right) motion-reduce:animate-none';
 
 export interface ToastHostProps {
+  /** @deprecated Toasts always anchor top-right. Accepted for one release, without changing placement. */
   readonly position?: OverlayPosition;
   readonly max?: number;
   /**
@@ -466,7 +445,7 @@ const ToastSeconds = defineComponent({
 defineOptions({ name: 'ToastHost', inheritAttrs: false });
 
 const props = withDefaults(defineProps<ToastHostProps>(), {
-  position: OverlayPositionToken.BottomRight,
+  position: OverlayPositionToken.TopRight,
   max: 5,
   defaultDuration: 5000,
   durations: () => DefaultToastDurations,
@@ -628,16 +607,10 @@ function onFocusout(event: FocusEvent): void {
 }
 
 const stackClasses = computed(() =>
-  cn(
-    'pointer-events-none fixed z-toast flex flex-col',
-    PositionClasses[props.position],
-    attrs.class as string | undefined,
-  ),
+  cn('pointer-events-none fixed z-toast flex flex-col', PositionClasses, attrs.class as string | undefined),
 );
 
-const itemClasses = computed(() =>
-  cn('pointer-events-auto relative w-80 overflow-hidden rounded-md', MotionClasses[props.position]),
-);
+const itemClasses = computed(() => cn('pointer-events-auto relative w-80 overflow-hidden rounded-md', MotionClasses));
 
 /** The display a toast asked for — its own `timer`, its deprecated `progress`, then the host's two. */
 function requestedTimer(t: VisibleToast): ToastTimer {
@@ -689,6 +662,7 @@ const stackStyle = computed(() => ({ gap: `${props.gap}px` }));
             v-else
             :severity="t.severity"
             :show-severity-icon="t.showSeverityIcon ?? props.showSeverityIcon"
+            v-on="t.onDelete ? { delete: t.onDelete } : {}"
             @close="toastHost.dismiss(t.id)"
           >
             <template v-if="t.icon" #icon><ToastNodeView :node="t.icon" /></template>

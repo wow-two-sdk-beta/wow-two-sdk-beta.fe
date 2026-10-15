@@ -8,6 +8,10 @@ Public import: `import { NotificationCenterGroup } from '@wow-two-beta/ui-vue/pr
 
 ## Contract
 
+- Passing an explicit `bus` renders its newest-first retained snapshot, including notices published before mount; no storage, account or network wiring is implied. No `bus` retains the slot-only API.
+- The default list displays severity glyphs, notice copy, custom `action`/`report` content and an accessible icon-only Delete control. Deleting removes retained history and any visible toast through the same bus.
+- A custom default slot replaces bus-rendered rows. An explicit `count` or count slot overrides the retained count.
+- Bus changes and unmounting unsubscribe; reset/dispose clears this bus's rows. Scope identity and reset/disposal belong to the application.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -15,12 +19,15 @@ Public import: `import { NotificationCenterGroup } from '@wow-two-beta/ui-vue/pr
 
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
+| `bus` | `FeedbackBus` | no | — | Explicit in-memory retained-notification scope. |
 | `title` | `string` | no | `'Notifications'` | The header title. Default `"Notifications"`. Rich content → the `title` slot. |
 | `count` | `string \| number` | no | — | The badge / count rendered next to the title. Rich content → the `count` slot. |
 
 ## Emits
 
-None declared.
+| Event | Signature | Meaning |
+|---|---|---|
+| `close` | `close: [];` | Requests closing the containing popover/panel, without deleting retained history. The icon renders when bound. |
 
 ## Slots
 

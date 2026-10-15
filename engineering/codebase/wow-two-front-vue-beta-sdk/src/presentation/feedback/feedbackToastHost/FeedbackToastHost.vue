@@ -34,7 +34,7 @@ function toToastOptions(notice: PublishedNotice): ToastOptions {
 
 <script setup lang="ts">
 import { computed, useAttrs, watch } from 'vue';
-import { feedbackBus } from '../../../feedback';
+import { feedbackBus, NoticeCategory } from '../../../feedback';
 import ToastHost from '../toastHost/ToastHost.vue';
 import { toastHost } from '../toastHost';
 
@@ -63,11 +63,33 @@ watch(
   (current, _previous, onCleanup) => {
     // Client-only, as the effect was: a server render has no viewport to forward into.
     if (typeof document === 'undefined') return;
-    onCleanup(
-      current.subscribe((notice) => {
-        toastHost.toast(toToastOptions(notice));
-      }),
-    );
+    const toastIds = new Map<string, string>();
+    const close = (id: string | null): void => {
+      if (id !== null) {
+        const toastId = toastIds.get(id);
+        if (toastId) toastHost.dismiss(toastId);
+        return;
+      }
+      for (const toastId of [...toastIds.values()]) toastHost.dismiss(toastId);
+    };
+    const unsubscribe = current.subscribe((notice) => {
+      const options: ToastOptions = {
+        ...toToastOptions(notice),
+        onDelete: notice.category === NoticeCategory.Retained ? () => current.remove(notice.id) : undefined,
+        onDismiss: () => {
+          toastIds.delete(notice.id);
+        },
+      };
+      const existing = toastIds.get(notice.id);
+      if (existing) toastHost.update(existing, options);
+      else toastIds.set(notice.id, toastHost.toast(options));
+    });
+    const unsubscribeDismiss = current.subscribeDismiss(close);
+    onCleanup(() => {
+      unsubscribe();
+      unsubscribeDismiss();
+      close(null);
+    });
   },
   { immediate: true },
 );

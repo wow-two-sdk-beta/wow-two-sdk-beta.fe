@@ -1,5 +1,8 @@
 <script lang="ts">
+import type { FeedbackBus } from '../../../feedback';
 export interface NotificationCenterGroupProps {
+  /** Explicit bus to browse; omitted keeps the slot-only presentation contract. */
+  readonly bus?: FeedbackBus;
   /** The header title. Default `"Notifications"`. Rich content → the `title` slot. */
   readonly title?: string;
 
@@ -11,8 +14,22 @@ export interface NotificationCenterGroupProps {
 <script setup lang="ts">
 import { useLocale } from '../../../foundation/i18n';
 import { useLocaleDefaults } from '../../../foundation/i18n';
-import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
-import { Bell } from 'lucide-vue-next';
+import {
+  computed,
+  defineComponent,
+  getCurrentInstance,
+  shallowRef,
+  useAttrs,
+  useSlots,
+  useTemplateRef,
+  watch,
+  type PropType,
+} from 'vue';
+import type { NoticeNode, PublishedNotice } from '../../../feedback';
+import NotificationItem from './NotificationItem.vue';
+import ReportAction from '../../feedback/reportAction/ReportAction.vue';
+import { Bell, X } from 'lucide-vue-next';
+import { Icon } from '../../../foundation/icons';
 import { cn, surfaceVariants } from '../../../foundation/styles';
 import { renderableChildren } from '../../../foundation/primitives';
 
@@ -30,6 +47,12 @@ defineOptions({ name: 'NotificationCenterGroup', inheritAttrs: false });
 
 const componentProps = withDefaults(defineProps<NotificationCenterGroupProps>(), {});
 const props = useLocaleDefaults(componentProps, 'NotificationCenterGroup', { title: 'Notifications' });
+const emit = defineEmits<{
+  /** Requests closing the containing panel; never deletes or clears retained notifications. */
+  close: [];
+}>();
+const instance = getCurrentInstance();
+const hasClose = () => Boolean(instance?.vnode.props?.onClose);
 
 defineSlots<{
   /** The `NotificationItem` children filling the scrolling list. */
@@ -56,7 +79,28 @@ const el = useTemplateRef<HTMLDivElement>('el');
  * time, and `renderableChildren` drops the comment/whitespace vnodes that would
  * otherwise read as content.
  */
-const isEmpty = () => renderableChildren(slots.default?.()).length === 0;
+const notices = shallowRef<ReadonlyArray<PublishedNotice>>([]);
+watch(
+  () => props.bus,
+  (bus, _previous, onCleanup) => {
+    notices.value = bus?.retained() ?? [];
+    if (bus && typeof document !== 'undefined')
+      onCleanup(
+        bus.subscribeRetained((snapshot) => {
+          notices.value = snapshot;
+        }),
+      );
+  },
+  { immediate: true },
+);
+const isEmpty = () => (slots.default ? renderableChildren(slots.default()).length === 0 : notices.value.length === 0);
+const resolvedCount = computed(() => props.count ?? (props.bus ? notices.value.length : undefined));
+
+const NoticeNodeView = defineComponent({
+  name: 'NoticeNodeView',
+  props: { node: { type: [String, Object] as PropType<NoticeNode>, required: true } },
+  setup: (nodeProps) => () => nodeProps.node,
+});
 
 const classes = computed(() =>
   cn('flex w-80 flex-col', surfaceVariants({ variant: 'surface', radius: 'md' }), attrs.class as string | undefined),
@@ -85,13 +129,24 @@ defineExpose({ el });
           <slot name="title">{{ props.title }}</slot>
         </span>
         <span
-          v-if="props.count != null || $slots.count"
+          v-if="resolvedCount != null || $slots.count"
           class="inline-flex items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-5 text-primary-foreground"
         >
-          <slot name="count">{{ props.count }}</slot>
+          <slot name="count">{{ resolvedCount }}</slot>
         </span>
       </div>
-      <slot name="headerActions" />
+      <div v-if="$slots.headerActions || hasClose()" class="flex items-center gap-2">
+        <slot name="headerActions" />
+        <button
+          v-if="hasClose()"
+          type="button"
+          :aria-label="locale.t('NotificationCenterGroup.closeNotifications', undefined, 'Close notifications')"
+          class="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+          @click="emit('close')"
+        >
+          <Icon :icon="X" :size="14" />
+        </button>
+      </div>
     </header>
     <div class="max-h-96 overflow-y-auto py-1">
       <template v-if="isEmpty()">
@@ -104,7 +159,23 @@ defineExpose({ el });
           </div>
         </slot>
       </template>
-      <div v-else class="flex flex-col"><slot /></div>
+      <div v-else class="flex flex-col">
+        <slot>
+          <NotificationItem
+            v-for="notice in notices"
+            :key="notice.id"
+            :severity="notice.tone"
+            @delete="props.bus?.remove(notice.id)"
+          >
+            <template #title><NoticeNodeView :node="notice.title" /></template>
+            <template v-if="notice.description" #description><NoticeNodeView :node="notice.description" /></template>
+            <template v-if="notice.action || notice.report" #actions>
+              <NoticeNodeView v-if="notice.action" :node="notice.action" />
+              <ReportAction v-if="notice.report" :send="notice.report" />
+            </template>
+          </NotificationItem>
+        </slot>
+      </div>
     </div>
     <div v-if="$slots.footer" class="border-t border-border px-3 py-2 text-center text-xs">
       <slot name="footer" />

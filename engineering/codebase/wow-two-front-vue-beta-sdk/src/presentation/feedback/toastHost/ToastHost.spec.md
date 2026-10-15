@@ -10,6 +10,8 @@ Component-only import: `@wow-two-beta/ui-vue/presentation/feedback/toast-host` w
 
 ## Contract
 
+- Toasts always anchor top-right. The deprecated `position` prop remains accepted for one release but does not relocate them.
+- An optional `onDelete` supplies the icon-only Delete control for a retained notice; Close only dismisses its toast.
 - Hover and descendant keyboard focus independently pause expiration; expiration resumes only when both have left.
 - `toastHost.promise` returns the full settlement chain, preserving resolved values and rejected reasons. Content formatter failures reject that returned promise.
 - Dismissal updates subscribers even if an `onDismiss` callback throws; callers still receive that callback error.
@@ -27,7 +29,7 @@ Component-only import: `@wow-two-beta/ui-vue/presentation/feedback/toast-host` w
 
 | Prop               | Type                                           | Required | Default                            | Meaning                                                                                  |
 | ------------------ | ---------------------------------------------- | -------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
-| `position`         | `OverlayPosition`                              | no       | `OverlayPositionToken.BottomRight` | The corner or edge the stack anchors to.                                                 |
+| `position`         | `OverlayPosition`                              | no       | `OverlayPositionToken.TopRight` | The corner or edge the stack anchors to.                                                 |
 | `max`              | `number`                                       | no       | `5`                                | How many toasts show at once; the rest wait in order.                                    |
 | `defaultDuration`  | `number`                                       | no       | `5000`                             | The auto-dismiss delay in ms for a severity missing from `durations`. `Infinity` = none. |
 | `durations`        | `Partial<Record<ToastSeverity, number>>`       | no       | `DefaultToastDurations`            | The auto-dismiss delay per severity; replaces the default table.                         |
@@ -39,7 +41,7 @@ Component-only import: `@wow-two-beta/ui-vue/presentation/feedback/toast-host` w
 
 ## Toast options
 
-`toastHost.toast(options)` and `update(id, patch)` take `ToastOptions`: `title`, `description`, `icon`, `severity`, `duration`, `action`, `report`, `showSeverityIcon`, `content`, `onDismiss`, `key`, `timer`, and the deprecated `progress`.
+`toastHost.toast(options)` and `update(id, patch)` take `ToastOptions`: `title`, `description`, `icon`, `severity`, `duration`, `action`, `report`, `showSeverityIcon`, `content`, `onDismiss`, `onDelete`, `key`, `timer`, and the deprecated `progress`.
 
 ## Emits
 

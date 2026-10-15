@@ -8,6 +8,10 @@ Public import: `import { FeedbackToastHost } from '@wow-two-beta/ui-vue/presenta
 
 ## Contract
 
+- A stable notice `id` updates its existing visible toast and refreshes its timer rather than stacking duplicates.
+- Retained notices expose Delete and Close icons: Delete calls `bus.remove(id)`; Close and expiration only hide the toast.
+- Bus reset/disposal closes this adapter's toasts without dismissing another publisher's toasts. Swapping the bus and unmounting clean up owned subscriptions and toasts, without deleting retained history.
+- Retained history is replayed by `NotificationCenterGroup`, never replayed as a toast on mount.
 - Each notice becomes one toast: `tone` → `severity`, `durationMs` → `duration`, and `title`, `description`, `action` and `report` pass through — a notice carrying `report` shows the one-click Report action.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.

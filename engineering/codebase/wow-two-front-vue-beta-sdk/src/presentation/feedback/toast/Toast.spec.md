@@ -8,6 +8,7 @@ Public import: `import { Toast } from '@wow-two-beta/ui-vue/presentation/feedbac
 
 ## Contract
 
+- Binding `delete` renders an icon-only Delete control with `deleteLabel`; omission hides it. The caller only binds it for retained notices.
 - A non-neutral toast without an `icon` shows its severity's glyph (`SeverityIcons` from `foundation/icons`), coloured with the tone's `-soft-foreground` token, so severity never rests on colour alone. `showSeverityIcon: false` removes it; an `icon` prop or slot replaces it.
 - Slot presence is read on every render, so a host that updates a toast in place may add or drop a title, description, action or trailing adornment.
 - The `trailing` slot sits between the body and the close button — a countdown or a timestamp.
@@ -24,12 +25,14 @@ Public import: `import { Toast } from '@wow-two-beta/ui-vue/presentation/feedbac
 | `description` | `string` | no | — | The body text below the title. Rich content → the `description` slot. |
 | `actions` | `string` | no | — | The action area below the body. Rich content → the `actions` slot. |
 | `closeLabel` | `string` | no | `'Dismiss'` | The accessible label for the close button. Default `"Dismiss"`. |
+| `deleteLabel` | `string` | no | `'Delete notification'` | Accessible label for the Delete control. |
 | `showSeverityIcon` | `boolean` | no | `true` | Shows the severity's own glyph when no `icon` is given; `neutral` has none. |
 
 ## Emits
 
 | Event | Signature | Meaning |
 |---|---|---|
+| `delete` | `delete: [];` | Removes a retained notification when activated. |
 | `close` | `close: [];` | Fires when the close button is activated. |
 
 ## Slots

@@ -6,13 +6,14 @@
 // `ApiError` → danger notice with the problem-details title; the bridge lives HERE so `/query`
 // never depends on the bus. Given a `/reporting` reporter, the bridge captures each reportable
 // failure and puts the incident's one-click send on the notice (`report`). GWDNBM: pure
-// fire-and-forget pub/sub, nothing auto-subscribes, no replay — every wire is explicit opt-in. This
+// transient pub/sub plus explicit retained history; nothing auto-subscribes or persists. This
 // subpath carries NO peer dependency (the `VNode` type, `foundation` and `/reporting` only) and NO
 // UI — mirrors `/auth`'s standalone, presentation-free shape.
 
 // Bus — notice model, hub factory, default singleton
 export {
   NoticeTone,
+  NoticeCategory,
   createFeedbackBus,
   feedbackBus,
   notify,
@@ -20,6 +21,8 @@ export {
   type FeedbackNotice,
   type PublishedNotice,
   type NoticeListener,
+  type RetainedNoticeListener,
+  type NoticeDismissListener,
   type FeedbackBus,
   type FeedbackBusOptions,
   type FeedbackErrorContext,
