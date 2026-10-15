@@ -8,6 +8,11 @@ Public import: `import { MeterBar } from '@wow-two-beta/ui-vue/presentation/feed
 
 ## Contract
 
+- Without `isLabelVisible` the root is the `role="meter"` bar, named by `label`. With it, the root is a column: a
+  row with the label (naming the meter) and the readout — `valueLabel`, else the rounded locale percentage — over
+  the bar; `class` and attributes land on that column.
+- `isLoading` drops the fill, pulses the track, marks the meter `aria-busy` with a loading value text, and shows a
+  skeleton in place of the readout.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -19,7 +24,10 @@ Public import: `import { MeterBar } from '@wow-two-beta/ui-vue/presentation/feed
 | `max` | `number` | no | `100` | Declared by the source contract. |
 | `thresholds` | `[number, number]` | no | — | The threshold values that change the fill tone. Pass `[good, warn]` — `value <= good` → success, `<= warn` → warning, otherwise destructive. Defaults: `[max * 0.7, max * 0.9]`. |
 | `size` | `Size` | no | `SizeToken.Md` | The bar thickness. |
-| `label` | `string` | no | — | Declared by the source contract. |
+| `label` | `string` | no | — | The meter's accessible name; drawn above the bar with `isLabelVisible`. |
+| `isLabelVisible` | `boolean` | no | `false` | Draws the label and readout above the bar. |
+| `valueLabel` | `string` | no | rounded percentage | The readout beside a visible label. |
+| `isLoading` | `boolean` | no | `false` | The value is still loading: no fill, pulsing track, placeholder readout. |
 
 ## Emits
 
@@ -36,4 +44,5 @@ None declared.
 ## Verification
 
 - Public render fixture: [FeedbackExamples.ts](../../../../apps/playground/src/gallery/fixtures/FeedbackExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
+- Focused test references: [StatAndMeter.dom.test.ts](../../../../tests/unit/presentation/display/StatAndMeter.dom.test.ts).
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

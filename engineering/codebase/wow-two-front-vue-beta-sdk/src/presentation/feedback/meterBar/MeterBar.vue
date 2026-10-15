@@ -12,14 +12,27 @@ export interface MeterBarProps {
 
   /** The bar thickness. */
   readonly size?: Size;
+
+  /** The meter's accessible name; drawn above the bar with `isLabelVisible`. */
   readonly label?: string;
+
+  /** Draws `label` above the bar with the readout on its right. Default `false`. */
+  readonly isLabelVisible?: boolean;
+
+  /** The readout beside a visible label, e.g. `6.2 of 10 GB`. Default the rounded percentage. */
+  readonly valueLabel?: string;
+
+  /** The value is still loading: the bar pulses without a fill and the readout is a placeholder. Default `false`. */
+  readonly isLoading?: boolean;
 }
 </script>
 
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn, Size as SizeToken } from '../../../foundation/styles';
-import { useLocale } from '../../../foundation/i18n';
+import { useLocale, useLocaleFormatters } from '../../../foundation/i18n';
+import { useId } from '../../../foundation/identifiers';
+import SkeletonState from '../skeletonState/SkeletonState.vue';
 
 /* Only the sm/md/lg steps carry a thickness; other `Size` members fall through
    to the `md` default at the lookup below. */
@@ -35,7 +48,12 @@ const TrackHeight: Partial<Record<Size, string>> = {
  */
 defineOptions({ name: 'MeterBar', inheritAttrs: false });
 
-const props = withDefaults(defineProps<MeterBarProps>(), { max: 100, size: SizeToken.Md });
+const props = withDefaults(defineProps<MeterBarProps>(), {
+  max: 100,
+  size: SizeToken.Md,
+  isLabelVisible: false,
+  isLoading: false,
+});
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
@@ -61,19 +79,34 @@ const ZoneLabel = {
   critical: () => locale.t('MeterBar.zoneCritical', undefined, 'critical'),
 } as const;
 const valueText = computed(() =>
-  locale.t(
-    'MeterBar.valueText',
-    { percent: Math.round(pct.value), zone: ZoneLabel[zone.value]() },
-    '{percent}%, {zone}',
-  ),
+  props.isLoading
+    ? locale.t('MeterBar.loading', undefined, 'Loading')
+    : locale.t(
+        'MeterBar.valueText',
+        { percent: Math.round(pct.value), zone: ZoneLabel[zone.value]() },
+        '{percent}%, {zone}',
+      ),
 );
 
-const classes = computed(() =>
+const formatters = useLocaleFormatters();
+const readout = computed(
+  () => props.valueLabel ?? formatters.value.percent(pct.value / 100, { maximumFractionDigits: 0 }),
+);
+const labelId = useId();
+
+const trackClasses = computed(() =>
   cn(
     'w-full overflow-hidden rounded-full bg-muted',
     TrackHeight[props.size] ?? TrackHeight.md,
-    attrs.class as string | undefined,
+    props.isLoading && 'animate-pulse motion-reduce:animate-none',
   ),
+);
+
+/* Without a visible label the bar is the root, as before; with one, a column holds the label row and the bar. */
+const classes = computed(() =>
+  props.isLabelVisible
+    ? cn('flex w-full flex-col gap-1.5', attrs.class as string | undefined)
+    : cn(trackClasses.value, attrs.class as string | undefined),
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */
@@ -86,7 +119,32 @@ defineExpose({ el });
 </script>
 
 <template>
+  <div v-if="props.isLabelVisible" ref="el" v-bind="rest" :class="classes">
+    <div class="flex items-center justify-between gap-3 text-xs">
+      <span :id="labelId" class="min-w-0 truncate text-muted-foreground">{{ props.label }}</span>
+      <SkeletonState v-if="props.isLoading" shape="text" class="h-3 w-10" />
+      <span v-else class="shrink-0 font-medium tabular-nums">{{ readout }}</span>
+    </div>
+    <div
+      role="meter"
+      :aria-labelledby="labelId"
+      :aria-valuemin="0"
+      :aria-valuemax="props.max"
+      :aria-valuenow="props.value"
+      :aria-valuetext="valueText"
+      :aria-busy="props.isLoading || undefined"
+      :data-zone="props.isLoading ? undefined : zone"
+      :class="trackClasses"
+    >
+      <div
+        v-if="!props.isLoading"
+        :class="cn('h-full rounded-full transition-[width] duration-300', tone)"
+        :style="{ width: `${pct}%` }"
+      />
+    </div>
+  </div>
   <div
+    v-else
     ref="el"
     role="meter"
     :aria-label="props.label"
@@ -94,10 +152,15 @@ defineExpose({ el });
     :aria-valuemax="props.max"
     :aria-valuenow="props.value"
     :aria-valuetext="valueText"
-    :data-zone="zone"
+    :aria-busy="props.isLoading || undefined"
+    :data-zone="props.isLoading ? undefined : zone"
     v-bind="rest"
     :class="classes"
   >
-    <div :class="cn('h-full rounded-full transition-[width] duration-300', tone)" :style="{ width: `${pct}%` }" />
+    <div
+      v-if="!props.isLoading"
+      :class="cn('h-full rounded-full transition-[width] duration-300', tone)"
+      :style="{ width: `${pct}%` }"
+    />
   </div>
 </template>
