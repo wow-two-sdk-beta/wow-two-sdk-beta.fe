@@ -8,6 +8,8 @@ Public import: `import { SelectPickerTrigger } from '@wow-two-beta/ui-vue/presen
 
 ## Contract
 
+- Size the trigger with `width` / `isFullWidth`, not a width class: a fallthrough `class` lands on the inner
+  button, while the wrapper the clear control is positioned against keeps its own width.
 - Mount within the owner supplying `useSelectContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -17,6 +19,8 @@ Public import: `import { SelectPickerTrigger } from '@wow-two-beta/ui-vue/presen
 |---|---|---|---|---|
 | `size` | `SelectPickerSize` | no | — | The trigger size. |
 | `state` | `InputState` | no | — | The validity surface. |
+| `isFullWidth` | `boolean` | no | `true` | Stretches the trigger across its container; `false` sizes it to its value. |
+| `width` | `SizeValue` | no | — | The trigger width — number = px, string = any CSS length. Wins over `isFullWidth`. |
 
 ## Emits
 

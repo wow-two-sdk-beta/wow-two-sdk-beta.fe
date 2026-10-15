@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { SizeValue } from '../../../foundation/styles';
 import type { InputState } from '../InputStyles';
 import type { SelectPickerSize } from './SelectPicker.variants';
 
@@ -9,6 +10,12 @@ export interface SelectPickerTriggerProps {
 
   /** The validity surface. */
   readonly state?: InputState;
+
+  /** Stretches the trigger across its container. Default `true`; `false` sizes it to its value. */
+  readonly isFullWidth?: boolean;
+
+  /** The trigger width — number = px, string = any CSS length. Wins over `isFullWidth`. */
+  readonly width?: SizeValue;
 }
 
 /** Contains the icon Tailwind classes per trigger size. */
@@ -65,7 +72,7 @@ import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { ChevronDown, Loader2, X } from 'lucide-vue-next';
 import { AriaAttribute } from '../../../foundation/dom';
-import { cn } from '../../../foundation/styles';
+import { cn, CssExtensions } from '../../../foundation/styles';
 import { useTypeahead } from '../../../foundation/selection';
 import { Announce } from '../../../foundation/primitives';
 import { PopoverTrigger } from '../../overlays';
@@ -86,7 +93,7 @@ defineOptions({ name: 'SelectPickerTrigger', inheritAttrs: false });
 /** The trigger content — defaults to `<SelectPickerValue />`. React's `children`. */
 defineSlots<{ default?(): unknown }>();
 
-const props = defineProps<SelectPickerTriggerProps>();
+const props = withDefaults(defineProps<SelectPickerTriggerProps>(), { isFullWidth: true, width: undefined });
 
 const attrs = useAttrs();
 
@@ -163,6 +170,14 @@ const buttonClass = computed(() =>
   cn(selectTriggerVariants({ size: props.size, state: triggerState.value }), attrs.class as ClassValue),
 );
 
+/* The wrapper carries the width: the clear button is positioned against its right edge, so the button fills it. */
+const wrapperClass = computed(() =>
+  cn('relative inline-flex', props.width === undefined && props.isFullWidth ? 'w-full' : 'max-w-full'),
+);
+const wrapperStyle = computed(() =>
+  props.width === undefined ? undefined : { width: CssExtensions.toCss(props.width) },
+);
+
 const root = useTemplateRef<HTMLButtonElement>('root');
 
 /** The rendered `<button>` — the Vue stand-in for the React original's forwarded ref. */
@@ -170,7 +185,7 @@ defineExpose({ el: root });
 </script>
 
 <template>
-  <span class="relative inline-flex w-full">
+  <span :class="wrapperClass" :style="wrapperStyle">
     <!--
       Always-mounted polite live region — swapping content (empty ↔ label) makes SRs announce
       the loading transition. `aria-busy` on the button alone isn't announced.
