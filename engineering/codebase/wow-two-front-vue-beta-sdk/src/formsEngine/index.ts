@@ -40,6 +40,9 @@ export type { StandardSchemaV1 } from './StandardSchema';
 // Server-error path rewrite default — exported so apps can wrap it (`mapFieldPath`)
 export { defaultMapFieldPath } from './SubmitErrors';
 
+// Dialog-hosted forms — a fresh session from the record being edited each time the dialog opens.
+export { useFormDialogSession, type FormDialogSessionOptions } from './UseFormDialogSession';
+
 // Submit-rejection a11y hop — focuses the first `aria-invalid` control after a failed submit.
 // Engine-neutral (reads the FormControlContext-stamped aria, not engine state).
 export { focusFirstInvalid } from './FocusFirstInvalid';
