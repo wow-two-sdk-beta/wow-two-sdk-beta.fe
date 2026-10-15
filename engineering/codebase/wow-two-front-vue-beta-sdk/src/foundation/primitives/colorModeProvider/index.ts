@@ -6,3 +6,4 @@ export {
   ColorModeSystemValue,
   type ColorModeContextValue,
 } from './ColorModeContext';
+export { colorModeScript, ColorModeStorageKey, type ColorModeScriptOptions } from './ColorModeScript';

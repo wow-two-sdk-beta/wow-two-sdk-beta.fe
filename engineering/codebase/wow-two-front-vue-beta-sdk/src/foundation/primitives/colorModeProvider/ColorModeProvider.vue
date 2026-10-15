@@ -51,6 +51,7 @@ export interface ColorModeProviderProps {
 import { inject, onMounted, onScopeDispose, provide, shallowRef, watch } from 'vue';
 import { useMediaQuery } from '../../device';
 import { ColorMode, ColorModeKey, ColorModeSystemValue, type ColorModeContextValue } from './ColorModeContext';
+import { ColorModeStorageKey } from './ColorModeScript';
 
 /**
  * Renders no element of its own — the slot passes straight through — while owning the app's light/dark mode:
@@ -62,7 +63,7 @@ defineOptions({ name: 'ColorModeProvider' });
 
 const props = withDefaults(defineProps<ColorModeProviderProps>(), {
   defaultMode: 'system',
-  storageKey: 'wow-color-mode',
+  storageKey: ColorModeStorageKey,
 });
 
 defineSlots<{
