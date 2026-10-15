@@ -19,3 +19,4 @@ export * from './hooks/UseScrollLock';
 
 export { DomOrderExtensions } from './DomOrderExtensions';
 export { resolveElement } from './ResolveElement';
+export { ScrollRegionAttribute, findScrollRegions } from './ScrollRegion';

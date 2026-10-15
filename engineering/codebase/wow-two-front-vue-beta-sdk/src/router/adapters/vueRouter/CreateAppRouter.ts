@@ -8,7 +8,6 @@ import {
   type RouteRecordRaw,
   type Router,
   type RouterHistory as VueRouterHistory,
-  type RouterScrollBehavior,
 } from 'vue-router';
 
 import { installDocumentMeta } from './DocumentMeta';
@@ -19,6 +18,7 @@ import { installPageViewTracker, type PageView } from './PageViewTracker';
 import type { AppRoute, RouteConfig, RouteGuard } from './RouteConfig';
 import { installRoutePersistence, type RoutePersistenceOptions } from './RoutePersistence';
 import { installRouteNavigating } from './hooks/UseRouteNavigating';
+import { createScrollRestoration } from './ScrollRestoration';
 
 /**
  * vue-router's catch-all. A bare `*` is a hard error here ("Catch all routes must now be defined
@@ -58,7 +58,11 @@ export interface CreateAppRouterOptions {
   /** Overrides the built-in `*` catch-all page. */
   readonly notFound?: Component;
 
-  /** Whether to restore scroll position across navigations. Default `true`. */
+  /**
+   * Whether to restore scroll position across navigations. Default `true`. Covers the window and every
+   * `ScrollRegionAttribute` element, such as the main region of a `region` AppShell: back/forward restores
+   * their offsets, a new navigation returns them to the top.
+   */
   readonly scrollRestoration?: boolean;
 
   /** The document-title suffix (usually the app name) applied on every navigation. */
@@ -140,13 +144,6 @@ function toPath(path: string | undefined, index: boolean | undefined, isRoot: bo
   return isRoot ? '/' : '';
 }
 
-/** Restores the saved position, else honours a hash target, else returns to the top. */
-const houseScrollBehavior: RouterScrollBehavior = (to, _from, savedPosition) => {
-  if (savedPosition) return savedPosition;
-  if (to.hash) return { el: to.hash };
-  return { left: 0, top: 0 };
-};
-
 /** Builds the history the router runs on — memory without a `window`, so SSR never touches `window.location`. */
 function toHistory(options: CreateAppRouterOptions): VueRouterHistory {
   const { basename, history } = options;
@@ -174,11 +171,13 @@ export function createAppRouter(config: RouteConfig, options: CreateAppRouterOpt
   const routes: RouteRecordRaw[] = config.map((route) => toRouteRecord(route, true));
   routes.push({ path: CatchAllPath, component: options.notFound ?? NotFound } as RouteRecordRaw);
 
+  const scroll = (options.scrollRestoration ?? true) ? createScrollRestoration() : undefined;
   const router = createRouter({
     history: toHistory(options),
     routes,
-    scrollBehavior: (options.scrollRestoration ?? true) ? houseScrollBehavior : undefined,
+    scrollBehavior: scroll?.scrollBehavior,
   });
+  scroll?.install(router);
 
   // Eager, so the FIRST navigation is already observable by `<NavigationProgress mode="auto">` —
   // a lazily installed hook would miss it.

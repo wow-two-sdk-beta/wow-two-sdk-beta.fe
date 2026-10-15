@@ -8,6 +8,9 @@ Public import: `import { AppShellMain } from '@wow-two-beta/ui-vue/presentation/
 
 ## Contract
 
+- In a `region` shell the element is the one scroll container and carries `ScrollRegionAttribute`
+  (`data-scroll-region`), so `createAppRouter` restores its offset on back/forward and resets it on a new
+  navigation, as it does the window's.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 

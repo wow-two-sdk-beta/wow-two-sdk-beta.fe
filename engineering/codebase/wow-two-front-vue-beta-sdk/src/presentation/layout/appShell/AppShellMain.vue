@@ -11,6 +11,7 @@ export type AppShellMainProps = Record<string, never>;
 
 <script setup lang="ts">
 import { computed, inject, useAttrs, useTemplateRef } from 'vue';
+import { ScrollRegionAttribute } from '../../../foundation/dom';
 import { cn } from '../../../foundation/styles';
 import { appShellContextKey, AppShellScroll } from './AppShell.vue';
 
@@ -31,12 +32,17 @@ const el = useTemplateRef<HTMLElement>('el');
 /* Optional: a main region rendered outside a shell keeps the document's scrolling. */
 const context = inject(appShellContextKey, null);
 
+const isRegion = computed(() => context?.scroll.value === AppShellScroll.Region);
+
+/* The app router saves, restores and resets a marked region's scroll as it does the window's. */
+const regionAttrs = computed(() => (isRegion.value ? { [ScrollRegionAttribute]: '' } : {}));
+
 /* In a region shell this is the one scroll container; its gutter is reserved so opening a panel never shifts
    the layout sideways. */
 const classes = computed(() =>
   cn(
     'flex flex-col [grid-area:main] focus:outline-hidden',
-    context?.scroll.value === AppShellScroll.Region && 'min-h-0 overflow-y-auto [scrollbar-gutter:stable]',
+    isRegion.value && 'min-h-0 overflow-y-auto [scrollbar-gutter:stable]',
     attrs.class as string | undefined,
   ),
 );
@@ -51,7 +57,7 @@ defineExpose({ el });
 </script>
 
 <template>
-  <main ref="el" id="app-shell-main" tabindex="-1" v-bind="rest" :class="classes">
+  <main ref="el" id="app-shell-main" tabindex="-1" v-bind="{ ...regionAttrs, ...rest }" :class="classes">
     <slot />
   </main>
 </template>
