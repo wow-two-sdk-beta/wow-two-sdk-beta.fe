@@ -35,7 +35,6 @@ const SizeClasses: Record<EmptyStateSize, { wrap: string; iconBox: string }> = {
 <script setup lang="ts">
 import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
-import Heading from '../heading/Heading.vue';
 import Text from '../text/Text.vue';
 
 /** Renders a centred no-results affordance — icon, title, description, actions — from any subset of them. */
@@ -68,10 +67,6 @@ const el = useTemplateRef<HTMLDivElement>('el');
 
 const sizing = computed(() => SizeClasses[props.size]);
 
-const headingSize = computed(() =>
-  props.size === EmptyStateSize.Sm ? 'md' : props.size === EmptyStateSize.Lg ? 'xl' : 'lg',
-);
-
 const textSize = computed(() => (props.size === EmptyStateSize.Lg ? 'md' : 'sm'));
 
 const hasDescription = computed(() => props.description !== undefined || !!slots.description);
@@ -96,9 +91,9 @@ defineExpose({ el });
 <template>
   <div ref="el" v-bind="rest" :class="classes">
     <div v-if="$slots.icon" :class="iconBoxClasses"><slot name="icon" /></div>
-    <Heading :level="3" :size="headingSize">
+    <Text color="muted" :size="textSize">
       <slot name="title">{{ props.title }}</slot>
-    </Heading>
+    </Text>
     <Text v-if="hasDescription" color="muted" :size="textSize">
       <slot name="description">{{ props.description }}</slot>
     </Text>
