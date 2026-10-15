@@ -23,7 +23,7 @@ export interface ComboboxPickerContentProps {
   /** The gap between the input and the panel, in px. */
   readonly offset?: number;
 
-  /** The visual recipe. */
+  /** The visual recipe. Default `raised`. */
   readonly variant?: SurfaceVariant;
 
   /** The color tone the recipe is tinted with. */
@@ -133,7 +133,7 @@ const panelClass = computed(() =>
     'motion-safe:group-data-[state=open]:animate-(--animate-pop-in)',
     'motion-safe:group-data-[state=closed]:animate-(--animate-pop-out) motion-reduce:animate-none',
     surfaceVariants({
-      variant: props.variant,
+      variant: props.variant ?? 'raised',
       tone: props.tone,
       radius: props.radius,
       padding: resolvedPadding.value,

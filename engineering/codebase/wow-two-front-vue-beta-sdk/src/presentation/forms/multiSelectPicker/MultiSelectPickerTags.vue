@@ -74,7 +74,7 @@ const CloseIcon = X;
   </span>
   <span v-else :class="stripClass">
     <!-- `border-border` is load-bearing, not decoration: `bg-muted` resolves to the same
-         color as the trigger's `bg-popover` in several shipped themes (smart-qr among
+         color as the trigger's `bg-field` in several shipped themes (smart-qr among
          them), and a chip with no edge reads as a bare trigger. -->
     <span
       v-for="v in visibleValues"

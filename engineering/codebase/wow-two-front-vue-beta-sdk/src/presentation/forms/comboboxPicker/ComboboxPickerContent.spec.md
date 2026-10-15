@@ -17,7 +17,7 @@ Public import: `import { ComboboxPickerContent } from '@wow-two-beta/ui-vue/pres
 |---|---|---|---|---|
 | `placement` | `Placement` | no | `'bottom'` | The floating placement of the panel. |
 | `offset` | `number` | no | `6` | The gap between the input and the panel, in px. |
-| `variant` | `SurfaceVariant` | no | — | The visual recipe. |
+| `variant` | `SurfaceVariant` | no | `raised` | The visual recipe. |
 | `tone` | `SurfaceTone` | no | — | The color tone the recipe is tinted with. |
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. |
 | `padding` | `SurfacePadding` | no | — | The inner spacing step. Defaults to `xs` (p-1), so items breathe — same as ListboxPicker. |

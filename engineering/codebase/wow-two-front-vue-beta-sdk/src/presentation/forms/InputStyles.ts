@@ -4,7 +4,7 @@
 import { tv, type VariantProps } from '../../foundation/styles';
 
 export const inputBaseVariants = tv({
-  base: 'flex w-full rounded-md bg-popover text-foreground placeholder:text-subtle-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 read-only:bg-muted',
+  base: 'flex w-full rounded-md bg-field text-foreground placeholder:text-subtle-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 read-only:bg-muted',
   variants: {
     size: {
       xs: 'h-7 px-2 text-xs',

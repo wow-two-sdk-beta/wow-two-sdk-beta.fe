@@ -294,7 +294,7 @@ const passthroughAttrs = computed(() =>
 
 const padClass = computed(() =>
   cn(
-    'relative h-40 w-full overflow-hidden rounded-md border bg-popover text-foreground',
+    'relative h-40 w-full overflow-hidden rounded-md border bg-field text-foreground',
     invalid.value ? 'border-destructive-soft-foreground' : 'border-input',
     disabled.value && 'opacity-60',
     readOnly.value && 'bg-muted',

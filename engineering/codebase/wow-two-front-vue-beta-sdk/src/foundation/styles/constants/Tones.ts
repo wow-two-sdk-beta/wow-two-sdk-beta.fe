@@ -11,6 +11,8 @@ export const ToneFamily = {
   Soft: 'soft',
   /** Refers to a popover bg + tone-accent border. */
   Surface: 'surface',
+  /** Refers to a popover bg + a stronger tone border — open menus, listboxes and popovers. */
+  Raised: 'raised',
   /** Refers to a transparent bg, tone border + tone text. */
   Outline: 'outline',
   /** Refers to a translucent tone bg + blur. */
@@ -58,6 +60,19 @@ export const Tones: Record<ToneFamily, Record<Tone, string>> = {
     success: 'border-success/40 bg-popover text-popover-foreground',
     warning: 'border-warning/40 bg-popover text-popover-foreground',
     info: 'border-info/40 bg-popover text-popover-foreground',
+  },
+  /**
+   * Popover bg + a visible tone border. The fill differs from the `field` fill of the inputs an open menu covers
+   * (in dark mode; light mode separates them by border and shadow), and the border reads at ~2:1 where `surface`'s
+   * decorative border fades into a white page.
+   */
+  raised: {
+    neutral: 'border-border-strong/60 bg-popover text-popover-foreground',
+    primary: 'border-primary/60 bg-popover text-popover-foreground',
+    danger: 'border-destructive/60 bg-popover text-popover-foreground',
+    success: 'border-success/60 bg-popover text-popover-foreground',
+    warning: 'border-warning/60 bg-popover text-popover-foreground',
+    info: 'border-info/60 bg-popover text-popover-foreground',
   },
   /**
    * Transparent bg, tone border + tone text.

@@ -1,7 +1,9 @@
 import { tv, type VariantProps } from '../../../foundation/styles';
 
 export const menuVariants = tv({
-  base: 'flex min-w-[8rem] flex-col gap-0.5 rounded-md border border-border bg-popover p-1 text-sm text-popover-foreground shadow-md outline-hidden',
+  /* Layout only: fill, border, radius, padding and shadow come from the surface recipe, so the `variant`, `tone`,
+     `radius`, `padding` and `elevation` props reach the panel. */
+  base: 'flex min-w-[8rem] flex-col gap-0.5 text-sm outline-hidden',
 });
 
 export const menuItemVariants = tv({

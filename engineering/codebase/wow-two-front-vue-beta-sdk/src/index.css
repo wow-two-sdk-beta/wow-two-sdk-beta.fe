@@ -13,7 +13,7 @@
  *   1. RAW SCALES (`--color-brand-*`, `--color-success-*`, …) — full palettes
  *      kept as escape hatches. Use directly when you need a specific shade.
  *   2. SEMANTIC TOKENS (`--color-background`, `--color-primary`, …) — the
- *      24-token surface every atom should consume. These flip in `.dark { }`
+ *      40-token surface every atom should consume. These flip in `.dark { }`
  *      below; consumers can override either layer in their own CSS.
  *
  * Tailwind v4 emits each `--*` here as a CSS variable AND uses it to generate
@@ -87,6 +87,9 @@
   --color-card-foreground: #18181b;
   --color-popover: #ffffff;
   --color-popover-foreground: #18181b;
+  /* Form-field fill (inputs, select and combobox triggers). Kept apart from `popover` so an open menu reads as a
+     raised surface over the fields it covers; dark mode drops fields to the page fill. */
+  --color-field: #ffffff;
   --color-inverse: #18181b;
   --color-inverse-foreground: #fafafa;
 
@@ -200,6 +203,7 @@
   --color-card-foreground: #fafafa;
   --color-popover: #18181b;
   --color-popover-foreground: #fafafa;
+  --color-field: #09090b;
   --color-inverse: #fafafa;
   --color-inverse-foreground: #09090b;
 

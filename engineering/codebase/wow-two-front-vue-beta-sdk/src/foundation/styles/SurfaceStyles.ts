@@ -12,6 +12,8 @@ export const SurfaceVariant = {
   Soft: 'soft',
   /** Refers to an opaque fill + visible border + medium shadow. */
   Surface: 'surface',
+  /** Refers to an opaque popover fill + stronger border + heavy shadow — open menus, listboxes and popovers. */
+  Raised: 'raised',
   /** Refers to a transparent fill + visible border. */
   Outline: 'outline',
   /** Refers to a translucent + blur fill, no border, medium shadow. */
@@ -37,8 +39,11 @@ export const surfaceVariants = tv({
       solid: 'shadow-sm',
       /* Muted/tinted fill, no border, light shadow — chat bubbles, inline groups. */
       soft: 'shadow-sm',
-      /* Opaque fill + visible border + medium shadow — default for popovers/menus. */
+      /* Opaque fill + visible border + medium shadow — cards, panels, toasts. */
       surface: 'border shadow-md',
+      /* Opaque popover fill + stronger border + large shadow — the default for floating menus and popovers, so an
+         open list reads as raised over the form fields it covers. */
+      raised: 'border shadow-lg',
       /* Transparent fill + visible border — static cards, embedded info blocks. */
       outline: 'border bg-transparent',
       /* Translucent + blur, no border, medium shadow — image overlays. */
@@ -118,6 +123,14 @@ export const surfaceVariants = tv({
     { variant: 'surface', tone: 'success', class: Tones.surface.success },
     { variant: 'surface', tone: 'warning', class: Tones.surface.warning },
     { variant: 'surface', tone: 'info', class: Tones.surface.info },
+
+    /* raised — popover bg + stronger tone border. */
+    { variant: 'raised', tone: 'neutral', class: Tones.raised.neutral },
+    { variant: 'raised', tone: 'primary', class: Tones.raised.primary },
+    { variant: 'raised', tone: 'danger', class: Tones.raised.danger },
+    { variant: 'raised', tone: 'success', class: Tones.raised.success },
+    { variant: 'raised', tone: 'warning', class: Tones.raised.warning },
+    { variant: 'raised', tone: 'info', class: Tones.raised.info },
 
     /* outline — transparent fill, tone border + tone text. */
     { variant: 'outline', tone: 'neutral', class: Tones.outline.neutral },

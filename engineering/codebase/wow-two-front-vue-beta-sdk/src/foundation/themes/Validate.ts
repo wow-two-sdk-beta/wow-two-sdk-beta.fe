@@ -43,8 +43,8 @@ export function contrastPairs(): ReadonlyArray<ContrastPair> {
   ];
 
   // Small placeholders and secondary text are text under WCAG 1.4.3, including read-only inputs.
-  // These neutral surfaces host InputStyles, CodeEditor, command inputs and ordinary body text.
-  for (const bg of ['background', 'card', 'popover', 'muted'] as const) {
+  // These neutral surfaces host InputStyles (on `field`), CodeEditor, command inputs and ordinary body text.
+  for (const bg of ['background', 'card', 'popover', 'muted', 'field'] as const) {
     // Required control boundaries and focus indicators (not decorative border tokens).
     for (const fg of ['input', 'border-strong', 'ring'] as const) pairs.push({ fg, bg, min: AaUi });
     for (const fg of ['foreground', 'muted-foreground', 'subtle-foreground'] as const) {

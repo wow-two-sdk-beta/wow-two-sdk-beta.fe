@@ -347,7 +347,7 @@ function optionClass(index: number): string {
           :id="listId"
           role="listbox"
           :aria-label="locale.t('MentionInput.label', undefined, 'Suggestions')"
-          class="max-h-64 min-w-48 max-w-72 overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md"
+          class="max-h-64 min-w-48 max-w-72 overflow-y-auto rounded-md border border-border-strong/60 bg-popover p-1 text-popover-foreground shadow-lg"
         >
           <li
             v-for="(option, index) in suggestions"

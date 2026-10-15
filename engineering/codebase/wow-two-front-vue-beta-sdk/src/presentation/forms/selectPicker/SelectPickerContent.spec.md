@@ -15,7 +15,7 @@ Public import: `import { SelectPickerContent } from '@wow-two-beta/ui-vue/presen
 
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
-| `variant` | `SurfaceVariant` | no | — | The visual recipe. |
+| `variant` | `SurfaceVariant` | no | `raised` (from `PopoverContent`) | The visual recipe. |
 | `tone` | `SurfaceTone` | no | — | The color tone the recipe is tinted with. |
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. |
 | `padding` | `SurfacePadding` | no | — | The inner spacing step. Defaults to `none`. |

@@ -20,7 +20,7 @@ export interface PopoverContentProps {
   /** The bare toggle — skips the surface chrome (bg/border/shadow); keeps only z-index + animation. */
   readonly isBare?: boolean;
 
-  /** The visual recipe. */
+  /** The visual recipe. Default `raised`. */
   readonly variant?: SurfaceVariant;
 
   /** The color tone the recipe is tinted with. */
@@ -81,7 +81,7 @@ const classes = computed(() =>
       cn(
         DefaultWidth,
         surfaceVariants({
-          variant: props.variant,
+          variant: props.variant ?? 'raised',
           tone: props.tone,
           radius: props.radius,
           padding: resolvedPadding.value,

@@ -23,6 +23,7 @@ export const SurfaceTokens = [
   'card-foreground',
   'popover',
   'popover-foreground',
+  'field',
   'muted',
   'muted-foreground',
   'subtle-foreground',
@@ -44,7 +45,7 @@ type ToneFamilyTokens<F extends string> = F extends string ? `${F}${ToneSlotSuff
  * Every semantic token key (the part after `--color-`).
  *
  * = surface/chrome tokens ∪ (each tone family × {base,-foreground,-soft,-soft-foreground}).
- * 15 surface + 6×4 tone = 39 keys total.
+ * 16 surface + 6×4 tone = 40 keys total.
  */
 export type SemanticToken = (typeof SurfaceTokens)[number] | ToneFamilyTokens<ToneFamilyName>;
 

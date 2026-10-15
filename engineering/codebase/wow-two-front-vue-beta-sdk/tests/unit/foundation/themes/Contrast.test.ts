@@ -39,7 +39,7 @@ function ratio(foreground: number[], background: number[]): number {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
-const surfaces = ['background', 'card', 'popover', 'muted'] as const;
+const surfaces = ['background', 'card', 'popover', 'muted', 'field'] as const;
 const tones = ['primary', 'accent', 'destructive', 'info', 'success', 'warning'] as const;
 
 function checkSupportedPairs(set: TokenSet, label: string): void {
@@ -126,13 +126,22 @@ describe('supported text and translucent-surface contrast', () => {
       ...(['light', 'dark'] as const).map((mode) =>
         Object.entries(theme[mode]).filter(
           ([key]) =>
-            key !== 'foreground' && !key.endsWith('-foreground') && !['input', 'border-strong', 'ring'].includes(key),
+            key !== 'foreground' &&
+            !key.endsWith('-foreground') &&
+            !['input', 'border-strong', 'ring', 'field'].includes(key),
         ),
       ),
     ]);
     const hash = createHash('sha256').update(JSON.stringify(palette)).digest('hex');
     // Adding a theme changes this on purpose; re-pin it from the message, never for an edit to an existing theme.
     expect(hash, `palette hash ${hash}`).toBe('7a06a5d03fe50dfc964db157473d5f1248340377d21ac0a05e6133e6209d7ed0');
+  });
+
+  it('derives every field fill from an existing surface: the popover in light mode, the page in dark mode', () => {
+    for (const theme of THEMES) {
+      expect(theme.light.field, theme.id + ' light').toBe(theme.light.popover);
+      expect(theme.dark.field, theme.id + ' dark').toBe(theme.dark.background);
+    }
   });
 
   it('uses independently tested soft foregrounds for every colored glass recipe', () => {

@@ -36,7 +36,7 @@ export interface MenuProps {
   /** The distance between anchor and surface in px. Default 6. */
   readonly offset?: number;
 
-  /** The visual recipe. Default `surface`. */
+  /** The visual recipe. Default `raised`. */
   readonly variant?: SurfaceVariant;
 
   /** The color tone the recipe is tinted with. */
@@ -286,7 +286,7 @@ onScopeDispose(() => {
 const classes = computed(() =>
   cn(
     surfaceVariants({
-      variant: props.variant ?? 'surface',
+      variant: props.variant ?? 'raised',
       tone: props.tone,
       radius: props.radius ?? 'md',
       padding: props.padding ?? 'xs',

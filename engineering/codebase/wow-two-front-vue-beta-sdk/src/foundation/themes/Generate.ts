@@ -7,7 +7,7 @@
  *
  *   1. Neutral ramp  — low-chroma lightness steps, hue/chroma biased by
  *      `neutralTemp`; `surface` widens/narrows the steps. Drives background /
- *      card / popover / muted / border / input / *-foreground.
+ *      card / popover / field / muted / border / input / *-foreground.
  *   2. Primary       — from `primaryHue` at a readable chroma; soft = high-L
  *      low-C tint; foregrounds auto-nudged to clear AA.
  *   3. Accent        — primary hue rotated per `accentMode`.
@@ -176,6 +176,9 @@ function buildMode(
   // card/popover sit one step "in front of" the background.
   const card: Oklch = { l: clampL(cfg.bgL + cfg.surfStep), c: nc, h: nh };
   const popover = card;
+  // Form fields sit below raised panels: the popover fill in light mode, the page fill in dark mode, so an open
+  // menu reads as a lighter surface over the fields it covers.
+  const field = isDark ? background : popover;
   const muted: Oklch = { l: clampL(cfg.bgL + cfg.surfStep * 1.5), c: nc * 1.4, h: nh };
 
   // Borders / input outline — a couple steps further from bg, slightly more chroma.
@@ -228,6 +231,7 @@ function buildMode(
     'card-foreground': oklchToCss(cardFg),
     popover: oklchToCss(popover),
     'popover-foreground': oklchToCss(popoverFg),
+    field: oklchToCss(field),
     muted: oklchToCss(muted),
     'muted-foreground': oklchToCss(mutedFg),
     'subtle-foreground': oklchToCss(subtleFg),

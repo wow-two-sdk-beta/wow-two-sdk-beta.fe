@@ -20,7 +20,7 @@ Public import: `import { Menu } from '@wow-two-beta/ui-vue/presentation/nav';`.
 | `anchor`    | `HTMLElement \| null` | yes      | —                | The element the surface anchors to.                                                           |
 | `placement` | `Placement`           | no       | `'bottom-start'` | The Floating UI placement. Default `bottom-start`.                                            |
 | `offset`    | `number`              | no       | `6`              | The distance between anchor and surface in px. Default 6.                                     |
-| `variant`   | `SurfaceVariant`      | no       | `undefined`      | The visual recipe. Default `surface`.                                                         |
+| `variant`   | `SurfaceVariant`      | no       | `undefined`      | The visual recipe. Default `raised`.                                                          |
 | `tone`      | `SurfaceTone`         | no       | `undefined`      | The color tone the recipe is tinted with.                                                     |
 | `radius`    | `SurfaceRadius`       | no       | `undefined`      | The corner rounding. Default `md`.                                                            |
 | `padding`   | `SurfacePadding`      | no       | `undefined`      | The inner spacing step. Default `xs`.                                                         |

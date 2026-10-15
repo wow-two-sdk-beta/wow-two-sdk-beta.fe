@@ -90,7 +90,7 @@ const classes = computed(() =>
     'motion-safe:data-[state=open]:animate-(--animate-pop-in)',
     'motion-safe:data-[state=closed]:animate-(--animate-pop-out)',
     'motion-reduce:animate-none',
-    surfaceVariants({ variant: 'surface', radius: 'md', padding: 'md' }),
+    surfaceVariants({ variant: 'raised', radius: 'md', padding: 'md' }),
     attrs.class as string | undefined,
   ),
 );
