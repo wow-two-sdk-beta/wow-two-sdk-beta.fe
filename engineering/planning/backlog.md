@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.ui — Backlog
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-15*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -78,7 +78,6 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 
 | Item | Type | Notes |
 |---|---|---|
-| Confirm Firefox passes the Linux CI browser matrix | engineering | Firefox cannot launch on the macOS host; the next hosted run decides |
 | Add focused tests to parts covered only by the render smoke | engineering | 223 SFCs lacked one at the 2026-09-28 scan; re-measure first |
 | Sweep the remaining small convention breaches | engineering | `Avatar`'s 68 raw palette classes, 4 inline `defineProps<{…}>`; re-measure the rest |
 | Ability to make the node editor read-only as a whole | feature | whole-control read-only API and Field adoption |
@@ -94,7 +93,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 |---|---|---|
 | Fix `useDrag` and `usePinch` capturing on press | fix | ListingShelf: taps on controls inside never click |
 | Fix `@vue-ignore` props breaking `strictTemplates` | fix | ListingShelf, Haven (strict-template-friendly components) |
-| Fix `SelectPicker` forcing `w-full` and dropping `class` | fix | ListingShelf |
+| Fix `SelectPicker` dropping `class` | fix | ListingShelf; `0.0.13` added `isFullWidth` and `width` |
 | Fix `SliderInput` lacking `step` and emitting strings | fix | PbnStudio |
 | Fix `Tooltip`'s ref owner under interaction | fix | TNIS on `0.0.7`; re-check at HEAD |
 | Verify `Button` types `onClick` and fires `@press` | fix | Arcade, Hijinx on `0.0.7`; `onClick` typing landed in `0.0.8` |
@@ -103,7 +102,6 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to follow the system colour scheme | feature | ListingShelf, Hijinx (theme-mode helper) |
 | Ability to set page titles and map routes to typed props | feature | ListingShelf |
 | Ability to update the query cache by key prefix | feature | ListingShelf |
-| Ability to keep previous data while `useAppQuery` refetches | feature | Haven |
 | Ability to show a word-level diff | feature | ListingShelf |
 | Ability to fit, select and size nodes in the node editor | feature | ListingShelf: zoom anchors at the corner; `CanvasArea` may take over |
 | Ability to anchor a positioner to a point, not only an element | feature | TNIS: map-point anchors |
@@ -122,6 +120,12 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to spin a wheel and roll dice or coins | feature | Hijinx |
 | Ability to persist a ref over a fault-tolerant storage port | feature | Hijinx |
 | Ability to host a Telegram Mini App | feature | Arcade; extract after a second Mini App |
+| Ability to reach the `RelativeTime` tooltip by keyboard | feature | Wheelhouse; the absolute time shows on hover only |
+| Fix `PageHeaderActions` hydration under server rendering | fix | Renders in place on the server, teleports on the client |
+| Deprecate `useAppQuery`'s `loading` beside `isFirstLoad` | engineering | Wheelhouse; decide across every query hook |
+| Ability to size `SectionHeading` at `text-base` | feature | Wheelhouse panel titles override `[&_h2]` |
+| Ability to size `DescriptionGroup` labels | feature | Wheelhouse overrides `[&_dt]:text-xs` |
+| Ability to lazy-load and contain `Avatar` images | feature | Wheelhouse product icons all load at page open |
 
 ## Vectors
 
@@ -142,6 +146,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 
 | Item | Type | Notes |
 |---|---|---|
+| Sync the root `THEMES.md` with the Vue `field` token | engineering | The Vue contract has 40 tokens; the React doc says 39 |
 | Delete the stale `enum-alignment` decision record | engineering | first confirm its 16-enum registry lives in the wow-two-ws `enums.md` convention |
 
 ## React package
