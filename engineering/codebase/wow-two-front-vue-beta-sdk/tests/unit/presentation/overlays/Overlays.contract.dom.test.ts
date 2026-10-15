@@ -139,6 +139,17 @@ describe('overlays — a11y', () => {
 });
 
 describe('AlertModal actions', () => {
+  it('keeps the default backdrop when no backdrop prop is passed', async () => {
+    const wrapper = mount({
+      render: () => h(AlertModal, { defaultOpen: true }, () => h(AlertModalContent, null, () => 'Discard draft?')),
+    });
+    await nextTick();
+
+    expect(document.body.querySelector('.ui-backdrop-overlay')).not.toBeNull();
+
+    wrapper.unmount();
+  });
+
   it('renders footer actions without close-glyph positioning', async () => {
     const wrapper = mount({
       render: () =>

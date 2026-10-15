@@ -9,6 +9,7 @@ Public import: `import { AlertModalContent } from '@wow-two-beta/ui-vue/presenta
 ## Contract
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
+- Every `ModalContent` prop forwards unchanged; an absent prop keeps `ModalContent`'s default (the backdrop shows).
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

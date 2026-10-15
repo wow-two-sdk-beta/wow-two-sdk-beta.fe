@@ -16,7 +16,12 @@ defineOptions({ name: 'AlertModalContent', inheritAttrs: false });
 /** The panel content — chrome subcomponents and the dialog body. React's `children`. */
 defineSlots<{ default(): unknown }>();
 
-const props = defineProps<AlertModalContentProps>();
+/* Absent booleans stay `undefined`: a cast `false` would forward `showBackdrop: false` and drop the scrim. */
+const props = withDefaults(defineProps<AlertModalContentProps>(), {
+  showBackdrop: undefined,
+  hideBackdrop: undefined,
+  isBlurred: undefined,
+});
 
 const attrs = useAttrs();
 const inner = useTemplateRef<ComponentPublicInstance & { el?: unknown }>('inner');
