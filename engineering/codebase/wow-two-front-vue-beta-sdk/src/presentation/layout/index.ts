@@ -18,6 +18,7 @@ export * from './twoColumnLayout';
 export * from './resizablePanelsLayout';
 export * from './pullToRefreshLayout';
 export * from './appShell';
+export * from './pageHeader';
 export * from './anchorLayout';
 export * from './surfaceLayout';
 export * from './section';

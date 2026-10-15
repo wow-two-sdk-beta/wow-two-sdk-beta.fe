@@ -25,6 +25,8 @@ import {
   HStackLayout,
   InlineLayout,
   Navbar,
+  PageHeader,
+  PageHeaderActions,
   AnchorLayout,
   PullToRefreshLayout,
   ResizablePanel,
@@ -108,6 +110,11 @@ export const layoutExamples: readonly SmokeCase[] = [
   smokeCase('AppShellMain', AppShellMain, {}, { slot: true, wrap: inAppShell }),
 
   smokeCase('AppShellContent', AppShellContent, {}, { slot: true, wrap: inAppShellMain }),
+
+  smokeCase('PageHeader', PageHeader, { title: 'Deployments', description: 'Every release, newest first.' }),
+
+  // Without a mounted header the actions render in place, which is what both render tiers see.
+  smokeCase('PageHeaderActions', PageHeaderActions, {}, { slot: true }),
 
   // No slot probe: the aside is `v-if`d off `isAsideHidden`, which tracks a media query — with no
   // real viewport it is always hidden. Its rendered form belongs to the `browser` tier.

@@ -64,6 +64,9 @@ export interface RouteHandle {
   /** The document title for this route, or a resolver against the active location. */
   readonly title?: string | RouteHandleResolver<string>;
 
+  /** The line `RoutePageHeader` shows under the title, or a resolver; falls back to `meta.description`. */
+  readonly description?: string | RouteHandleResolver<string>;
+
   /** The per-route meta tags (description / og) for the document head, or a resolver against the active location. */
   readonly meta?: RouteMeta | RouteHandleResolver<RouteMeta>;
 

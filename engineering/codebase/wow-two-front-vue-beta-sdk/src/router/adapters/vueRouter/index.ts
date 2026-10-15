@@ -43,6 +43,7 @@ export { installPageViewTracker, type PageView, type PageViewTrackerOptions } fr
 // Components
 export { default as RouteAnnouncer, type RouteAnnouncerProps } from './routeAnnouncer/RouteAnnouncer.vue';
 export { default as NotFound, type NotFoundProps } from './notFound/NotFound.vue';
+export { default as RoutePageHeader, type RoutePageHeaderProps } from './routePageHeader/RoutePageHeader.vue';
 export { default as AppErrorBoundary, type AppErrorBoundaryProps } from './appErrorBoundary/AppErrorBoundary.vue';
 export {
   default as NavigationProgress,

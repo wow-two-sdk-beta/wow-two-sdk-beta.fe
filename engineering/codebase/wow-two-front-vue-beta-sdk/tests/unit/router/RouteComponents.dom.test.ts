@@ -3,7 +3,7 @@ import { defineComponent, h, nextTick } from 'vue';
 import { createMemoryHistory, createRouter, RouterView } from 'vue-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { AppErrorBoundary, RouteAnnouncer } from '@src/router';
+import { AppErrorBoundary, RouteAnnouncer, RoutePageHeader } from '@src/router';
 
 const Blank = { template: '<div />' };
 
@@ -108,5 +108,34 @@ describe('router root components', () => {
     expect(wrapper.text()).toContain('503');
     expect(wrapper.text()).toContain('Preview unavailable');
     expect(wrapper.get('a').attributes('href')).toBe('/codes');
+  });
+
+  it('heads the page with the route title and description, letting props override', async () => {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/', component: Blank, meta: { title: 'Home' } },
+        {
+          path: '/codes/:id',
+          component: Blank,
+          meta: { title: (route: { params: { id?: string } }) => `Code ${route.params.id}`, description: 'One code.' },
+        },
+        { path: '/seo', component: Blank, meta: { title: 'Seo', meta: { description: 'From the head meta.' } } },
+      ],
+    });
+    await router.push('/codes/7');
+    await router.isReady();
+    const wrapper = mount(RoutePageHeader, { global: { plugins: [router] } });
+    expect(wrapper.get('h1').text()).toBe('Code 7');
+    expect(wrapper.text()).toContain('One code.');
+
+    await router.push('/seo');
+    await nextTick();
+    expect(wrapper.get('h1').text()).toBe('Seo');
+    expect(wrapper.text()).toContain('From the head meta.');
+
+    await wrapper.setProps({ title: 'Override' });
+    expect(wrapper.get('h1').text()).toBe('Override');
+    wrapper.unmount();
   });
 });
