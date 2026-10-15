@@ -5,9 +5,9 @@
 </script>
 
 <script setup lang="ts">
-import { computed, useAttrs, useTemplateRef } from 'vue';
+import { computed, provide, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
-import { useTableContext } from './TableContext';
+import { TableSection, TableSectionKey, stackAttribute, stackRole, useTableContext } from './TableContext';
 
 /** Renders the `tbody` of a `Table`, picking up striping and hover from the root. */
 defineOptions({ name: 'TableBody', inheritAttrs: false });
@@ -18,9 +18,11 @@ defineSlots<{ default(): unknown }>();
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLTableSectionElement>('el');
 const table = useTableContext();
+provide(TableSectionKey, TableSection.Body);
 
 const classes = computed(() =>
   cn(
+    'table-stacked:flex table-stacked:flex-col table-stacked:gap-2',
     table.isStriped && '[&>tr:nth-child(even)]:bg-muted/30',
     table.isHoverable && '[&>tr:hover]:bg-muted',
     attrs.class as string | undefined,
@@ -37,7 +39,13 @@ defineExpose({ el });
 </script>
 
 <template>
-  <tbody ref="el" v-bind="rest" :class="classes">
+  <tbody
+    ref="el"
+    :role="stackRole(table, 'rowgroup')"
+    :data-stack="stackAttribute(table)"
+    v-bind="rest"
+    :class="classes"
+  >
     <slot />
   </tbody>
 </template>

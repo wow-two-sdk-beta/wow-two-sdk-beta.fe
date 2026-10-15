@@ -10,6 +10,8 @@ Public import: `import { TableHead } from '@wow-two-beta/ui-vue/presentation/dis
 
 - Under a `Table` with `hasStickyHeader` it pins to the top of the scroll container on an opaque `muted` fill and
   draws its bottom rule as an inset shadow, which stays with it.
+- In a stacked `Table`, below its breakpoint, it is a bordered bar of the header's controls above the cards, still
+  pinned by `hasStickyHeader`; holding no control, it is visually hidden and stays for assistive technology.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 

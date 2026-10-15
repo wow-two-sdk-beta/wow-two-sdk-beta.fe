@@ -9,11 +9,17 @@ Public import: `import { TableHeaderCell } from '@wow-two-beta/ui-vue/presentati
 ## Contract
 
 - Mount within the owner supplying `useTableContext`; a compound part is not an independent root.
+- In a stacked `Table`, below its breakpoint, a head-row cell is an item of the control bar at its own width
+  (`width` styles yield); one holding no control is visually hidden. A body or footer `th` lays out as a `TableCell`,
+  with the same `label`.
+- While stacking it restates `role`: `rowheader` for `scope="row"`, `columnheader` otherwise.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
 
-No declared props.
+| Prop | Type | Required | Default | Meaning |
+|---|---|---|---|---|
+| `label` | `string` | no | — | A body or footer `th`'s stacked label; omit it for the column's header text, `''` for none. |
 
 ## Emits
 

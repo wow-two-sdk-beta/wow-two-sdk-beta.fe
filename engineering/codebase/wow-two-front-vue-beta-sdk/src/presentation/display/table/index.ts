@@ -8,4 +8,4 @@ export { default as TableRow } from './TableRow.vue';
 export { default as TableHeaderCell, type TableHeaderCellProps } from './TableHeaderCell.vue';
 export { default as TableCell, type TableCellProps } from './TableCell.vue';
 export { default as TableCaption } from './TableCaption.vue';
-export { TableDensity, TableRadius, useTableContext, type TableContextValue } from './TableContext';
+export { TableDensity, TablePhoneLayout, TableRadius, useTableContext, type TableContextValue } from './TableContext';

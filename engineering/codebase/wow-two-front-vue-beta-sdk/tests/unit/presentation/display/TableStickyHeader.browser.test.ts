@@ -1,8 +1,18 @@
-import { afterEach, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h, nextTick } from 'vue';
+import { page } from 'vitest/browser';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@src/presentation/display';
 import '@src/index.css';
+
+/* The table layout, from the stack breakpoint up; the stacked bar is covered in `TableStacked.browser.test.ts`. */
+beforeAll(async () => {
+  await page.viewport(1024, 768);
+});
+
+afterAll(async () => {
+  await page.viewport(414, 896);
+});
 
 let wrapper: VueWrapper | null = null;
 afterEach(() => {

@@ -38,6 +38,8 @@ Public import: `import { DataTable } from '@wow-two-beta/ui-vue/presentation/dis
 | `isLoading` | `boolean` | no | `false` | Marks the table busy; an empty table draws skeleton rows instead of the empty state. |
 | `loadingRowCount` | `number` | no | `5` | The skeleton rows drawn while an empty table loads. |
 | `containerClassName` | `string` | no | `undefined` | Classes for the scroll container; a height such as `max-h-96` lets the sticky header pin. |
+| `phoneLayout` | `TablePhoneLayout` | no | `stack` | Below `stackBreakpoint`: `stack` (a card per row) or `scroll` (the table, scrolling sideways). |
+| `stackBreakpoint` | `Breakpoint` | no | `md` | Rows stack into cards below this breakpoint. |
 
 ## Column sorting and row interaction
 
@@ -69,6 +71,17 @@ Regression: `tests/unit/presentation/display/DataTableDepth.dom.test.ts`.
 - Control labels are localized: `DataTable.selectAll`, `.selectRow`, `.selectColumn`, `.expandRow`, `.collapseRow`,
   `.expandColumn`.
 Regression: `tests/unit/presentation/display/DataTableDepth.dom.test.ts`.
+
+## Phones
+
+- Below `stackBreakpoint` each row is a card (the `Table` contract): every value sits beside its column's `header`,
+  set as the cell's `label`, so a server render already carries it.
+- The checkbox and expand cells head their card inline, without a label.
+- Sort buttons and select-all form a bar above the cards, pinned by `hasStickyHeader`; `aria-sort` stays on their
+  header cells, `aria-selected` on the rows.
+- `phoneLayout: 'scroll'` keeps the plain table, scrolling sideways in its container.
+Regression: `tests/unit/presentation/display/TableStacking.dom.test.ts`,
+`tests/unit/presentation/display/TableStacked.browser.test.ts`.
 
 ## Emits
 

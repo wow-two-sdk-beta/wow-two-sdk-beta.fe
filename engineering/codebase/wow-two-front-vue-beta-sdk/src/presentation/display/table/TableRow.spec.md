@@ -9,6 +9,8 @@ Public import: `import { TableRow } from '@wow-two-beta/ui-vue/presentation/disp
 ## Contract
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
+- In a stacked `Table`, below its breakpoint, a body or footer row is a bordered card; the head row is the bar its
+  controls wrap in. While stacking it restates `role="row"`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { SelectionKey, SelectionMode } from '../../../foundation/selection';
-import type { TableDensity } from '../table';
+import type { Breakpoint } from '../../layout/appShell/AppShell.vue';
+import type { TableDensity, TablePhoneLayout } from '../table';
 
 /** Defines the sort order of a DataTable column. */
 export const SortDirection = {
@@ -104,7 +105,19 @@ export interface DataTableProps<T> {
 
   /** Classes for the scroll container — a height such as `max-h-96` lets a sticky header pin. */
   readonly containerClassName?: string;
+
+  /**
+   * The layout below `stackBreakpoint`. Default `stack`: one card per row, each value beside its column's `header`,
+   * with the sort and select-all controls in a bar above. `scroll` keeps the table and scrolls it sideways.
+   */
+  readonly phoneLayout?: TablePhoneLayout;
+
+  /** Rows stack into cards below this breakpoint. Default `md`. */
+  readonly stackBreakpoint?: Breakpoint;
 }
+
+/** @internal A row-control cell when stacked: inline at the head of its card, with no label. */
+const StackedControlClass = 'w-10 table-stacked:inline-flex table-stacked:w-auto';
 
 /** @internal The skeleton rows drawn while an empty table loads, when `loadingRowCount` is not set. */
 const DefaultLoadingRows = 5;
@@ -174,6 +187,8 @@ const props = withDefaults(defineProps<DataTableProps<T>>(), {
   isLoading: false,
   loadingRowCount: DefaultLoadingRows,
   containerClassName: undefined,
+  phoneLayout: undefined,
+  stackBreakpoint: undefined,
 });
 
 const emit = defineEmits<{
@@ -464,6 +479,8 @@ const ExpandButtonClass =
     :is-bare="isBare"
     :container-class-name="containerClassName"
     :has-sticky-header="hasStickyHeader"
+    :phone-layout="phoneLayout"
+    :stack-breakpoint="stackBreakpoint"
     :aria-busy="isLoading || undefined"
   >
     <TableHead>
@@ -506,13 +523,18 @@ const ExpandButtonClass =
       <template v-if="isShowingSkeleton">
         <slot name="loading">
           <TableRow v-for="index in skeletonRows" :key="`skeleton-${index}`" data-skeleton-row>
-            <TableCell v-if="hasExpansion" class="w-10" data-row-control>
+            <TableCell v-if="hasExpansion" :class="StackedControlClass" label="" data-row-control>
               <SkeletonState class="size-4 rounded-sm" />
             </TableCell>
-            <TableCell v-if="hasSelection" class="w-10" data-row-control>
+            <TableCell v-if="hasSelection" :class="StackedControlClass" label="" data-row-control>
               <SkeletonState class="size-4 rounded-sm" />
             </TableCell>
-            <TableCell v-for="(column, position) in columns" :key="column.key" :class="alignClass(column.align)">
+            <TableCell
+              v-for="(column, position) in columns"
+              :key="column.key"
+              :label="String(column.header)"
+              :class="alignClass(column.align)"
+            >
               <SkeletonState shape="text" :class="skeletonLineClass(column.align, index, position)" />
             </TableCell>
           </TableRow>
@@ -520,7 +542,7 @@ const ExpandButtonClass =
       </template>
       <template v-else-if="rows.length === 0">
         <TableRow>
-          <TableCell :colspan="columnCount" class="py-8 text-center text-muted-foreground">
+          <TableCell :colspan="columnCount" label="" class="py-8 text-center text-muted-foreground">
             <slot name="emptyContent">{{ emptyText }}</slot>
           </TableCell>
         </TableRow>
@@ -528,7 +550,7 @@ const ExpandButtonClass =
       <template v-else>
         <template v-for="row in rows" :key="row.key">
           <TableRow v-bind="row.attrs" :class="row.class">
-            <TableCell v-if="hasExpansion" class="w-10" data-row-control>
+            <TableCell v-if="hasExpansion" :class="StackedControlClass" label="" data-row-control>
               <button
                 v-if="row.isExpandable"
                 type="button"
@@ -545,7 +567,13 @@ const ExpandButtonClass =
                 <ChevronRight :class="expandIconClass(row.isExpanded)" />
               </button>
             </TableCell>
-            <TableCell v-if="hasSelection" class="w-10" data-row-control @click.capture="rememberGesture">
+            <TableCell
+              v-if="hasSelection"
+              :class="StackedControlClass"
+              label=""
+              data-row-control
+              @click.capture="rememberGesture"
+            >
               <CheckboxInput
                 size="sm"
                 :model-value="row.isSelected"
@@ -554,14 +582,19 @@ const ExpandButtonClass =
                 @update:model-value="toggleRow(row.key)"
               />
             </TableCell>
-            <TableCell v-for="column in columns" :key="column.key" :class="alignClass(column.align)">
+            <TableCell
+              v-for="column in columns"
+              :key="column.key"
+              :label="String(column.header)"
+              :class="alignClass(column.align)"
+            >
               <slot name="cell" :row="row.row" :column="column" :index="row.index"
                 ><CellContent :value="renderCell(column, row.row, row.index)"
               /></slot>
             </TableCell>
           </TableRow>
           <TableRow v-if="row.isExpandable && row.isExpanded" :id="row.detailId" data-detail-row>
-            <TableCell :colspan="columnCount" class="bg-muted/30">
+            <TableCell :colspan="columnCount" label="" class="bg-muted/30">
               <slot name="expanded" :row="row.row" :index="row.index" />
             </TableCell>
           </TableRow>

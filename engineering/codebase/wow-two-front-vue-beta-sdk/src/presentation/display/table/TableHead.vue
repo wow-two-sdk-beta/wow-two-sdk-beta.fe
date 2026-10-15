@@ -21,9 +21,16 @@ export interface TableHeadProps {
 </script>
 
 <script setup lang="ts">
-import { computed, useAttrs, useTemplateRef } from 'vue';
+import { computed, provide, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
-import { useTableContext } from './TableContext';
+import {
+  StackedPassiveHeaderClass,
+  TableSection,
+  TableSectionKey,
+  stackAttribute,
+  stackRole,
+  useTableContext,
+} from './TableContext';
 
 /** Renders the `thead` section of a `Table`, holding its header row. */
 defineOptions({ name: 'TableHead', inheritAttrs: false });
@@ -39,13 +46,17 @@ const attrs = useAttrs();
 const el = useTemplateRef<HTMLTableSectionElement>('el');
 
 const table = useTableContext();
+provide(TableSectionKey, TableSection.Head);
 
 /* A pinned head paints opaque so rows never show through, and draws its rule as an inset shadow: a collapsed
-   table's borders belong to the table and scroll away with the body. */
+   table's borders belong to the table and scroll away with the body. Stacked, the head becomes a bar of its
+   controls — sort buttons, select-all — above the cards, and leaves only assistive text when it holds none. */
 const classes = computed(() =>
   cn(
     'border-b border-border bg-muted/50',
     table.hasStickyHeader && 'sticky top-0 z-raised bg-muted shadow-[inset_0_-1px_0_var(--color-border)]',
+    'table-stacked:mb-2 table-stacked:block table-stacked:rounded-lg table-stacked:border',
+    StackedPassiveHeaderClass,
     HeadVariant[props.headVariant],
     attrs.class as string | undefined,
   ),
@@ -61,7 +72,13 @@ defineExpose({ el });
 </script>
 
 <template>
-  <thead ref="el" v-bind="rest" :class="classes">
+  <thead
+    ref="el"
+    :role="stackRole(table, 'rowgroup')"
+    :data-stack="stackAttribute(table)"
+    v-bind="rest"
+    :class="classes"
+  >
     <slot />
   </thead>
 </template>

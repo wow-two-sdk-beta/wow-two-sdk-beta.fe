@@ -9,11 +9,16 @@ Public import: `import { TableCell } from '@wow-two-beta/ui-vue/presentation/dis
 ## Contract
 
 - Mount within the owner supplying `useTableContext`; a compound part is not an independent root.
+- In a stacked `Table`, below its breakpoint, the cell is a line of label then value. The label is the column's header
+  text unless `label` is set; `label: ''` shows none. A set `label` renders on the server and carries
+  `data-fixed-label`, which keeps the table from replacing it.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
 
-No declared props.
+| Prop | Type | Required | Default | Meaning |
+|---|---|---|---|---|
+| `label` | `string` | no | — | The stacked label; omit it for the column's header text, `''` for none. |
 
 ## Emits
 

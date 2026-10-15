@@ -6,6 +6,36 @@
 /* Dark mode variant — apply by toggling `.dark` on <html> or <body>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* A `Table` part below its table's stack breakpoint. Every part of a stacking table carries `data-stack` with the
+   breakpoint key, so one variant serves every breakpoint and follows the app's own `@theme` breakpoints. */
+@custom-variant table-stacked {
+  @variant max-sm {
+    &:where([data-stack='sm']) {
+      @slot;
+    }
+  }
+  @variant max-md {
+    &:where([data-stack='md']) {
+      @slot;
+    }
+  }
+  @variant max-lg {
+    &:where([data-stack='lg']) {
+      @slot;
+    }
+  }
+  @variant max-xl {
+    &:where([data-stack='xl']) {
+      @slot;
+    }
+  }
+  @variant max-2xl {
+    &:where([data-stack='2xl']) {
+      @slot;
+    }
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Theme tokens — single source of truth for colors, radii, motion.
  *

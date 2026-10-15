@@ -7,6 +7,7 @@
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { TableSection, stackAttribute, stackRole, useTableContext, useTableSection } from './TableContext';
 
 /** Renders a `tr` in a `Table`; `data-selected` tints it with the selection fill. */
 defineOptions({ name: 'TableRow', inheritAttrs: false });
@@ -16,10 +17,16 @@ defineSlots<{ default(): unknown }>();
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLTableRowElement>('el');
+const table = useTableContext();
+const section = useTableSection();
 
+/* Stacked, a body or footer row is a card; the header row is the bar its controls sit in. */
 const classes = computed(() =>
   cn(
     'border-b border-border last:border-0 transition-colors data-[selected]:bg-primary-soft',
+    section === TableSection.Head
+      ? 'table-stacked:flex table-stacked:flex-wrap table-stacked:items-center table-stacked:gap-1 table-stacked:p-1'
+      : 'table-stacked:block table-stacked:rounded-lg table-stacked:border table-stacked:py-1 table-stacked:last:border',
     attrs.class as string | undefined,
   ),
 );
@@ -34,7 +41,7 @@ defineExpose({ el });
 </script>
 
 <template>
-  <tr ref="el" v-bind="rest" :class="classes">
+  <tr ref="el" :role="stackRole(table, 'row')" :data-stack="stackAttribute(table)" v-bind="rest" :class="classes">
     <slot />
   </tr>
 </template>

@@ -9,6 +9,8 @@ Public import: `import { TableFooter } from '@wow-two-beta/ui-vue/presentation/d
 ## Contract
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
+- In a stacked `Table`, below its breakpoint, its rows follow the body's cards. While stacking it restates
+  `role="rowgroup"`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

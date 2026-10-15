@@ -9,6 +9,8 @@ Public import: `import { TableBody } from '@wow-two-beta/ui-vue/presentation/dis
 ## Contract
 
 - Mount within the owner supplying `useTableContext`; a compound part is not an independent root.
+- In a stacked `Table`, below its breakpoint, it spaces its rows as a column of cards. While stacking it restates
+  `role="rowgroup"`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
