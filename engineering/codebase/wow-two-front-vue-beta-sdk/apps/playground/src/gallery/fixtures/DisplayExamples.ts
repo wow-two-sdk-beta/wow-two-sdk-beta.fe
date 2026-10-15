@@ -1,4 +1,5 @@
 import {
+  RelativeTime,
   LabelText,
   FieldHelperText,
   LegendText,
@@ -227,6 +228,8 @@ export const displayExamples: readonly SmokeCase[] = [
   smokeCase('EmptyState', EmptyState, { title: 'Nothing here' }),
 
   smokeCase('StatCard', StatCard, { label: 'Revenue', value: '1.2k' }),
+
+  smokeCase('RelativeTime', RelativeTime, { value: Date.UTC(2026, 9, 12), now: Date.UTC(2026, 9, 15) }),
 
   smokeCase('SnippetText', SnippetText, { text: 'pnpm add @wow-two-beta/ui-vue' }),
 

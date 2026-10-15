@@ -1,6 +1,7 @@
 export * from './providers/LocaleContext';
 export * from './LocaleFormatters';
 export * from './ExactNumberFormatter';
+export { toRelativeTimeParts, toEpochMs, type RelativeTimeParts } from './RelativeTimeParts';
 
 // `LocaleProvider` and `FormattedRelative` are SFCs, so they need a named re-export rather than a `export *`
 // (a `.vue` module's only meaningful export is its default). The provide/inject half of `LocaleProvider` lives

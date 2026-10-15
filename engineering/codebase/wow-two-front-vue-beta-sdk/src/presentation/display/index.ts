@@ -14,6 +14,7 @@ export * from './card';
 export * from './avatarGroup';
 export * from './emptyState';
 export * from './statCard';
+export * from './relativeTime';
 export * from './snippetText';
 export * from './notificationIndicator';
 export * from './countBadge';
