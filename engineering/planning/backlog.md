@@ -126,6 +126,12 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to size `SectionHeading` at `text-base` | feature | Wheelhouse panel titles override `[&_h2]` |
 | Ability to size `DescriptionGroup` labels | feature | Wheelhouse overrides `[&_dt]:text-xs` |
 | Ability to lazy-load and contain `Avatar` images | feature | Wheelhouse product icons all load at page open |
+| Prove `useFormDialogSession` against a template parent | engineering | Its test parent is a render function that writes boolean props last, so the props-settle bug may pass unseen |
+| Ability to set `retry` per `useAppQuery` | feature | Wheelhouse: a failing vitals snapshot makes 3 requests |
+| Ability to show `MeterBar` as unavailable for a null value | feature | Wheelhouse resource meters |
+| Fix `StatCard` optional props rejecting `undefined` | fix | Breaks under `exactOptionalPropertyTypes` |
+| Fix `SelectPickerValue` showing the raw key without `get-option-label` | fix | Wheelhouse filters showed "all" and "day" |
+| Fix `PageHeader` actions not wrapping on narrow screens | fix | `shrink-0` and no `flex-wrap` |
 
 ## Vectors
 
