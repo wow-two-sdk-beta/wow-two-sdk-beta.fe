@@ -23,6 +23,7 @@ export interface TableHeadProps {
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { useTableContext } from './TableContext';
 
 /** Renders the `thead` section of a `Table`, holding its header row. */
 defineOptions({ name: 'TableHead', inheritAttrs: false });
@@ -37,8 +38,17 @@ const props = withDefaults(defineProps<TableHeadProps>(), {
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLTableSectionElement>('el');
 
+const table = useTableContext();
+
+/* A pinned head paints opaque so rows never show through, and draws its rule as an inset shadow: a collapsed
+   table's borders belong to the table and scroll away with the body. */
 const classes = computed(() =>
-  cn('border-b border-border bg-muted/50', HeadVariant[props.headVariant], attrs.class as string | undefined),
+  cn(
+    'border-b border-border bg-muted/50',
+    table.hasStickyHeader && 'sticky top-0 z-raised bg-muted shadow-[inset_0_-1px_0_var(--color-border)]',
+    HeadVariant[props.headVariant],
+    attrs.class as string | undefined,
+  ),
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */

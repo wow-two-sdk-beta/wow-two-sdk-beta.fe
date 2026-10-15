@@ -8,6 +8,8 @@ Public import: `import { TableHead } from '@wow-two-beta/ui-vue/presentation/dis
 
 ## Contract
 
+- Under a `Table` with `hasStickyHeader` it pins to the top of the scroll container on an opaque `muted` fill and
+  draws its bottom rule as an inset shadow, which stays with it.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 

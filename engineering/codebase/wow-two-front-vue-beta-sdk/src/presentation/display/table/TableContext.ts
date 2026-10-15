@@ -37,6 +37,8 @@ export interface TableContextValue {
   isStriped: boolean;
   isHoverable: boolean;
   density: TableDensity;
+  /** Whether `TableHead` pins itself to the top of the scroll container. */
+  hasStickyHeader: boolean;
 }
 
 export const TableKey: InjectionKey<TableContextValue> = Symbol('wow-two.table');
@@ -50,6 +52,7 @@ export const DefaultTableContext: TableContextValue = {
   isStriped: false,
   isHoverable: false,
   density: TableDensity.Cozy,
+  hasStickyHeader: false,
 };
 
 /** Reads the enclosing `Table` state, falling back to the cozy defaults. */

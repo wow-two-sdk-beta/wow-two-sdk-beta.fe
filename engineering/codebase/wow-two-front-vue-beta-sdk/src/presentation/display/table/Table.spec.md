@@ -21,6 +21,7 @@ Public import: `import { Table } from '@wow-two-beta/ui-vue/presentation/display
 | `isBare` | `boolean` | no | `false` | Declared by the source contract. |
 | `radius` | `TableRadius` | no | `TableRadius.Md` | The corner radius of the scroll wrapper (ignored when `isBare`). |
 | `containerClassName` | `string` | no | `undefined` | Classes for the scroll wrapper (ignored when `isBare`). A fallthrough `class` lands on the inner `<table>`. |
+| `hasStickyHeader` | `boolean` | no | `false` | Pins `TableHead` on an opaque fill while the body scrolls — inside the wrapper (give it a height through `containerClassName`), or the nearest scrolling ancestor when `isBare`. |
 
 ## Emits
 

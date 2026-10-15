@@ -332,8 +332,6 @@ const skeletonRows = computed(() =>
 
 const isShowingSkeleton = computed(() => props.isLoading && rows.value.length === 0);
 
-const headClass = computed(() => cn(props.hasStickyHeader && 'sticky top-0 z-raised bg-muted'));
-
 function cycleSort(columnKey: string): void {
   const active = sort.value;
   if (!active || active.columnKey !== columnKey) {
@@ -451,9 +449,10 @@ const ExpandButtonClass =
     :density="density"
     :is-bare="isBare"
     :container-class-name="containerClassName"
+    :has-sticky-header="hasStickyHeader"
     :aria-busy="isLoading || undefined"
   >
-    <TableHead :class="headClass">
+    <TableHead>
       <TableRow>
         <TableHeaderCell v-if="hasExpansion" class="w-10">
           <span class="sr-only">{{ locale.t('DataTable.expandColumn', undefined, 'Details') }}</span>

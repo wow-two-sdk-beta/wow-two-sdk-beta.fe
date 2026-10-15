@@ -14,6 +14,12 @@ export interface TableProps {
 
   /** Classes for the scroll wrapper (ignored when `isBare`). A fallthrough `class` lands on the inner `<table>`. */
   readonly containerClassName?: string;
+
+  /**
+   * Pins the header row on an opaque fill while the body scrolls under it — inside the wrapper (give it a height
+   * through `containerClassName`), or inside the nearest scrolling ancestor when `isBare`.
+   */
+  readonly hasStickyHeader?: boolean;
 }
 </script>
 
@@ -43,6 +49,7 @@ const props = withDefaults(defineProps<TableProps>(), {
   isBare: false,
   radius: TableRadius.Md,
   containerClassName: undefined,
+  hasStickyHeader: false,
 });
 
 const attrs = useAttrs();
@@ -59,6 +66,9 @@ provide<TableContextValue>(TableKey, {
   },
   get density() {
     return props.density;
+  },
+  get hasStickyHeader() {
+    return props.hasStickyHeader;
   },
 });
 
