@@ -5,6 +5,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@src/presentation/overl
 import { TextInput } from '@src/presentation/forms';
 import '@src/index.css';
 
+// Forced colours replace fills with system colours and drop shadows by design, so there is nothing to compare.
+const isForcedColors = matchMedia('(forced-colors: active)').matches;
+
 let wrapper: VueWrapper | null = null;
 afterEach(() => {
   wrapper?.unmount();
@@ -33,12 +36,12 @@ async function paint(isDark: boolean): Promise<{ field: CSSStyleDeclaration; pan
   return { field: getComputedStyle(field), panel: getComputedStyle(document.querySelector('[role=dialog]')!) };
 }
 
-it('separates an open popover from the fields it covers in dark mode by fill', async () => {
+it.skipIf(isForcedColors)('separates an open popover from the fields it covers in dark mode by fill', async () => {
   const { field, panel } = await paint(true);
   expect(panel.backgroundColor).not.toBe(field.backgroundColor);
 });
 
-it('gives an open popover a visible border and a large shadow in light mode', async () => {
+it.skipIf(isForcedColors)('gives an open popover a visible border and a large shadow in light mode', async () => {
   const { field, panel } = await paint(false);
   expect(panel.borderTopWidth).toBe('1px');
   expect(panel.borderTopColor).not.toBe(field.backgroundColor);

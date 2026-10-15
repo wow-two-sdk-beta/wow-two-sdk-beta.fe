@@ -42,20 +42,20 @@ it('resets the region scroller on a new navigation and restores it on back', asy
   const main = document.querySelector<HTMLElement>('[data-scroll-region]')!;
   expect(main.tagName).toBe('MAIN');
   main.scrollTop = 800;
-  await expect.poll(() => main.scrollTop).toBe(800);
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(800);
 
   await router.push('/b');
   await expect.poll(() => document.querySelector('[data-page=B]') !== null).toBe(true);
-  await expect.poll(() => main.scrollTop).toBe(0);
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(0);
 
   main.scrollTop = 300;
   router.back();
   await expect.poll(() => document.querySelector('[data-page=A]') !== null).toBe(true);
-  await expect.poll(() => main.scrollTop).toBe(800);
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(800);
 
   router.forward();
   await expect.poll(() => document.querySelector('[data-page=B]') !== null).toBe(true);
-  await expect.poll(() => main.scrollTop).toBe(300);
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(300);
 });
 
 it('leaves a document shell unmarked', async () => {

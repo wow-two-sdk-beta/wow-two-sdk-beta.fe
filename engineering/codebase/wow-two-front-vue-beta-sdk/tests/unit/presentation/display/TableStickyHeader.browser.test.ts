@@ -34,7 +34,7 @@ async function mountTable(hasStickyHeader: boolean): Promise<{ head: HTMLElement
 it('pins an opaque header while the body scrolls', async () => {
   const { head, scroller } = await mountTable(true);
   scroller.scrollTop = 200;
-  await expect.poll(() => scroller.scrollTop).toBe(200);
+  await expect.poll(() => Math.round(scroller.scrollTop)).toBe(200);
   expect(Math.round(head.getBoundingClientRect().top)).toBe(Math.round(scroller.getBoundingClientRect().top + 1));
   const opaque = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'bg-muted' }));
   expect(getComputedStyle(head).backgroundColor).toBe(getComputedStyle(opaque).backgroundColor);
@@ -43,6 +43,6 @@ it('pins an opaque header while the body scrolls', async () => {
 it('lets the header scroll away without the option', async () => {
   const { head, scroller } = await mountTable(false);
   scroller.scrollTop = 200;
-  await expect.poll(() => scroller.scrollTop).toBe(200);
+  await expect.poll(() => Math.round(scroller.scrollTop)).toBe(200);
   expect(head.getBoundingClientRect().bottom).toBeLessThan(scroller.getBoundingClientRect().top);
 });
