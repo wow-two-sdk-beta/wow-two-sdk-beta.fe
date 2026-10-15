@@ -1,6 +1,6 @@
 {
   "name": "@wow-two-beta/ui-vue",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Beta-forever Vue 3 UI library for the wow-two ecosystem — the Vue port of @wow-two-beta/ui.",
   "license": "MIT",
   "repository": {
