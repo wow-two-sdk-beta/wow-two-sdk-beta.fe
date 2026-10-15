@@ -64,6 +64,8 @@ Regression: `tests/unit/presentation/display/DataTableDepth.dom.test.ts`.
 - Selected rows carry `aria-selected` and `data-selected`; expand toggles carry `aria-expanded` and `aria-controls`.
 - The sticky header pins inside the table's own scroll container, so give it a height through `containerClassName`.
 - Loading sets `aria-busy` on the table; rows already present stay visible while it refreshes.
+- An empty loading table draws `SkeletonState` cells shaped like its columns: square controls, then text lines of
+  varied length aligned as each column aligns. A surrounding `SkeletonStateGroup` sets their animation.
 - Control labels are localized: `DataTable.selectAll`, `.selectRow`, `.selectColumn`, `.expandRow`, `.collapseRow`,
   `.expandColumn`.
 Regression: `tests/unit/presentation/display/DataTableDepth.dom.test.ts`.

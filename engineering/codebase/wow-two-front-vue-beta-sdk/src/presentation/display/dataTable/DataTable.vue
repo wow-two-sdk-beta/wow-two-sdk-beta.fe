@@ -140,6 +140,7 @@ import {
 import { cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import CheckboxInput from '../../forms/checkboxInput/CheckboxInput.vue';
+import SkeletonState from '../../feedback/skeletonState/SkeletonState.vue';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../table';
 
 /**
@@ -349,6 +350,19 @@ function alignClass(align: DataTableColumn<T>['align']): string {
   return 'text-left';
 }
 
+/** Line lengths a loading cell cycles through, so the placeholder reads as varied text rather than a grid of bars. */
+const SkeletonLineWidths = ['w-3/4', 'w-1/2', 'w-5/6', 'w-2/3'] as const;
+
+/** A loading cell's text line, sitting where the column aligns its content. */
+function skeletonLineClass(align: DataTableColumn<T>['align'], row: number, column: number): string {
+  return cn(
+    'max-w-48',
+    SkeletonLineWidths[(row + column) % SkeletonLineWidths.length],
+    align === DataTableColumnAlign.Right && 'ml-auto',
+    align === DataTableColumnAlign.Center && 'mx-auto',
+  );
+}
+
 const headerCells = computed(() =>
   props.columns.map((column) => {
     const active = sort.value;
@@ -492,8 +506,14 @@ const ExpandButtonClass =
       <template v-if="isShowingSkeleton">
         <slot name="loading">
           <TableRow v-for="index in skeletonRows" :key="`skeleton-${index}`" data-skeleton-row>
-            <TableCell v-for="column in columnCount" :key="column">
-              <span class="block h-4 w-full max-w-48 animate-pulse rounded-sm bg-muted motion-reduce:animate-none" />
+            <TableCell v-if="hasExpansion" class="w-10" data-row-control>
+              <SkeletonState class="size-4 rounded-sm" />
+            </TableCell>
+            <TableCell v-if="hasSelection" class="w-10" data-row-control>
+              <SkeletonState class="size-4 rounded-sm" />
+            </TableCell>
+            <TableCell v-for="(column, position) in columns" :key="column.key" :class="alignClass(column.align)">
+              <SkeletonState shape="text" :class="skeletonLineClass(column.align, index, position)" />
             </TableCell>
           </TableRow>
         </slot>

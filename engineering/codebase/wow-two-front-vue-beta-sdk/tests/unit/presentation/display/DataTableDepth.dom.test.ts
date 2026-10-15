@@ -158,6 +158,30 @@ describe('DataTable expansion, pinning and loading', () => {
     expect(wrapper.element.querySelector('table')!.hasAttribute('aria-busy')).toBe(false);
   });
 
+  it('shapes skeleton cells like their columns', () => {
+    const aligned = [
+      { key: 'name', header: 'Name' },
+      { key: 'age', header: 'Age', align: 'right' },
+    ];
+    const wrapper = mountTable({
+      columns: aligned,
+      data: [],
+      isLoading: true,
+      loadingRowCount: 2,
+      selectionMode: 'multiple',
+    });
+    const rows = wrapper.element.querySelectorAll('[data-skeleton-row]');
+    const cells = [...rows[0]!.querySelectorAll('td')];
+    expect(cells).toHaveLength(3);
+    expect(cells[0]!.hasAttribute('data-row-control')).toBe(true);
+    expect(cells[0]!.querySelector('[aria-hidden=true]')!.className).toContain('size-4');
+    const nameLine = cells[1]!.querySelector('[aria-hidden=true]')!;
+    const ageLine = cells[2]!.querySelector('[aria-hidden=true]')!;
+    expect(nameLine.className).toContain('h-4');
+    expect(ageLine.className).toContain('ml-auto');
+    expect(nameLine.className).not.toBe(rows[1]!.querySelectorAll('td')[1]!.firstElementChild!.className);
+  });
+
   it('localizes the control column labels', () => {
     const wrapper = mount(
       defineComponent({
