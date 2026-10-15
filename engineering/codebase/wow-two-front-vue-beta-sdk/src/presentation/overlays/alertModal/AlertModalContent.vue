@@ -1,16 +1,19 @@
 <script lang="ts">
 import type { ModalContentProps } from '../modal';
 
-/** The prop surface of `AlertModalContent` — identical to `ModalContent`'s. */
+/** The prop surface of `AlertModalContent` — `ModalContent`'s, with `phoneLayout` defaulting to `sheet`. */
 export type AlertModalContentProps = ModalContentProps;
 </script>
 
 <script setup lang="ts">
 import { resolveElement } from '../../../foundation/dom';
 import { computed, useAttrs, useTemplateRef, type ComponentPublicInstance } from 'vue';
-import ModalContent from '../modal/ModalContent.vue';
+import ModalContent, { ModalPhoneLayout } from '../modal/ModalContent.vue';
 
-/** Renders the alert dialog's panel — `ModalContent` verbatim; the alert semantics live on the root. */
+/**
+ * Renders the alert dialog's panel — `ModalContent`, opening as a bottom sheet on phones; the alert semantics live
+ * on the root.
+ */
 defineOptions({ name: 'AlertModalContent', inheritAttrs: false });
 
 /** The panel content — chrome subcomponents and the dialog body. React's `children`. */
@@ -21,6 +24,8 @@ const props = withDefaults(defineProps<AlertModalContentProps>(), {
   showBackdrop: undefined,
   hideBackdrop: undefined,
   isBlurred: undefined,
+  phoneLayout: ModalPhoneLayout.Sheet,
+  showHandle: undefined,
 });
 
 const attrs = useAttrs();

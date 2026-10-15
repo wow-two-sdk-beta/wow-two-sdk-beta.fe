@@ -34,7 +34,8 @@ describe('modal size', () => {
   ])('maps %s to %s', async (size, expected) => {
     const className = await panelClass({ size });
     expect(className).toContain(expected);
-    expect(className.match(/\bmax-w-\S+/g)).toHaveLength(1);
+    /* One step for the card; the phone layout's own `max-sm:` width is not a step. */
+    expect(className.split(/\s+/).filter((name) => name.startsWith('max-w-'))).toHaveLength(1);
   });
 
   it('lets a max-w class override the step', async () => {

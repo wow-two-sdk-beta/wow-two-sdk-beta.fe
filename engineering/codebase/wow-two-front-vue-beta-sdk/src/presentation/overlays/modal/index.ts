@@ -1,6 +1,6 @@
 export { default as Modal, ModalRole, type ModalProps } from './Modal.vue';
 export { default as ModalTrigger, type ModalTriggerProps } from './ModalTrigger.vue';
-export { default as ModalContent, ModalSize, type ModalContentProps } from './ModalContent.vue';
+export { default as ModalContent, ModalPhoneLayout, ModalSize, type ModalContentProps } from './ModalContent.vue';
 
 /*
  * Shared chrome re-exported under the Modal namespace. React attached these as

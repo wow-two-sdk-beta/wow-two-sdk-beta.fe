@@ -1,8 +1,18 @@
-import { afterEach, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h, nextTick } from 'vue';
+import { page } from 'vitest/browser';
 import { Modal, ModalContent, ModalTitle } from '@src/presentation/overlays';
 import '@src/index.css';
+
+/* The card is the layout from `sm` up; phones are covered in `ModalPhone.browser.test.ts`. */
+beforeAll(async () => {
+  await page.viewport(1024, 768);
+});
+
+afterAll(async () => {
+  await page.viewport(414, 896);
+});
 
 let wrapper: VueWrapper | null = null;
 afterEach(() => {

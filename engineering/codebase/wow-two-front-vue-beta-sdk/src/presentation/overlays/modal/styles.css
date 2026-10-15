@@ -31,3 +31,36 @@
   width: 100%;
   max-width: 512px;
 }
+
+/* Below `sm` a fullscreen panel fills the window and a sheet docks to the bottom edge. */
+@media (width < 40rem) {
+  .ui-modal-layer[data-phone-layout='fullscreen'],
+  .ui-modal-layer[data-phone-layout='sheet'] {
+    padding: 0;
+  }
+
+  .ui-modal-layer[data-phone-layout='fullscreen'] {
+    place-items: stretch;
+  }
+
+  .ui-modal-layer[data-phone-layout='sheet'] {
+    place-items: end stretch;
+  }
+
+  .ui-modal-layer:is([data-phone-layout='fullscreen'], [data-phone-layout='sheet']) .ui-modal-frame {
+    justify-items: stretch;
+  }
+
+  .ui-modal-content[data-phone-layout='fullscreen'] {
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .ui-modal-content[data-phone-layout='sheet'] {
+    max-width: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}

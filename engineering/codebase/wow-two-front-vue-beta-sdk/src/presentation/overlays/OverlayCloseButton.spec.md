@@ -9,6 +9,8 @@ Internal implementation: compose through the family’s public exports in [index
 ## Contract
 
 - Mount within the owner supplying `useOverlayChromeContext`; a compound part is not an independent root.
+- The default glyph button sits 1rem from the top-right corner, plus `--ui-overlay-inset-top` where the panel sets it
+  (a fullscreen `ModalContent` on a phone sets the top safe-area inset).
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

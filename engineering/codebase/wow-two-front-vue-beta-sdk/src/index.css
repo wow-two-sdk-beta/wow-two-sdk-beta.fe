@@ -167,6 +167,9 @@
   --animate-slide-out-left: slide-out-left var(--duration-fast) var(--ease-in);
   --animate-slide-in-right: slide-in-right var(--duration-base) var(--ease-out);
   --animate-slide-out-right: slide-out-right var(--duration-fast) var(--ease-in);
+  /* Full-edge rise for a phone dialog; the exit stays on the fast step so the layer's fade still gates unmount. */
+  --animate-sheet-in: sheet-in var(--duration-base) var(--ease-out);
+  --animate-sheet-out: sheet-out var(--duration-fast) var(--ease-in);
 
   /* ---------- Layers (z-index) ----------
    * Semantic stacking tiers. TS const lives in `src/utils/Layers.ts`.
@@ -413,6 +416,18 @@ body {
   to {
     opacity: 0;
     transform: translateX(8px);
+  }
+}
+/* One-sided on purpose: each runs from or to the panel's own transform, so a sheet dragged part-way leaves from
+   where it was let go. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
   }
 }
 
