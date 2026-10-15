@@ -39,6 +39,7 @@ import {
   StickyLayout,
   SurfaceLayout,
   TwoColumnLayout,
+  ListDetailLayout,
   VStackLayout,
   VirtualScrollArea,
   MasonryLayout,
@@ -92,6 +93,8 @@ export const layoutExamples: readonly SmokeCase[] = [
   smokeCase('FrameLayout', FrameLayout, {}, { slot: true }),
 
   smokeCase('TwoColumnLayout', TwoColumnLayout, {}, { slot: true }),
+
+  smokeCase('ListDetailLayout', ListDetailLayout, { isDetailOpen: true, breakpoint: 'md' }),
 
   smokeCase('ResizablePanel', ResizablePanel, {}, { slot: true, wrap: inResizablePanels }),
 

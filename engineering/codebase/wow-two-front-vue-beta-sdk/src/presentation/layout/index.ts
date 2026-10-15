@@ -15,6 +15,7 @@ export * from './inlineLayout';
 export * from './clusterLayout';
 export * from './frameLayout';
 export * from './twoColumnLayout';
+export * from './listDetailLayout';
 export * from './resizablePanelsLayout';
 export * from './pullToRefreshLayout';
 export * from './appShell';
