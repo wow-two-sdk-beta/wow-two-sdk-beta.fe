@@ -144,8 +144,11 @@ defineExpose({ el });
           "
           @click.self="handleOutsideClick"
         >
+          <!-- The layer is the grid item, so it spans the window's width: a shrink-wrapped layer would hold the
+               panel's `w-full` to its content width. It centers the panel in turn. -->
           <FocusScope as-child is-trapped can-loop is-modal>
             <DismissableLayer
+              class="ui-modal-frame grid w-full justify-items-center"
               :is-escape-disabled="!dismissOnEscape"
               is-outside-click-disabled
               :on-escape="handleEscape"

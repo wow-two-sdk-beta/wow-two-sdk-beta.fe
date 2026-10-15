@@ -20,6 +20,12 @@
   padding: 16px;
 }
 
+.ui-modal-frame {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+}
+
 .ui-modal-content {
   position: relative;
   width: 100%;
