@@ -8,8 +8,8 @@ Public import: `import { ModalContent } from '@wow-two-beta/ui-vue/presentation/
 
 ## Contract
 
-- The panel is centered and reaches its `max-w-*` cap whatever its content length; `w-full` resolves against the
-  window, never against the content.
+- `size` picks the max-width step (`ModalSize`, exported beside the component). The panel is centered and reaches
+  that cap whatever its content length: `w-full` resolves against the window, never against the content.
 - The panel caps at the viewport (`100dvh - 2rem`) as a flex column: its `ModalBody` scrolls between a fixed header and footer, and a panel without a body scrolls whole.
 - A modal FocusScope traps/loops focus and owns modal background isolation.
 - Label and description IDs come from the owning Modal root; provide matching title/description parts or explicit accessible attributes.
@@ -23,6 +23,7 @@ Public import: `import { ModalContent } from '@wow-two-beta/ui-vue/presentation/
 | `showBackdrop` | `boolean` | no | `true` | Shows the default backdrop behind the panel. Default `true`.        |
 | `hideBackdrop` | `boolean` | no | — | Deprecated — use `showBackdrop` (inverted); removed next release.   |
 | `isBlurred` | `boolean` | no | — | The backdrop-blur toggle. |
+| `size` | `ModalSize` | no | `md` | The max-width step: `sm` 24rem · `md` 32rem · `lg` 42rem · `xl` 56rem · `full` the window inside its gutter. A `max-w-*` class still overrides it. |
 | `variant` | `SurfaceVariant` | no | — | The visual recipe. Default `elevated`. |
 | `tone` | `SurfaceTone` | no | — | The color tone the recipe is tinted with. |
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. Default `lg`. |

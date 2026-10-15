@@ -7,6 +7,30 @@ import type {
   SurfaceVariant,
 } from '../../../foundation/styles';
 
+/** Defines the max-width step of a `ModalContent` panel. */
+export const ModalSize = {
+  /** Refers to a narrow panel (24rem) — confirmations and short prompts. */
+  Sm: 'sm',
+  /** Refers to the default panel (32rem). */
+  Md: 'md',
+  /** Refers to a wide panel (42rem) — forms with paired fields. */
+  Lg: 'lg',
+  /** Refers to an extra-wide panel (56rem) — tables and multi-column forms. */
+  Xl: 'xl',
+  /** Refers to a panel that spans the window, inside its gutter. */
+  Full: 'full',
+} as const;
+
+export type ModalSize = (typeof ModalSize)[keyof typeof ModalSize];
+
+const ModalSizeClass: Record<ModalSize, string> = {
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+  full: 'max-w-none',
+};
+
 /**
  * Represents the prop surface of `ModalContent`.
  *
@@ -24,6 +48,9 @@ export interface ModalContentProps {
 
   /** The backdrop-blur toggle. */
   readonly isBlurred?: boolean;
+
+  /** The panel's max-width step; a `max-w-*` class still overrides it. Default `md`. */
+  readonly size?: ModalSize;
 
   /** The visual recipe. Default `elevated`. */
   readonly variant?: SurfaceVariant;
@@ -56,7 +83,11 @@ defineOptions({ name: 'ModalContent', inheritAttrs: false });
 /** The panel content — chrome subcomponents and the dialog body. React's `children`. */
 defineSlots<{ default(): unknown }>();
 
-const props = withDefaults(defineProps<ModalContentProps>(), { showBackdrop: undefined, hideBackdrop: undefined });
+const props = withDefaults(defineProps<ModalContentProps>(), {
+  size: 'md',
+  showBackdrop: undefined,
+  hideBackdrop: undefined,
+});
 
 /** `showBackdrop` first, then the inverted deprecated `hideBackdrop`. */
 const hasBackdrop = computed(() => props.showBackdrop ?? !(props.hideBackdrop ?? false));
@@ -82,7 +113,8 @@ provide(overlayChromeContextKey, {
 
 const classes = computed(() =>
   cn(
-    'ui-modal-content relative w-full max-w-lg',
+    'ui-modal-content relative w-full',
+    ModalSizeClass[props.size],
     /* The panel never outgrows the window: it caps at the viewport and its body scrolls under a fixed header and
        footer. A panel without a body part scrolls whole. */
     'flex max-h-[calc(100dvh-2rem)] flex-col overflow-y-auto overscroll-contain',
