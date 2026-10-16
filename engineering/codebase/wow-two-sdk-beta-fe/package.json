@@ -1,16 +1,16 @@
 {
-  "name": "@wow-two-beta/ui-vue",
-  "version": "0.0.17",
-  "description": "Beta-forever Vue 3 UI library for the wow-two ecosystem — the Vue port of @wow-two-beta/ui.",
+  "name": "@wow-two-beta/fe",
+  "version": "0.0.18",
+  "description": "Beta-forever Vue 3 fe sdk for the wow-two ecosystem — components, application adapters and browser capabilities.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wow-two-sdk-beta/wow-two-sdk-beta.ui.git",
+    "url": "git+https://github.com/wow-two-sdk-beta/wow-two-sdk-beta.fe.git",
     "directory": "engineering/codebase/wow-two-sdk-beta-fe"
   },
-  "homepage": "https://github.com/wow-two-sdk-beta/wow-two-sdk-beta.ui#readme",
+  "homepage": "https://github.com/wow-two-sdk-beta/wow-two-sdk-beta.fe#readme",
   "bugs": {
-    "url": "https://github.com/wow-two-sdk-beta/wow-two-sdk-beta.ui/issues"
+    "url": "https://github.com/wow-two-sdk-beta/wow-two-sdk-beta.fe/issues"
   },
   "keywords": [
     "vue",

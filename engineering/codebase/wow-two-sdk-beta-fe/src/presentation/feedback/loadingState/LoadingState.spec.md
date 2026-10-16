@@ -4,7 +4,7 @@ Renders a centered spinner, title, and description filling a whole section or pa
 
 Source: [LoadingState.vue](LoadingState.vue).
 
-Public import: `import { LoadingState } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { LoadingState } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

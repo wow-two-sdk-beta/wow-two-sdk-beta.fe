@@ -4,7 +4,7 @@ Renders a numeric input flanked by minus and plus buttons that step the value by
 
 Source: [NumberInput.vue](NumberInput.vue).
 
-Public import: `import { NumberInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { NumberInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

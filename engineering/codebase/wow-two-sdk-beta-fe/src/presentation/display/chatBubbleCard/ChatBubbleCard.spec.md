@@ -4,7 +4,7 @@ Renders one chat message bubble with author, timestamp, delivery status, and a f
 
 Source: [ChatBubbleCard.vue](ChatBubbleCard.vue).
 
-Public import: `import { ChatBubbleCard } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ChatBubbleCard } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

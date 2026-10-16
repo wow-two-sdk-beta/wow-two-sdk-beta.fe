@@ -4,7 +4,7 @@ Renders a trigger that opens a decade page of years and shows the picked year.
 
 Source: [YearPicker.vue](YearPicker.vue) · shared parts: [PeriodPicker.vue](../PeriodPicker.vue), [PeriodGrid.vue](../PeriodGrid.vue).
 
-Public import: `import { YearPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { YearPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders an `<input type="url">` with `inputmode="url"` and `autocomplete="url"` 
 
 Source: [UrlInput.vue](UrlInput.vue).
 
-Public import: `import { UrlInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { UrlInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

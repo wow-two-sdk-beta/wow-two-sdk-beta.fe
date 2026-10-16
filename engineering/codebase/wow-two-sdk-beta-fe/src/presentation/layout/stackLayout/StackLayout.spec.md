@@ -4,7 +4,7 @@ Renders a vertical (default) or horizontal flex container with gap and alignment
 
 Source: [StackLayout.vue](StackLayout.vue).
 
-Public import: `import { StackLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { StackLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

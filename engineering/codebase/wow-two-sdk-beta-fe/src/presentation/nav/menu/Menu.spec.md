@@ -4,7 +4,7 @@ Renders the anchored, focus-trapped menu surface the arrow keys walk.
 
 Source: [Menu.vue](Menu.vue).
 
-Public import: `import { Menu } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { Menu } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

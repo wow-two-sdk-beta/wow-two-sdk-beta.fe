@@ -4,7 +4,7 @@ Renders a region that pins to the top or bottom edge of its scroll area and repo
 
 Source: [StickyLayout.vue](StickyLayout.vue).
 
-Public import: `import { StickyLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { StickyLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

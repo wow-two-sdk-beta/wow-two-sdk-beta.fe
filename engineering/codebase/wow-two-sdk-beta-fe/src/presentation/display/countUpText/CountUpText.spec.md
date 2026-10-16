@@ -4,7 +4,7 @@ Renders a number that counts up to `to` on mount, or when it first enters the vi
 
 Source: [CountUpText.vue](CountUpText.vue).
 
-Public import: `import { CountUpText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CountUpText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

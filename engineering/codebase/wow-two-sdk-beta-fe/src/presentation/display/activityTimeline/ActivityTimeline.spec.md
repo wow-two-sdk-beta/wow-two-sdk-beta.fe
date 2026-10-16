@@ -4,7 +4,7 @@ Renders an ordered feed of `ActivityItem` rows joined by a connector rail down t
 
 Source: [ActivityTimeline.vue](ActivityTimeline.vue).
 
-Public import: `import { ActivityTimeline } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ActivityTimeline } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

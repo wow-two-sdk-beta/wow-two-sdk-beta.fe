@@ -4,7 +4,7 @@ Renders a three-vertical-bar glyph.
 
 Source: [VerticalBarsGlyph.vue](VerticalBarsGlyph.vue).
 
-Public import: `import { VerticalBarsGlyph } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { VerticalBarsGlyph } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a raised surface that groups content, padded to frame its header, body, 
 
 Source: [Card.vue](Card.vue).
 
-Public import: `import { Card } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Card } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

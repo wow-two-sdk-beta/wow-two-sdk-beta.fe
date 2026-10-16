@@ -4,7 +4,7 @@ Renders the clipping frame and owns the arrow-key seam.
 
 Source: [CarouselViewport.vue](CarouselViewport.vue).
 
-Public import: `import { CarouselViewport } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselViewport } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

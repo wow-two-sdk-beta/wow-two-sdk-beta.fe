@@ -4,7 +4,7 @@ Renders the one-click Report action a failure notice carries — Report → Send
 
 Source: [ReportAction.vue](ReportAction.vue).
 
-Public import: `import { ReportAction } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ReportAction } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

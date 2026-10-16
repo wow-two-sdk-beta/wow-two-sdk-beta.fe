@@ -4,7 +4,7 @@ Renders an onboarding card — title, progress meter, and the checklist rows in 
 
 Source: [OnboardingChecklistCard.vue](OnboardingChecklistCard.vue).
 
-Public import: `import { OnboardingChecklistCard } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { OnboardingChecklistCard } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders two-or-more resizable panes split by draggable separators.
 
 Source: [ResizablePanelsLayout.vue](ResizablePanelsLayout.vue).
 
-Public import: `import { ResizablePanelsLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ResizablePanelsLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a floating action button — a circular, shadowed control pinned to a co
 
 Source: [FabButton.vue](FabButton.vue).
 
-Public import: `import { FabButton } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { FabButton } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a `th` column header in a `Table`, padded to the root density.
 
 Source: [TableHeaderCell.vue](TableHeaderCell.vue).
 
-Public import: `import { TableHeaderCell } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableHeaderCell } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

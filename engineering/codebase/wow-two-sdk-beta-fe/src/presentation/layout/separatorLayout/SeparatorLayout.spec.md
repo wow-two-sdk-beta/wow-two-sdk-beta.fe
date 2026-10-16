@@ -4,7 +4,7 @@ Renders a hairline divider, horizontal by default or vertical for column splits.
 
 Source: [SeparatorLayout.vue](SeparatorLayout.vue).
 
-Public import: `import { SeparatorLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { SeparatorLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

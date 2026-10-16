@@ -4,7 +4,7 @@ Renders a selectable leaf of a `TreeViewer`.
 
 Source: [TreeViewerItem.vue](TreeViewerItem.vue).
 
-Public import: `import { TreeViewerItem } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TreeViewerItem } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

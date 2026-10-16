@@ -17,13 +17,13 @@ export default defineConfig({
   resolve: {
     alias: libSourceAliases(libRoot, [
       {
-        find: '@wow-two-beta/ui-vue/styles.css',
+        find: '@wow-two-beta/fe/styles.css',
         replacement: path.resolve(libRoot, 'src/index.css'),
       },
       { find: /^@src\//, replacement: `${path.resolve(libRoot, 'src')}/` },
     ]),
   },
   optimizeDeps: {
-    exclude: ['@wow-two-beta/ui-vue'],
+    exclude: ['@wow-two-beta/fe'],
   },
 });

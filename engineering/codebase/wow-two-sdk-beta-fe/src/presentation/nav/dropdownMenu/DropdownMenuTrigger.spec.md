@@ -4,7 +4,7 @@ Renders the button that toggles the enclosing `DropdownMenu` and anchors its pan
 
 Source: [DropdownMenuTrigger.vue](DropdownMenuTrigger.vue).
 
-Public import: `import { DropdownMenuTrigger } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { DropdownMenuTrigger } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

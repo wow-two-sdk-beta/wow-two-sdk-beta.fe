@@ -4,7 +4,7 @@ Renders N-of-M progress dots or pills joined by connectors, horizontally or vert
 
 Source: [ProgressStepsIndicator.vue](ProgressStepsIndicator.vue).
 
-Public import: `import { ProgressStepsIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ProgressStepsIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

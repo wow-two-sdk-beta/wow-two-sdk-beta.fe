@@ -4,7 +4,7 @@ Renders an app's first-load screen: the product logo centred above a slim progre
 
 Source: [SplashScreen.vue](SplashScreen.vue).
 
-Public import: `import { SplashScreen } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { SplashScreen } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

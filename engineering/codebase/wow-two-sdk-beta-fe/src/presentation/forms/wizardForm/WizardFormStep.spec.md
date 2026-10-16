@@ -4,7 +4,7 @@ Renders one wizard panel while its step is active, registering the step's metada
 
 Source: [WizardFormStep.vue](WizardFormStep.vue).
 
-Public import: `import { WizardFormStep } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { WizardFormStep } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

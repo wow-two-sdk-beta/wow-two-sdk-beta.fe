@@ -4,7 +4,7 @@ Renders the panel of one tab, mounted only while that tab is active.
 
 Source: [TabsGroupPanel.vue](TabsGroupPanel.vue).
 
-Public import: `import { TabsGroupPanel } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TabsGroupPanel } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

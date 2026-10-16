@@ -4,7 +4,7 @@ Renders a labelled `role="group"` band of menu items.
 
 Source: [MenuGroup.vue](MenuGroup.vue).
 
-Public import: `import { MenuGroup } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuGroup } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a search field with a leading magnifier and an optional clear button ins
 
 Source: [SearchInput.vue](SearchInput.vue).
 
-Public import: `import { SearchInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SearchInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

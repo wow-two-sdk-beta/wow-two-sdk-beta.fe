@@ -4,7 +4,7 @@ Renders a checkbox, its right-side label and an optional description in one clic
 
 Source: [CheckboxField.vue](CheckboxField.vue).
 
-Public import: `import { CheckboxField } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CheckboxField } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

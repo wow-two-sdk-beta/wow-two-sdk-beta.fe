@@ -4,7 +4,7 @@ Renders a single day of a multi-resource schedule — one row per resource acros
 
 Source: [ScheduleView.vue](ScheduleView.vue).
 
-Public import: `import { ScheduleView } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ScheduleView } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

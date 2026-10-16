@@ -4,7 +4,7 @@ Renders a thin rule between content — plain on a stated axis, or horizontal wi
 
 Source: [DividerLayout.vue](DividerLayout.vue).
 
-Public import: `import { DividerLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { DividerLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a styled trigger button over a visually-hidden native `<input type="file
 
 Source: [FilePicker.vue](FilePicker.vue).
 
-Public import: `import { FilePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { FilePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

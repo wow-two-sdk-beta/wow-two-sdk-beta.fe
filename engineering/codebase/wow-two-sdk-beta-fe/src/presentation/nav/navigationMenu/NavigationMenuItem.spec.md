@@ -4,7 +4,7 @@ Renders one `<li>` of the strip, pairing a trigger or link with its content pane
 
 Source: [NavigationMenuItem.vue](NavigationMenuItem.vue).
 
-Public import: `import { NavigationMenuItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavigationMenuItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

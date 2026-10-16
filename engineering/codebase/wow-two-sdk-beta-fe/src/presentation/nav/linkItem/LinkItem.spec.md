@@ -4,7 +4,7 @@ Renders a styled anchor with consistent focus and hover treatment, or lends its 
 
 Source: [LinkItem.vue](LinkItem.vue).
 
-Public import: `import { LinkItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { LinkItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

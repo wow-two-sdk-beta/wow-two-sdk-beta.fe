@@ -4,7 +4,7 @@ Renders a page's identity — title, description and actions — with an outlet 
 
 Source: [PageHeader.vue](PageHeader.vue).
 
-Public import: `import { PageHeader } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { PageHeader } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

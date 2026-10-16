@@ -4,7 +4,7 @@ Renders a markdown pane, a formatting toolbar and a sanitized live preview, in s
 
 Source: [MarkdownEditor.vue](MarkdownEditor.vue).
 
-Public import: `import { MarkdownEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MarkdownEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

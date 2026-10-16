@@ -4,7 +4,7 @@ Renders the carousel root that owns the index, the slide count, and the auto-pla
 
 Source: [Carousel.vue](Carousel.vue).
 
-Public import: `import { Carousel } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Carousel } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

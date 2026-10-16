@@ -4,7 +4,7 @@ Renders a semantic `<mark>` tint over text — search matches, "you mentioned th
 
 Source: [MarkText.vue](MarkText.vue).
 
-Public import: `import { MarkText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { MarkText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

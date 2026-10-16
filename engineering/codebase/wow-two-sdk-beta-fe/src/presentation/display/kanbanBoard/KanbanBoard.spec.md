@@ -4,7 +4,7 @@ Renders a board of columns whose cards move by drag and drop or by Alt with the 
 
 Source: [KanbanBoard.vue](KanbanBoard.vue) · [KanbanColumn.vue](KanbanColumn.vue) · [KanbanCard.vue](KanbanCard.vue) · [KanbanBoardContext.ts](KanbanBoardContext.ts).
 
-Public import: `import { KanbanBoard, KanbanColumn, KanbanCard, type KanbanMove } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { KanbanBoard, KanbanColumn, KanbanCard, type KanbanMove } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

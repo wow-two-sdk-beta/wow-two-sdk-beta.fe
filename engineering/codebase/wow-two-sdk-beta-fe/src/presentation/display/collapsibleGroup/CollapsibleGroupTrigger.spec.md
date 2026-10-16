@@ -4,7 +4,7 @@ Renders the disclosure toggle, owning `aria-expanded` and `aria-controls` for it
 
 Source: [CollapsibleGroupTrigger.vue](CollapsibleGroupTrigger.vue).
 
-Public import: `import { CollapsibleGroupTrigger } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CollapsibleGroupTrigger } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

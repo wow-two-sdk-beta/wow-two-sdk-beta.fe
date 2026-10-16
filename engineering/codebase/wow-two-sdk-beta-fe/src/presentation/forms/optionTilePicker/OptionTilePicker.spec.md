@@ -4,7 +4,7 @@ Renders one square, icon-only tile of a single-select preset grid, washed with t
 
 Source: [OptionTilePicker.vue](OptionTilePicker.vue).
 
-Public import: `import { OptionTilePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { OptionTilePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

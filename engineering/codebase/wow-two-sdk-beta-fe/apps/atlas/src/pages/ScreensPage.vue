@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue';
-import { Density } from '@wow-two-beta/ui-vue/foundation/styles';
+import { Density } from '@wow-two-beta/fe/foundation/styles';
 import { ArrowRight } from 'lucide-vue-next';
 import { findArchetype } from '../content/layouts';
 import { Screens, findScreen } from '../content/screens';

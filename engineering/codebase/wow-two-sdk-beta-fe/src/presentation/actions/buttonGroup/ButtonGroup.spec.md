@@ -4,7 +4,7 @@ Renders a row or column of related buttons, collapsing their inner radii into on
 
 Source: [ButtonGroup.vue](ButtonGroup.vue).
 
-Public import: `import { ButtonGroup } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { ButtonGroup } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

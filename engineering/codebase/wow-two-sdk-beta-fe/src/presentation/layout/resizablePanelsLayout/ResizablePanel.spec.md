@@ -4,7 +4,7 @@ Renders one pane of a `<ResizablePanelsLayout>` group.
 
 Source: [ResizablePanel.vue](ResizablePanel.vue).
 
-Public import: `import { ResizablePanel } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ResizablePanel } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

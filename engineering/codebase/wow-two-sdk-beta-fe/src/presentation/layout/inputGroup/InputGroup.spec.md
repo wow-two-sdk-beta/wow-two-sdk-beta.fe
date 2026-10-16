@@ -4,7 +4,7 @@ Renders a row or column of inputs as one connected control, collapsing the radii
 
 Source: [InputGroup.vue](InputGroup.vue).
 
-Public import: `import { InputGroup } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { InputGroup } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

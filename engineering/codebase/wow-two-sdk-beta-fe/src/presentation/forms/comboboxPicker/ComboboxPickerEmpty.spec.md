@@ -4,7 +4,7 @@ Renders the no-matches message as a disabled option row, perceivable to AT but s
 
 Source: [ComboboxPickerEmpty.vue](ComboboxPickerEmpty.vue).
 
-Public import: `import { ComboboxPickerEmpty } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPickerEmpty } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

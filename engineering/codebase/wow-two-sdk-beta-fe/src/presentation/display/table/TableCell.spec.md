@@ -4,7 +4,7 @@ Renders a `td` in a `Table`, padded to the root density.
 
 Source: [TableCell.vue](TableCell.vue).
 
-Public import: `import { TableCell } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableCell } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

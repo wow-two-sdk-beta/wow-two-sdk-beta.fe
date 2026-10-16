@@ -4,7 +4,7 @@ Renders a CSS grid container with column and gap variants.
 
 Source: [Grid.vue](Grid.vue).
 
-Public import: `import { Grid } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { Grid } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

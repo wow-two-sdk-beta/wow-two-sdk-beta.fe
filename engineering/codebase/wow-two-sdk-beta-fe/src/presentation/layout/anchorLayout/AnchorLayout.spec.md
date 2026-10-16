@@ -4,7 +4,7 @@ Renders a positioned overlay anchored to its nearest positioned ancestor — for
 
 Source: [AnchorLayout.vue](AnchorLayout.vue).
 
-Public import: `import { AnchorLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AnchorLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

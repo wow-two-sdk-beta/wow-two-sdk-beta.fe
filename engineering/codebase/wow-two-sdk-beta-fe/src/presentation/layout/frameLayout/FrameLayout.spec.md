@@ -4,7 +4,7 @@ Renders a bordered shell with padding and radius — `Card` without slot semanti
 
 Source: [FrameLayout.vue](FrameLayout.vue).
 
-Public import: `import { FrameLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { FrameLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

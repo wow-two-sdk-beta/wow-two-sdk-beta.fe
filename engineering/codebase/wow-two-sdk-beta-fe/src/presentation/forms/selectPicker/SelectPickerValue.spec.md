@@ -4,7 +4,7 @@ Renders the selected item's label inside the trigger, or the placeholder while n
 
 Source: [SelectPickerValue.vue](SelectPickerValue.vue).
 
-Public import: `import { SelectPickerValue } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SelectPickerValue } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

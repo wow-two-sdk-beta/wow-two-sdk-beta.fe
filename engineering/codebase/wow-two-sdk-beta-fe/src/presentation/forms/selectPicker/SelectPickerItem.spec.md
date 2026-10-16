@@ -4,7 +4,7 @@ Renders one selectable option row, hidden while it misses the panel's search que
 
 Source: [SelectPickerItem.vue](SelectPickerItem.vue).
 
-Public import: `import { SelectPickerItem } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SelectPickerItem } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

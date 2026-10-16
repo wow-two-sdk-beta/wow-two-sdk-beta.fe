@@ -4,7 +4,7 @@ Renders a linear trail of links and separators marking where the reader stands.
 
 Source: [Breadcrumb.vue](Breadcrumb.vue).
 
-Public import: `import { Breadcrumb } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { Breadcrumb } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

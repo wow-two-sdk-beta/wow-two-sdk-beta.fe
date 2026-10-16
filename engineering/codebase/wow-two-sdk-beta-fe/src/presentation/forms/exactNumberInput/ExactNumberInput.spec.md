@@ -1,7 +1,7 @@
 # ExactNumberInput
 
 Text editing for exact decimal values without native-number conversion.
-Public import: `import { ExactNumberInput } from '@wow-two-beta/ui-vue/presentation/forms'`.
+Public import: `import { ExactNumberInput } from '@wow-two-beta/fe/presentation/forms'`.
 Source: [ExactNumberInput.vue](ExactNumberInput.vue).
 
 ## Model and draft

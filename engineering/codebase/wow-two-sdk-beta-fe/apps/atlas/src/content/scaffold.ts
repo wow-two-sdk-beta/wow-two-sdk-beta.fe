@@ -371,7 +371,7 @@ export function scaffold(spec: LayoutSpec): string {
   }
   const imports = [...byGroup.entries()]
     .sort(([a], [b2]) => a.localeCompare(b2))
-    .map(([group, names]) => `import { ${names.join(', ')} } from '@wow-two-beta/ui-vue/presentation/${group}';`);
+    .map(([group, names]) => `import { ${names.join(', ')} } from '@wow-two-beta/fe/presentation/${group}';`);
 
   const needsRef = [...b.state].some((line) => line.includes('ref('));
   const needsReactive = [...b.state].some((line) => line.includes('reactive('));

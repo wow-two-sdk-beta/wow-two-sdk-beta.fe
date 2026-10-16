@@ -4,7 +4,7 @@ Renders the control that opens the enclosing `Drawer` and takes focus back on cl
 
 Source: [DrawerTrigger.vue](DrawerTrigger.vue).
 
-Public import: `import { DrawerTrigger } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { DrawerTrigger } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

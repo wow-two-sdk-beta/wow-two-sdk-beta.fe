@@ -4,7 +4,7 @@ Renders a `NumberInput` behind a leading currency symbol; the typed value stays 
 
 Source: [CurrencyInput.vue](CurrencyInput.vue).
 
-Public import: `import { CurrencyInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CurrencyInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

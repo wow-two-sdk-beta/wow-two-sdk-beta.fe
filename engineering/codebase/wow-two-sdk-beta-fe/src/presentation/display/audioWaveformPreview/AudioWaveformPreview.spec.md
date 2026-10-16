@@ -4,7 +4,7 @@ Renders an SVG bar waveform from per-bin `peaks` amplitudes, seekable by click a
 
 Source: [AudioWaveformPreview.vue](AudioWaveformPreview.vue).
 
-Public import: `import { AudioWaveformPreview } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AudioWaveformPreview } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

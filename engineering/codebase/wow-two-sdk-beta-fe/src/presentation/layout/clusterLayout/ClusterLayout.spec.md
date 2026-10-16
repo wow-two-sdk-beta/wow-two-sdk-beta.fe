@@ -4,7 +4,7 @@ Renders a centered wrapping row — for auth-page action clusters, hero CTAs, fo
 
 Source: [ClusterLayout.vue](ClusterLayout.vue).
 
-Public import: `import { ClusterLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ClusterLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

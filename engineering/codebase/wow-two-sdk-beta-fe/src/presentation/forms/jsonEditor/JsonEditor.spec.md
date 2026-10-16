@@ -4,7 +4,7 @@ Renders a JSON document as an inline-editable tree or as raw text, switched by a
 
 Source: [JsonEditor.vue](JsonEditor.vue).
 
-Public import: `import { JsonEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { JsonEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

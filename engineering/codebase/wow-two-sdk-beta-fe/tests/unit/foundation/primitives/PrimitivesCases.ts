@@ -25,7 +25,7 @@ import { smokeCase, type SmokeCase } from '../../../support/Smoke';
 const inPositioner = (node: VNode): VNode => h(AnchoredPositioner, { anchor: null }, () => node);
 
 /**
- * Every component `@wow-two-beta/ui-vue/foundation/primitives` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/foundation/primitives` exports, as smoke cases.
  *
  * This is the L2 headless layer every presentation component composes over, so a primitive that
  * stops mounting or stops surviving SSR breaks the groups above it wholesale rather than one

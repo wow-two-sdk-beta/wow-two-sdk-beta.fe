@@ -4,7 +4,7 @@ Renders a scroll area that keeps only the rows near its viewport in the DOM.
 
 Source: [VirtualScrollArea.vue](VirtualScrollArea.vue).
 
-Public import: `import { VirtualScrollArea } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { VirtualScrollArea } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

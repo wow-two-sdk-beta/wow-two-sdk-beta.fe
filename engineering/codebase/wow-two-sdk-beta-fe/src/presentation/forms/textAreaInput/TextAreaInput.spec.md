@@ -4,7 +4,7 @@ Renders a fixed-height multi-line textarea on the shared input visual base, size
 
 Source: [TextAreaInput.vue](TextAreaInput.vue).
 
-Public import: `import { TextAreaInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TextAreaInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

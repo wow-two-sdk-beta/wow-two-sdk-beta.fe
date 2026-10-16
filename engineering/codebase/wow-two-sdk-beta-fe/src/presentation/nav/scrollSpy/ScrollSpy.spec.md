@@ -4,7 +4,7 @@ Renders nothing by default — hands the topmost in-view section's id to its def
 
 Source: [ScrollSpy.vue](ScrollSpy.vue).
 
-Public import: `import { ScrollSpy } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { ScrollSpy } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

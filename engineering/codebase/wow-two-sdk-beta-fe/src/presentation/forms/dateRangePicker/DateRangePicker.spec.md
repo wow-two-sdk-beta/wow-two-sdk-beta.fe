@@ -4,7 +4,7 @@ Renders a trigger button that opens a popover `RangeCalendarPicker` and closes o
 
 Source: [DateRangePicker.vue](DateRangePicker.vue).
 
-Public import: `import { DateRangePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { DateRangePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

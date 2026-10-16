@@ -4,7 +4,7 @@ Renders a shimmering placeholder block standing in for content that is still loa
 
 Source: [SkeletonState.vue](SkeletonState.vue).
 
-Public import: `import { SkeletonState } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { SkeletonState } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

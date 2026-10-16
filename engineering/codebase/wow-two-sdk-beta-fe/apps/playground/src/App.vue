@@ -34,7 +34,7 @@ const warnCount = computed(() => diagnostics.filter((d) => d.kind === 'warn').le
     <header
       class="sticky top-0 z-50 flex flex-wrap items-center gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur"
     >
-      <span class="font-mono text-sm font-semibold">@wow-two-beta/ui-vue</span>
+      <span class="font-mono text-sm font-semibold">@wow-two-beta/fe</span>
 
       <nav class="flex flex-wrap gap-1">
         <a

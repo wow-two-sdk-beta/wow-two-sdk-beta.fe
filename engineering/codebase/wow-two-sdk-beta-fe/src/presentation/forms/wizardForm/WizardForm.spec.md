@@ -4,7 +4,7 @@ Renders the wizard root, owning the step registry, the active step and the pendi
 
 Source: [WizardForm.vue](WizardForm.vue).
 
-Public import: `import { WizardForm } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { WizardForm } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

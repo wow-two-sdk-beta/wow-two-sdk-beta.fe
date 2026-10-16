@@ -4,7 +4,7 @@ Renders the animated panel handed to `Menu` as its child.
 
 Source: [DropdownMenuContent.vue](DropdownMenuContent.vue).
 
-Public import: `import { DropdownMenuContent } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { DropdownMenuContent } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

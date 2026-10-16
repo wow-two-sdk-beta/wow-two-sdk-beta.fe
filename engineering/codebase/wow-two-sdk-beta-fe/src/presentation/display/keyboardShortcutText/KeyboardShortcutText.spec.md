@@ -4,7 +4,7 @@ Renders a `keys` sequence as `KbdText` chips joined by connectors.
 
 Source: [KeyboardShortcutText.vue](KeyboardShortcutText.vue).
 
-Public import: `import { KeyboardShortcutText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { KeyboardShortcutText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

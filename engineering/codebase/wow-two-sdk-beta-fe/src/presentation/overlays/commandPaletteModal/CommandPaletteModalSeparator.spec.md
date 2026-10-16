@@ -4,7 +4,7 @@ Renders the hairline rule between palette sections.
 
 Source: [CommandPaletteModalSeparator.vue](CommandPaletteModalSeparator.vue).
 
-Public import: `import { CommandPaletteModalSeparator } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalSeparator } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

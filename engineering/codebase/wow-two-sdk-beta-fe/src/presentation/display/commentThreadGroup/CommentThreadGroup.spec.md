@@ -4,7 +4,7 @@ Renders the root of a nested comment tree, owning the ARIA `tree` role and nothi
 
 Source: [CommentThreadGroup.vue](CommentThreadGroup.vue).
 
-Public import: `import { CommentThreadGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CommentThreadGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

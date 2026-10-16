@@ -1,13 +1,13 @@
 /* ---------------------------------------------------------------------------
- * @wow-two-beta/ui-vue — themes (foundation module).
+ * @wow-two-beta/fe — themes (foundation module).
  *
  * A theme ENGINE: derive proven light/dark token sets from an OKLCH seed, apply
  * a curated theme by name, validate any theme for WCAG AA, and emit the scoped
  * CSS / JSON manifest an app (or Claude) uses to "use theme X".
  *
- * Import: `import { THEMES, getTheme, generateTheme } from '@wow-two-beta/ui-vue/themes'`
+ * Import: `import { THEMES, getTheme, generateTheme } from '@wow-two-beta/fe/themes'`
  * Apply : add `theme-{id}` to a root element; toggle `.dark` for dark mode.
- *         The matching stylesheet ships at `@wow-two-beta/ui-vue/themes.css`.
+ *         The matching stylesheet ships at `@wow-two-beta/fe/themes.css`.
  *
  * Foundation layer — no upward imports (ESLint enforces).
  * ------------------------------------------------------------------------- */

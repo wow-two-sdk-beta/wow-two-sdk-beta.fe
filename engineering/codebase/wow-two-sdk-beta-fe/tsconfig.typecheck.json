@@ -8,10 +8,10 @@
     // Tests import playground modules; resolve their public subpaths to source before dist exists.
     "paths": {
       "@src/*": ["src/*"],
-      "@wow-two-beta/ui-vue": ["src/index.ts"],
-      "@wow-two-beta/ui-vue/foundation/*": ["src/foundation/*/index.ts"],
-      "@wow-two-beta/ui-vue/domain/*": ["src/domain/*/index.ts"],
-      "@wow-two-beta/ui-vue/presentation/*": ["src/presentation/*/index.ts"]
+      "@wow-two-beta/fe": ["src/index.ts"],
+      "@wow-two-beta/fe/foundation/*": ["src/foundation/*/index.ts"],
+      "@wow-two-beta/fe/domain/*": ["src/domain/*/index.ts"],
+      "@wow-two-beta/fe/presentation/*": ["src/presentation/*/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.vue"],

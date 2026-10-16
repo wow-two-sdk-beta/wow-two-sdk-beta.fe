@@ -4,7 +4,7 @@ Renders a native checkbox behind a custom visual — 6 variants × 5 tones, plus
 
 Source: [CheckboxInput.vue](CheckboxInput.vue).
 
-Public import: `import { CheckboxInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CheckboxInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

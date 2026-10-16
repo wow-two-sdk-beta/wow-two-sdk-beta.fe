@@ -4,7 +4,7 @@ Renders the first items of a list in one row and a single marker counting the re
 
 Source: [OverflowGroup.vue](OverflowGroup.vue).
 
-Public import: `import { OverflowGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { OverflowGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

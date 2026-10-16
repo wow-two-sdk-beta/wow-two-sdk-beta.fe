@@ -4,7 +4,7 @@ Renders one single-choice menu row that marks the group's selected value with a 
 
 Source: [MenuRadioItem.vue](MenuRadioItem.vue).
 
-Public import: `import { MenuRadioItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuRadioItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

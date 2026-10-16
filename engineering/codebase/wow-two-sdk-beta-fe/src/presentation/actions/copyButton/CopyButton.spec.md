@@ -4,7 +4,7 @@ Renders a clipboard-copy button — for code blocks, ID / URL fields, and inline
 
 Source: [CopyButton.vue](CopyButton.vue).
 
-Public import: `import { CopyButton } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { CopyButton } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

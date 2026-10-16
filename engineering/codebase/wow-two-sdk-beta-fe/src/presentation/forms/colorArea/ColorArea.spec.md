@@ -4,7 +4,7 @@ Renders a two-axis saturation/value square, pointer-draggable and keyboard-opera
 
 Source: [ColorArea.vue](ColorArea.vue).
 
-Public import: `import { ColorArea } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ColorArea } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

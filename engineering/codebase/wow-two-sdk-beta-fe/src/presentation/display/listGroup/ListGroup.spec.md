@@ -4,7 +4,7 @@ Renders a bulleted, numbered, or check list container.
 
 Source: [ListGroup.vue](ListGroup.vue).
 
-Public import: `import { ListGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ListGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

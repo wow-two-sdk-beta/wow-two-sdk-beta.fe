@@ -4,7 +4,7 @@ Renders a three-cell glyph with the given corner radius.
 
 Source: [CellsGlyph.vue](CellsGlyph.vue).
 
-Public import: `import { CellsGlyph } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CellsGlyph } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a switch, its label and an optional description in one clickable `<label
 
 Source: [SwitchField.vue](SwitchField.vue).
 
-Public import: `import { SwitchField } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SwitchField } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

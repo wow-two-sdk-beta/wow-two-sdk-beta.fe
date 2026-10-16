@@ -4,7 +4,7 @@ Renders a two-pane layout — fixed-width aside + flexible main.
 
 Source: [TwoColumnLayout.vue](TwoColumnLayout.vue).
 
-Public import: `import { TwoColumnLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { TwoColumnLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

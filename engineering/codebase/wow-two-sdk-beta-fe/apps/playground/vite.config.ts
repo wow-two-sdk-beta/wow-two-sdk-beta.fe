@@ -20,7 +20,7 @@ export default defineConfig({
   resolve: {
     alias: libSourceAliases(libRoot, [
       {
-        find: '@wow-two-beta/ui-vue/styles.css',
+        find: '@wow-two-beta/fe/styles.css',
         replacement: path.resolve(libRoot, 'src/index.css'),
       },
       // The lib's own relative imports use `@src/*` in a couple of places
@@ -31,6 +31,6 @@ export default defineConfig({
   optimizeDeps: {
     // The lib is consumed as raw source through the aliases above; pre-bundling
     // it would freeze a snapshot and defeat the hot-reload-on-edit point.
-    exclude: ['@wow-two-beta/ui-vue'],
+    exclude: ['@wow-two-beta/fe'],
   },
 });

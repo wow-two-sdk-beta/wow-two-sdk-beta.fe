@@ -1,5 +1,5 @@
 /* The lib's base stylesheet, aliased to the live `src/index.css` (tokens, dark variant, component CSS). */
-@import '@wow-two-beta/ui-vue/styles.css';
+@import '@wow-two-beta/fe/styles.css';
 
 /* Tailwind scans the root stylesheet's folder only: declare the lib, this app and the playground fixtures the
    components page renders. */

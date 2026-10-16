@@ -4,7 +4,7 @@ Renders a tip arrow tinted to the card surface; pair with Floating UI's `arrow()
 
 Source: [HoverCardArrow.vue](HoverCardArrow.vue).
 
-Public import: `import { HoverCardArrow } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { HoverCardArrow } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

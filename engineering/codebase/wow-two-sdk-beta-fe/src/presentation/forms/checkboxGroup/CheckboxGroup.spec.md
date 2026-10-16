@@ -4,7 +4,7 @@ Renders a fieldset of `CheckboxField` children as one multi-select group, keyed 
 
 Source: [CheckboxGroup.vue](CheckboxGroup.vue).
 
-Public import: `import { CheckboxGroup } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CheckboxGroup } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a quick-pick row of common emoji reactions, plus a `+` that hands off to
 
 Source: [ReactionPicker.vue](ReactionPicker.vue).
 
-Public import: `import { ReactionPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ReactionPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -3,8 +3,8 @@
 A portable image-editing surface. It composes `ImageCropEditor`, the shared snapshot history, buttons,
 checkboxes and numeric inputs. Processing and persistence belong to the caller.
 
-Public component: `@wow-two-beta/ui-vue/presentation/forms`.
-Public values: `@wow-two-beta/ui-vue/domain/imageEditing` (also exported by `presentation/forms`).
+Public component: `@wow-two-beta/fe/presentation/forms`.
+Public values: `@wow-two-beta/fe/domain/imageEditing` (also exported by `presentation/forms`).
 
 ## State and intents
 

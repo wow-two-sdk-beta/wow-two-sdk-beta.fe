@@ -173,7 +173,7 @@ const inEditable = (node: VNode): VNode => h(EditableInput, null, { default: () 
 const inEditingEditable = (node: VNode): VNode => h(EditableInput, { defaultEditing: true }, { default: () => node });
 
 /**
- * Every component `@wow-two-beta/ui-vue/presentation/forms` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/presentation/forms` exports, as smoke cases.
  * Imported through the public barrel on purpose — a component missing from `index.ts` fails
  * here before a consumer finds it.
  *

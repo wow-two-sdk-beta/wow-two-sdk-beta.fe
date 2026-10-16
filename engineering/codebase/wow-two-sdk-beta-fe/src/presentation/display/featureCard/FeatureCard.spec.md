@@ -4,7 +4,7 @@ Renders a marketing feature tile — tinted icon badge, title, description — i
 
 Source: [FeatureCard.vue](FeatureCard.vue).
 
-Public import: `import { FeatureCard } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { FeatureCard } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

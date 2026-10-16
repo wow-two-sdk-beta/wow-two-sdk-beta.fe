@@ -4,7 +4,7 @@ Renders a horizontal gauge whose fill color crosses threshold zones — green / 
 
 Source: [MeterBar.vue](MeterBar.vue).
 
-Public import: `import { MeterBar } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { MeterBar } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

@@ -4,10 +4,10 @@ import {
   NotificationItem,
   OnboardingChecklistCard,
   OnboardingChecklistCardTask,
-} from '@wow-two-beta/ui-vue/presentation/display';
+} from '@wow-two-beta/fe/presentation/display';
 import { defineComponent, h, ref } from 'vue';
-import * as feedback from '@wow-two-beta/ui-vue/presentation/feedback';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
+import * as feedback from '@wow-two-beta/fe/presentation/feedback';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
 import { Info } from 'lucide-vue-next';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';

@@ -4,7 +4,7 @@ Renders one tab button; the selected tab is the roving tab stop, per APG.
 
 Source: [TabsGroupTab.vue](TabsGroupTab.vue).
 
-Public import: `import { TabsGroupTab } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TabsGroupTab } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

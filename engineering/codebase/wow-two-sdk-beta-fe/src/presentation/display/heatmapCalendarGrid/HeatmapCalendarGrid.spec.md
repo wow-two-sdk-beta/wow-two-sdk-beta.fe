@@ -4,7 +4,7 @@ Renders a year-long heatmap — 53 week columns x 7 weekday rows, tinted per day
 
 Source: [HeatmapCalendarGrid.vue](HeatmapCalendarGrid.vue).
 
-Public import: `import { HeatmapCalendarGrid } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { HeatmapCalendarGrid } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

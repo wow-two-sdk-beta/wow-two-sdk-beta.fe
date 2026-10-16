@@ -4,7 +4,7 @@ Renders a font-family picker whose every option row previews itself in its own f
 
 Source: [FontPicker.vue](FontPicker.vue).
 
-Public import: `import { FontPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { FontPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, h, ref, shallowRef, watch } from 'vue';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { Badge, DataTable } from '@wow-two-beta/ui-vue/presentation/display';
-import { SearchInput, ToggleGroup, ToggleInput } from '@wow-two-beta/ui-vue/presentation/forms';
-import { Pagination } from '@wow-two-beta/ui-vue/presentation/nav';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { Badge, DataTable } from '@wow-two-beta/fe/presentation/display';
+import { SearchInput, ToggleGroup, ToggleInput } from '@wow-two-beta/fe/presentation/forms';
+import { Pagination } from '@wow-two-beta/fe/presentation/nav';
 
 /* Data console archetype: filters and search over a dense table, a bulk bar once rows are picked, and pagination.
    Filters reset the page, and a bulk action applies to exactly the picked rows. */

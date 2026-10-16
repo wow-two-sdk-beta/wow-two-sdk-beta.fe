@@ -4,7 +4,7 @@ Renders a heading above a subset of items and wires it as that group's accessibl
 
 Source: [ListboxPickerGroup.vue](ListboxPickerGroup.vue).
 
-Public import: `import { ListboxPickerGroup } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ListboxPickerGroup } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

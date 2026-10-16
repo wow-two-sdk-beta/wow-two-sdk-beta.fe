@@ -4,7 +4,7 @@ Renders one notification row — icon, title, description, timestamp, and an unr
 
 Source: [NotificationItem.vue](NotificationItem.vue).
 
-Public import: `import { NotificationItem } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { NotificationItem } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

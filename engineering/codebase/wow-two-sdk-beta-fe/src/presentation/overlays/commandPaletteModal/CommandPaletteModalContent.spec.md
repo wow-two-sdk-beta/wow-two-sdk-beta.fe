@@ -4,7 +4,7 @@ Renders the modal panel the palette lives in — full-bleed, no gap, no padding.
 
 Source: [CommandPaletteModalContent.vue](CommandPaletteModalContent.vue).
 
-Public import: `import { CommandPaletteModalContent } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalContent } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

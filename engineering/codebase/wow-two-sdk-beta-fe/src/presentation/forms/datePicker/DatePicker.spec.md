@@ -4,7 +4,7 @@ Renders a trigger button that opens a popover `CalendarPicker` and shows the pic
 
 Source: [DatePicker.vue](DatePicker.vue).
 
-Public import: `import { DatePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { DatePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

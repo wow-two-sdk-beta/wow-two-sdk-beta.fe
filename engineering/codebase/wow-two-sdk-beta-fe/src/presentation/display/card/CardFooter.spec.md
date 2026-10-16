@@ -4,7 +4,7 @@ Renders the bordered action row pinned to the bottom of a `Card`.
 
 Source: [CardFooter.vue](CardFooter.vue).
 
-Public import: `import { CardFooter } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CardFooter } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

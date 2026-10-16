@@ -4,7 +4,7 @@ Renders the tabs root that owns the active value and shares it with its parts.
 
 Source: [TabsGroup.vue](TabsGroup.vue).
 
-Public import: `import { TabsGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TabsGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

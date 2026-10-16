@@ -4,7 +4,7 @@ Renders a three-horizontal-bar glyph.
 
 Source: [HorizontalBarsGlyph.vue](HorizontalBarsGlyph.vue).
 
-Public import: `import { HorizontalBarsGlyph } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { HorizontalBarsGlyph } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

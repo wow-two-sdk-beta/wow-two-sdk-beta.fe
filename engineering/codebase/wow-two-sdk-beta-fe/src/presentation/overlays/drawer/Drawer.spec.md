@@ -4,7 +4,7 @@ Renders only its slot, owning the open state and a11y ids of the Drawer tree bel
 
 Source: [Drawer.vue](Drawer.vue).
 
-Public import: `import { Drawer } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { Drawer } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

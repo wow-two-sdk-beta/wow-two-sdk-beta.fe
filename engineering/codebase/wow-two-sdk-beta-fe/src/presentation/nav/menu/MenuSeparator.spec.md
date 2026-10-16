@@ -4,7 +4,7 @@ Renders the hairline rule between menu sections.
 
 Source: [MenuSeparator.vue](MenuSeparator.vue).
 
-Public import: `import { MenuSeparator } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuSeparator } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

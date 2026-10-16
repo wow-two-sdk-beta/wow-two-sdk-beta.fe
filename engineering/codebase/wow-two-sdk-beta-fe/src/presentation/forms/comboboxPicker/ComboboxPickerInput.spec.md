@@ -4,7 +4,7 @@ Renders the text box driving the combobox — it opens the panel, filters rows, 
 
 Source: [ComboboxPickerInput.vue](ComboboxPickerInput.vue).
 
-Public import: `import { ComboboxPickerInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPickerInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

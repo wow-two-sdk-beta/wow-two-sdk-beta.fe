@@ -4,7 +4,7 @@ Renders the no-items message as a disabled option row, perceivable to AT but ski
 
 Source: [ListboxPickerEmpty.vue](ListboxPickerEmpty.vue).
 
-Public import: `import { ListboxPickerEmpty } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ListboxPickerEmpty } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a pannable, wheel-zoomable node graph whose nodes drag to reposition.
 
 Source: [NodeEditor.vue](NodeEditor.vue).
 
-Public import: `import { NodeEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { NodeEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

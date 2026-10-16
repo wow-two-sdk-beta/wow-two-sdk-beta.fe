@@ -4,7 +4,7 @@ Renders the stepper root, owning the active step value for the strip and panels 
 
 Source: [StepperGroup.vue](StepperGroup.vue).
 
-Public import: `import { StepperGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { StepperGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

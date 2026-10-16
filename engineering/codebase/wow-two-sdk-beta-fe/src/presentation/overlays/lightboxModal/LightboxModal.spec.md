@@ -4,7 +4,7 @@ Renders a full-screen viewer that steps through images by button, arrow key or s
 
 Source: [LightboxModal.vue](LightboxModal.vue) · built on [Modal](../modal/Modal.spec.md).
 
-Public import: `import { LightboxModal, type LightboxImage } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { LightboxModal, type LightboxImage } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a row of reaction chips with an optional trailing add-reaction button.
 
 Source: [ReactionBar.vue](ReactionBar.vue).
 
-Public import: `import { ReactionBar } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ReactionBar } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

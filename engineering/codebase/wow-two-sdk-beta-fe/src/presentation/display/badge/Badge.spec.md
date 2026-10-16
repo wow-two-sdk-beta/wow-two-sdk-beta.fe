@@ -4,7 +4,7 @@ Renders a non-interactive pill marking a status or category.
 
 Source: [Badge.vue](Badge.vue).
 
-Public import: `import { Badge } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Badge } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

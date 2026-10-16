@@ -3,7 +3,7 @@ import {
   contrastPairs,
   type ContrastPair,
   type Theme,
-} from '@wow-two-beta/ui-vue/foundation/themes';
+} from '@wow-two-beta/fe/foundation/themes';
 
 /** One evaluated foreground↔surface pair. */
 export interface PairResult {

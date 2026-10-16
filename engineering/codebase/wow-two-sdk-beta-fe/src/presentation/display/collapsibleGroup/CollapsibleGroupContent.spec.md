@@ -4,7 +4,7 @@ Renders the disclosure pane, kept mounted by `Presence` until its close animatio
 
 Source: [CollapsibleGroupContent.vue](CollapsibleGroupContent.vue).
 
-Public import: `import { CollapsibleGroupContent } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CollapsibleGroupContent } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

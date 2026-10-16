@@ -4,7 +4,7 @@ Renders a line-level diff in split or unified columns, from its own LCS pass.
 
 Source: [DiffViewer.vue](DiffViewer.vue).
 
-Public import: `import { DiffViewer } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { DiffViewer } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders an icon, title, description, and actions laid over the `AlertSimple` ato
 
 Source: [Alert.vue](Alert.vue).
 
-Public import: `import { Alert } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { Alert } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

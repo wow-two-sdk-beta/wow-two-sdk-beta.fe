@@ -4,7 +4,7 @@ Renders code text with a copy button, inline for one-liners or block for multi-l
 
 Source: [SnippetText.vue](SnippetText.vue).
 
-Public import: `import { SnippetText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { SnippetText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders an inline doc-style note — colored left rule, no fill, quieter than `A
 
 Source: [Callout.vue](Callout.vue).
 
-Public import: `import { Callout } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { Callout } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

@@ -45,8 +45,8 @@ export interface PersistStorage<S> {
  * @example
  * import { create } from 'zustand';
  * import { persist } from 'zustand/middleware';
- * import { localStorageStorageBroker } from '@wow-two-beta/ui-vue/foundation/storage';
- * import { brokerPersistStorage } from '@wow-two-beta/ui-vue/foundation/storage/zustand';
+ * import { localStorageStorageBroker } from '@wow-two-beta/fe/foundation/storage';
+ * import { brokerPersistStorage } from '@wow-two-beta/fe/foundation/storage/zustand';
  *
  * const useStore = create(persist(init, { name: 'app', storage: brokerPersistStorage(localStorageStorageBroker) }));
  */

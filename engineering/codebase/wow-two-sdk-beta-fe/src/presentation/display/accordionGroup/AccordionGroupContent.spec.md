@@ -4,7 +4,7 @@ Renders the collapsible panel body of an `AccordionGroupItem`, mounted while its
 
 Source: [AccordionGroupContent.vue](AccordionGroupContent.vue).
 
-Public import: `import { AccordionGroupContent } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AccordionGroupContent } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

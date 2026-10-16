@@ -4,7 +4,7 @@ Renders the button that expands an item's panel, and anchors the panel's positio
 
 Source: [NavigationMenuTrigger.vue](NavigationMenuTrigger.vue).
 
-Public import: `import { NavigationMenuTrigger } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavigationMenuTrigger } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

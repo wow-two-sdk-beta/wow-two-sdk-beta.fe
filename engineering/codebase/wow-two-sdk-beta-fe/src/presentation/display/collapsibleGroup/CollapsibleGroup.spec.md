@@ -4,7 +4,7 @@ Renders the disclosure root that owns the open state and the trigger / content i
 
 Source: [CollapsibleGroup.vue](CollapsibleGroup.vue).
 
-Public import: `import { CollapsibleGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CollapsibleGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

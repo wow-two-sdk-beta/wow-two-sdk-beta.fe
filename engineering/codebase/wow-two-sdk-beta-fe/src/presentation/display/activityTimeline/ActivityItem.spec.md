@@ -4,7 +4,7 @@ Renders one `ActivityTimeline` row: avatar rail, the activity sentence, optional
 
 Source: [ActivityItem.vue](ActivityItem.vue).
 
-Public import: `import { ActivityItem } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ActivityItem } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

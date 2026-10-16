@@ -4,7 +4,7 @@ Renders a rotational dial whose arc, pointer and readout track one value, turned
 
 Source: [KnobInput.vue](KnobInput.vue).
 
-Public import: `import { KnobInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { KnobInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

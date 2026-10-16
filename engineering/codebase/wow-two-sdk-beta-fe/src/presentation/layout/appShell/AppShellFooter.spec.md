@@ -4,7 +4,7 @@ Renders the shell's bottom bar into the `footer` grid area.
 
 Source: [AppShellFooter.vue](AppShellFooter.vue).
 
-Public import: `import { AppShellFooter } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShellFooter } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

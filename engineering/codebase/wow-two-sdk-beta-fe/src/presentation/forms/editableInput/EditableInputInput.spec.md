@@ -4,7 +4,7 @@ Renders the edit-mode input, shown only while editing, focused with the caret at
 
 Source: [EditableInputInput.vue](EditableInputInput.vue).
 
-Public import: `import { EditableInputInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EditableInputInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

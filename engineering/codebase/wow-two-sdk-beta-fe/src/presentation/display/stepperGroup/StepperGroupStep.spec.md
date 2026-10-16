@@ -4,7 +4,7 @@ Renders one step as an index-or-tick button, its label and description, plus a t
 
 Source: [StepperGroupStep.vue](StepperGroupStep.vue).
 
-Public import: `import { StepperGroupStep } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { StepperGroupStep } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

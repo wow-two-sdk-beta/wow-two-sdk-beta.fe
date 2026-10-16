@@ -4,7 +4,7 @@ Renders one activatable menu row; the arrow keys walk the enabled siblings.
 
 Source: [MenuItem.vue](MenuItem.vue).
 
-Public import: `import { MenuItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a spinner beside a label on one line, for buttons, list rows, and mid-fl
 
 Source: [InlineSpinner.vue](InlineSpinner.vue).
 
-Public import: `import { InlineSpinner } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { InlineSpinner } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

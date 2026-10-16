@@ -4,7 +4,7 @@ Renders a styled visual surface composed from the `surfaceVariants` matrix.
 
 Source: [SurfaceLayout.vue](SurfaceLayout.vue).
 
-Public import: `import { SurfaceLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { SurfaceLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

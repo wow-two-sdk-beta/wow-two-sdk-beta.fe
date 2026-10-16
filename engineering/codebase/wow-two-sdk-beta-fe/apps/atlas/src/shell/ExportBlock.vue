@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CopyButton } from '@wow-two-beta/ui-vue/presentation/actions';
+import { CopyButton } from '@wow-two-beta/fe/presentation/actions';
 
 /** A labelled, copyable code block — one studio export format. */
 defineProps<{

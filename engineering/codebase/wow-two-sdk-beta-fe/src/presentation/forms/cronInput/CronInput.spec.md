@@ -4,7 +4,7 @@ Renders a cron-string input with a live plain-English preview of when the expres
 
 Source: [CronInput.vue](CronInput.vue).
 
-Public import: `import { CronInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CronInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

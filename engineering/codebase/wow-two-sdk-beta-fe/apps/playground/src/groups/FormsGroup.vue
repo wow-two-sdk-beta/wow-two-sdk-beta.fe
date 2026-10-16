@@ -8,18 +8,18 @@ import {
   StepperGroupList,
   StepperGroupStep,
   StepperGroupPanel,
-} from '@wow-two-beta/ui-vue/presentation/display';
+} from '@wow-two-beta/fe/presentation/display';
 import {
   FieldErrorCallout,
   CharacterCountCallout,
   PasswordStrengthCallout,
-} from '@wow-two-beta/ui-vue/presentation/feedback';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { FieldsetLayout, InputAddonLayout, InputGroup } from '@wow-two-beta/ui-vue/presentation/layout';
+} from '@wow-two-beta/fe/presentation/feedback';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { FieldsetLayout, InputAddonLayout, InputGroup } from '@wow-two-beta/fe/presentation/layout';
 import { computed, ref } from 'vue';
 import { Temporal } from 'temporal-polyfill';
 import { Star } from 'lucide-vue-next';
-import * as forms from '@wow-two-beta/ui-vue/presentation/forms';
+import * as forms from '@wow-two-beta/fe/presentation/forms';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';

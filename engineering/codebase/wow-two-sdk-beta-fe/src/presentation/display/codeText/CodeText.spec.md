@@ -4,7 +4,7 @@ Renders inline or block code text in the mono face — styling only, no tokenizi
 
 Source: [CodeText.vue](CodeText.vue).
 
-Public import: `import { CodeText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CodeText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a GanttTimeline chart — a task label column beside a day-scaled timeli
 
 Source: [GanttTimeline.vue](GanttTimeline.vue).
 
-Public import: `import { GanttTimeline } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { GanttTimeline } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

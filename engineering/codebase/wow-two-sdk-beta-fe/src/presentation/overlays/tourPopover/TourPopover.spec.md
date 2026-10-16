@@ -4,7 +4,7 @@ Renders a multi-step tour — an SVG mask cut out around each step's target, plu
 
 Source: [TourPopover.vue](TourPopover.vue).
 
-Public import: `import { TourPopover } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { TourPopover } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

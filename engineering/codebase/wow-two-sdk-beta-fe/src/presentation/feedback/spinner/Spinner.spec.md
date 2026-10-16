@@ -4,7 +4,7 @@ Renders an indeterminate spinning circle plus a visually hidden label for screen
 
 Source: [Spinner.vue](Spinner.vue).
 
-Public import: `import { Spinner } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { Spinner } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

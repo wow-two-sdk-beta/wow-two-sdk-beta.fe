@@ -21,7 +21,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const scratch = mkdtempSync(join(tmpdir(), 'ui-vue-package-'));
+const scratch = mkdtempSync(join(tmpdir(), 'fe-package-'));
 let installed;
 const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 
@@ -324,7 +324,7 @@ try {
   }
   if (process.argv.includes('--install')) {
     // Separate root prevents Node/TypeScript resolving through the linked fixture's ancestor node_modules.
-    installed = mkdtempSync(join(tmpdir(), 'ui-vue-installed-'));
+    installed = mkdtempSync(join(tmpdir(), 'fe-installed-'));
     const dependencies = { [published.name]: `file:${join(scratch, packed.filename)}` };
     for (const peer of Object.keys(published.peerDependencies ?? {})) {
       dependencies[peer] = JSON.parse(readFileSync(join(root, 'node_modules', peer, 'package.json'), 'utf8')).version;

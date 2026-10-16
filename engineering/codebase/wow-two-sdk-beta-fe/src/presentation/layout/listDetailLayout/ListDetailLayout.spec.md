@@ -4,7 +4,7 @@ Renders a master-detail page: list and detail side by side from `breakpoint`, on
 
 Source: [ListDetailLayout.vue](ListDetailLayout.vue).
 
-Public import: `import { ListDetailLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ListDetailLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

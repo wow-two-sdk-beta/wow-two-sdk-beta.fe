@@ -4,7 +4,7 @@ Renders a calendar in month, week, day, or agenda view, under a header of period
 
 Source: [EventCalendarViewer.vue](EventCalendarViewer.vue).
 
-Public import: `import { EventCalendarViewer } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { EventCalendarViewer } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

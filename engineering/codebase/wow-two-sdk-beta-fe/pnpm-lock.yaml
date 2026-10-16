@@ -135,7 +135,7 @@ importers:
 
   apps/atlas:
     dependencies:
-      '@wow-two-beta/ui-vue':
+      '@wow-two-beta/fe':
         specifier: workspace:*
         version: link:../..
       vue:
@@ -166,7 +166,7 @@ importers:
 
   apps/playground:
     dependencies:
-      '@wow-two-beta/ui-vue':
+      '@wow-two-beta/fe':
         specifier: workspace:*
         version: link:../..
       vue:

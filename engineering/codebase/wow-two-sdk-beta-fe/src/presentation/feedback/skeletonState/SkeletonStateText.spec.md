@@ -4,7 +4,7 @@ Renders a paragraph placeholder — `lines` text skeletons with a shorter last l
 
 Source: [SkeletonStateText.vue](SkeletonStateText.vue).
 
-Public import: `import { SkeletonStateText } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { SkeletonStateText } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

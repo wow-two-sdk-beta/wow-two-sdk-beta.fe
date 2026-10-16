@@ -4,7 +4,7 @@ Renders a trigger button that opens popover hour and minute columns and shows th
 
 Source: [TimePicker.vue](TimePicker.vue).
 
-Public import: `import { TimePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TimePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

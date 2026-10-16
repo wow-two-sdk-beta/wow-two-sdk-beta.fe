@@ -4,7 +4,7 @@ Renders a row that drags left or right to reveal its action slots.
 
 Source: [SwipeActionsLayout.vue](SwipeActionsLayout.vue).
 
-Public import: `import { SwipeActionsLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { SwipeActionsLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

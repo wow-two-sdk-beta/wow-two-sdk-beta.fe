@@ -4,7 +4,7 @@ Renders the top-level site navigation bar, holding one expandable panel open at 
 
 Source: [NavigationMenu.vue](NavigationMenu.vue).
 
-Public import: `import { NavigationMenu } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavigationMenu } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

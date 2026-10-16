@@ -4,7 +4,7 @@ Renders a live gradient preview over editors for its kind, angle and colour stop
 
 Source: [GradientPicker.vue](GradientPicker.vue).
 
-Public import: `import { GradientPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { GradientPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

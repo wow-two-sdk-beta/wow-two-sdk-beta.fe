@@ -4,7 +4,7 @@ Renders an image with a movable, resizable crop box — pointer and keyboard —
 
 Source: [ImageCropEditor.vue](ImageCropEditor.vue).
 
-Public import: `import { ImageCropEditor, type CropRect } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ImageCropEditor, type CropRect } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

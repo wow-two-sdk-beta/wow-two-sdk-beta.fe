@@ -4,7 +4,7 @@ Renders the portalled edge panel — scrim, focus trap, scroll lock, and the sli
 
 Source: [DrawerContent.vue](DrawerContent.vue).
 
-Public import: `import { DrawerContent } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { DrawerContent } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

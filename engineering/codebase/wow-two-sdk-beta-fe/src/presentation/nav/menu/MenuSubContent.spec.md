@@ -4,7 +4,7 @@ Renders the submenu surface beside its trigger row while the `MenuSub` is open.
 
 Source: [MenuSubContent.vue](MenuSubContent.vue).
 
-Public import: `import { MenuSubContent } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuSubContent } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

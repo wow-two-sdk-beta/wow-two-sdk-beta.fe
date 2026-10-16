@@ -4,7 +4,7 @@ Renders a decorative rule between groups of options, hidden from the accessibili
 
 Source: [ComboboxPickerSeparator.vue](ComboboxPickerSeparator.vue).
 
-Public import: `import { ComboboxPickerSeparator } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPickerSeparator } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

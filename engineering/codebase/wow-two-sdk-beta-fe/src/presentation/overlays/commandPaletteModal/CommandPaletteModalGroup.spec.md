@@ -4,7 +4,7 @@ Renders a labelled `role="group"` band of palette items.
 
 Source: [CommandPaletteModalGroup.vue](CommandPaletteModalGroup.vue).
 
-Public import: `import { CommandPaletteModalGroup } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalGroup } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

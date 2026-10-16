@@ -4,7 +4,7 @@ Renders an `<input type="email">` carrying the email `autocomplete` and `inputmo
 
 Source: [EmailInput.vue](EmailInput.vue).
 
-Public import: `import { EmailInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EmailInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders children scrolling continuously, duplicated once for a seamless loop.
 
 Source: [MarqueeGroup.vue](MarqueeGroup.vue).
 
-Public import: `import { MarqueeGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { MarqueeGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the confirming button of an `AlertModal`; it fires `action`, then closes
 
 Source: [AlertModalAction.vue](AlertModalAction.vue).
 
-Public import: `import { AlertModalAction } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { AlertModalAction } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a colored dot beside a bold label with a smaller helper line beneath it.
 
 Source: [StatusIndicator.vue](StatusIndicator.vue).
 
-Public import: `import { StatusIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { StatusIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

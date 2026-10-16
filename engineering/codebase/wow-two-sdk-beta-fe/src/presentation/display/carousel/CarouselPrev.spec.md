@@ -4,7 +4,7 @@ Renders the step-back nav button.
 
 Source: [CarouselPrev.vue](CarouselPrev.vue).
 
-Public import: `import { CarouselPrev } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselPrev } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

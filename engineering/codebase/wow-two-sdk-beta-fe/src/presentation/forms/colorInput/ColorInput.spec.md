@@ -4,7 +4,7 @@ Renders a hex text field with a live swatch, committing on blur or Enter and rev
 
 Source: [ColorInput.vue](ColorInput.vue).
 
-Public import: `import { ColorInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ColorInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a trigger that opens a tree of options and shows the picked leaf.
 
 Source: [TreeSelectPicker.vue](TreeSelectPicker.vue) · [TreeSelectPickerNode.vue](TreeSelectPickerNode.vue) (internal) · tree: [TreeViewer](../../display/treeViewer/TreeViewer.spec.md).
 
-Public import: `import { TreeSelectPicker, type TreeSelectNode } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TreeSelectPicker, type TreeSelectNode } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

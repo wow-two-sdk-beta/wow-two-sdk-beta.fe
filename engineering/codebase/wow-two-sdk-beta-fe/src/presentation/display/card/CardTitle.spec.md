@@ -4,7 +4,7 @@ Renders the `h3` title line of a `Card`, at heading weight and tight leading.
 
 Source: [CardTitle.vue](CardTitle.vue).
 
-Public import: `import { CardTitle } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CardTitle } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

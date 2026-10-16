@@ -4,7 +4,7 @@ Renders the "no results" notice, shown only while the filter matches nothing.
 
 Source: [CommandPaletteModalEmpty.vue](CommandPaletteModalEmpty.vue).
 
-Public import: `import { CommandPaletteModalEmpty } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalEmpty } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

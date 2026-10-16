@@ -4,7 +4,7 @@ Renders a badge, dot, or icon pinned to a corner of whatever child it wraps.
 
 Source: [BadgeOverlay.vue](BadgeOverlay.vue).
 
-Public import: `import { BadgeOverlay } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { BadgeOverlay } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

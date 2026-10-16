@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Density } from '@wow-two-beta/ui-vue/foundation/styles';
+import { Density } from '@wow-two-beta/fe/foundation/styles';
 import { Screens, findScreen } from '../content/screens';
 import { route } from '../router';
 import { ScreenViews } from '../screens/views';

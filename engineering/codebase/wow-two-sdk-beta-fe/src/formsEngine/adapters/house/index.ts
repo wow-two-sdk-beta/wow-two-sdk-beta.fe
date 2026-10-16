@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/forms-engine/house — the zero-dependency house micro-engine.
+// @wow-two-beta/fe/forms-engine/house — the zero-dependency house micro-engine.
 // The true vendor hedge behind the `/forms-engine` facade: a flat + dot-path store in a
 // `shallowRef`, whole-schema Standard Schema validation (sync or async, with `validateOn`
 // timing), push/insert/remove/swap/move array ops with row-scoped error and touched reindexing,

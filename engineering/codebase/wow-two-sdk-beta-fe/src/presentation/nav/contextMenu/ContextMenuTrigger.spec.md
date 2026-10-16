@@ -4,7 +4,7 @@ Renders the region a right-click, or a touch long-press, opens the menu over.
 
 Source: [ContextMenuTrigger.vue](ContextMenuTrigger.vue).
 
-Public import: `import { ContextMenuTrigger } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { ContextMenuTrigger } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

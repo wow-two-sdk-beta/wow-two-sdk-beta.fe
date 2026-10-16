@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Check } from 'lucide-vue-next';
-import { THEMES, type Theme } from '@wow-two-beta/ui-vue/foundation/themes';
+import { THEMES, type Theme } from '@wow-two-beta/fe/foundation/themes';
 import { findArchetype } from '../content/layouts';
 import { isDark, themeId } from '../theme';
 import ChoiceChips from '../shell/ChoiceChips.vue';

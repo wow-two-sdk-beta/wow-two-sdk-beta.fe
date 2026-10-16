@@ -4,7 +4,7 @@ Renders a linear progress bar with an optional label above it.
 
 Source: [ProgressBar.vue](ProgressBar.vue).
 
-Public import: `import { ProgressBar } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ProgressBar } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

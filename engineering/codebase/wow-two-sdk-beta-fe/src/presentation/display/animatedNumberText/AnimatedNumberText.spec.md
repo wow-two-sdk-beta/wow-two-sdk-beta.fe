@@ -4,7 +4,7 @@ Renders a number that tweens from its previous value to `value` on every change.
 
 Source: [AnimatedNumberText.vue](AnimatedNumberText.vue).
 
-Public import: `import { AnimatedNumberText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AnimatedNumberText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

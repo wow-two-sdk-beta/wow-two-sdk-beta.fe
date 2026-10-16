@@ -4,7 +4,7 @@ Renders a circular hue ring, pointer-draggable and fully keyboard-operable as an
 
 Source: [ColorWheelInput.vue](ColorWheelInput.vue).
 
-Public import: `import { ColorWheelInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ColorWheelInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

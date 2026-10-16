@@ -4,7 +4,7 @@ Renders the `tbody` of a `Table`, picking up striping and hover from the root.
 
 Source: [TableBody.vue](TableBody.vue).
 
-Public import: `import { TableBody } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableBody } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

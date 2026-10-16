@@ -4,7 +4,7 @@ Renders `text` with every occurrence of `query` wrapped in a `<MarkText>`.
 
 Source: [HighlightText.vue](HighlightText.vue).
 
-Public import: `import { HighlightText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { HighlightText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

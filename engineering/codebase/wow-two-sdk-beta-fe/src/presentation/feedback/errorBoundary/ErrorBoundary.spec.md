@@ -4,7 +4,7 @@ Renders its subtree until a descendant throws while rendering, then renders a fa
 
 Source: [ErrorBoundary.vue](ErrorBoundary.vue).
 
-Public import: `import { ErrorBoundary } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ErrorBoundary } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

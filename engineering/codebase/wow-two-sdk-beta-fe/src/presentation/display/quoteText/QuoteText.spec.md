@@ -4,7 +4,7 @@ Renders a block quote with a subtle left border and italic body text.
 
 Source: [QuoteText.vue](QuoteText.vue).
 
-Public import: `import { QuoteText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { QuoteText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/feedback — headless feedback bus. App code publishes notices
+// @wow-two-beta/fe/feedback — headless feedback bus. App code publishes notices
 // (`notify({ tone, title })` on the default bus, or `createFeedbackBus()` for isolation) and a
 // presentation adapter renders them — `<FeedbackToastHost/>` (`/presentation/feedback`) forwards each
 // notice into the imperative `toastHost.toast()` API. `feedbackQueryErrors()` produces the callback

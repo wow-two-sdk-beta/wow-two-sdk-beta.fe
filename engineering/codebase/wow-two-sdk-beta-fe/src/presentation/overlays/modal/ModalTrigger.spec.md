@@ -4,7 +4,7 @@ Renders the control that opens the enclosing `Modal` and takes focus back on clo
 
 Source: [ModalTrigger.vue](ModalTrigger.vue).
 
-Public import: `import { ModalTrigger } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { ModalTrigger } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

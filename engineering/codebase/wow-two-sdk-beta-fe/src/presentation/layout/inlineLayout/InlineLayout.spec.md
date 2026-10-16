@@ -4,7 +4,7 @@ Renders a wrapping horizontal row with a consistent gap.
 
 Source: [InlineLayout.vue](InlineLayout.vue).
 
-Public import: `import { InlineLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { InlineLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders only its slot, owning the open state of one nested submenu.
 
 Source: [MenuSub.vue](MenuSub.vue).
 
-Public import: `import { MenuSub } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuSub } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

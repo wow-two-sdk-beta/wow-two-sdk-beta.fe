@@ -4,7 +4,7 @@ Renders a fieldset of `RadioField` children as one exclusive group under a share
 
 Source: [RadioGroup.vue](RadioGroup.vue).
 
-Public import: `import { RadioGroup } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RadioGroup } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

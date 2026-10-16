@@ -4,7 +4,7 @@ Renders an outline of headings, taken from `items` (explicit) or `source` (auto-
 
 Source: [TableOfContents.vue](TableOfContents.vue).
 
-Public import: `import { TableOfContents } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { TableOfContents } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

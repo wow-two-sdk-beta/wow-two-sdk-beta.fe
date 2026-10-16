@@ -4,7 +4,7 @@ Renders a menu row that toggles one boolean option and marks it with a check.
 
 Source: [MenuCheckboxItem.vue](MenuCheckboxItem.vue).
 
-Public import: `import { MenuCheckboxItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuCheckboxItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

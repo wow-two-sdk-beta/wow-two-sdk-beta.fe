@@ -4,7 +4,7 @@ Renders the chrome of a thread panel: header, parent message, reply-count separa
 
 Source: [ThreadView.vue](ThreadView.vue).
 
-Public import: `import { ThreadView } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ThreadView } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

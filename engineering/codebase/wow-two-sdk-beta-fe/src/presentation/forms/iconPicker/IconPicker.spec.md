@@ -4,7 +4,7 @@ Renders a searchable grid of icons — a 50+ `lucide-vue-next` subset, or your o
 
 Source: [IconPicker.vue](IconPicker.vue).
 
-Public import: `import { IconPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { IconPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

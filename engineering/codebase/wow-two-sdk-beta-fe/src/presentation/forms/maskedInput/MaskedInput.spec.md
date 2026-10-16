@@ -4,7 +4,7 @@ Renders a text input that reformats typing against a mask — `#` digit, `A` let
 
 Source: [MaskedInput.vue](MaskedInput.vue).
 
-Public import: `import { MaskedInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MaskedInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

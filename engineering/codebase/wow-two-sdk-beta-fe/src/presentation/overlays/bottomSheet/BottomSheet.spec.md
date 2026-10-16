@@ -4,7 +4,7 @@ Renders a mobile bottom sheet with a drag handle and snap points.
 
 Source: [BottomSheet.vue](BottomSheet.vue).
 
-Public import: `import { BottomSheet } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { BottomSheet } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a coloured dot beside a text label — server status, online presence, b
 
 Source: [Status.vue](Status.vue).
 
-Public import: `import { Status } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Status } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

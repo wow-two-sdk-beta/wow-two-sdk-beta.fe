@@ -4,7 +4,7 @@ Renders a record button that captures the next key chord the reader presses.
 
 Source: [KeyboardShortcutPicker.vue](KeyboardShortcutPicker.vue).
 
-Public import: `import { KeyboardShortcutPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { KeyboardShortcutPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

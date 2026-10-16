@@ -4,7 +4,7 @@ Renders the lowest-level layout primitive — any element (default `div`) with c
 
 Source: [BoxLayout.vue](BoxLayout.vue).
 
-Public import: `import { BoxLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { BoxLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

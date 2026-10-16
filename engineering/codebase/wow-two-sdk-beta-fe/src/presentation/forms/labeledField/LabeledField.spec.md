@@ -4,7 +4,7 @@ Renders a `LabelText` above its control with no helper, error or context wiring 
 
 Source: [LabeledField.vue](LabeledField.vue).
 
-Public import: `import { LabeledField } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { LabeledField } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

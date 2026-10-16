@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/forms-engine/tanstack — the DEFAULT engine adapter over
+// @wow-two-beta/fe/forms-engine/tanstack — the DEFAULT engine adapter over
 // `@tanstack/vue-form` (optional peer; installed only by apps that pin this adapter).
 // Implements the full facade contract with TanStack owning values, validation scheduling
 // (`revalidateLogic` + a form-level Standard Schema bridge), and the submit lifecycle,

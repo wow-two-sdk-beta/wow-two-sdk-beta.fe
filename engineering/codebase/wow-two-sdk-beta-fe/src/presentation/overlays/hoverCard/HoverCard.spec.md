@@ -4,7 +4,7 @@ Renders only its slot, owning the open state and hover timing of the HoverCard t
 
 Source: [HoverCard.vue](HoverCard.vue).
 
-Public import: `import { HoverCard } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { HoverCard } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

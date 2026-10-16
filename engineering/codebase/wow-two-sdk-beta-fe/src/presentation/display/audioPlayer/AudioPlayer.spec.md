@@ -4,7 +4,7 @@ Renders an audio player with play/pause, a scrubber, volume, and speed over a na
 
 Source: [AudioPlayer.vue](AudioPlayer.vue).
 
-Public import: `import { AudioPlayer } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AudioPlayer } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

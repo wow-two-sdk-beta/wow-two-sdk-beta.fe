@@ -4,7 +4,7 @@ Renders a stack of overlapping `Avatar` children, with a "+N more" chip once the
 
 Source: [AvatarGroup.vue](AvatarGroup.vue).
 
-Public import: `import { AvatarGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AvatarGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

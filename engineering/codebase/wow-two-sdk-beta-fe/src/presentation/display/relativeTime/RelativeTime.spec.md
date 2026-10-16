@@ -5,7 +5,7 @@ live tick.
 
 Source: [RelativeTime.vue](RelativeTime.vue).
 
-Public import: `import { RelativeTime } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { RelativeTime } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a full-width labelled button with a rotating chevron that expands or col
 
 Source: [DisclosureButton.vue](DisclosureButton.vue).
 
-Public import: `import { DisclosureButton } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { DisclosureButton } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

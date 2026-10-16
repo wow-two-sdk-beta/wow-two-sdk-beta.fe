@@ -4,7 +4,7 @@ Renders the selections as removable chips inside the trigger, collapsing the tai
 
 Source: [MultiSelectPickerTags.vue](MultiSelectPickerTags.vue).
 
-Public import: `import { MultiSelectPickerTags } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MultiSelectPickerTags } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

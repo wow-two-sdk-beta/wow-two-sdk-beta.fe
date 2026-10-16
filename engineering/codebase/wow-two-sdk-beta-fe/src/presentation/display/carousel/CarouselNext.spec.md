@@ -4,7 +4,7 @@ Renders the step-forward nav button.
 
 Source: [CarouselNext.vue](CarouselNext.vue).
 
-Public import: `import { CarouselNext } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselNext } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

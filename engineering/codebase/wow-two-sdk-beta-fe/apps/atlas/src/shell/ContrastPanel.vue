@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Theme } from '@wow-two-beta/ui-vue/foundation/themes';
-import { Badge } from '@wow-two-beta/ui-vue/presentation/display';
+import type { Theme } from '@wow-two-beta/fe/foundation/themes';
+import { Badge } from '@wow-two-beta/fe/presentation/display';
 import { contrastReport, type PairResult } from '../content/contrast';
 
 /** The live WCAG report for both modes: pass counts, failures first, then the pairs with the least headroom. */

@@ -4,7 +4,7 @@ Renders a `StackLayout` locked to `direction="row"` — children laid out left t
 
 Source: [HStackLayout.vue](HStackLayout.vue).
 
-Public import: `import { HStackLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { HStackLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the portalled dialog surface — scrim, focus trap, scroll lock, and the
 
 Source: [ModalContent.vue](ModalContent.vue).
 
-Public import: `import { ModalContent } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { ModalContent } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

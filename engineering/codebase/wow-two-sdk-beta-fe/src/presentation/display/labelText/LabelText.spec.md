@@ -4,7 +4,7 @@ Renders a `<label>` that takes `htmlFor` and `id` from `FormControl`, plus the r
 
 Source: [LabelText.vue](LabelText.vue).
 
-Public import: `import { LabelText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { LabelText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

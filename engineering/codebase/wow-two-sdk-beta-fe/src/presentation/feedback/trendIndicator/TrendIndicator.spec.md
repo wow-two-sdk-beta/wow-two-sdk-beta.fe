@@ -4,7 +4,7 @@ Renders an up / down / flat arrow beside a value and an optional label.
 
 Source: [TrendIndicator.vue](TrendIndicator.vue).
 
-Public import: `import { TrendIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { TrendIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

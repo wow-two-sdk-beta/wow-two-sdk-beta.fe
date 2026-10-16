@@ -4,7 +4,7 @@ Renders a flexible empty box.
 
 Source: [SpacerLayout.vue](SpacerLayout.vue).
 
-Public import: `import { SpacerLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { SpacerLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

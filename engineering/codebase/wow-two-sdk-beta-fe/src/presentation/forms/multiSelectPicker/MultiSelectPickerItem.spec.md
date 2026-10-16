@@ -4,7 +4,7 @@ Renders one togglable row of the panel, and registers the chip text the trigger 
 
 Source: [MultiSelectPickerItem.vue](MultiSelectPickerItem.vue).
 
-Public import: `import { MultiSelectPickerItem } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MultiSelectPickerItem } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a confirmation dialog — a `Modal` locked to `role="alertdialog"`, outs
 
 Source: [AlertModal.vue](AlertModal.vue).
 
-Public import: `import { AlertModal } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { AlertModal } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

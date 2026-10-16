@@ -4,7 +4,7 @@ Renders the control that toggles the enclosing `Popover` and anchors its panel.
 
 Source: [PopoverTrigger.vue](PopoverTrigger.vue).
 
-Public import: `import { PopoverTrigger } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { PopoverTrigger } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

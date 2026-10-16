@@ -4,7 +4,7 @@ Renders a bare flex container — no opinions on direction, gap, or alignment.
 
 Source: [FlexLayout.vue](FlexLayout.vue).
 
-Public import: `import { FlexLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { FlexLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

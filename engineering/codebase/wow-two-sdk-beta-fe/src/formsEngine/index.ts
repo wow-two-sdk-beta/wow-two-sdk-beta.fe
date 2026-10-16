@@ -1,7 +1,7 @@
-// @wow-two-beta/ui-vue/forms-engine — the engine-free forms facade contract.
+// @wow-two-beta/fe/forms-engine — the engine-free forms facade contract.
 // One house surface (`useAppForm` options/result) implemented by swappable engine adapters;
 // the seam is the import path: apps pin an engine once in `src/form.ts`
-// (`export { useAppForm } from '@wow-two-beta/ui-vue/forms-engine/house'`) and screens import
+// (`export { useAppForm } from '@wow-two-beta/fe/forms-engine/house'`) and screens import
 // from `@/form` — changing engines is editing that one line. This entry carries the contract
 // types, the vendored Standard Schema v1 spec types (zero runtime dep — any zod/valibot/arktype
 // schema plugs in), the engine-free `Field` glue + the reactive-surface factories, and the

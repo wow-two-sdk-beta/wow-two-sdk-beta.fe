@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/reporting — headless incident reporting. The app keeps a trail of what the user did
+// @wow-two-beta/fe/reporting — headless incident reporting. The app keeps a trail of what the user did
 // (`wrapFetch` requests, `trackRouter` navigations, `captureClicks` clicks, `trackNotices` notices,
 // `captureErrors` uncaught errors, its own `record` steps); when something fails, `capture(error)` freezes an
 // incident — the trail so far, the request behind the failure with its trace and request ids, the page and the

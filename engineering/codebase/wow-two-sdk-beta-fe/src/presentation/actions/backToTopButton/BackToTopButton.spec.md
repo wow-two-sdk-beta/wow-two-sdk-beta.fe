@@ -4,7 +4,7 @@ Renders a floating button that appears past a scroll threshold and returns the p
 
 Source: [BackToTopButton.vue](BackToTopButton.vue).
 
-Public import: `import { BackToTopButton } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { BackToTopButton } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the side navigation rail — the `sidebar` grid area above `sidebarBreak
 
 Source: [AppShellSidebar.vue](AppShellSidebar.vue).
 
-Public import: `import { AppShellSidebar } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShellSidebar } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

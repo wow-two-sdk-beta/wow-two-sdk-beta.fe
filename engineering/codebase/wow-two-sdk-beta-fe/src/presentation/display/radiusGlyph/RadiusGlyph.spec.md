@@ -4,7 +4,7 @@ Renders a concentric-circle glyph whose filled inner disc scales with `extent` (
 
 Source: [RadiusGlyph.vue](RadiusGlyph.vue).
 
-Public import: `import { RadiusGlyph } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { RadiusGlyph } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

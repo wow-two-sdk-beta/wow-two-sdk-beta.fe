@@ -4,7 +4,7 @@ Renders the `thead` section of a `Table`, holding its header row.
 
 Source: [TableHead.vue](TableHead.vue).
 
-Public import: `import { TableHead } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableHead } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

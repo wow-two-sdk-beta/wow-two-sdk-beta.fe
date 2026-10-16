@@ -4,7 +4,7 @@ Renders copy clamped to a number of lines, with a toggle that appears only when 
 
 Source: [TruncatedText.vue](TruncatedText.vue).
 
-Public import: `import { TruncatedText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TruncatedText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

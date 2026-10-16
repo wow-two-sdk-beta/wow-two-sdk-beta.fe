@@ -4,7 +4,7 @@ Renders a numeric count badge showing `value` or `{max}+` past the cap, hidden a
 
 Source: [CountBadge.vue](CountBadge.vue).
 
-Public import: `import { CountBadge } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CountBadge } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

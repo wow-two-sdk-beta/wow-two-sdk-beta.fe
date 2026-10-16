@@ -4,7 +4,7 @@ Renders a chat input row — auto-resizing textarea, send button, and leading / 
 
 Source: [ChatComposerInput.vue](ChatComposerInput.vue).
 
-Public import: `import { ChatComposerInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ChatComposerInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

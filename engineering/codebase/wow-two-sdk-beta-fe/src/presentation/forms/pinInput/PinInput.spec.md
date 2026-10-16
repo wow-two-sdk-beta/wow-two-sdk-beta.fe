@@ -4,7 +4,7 @@ Renders a row of single-character PIN cells with auto-advance, paste-spread and 
 
 Source: [PinInput.vue](PinInput.vue).
 
-Public import: `import { PinInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { PinInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

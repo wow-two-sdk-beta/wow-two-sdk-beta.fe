@@ -4,7 +4,7 @@ Renders a keyboard-navigable option list with type-to-select, single or multi se
 
 Source: [ListboxPicker.vue](ListboxPicker.vue).
 
-Public import: `import { ListboxPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ListboxPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

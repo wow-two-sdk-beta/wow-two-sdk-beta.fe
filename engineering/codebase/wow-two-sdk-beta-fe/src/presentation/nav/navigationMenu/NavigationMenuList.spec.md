@@ -4,7 +4,7 @@ Renders the horizontal strip of items; arrow-key navigation comes from `RovingFo
 
 Source: [NavigationMenuList.vue](NavigationMenuList.vue).
 
-Public import: `import { NavigationMenuList } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavigationMenuList } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

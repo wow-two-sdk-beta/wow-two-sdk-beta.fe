@@ -4,7 +4,7 @@ Renders a vertical rail of `TimelineItem` nodes joined by connectors, suppressed
 
 Source: [Timeline.vue](Timeline.vue).
 
-Public import: `import { Timeline } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Timeline } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a `StackLayout` locked to `direction="column"` (its default).
 
 Source: [VStackLayout.vue](VStackLayout.vue).
 
-Public import: `import { VStackLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { VStackLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

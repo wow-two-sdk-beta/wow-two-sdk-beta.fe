@@ -4,7 +4,7 @@ Renders the muted supporting line under a `CardTitle`, at body-text scale.
 
 Source: [CardDescription.vue](CardDescription.vue).
 
-Public import: `import { CardDescription } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CardDescription } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

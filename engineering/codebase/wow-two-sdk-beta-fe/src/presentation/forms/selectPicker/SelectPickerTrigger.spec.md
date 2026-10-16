@@ -4,7 +4,7 @@ Renders the button that opens the dropdown, showing the selection, a chevron, an
 
 Source: [SelectPickerTrigger.vue](SelectPickerTrigger.vue).
 
-Public import: `import { SelectPickerTrigger } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SelectPickerTrigger } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

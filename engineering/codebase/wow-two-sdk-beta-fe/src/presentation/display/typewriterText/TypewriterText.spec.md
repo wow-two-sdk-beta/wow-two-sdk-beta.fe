@@ -4,7 +4,7 @@ Renders text typed character by character, cycling when given an array of string
 
 Source: [TypewriterText.vue](TypewriterText.vue).
 
-Public import: `import { TypewriterText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TypewriterText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

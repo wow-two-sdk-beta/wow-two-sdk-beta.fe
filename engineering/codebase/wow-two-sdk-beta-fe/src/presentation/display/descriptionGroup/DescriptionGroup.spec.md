@@ -4,7 +4,7 @@ Renders label-value pairs as a semantic `<dl>` for settings and property lists.
 
 Source: [DescriptionGroup.vue](DescriptionGroup.vue).
 
-Public import: `import { DescriptionGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { DescriptionGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

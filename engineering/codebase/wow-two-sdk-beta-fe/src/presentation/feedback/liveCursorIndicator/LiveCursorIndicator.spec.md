@@ -4,7 +4,7 @@ Renders a remote user's cursor and name label on a collaborative canvas.
 
 Source: [LiveCursorIndicator.vue](LiveCursorIndicator.vue).
 
-Public import: `import { LiveCursorIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { LiveCursorIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

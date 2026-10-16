@@ -4,7 +4,7 @@ Renders the commit button, shown only while editing, that saves the draft and le
 
 Source: [EditableInputSubmit.vue](EditableInputSubmit.vue).
 
-Public import: `import { EditableInputSubmit } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EditableInputSubmit } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

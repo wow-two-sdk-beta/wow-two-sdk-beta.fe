@@ -4,7 +4,7 @@ Renders a tiny coloured unread dot, absolutely placed over its parent when given
 
 Source: [NotificationIndicator.vue](NotificationIndicator.vue).
 
-Public import: `import { NotificationIndicator } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { NotificationIndicator } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

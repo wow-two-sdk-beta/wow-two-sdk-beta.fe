@@ -4,7 +4,7 @@ Renders one keyboard key as a `<kbd>` with a subtle border and inset shadow.
 
 Source: [KbdText.vue](KbdText.vue).
 
-Public import: `import { KbdText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { KbdText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

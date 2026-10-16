@@ -4,7 +4,7 @@ Renders an inline row of meta items with an optional trailing actions slot.
 
 Source: [MetaInlineText.vue](MetaInlineText.vue).
 
-Public import: `import { MetaInlineText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { MetaInlineText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

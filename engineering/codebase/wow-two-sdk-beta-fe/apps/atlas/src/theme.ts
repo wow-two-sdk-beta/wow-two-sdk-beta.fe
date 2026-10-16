@@ -6,7 +6,7 @@ import {
   themeToCss,
   type Theme,
   type ThemeSeed,
-} from '@wow-two-beta/ui-vue/foundation/themes';
+} from '@wow-two-beta/fe/foundation/themes';
 import { GeneratedThemeId, seedFromQuery, seedToQuery } from './content/seedQuery';
 
 /** The atlas opens on the house theme; any catalog theme can be applied from the top bar or the themes page. */

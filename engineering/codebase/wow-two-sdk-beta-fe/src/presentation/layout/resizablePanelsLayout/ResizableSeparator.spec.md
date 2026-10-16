@@ -4,7 +4,7 @@ Renders the draggable rule between two `<ResizablePanel>`s — arrow keys nudge,
 
 Source: [ResizableSeparator.vue](ResizableSeparator.vue).
 
-Public import: `import { ResizableSeparator } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ResizableSeparator } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

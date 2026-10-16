@@ -4,7 +4,7 @@ Renders a typed `YYYY-MM-DD` field with a design-system `CalendarPicker` popover
 
 Source: [DateInput.vue](DateInput.vue).
 
-Public import: `import { DateInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { DateInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

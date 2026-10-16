@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/router — declarative routing wrapper over vue-router v4. Apps author routes
+// @wow-two-beta/fe/router — declarative routing wrapper over vue-router v4. Apps author routes
 // as a `RouteConfig` and pass them to `createAppRouter`; this module owns the vue-router machinery
 // (scroll behavior, the `*` catch-all, and the root behaviors) plus a suite of nav helpers. Apps
 // declare their own typed `paths` registry over the exported `definePath`.

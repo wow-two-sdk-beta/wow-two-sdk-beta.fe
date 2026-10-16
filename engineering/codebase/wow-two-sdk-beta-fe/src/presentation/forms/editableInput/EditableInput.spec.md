@@ -4,7 +4,7 @@ Renders the inline-edit root, owning the committed value, the draft text and edi
 
 Source: [EditableInput.vue](EditableInput.vue).
 
-Public import: `import { EditableInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EditableInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

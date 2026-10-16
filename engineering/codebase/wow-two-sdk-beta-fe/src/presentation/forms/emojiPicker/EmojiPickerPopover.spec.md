@@ -4,7 +4,7 @@ Renders a trigger opening a popover that holds the full `EmojiPicker` — the ch
 
 Source: [EmojiPickerPopover.vue](EmojiPickerPopover.vue).
 
-Public import: `import { EmojiPickerPopover } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EmojiPickerPopover } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders children on a 3D tilt that follows the cursor through `rotateX` / `rotat
 
 Source: [TiltLayout.vue](TiltLayout.vue).
 
-Public import: `import { TiltLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { TiltLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

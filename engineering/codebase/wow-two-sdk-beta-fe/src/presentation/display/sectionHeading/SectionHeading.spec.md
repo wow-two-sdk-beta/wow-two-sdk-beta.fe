@@ -4,7 +4,7 @@ Renders a section header: a `Heading` title, an optional `Text` description, and
 
 Source: [SectionHeading.vue](SectionHeading.vue).
 
-Public import: `import { SectionHeading } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { SectionHeading } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

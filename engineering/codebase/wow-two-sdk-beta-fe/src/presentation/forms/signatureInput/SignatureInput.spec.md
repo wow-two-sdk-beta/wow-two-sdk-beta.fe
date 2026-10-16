@@ -4,7 +4,7 @@ Renders a pad the reader signs with a pointer — mouse, pen or finger — plus 
 
 Source: [SignatureInput.vue](SignatureInput.vue).
 
-Public import: `import { SignatureInput, SignatureFormat } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SignatureInput, SignatureFormat } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

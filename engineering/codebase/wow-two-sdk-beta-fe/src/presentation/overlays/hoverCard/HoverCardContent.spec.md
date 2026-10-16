@@ -4,7 +4,7 @@ Renders the anchored hover-card panel, which stays open while the pointer is ove
 
 Source: [HoverCardContent.vue](HoverCardContent.vue).
 
-Public import: `import { HoverCardContent } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { HoverCardContent } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

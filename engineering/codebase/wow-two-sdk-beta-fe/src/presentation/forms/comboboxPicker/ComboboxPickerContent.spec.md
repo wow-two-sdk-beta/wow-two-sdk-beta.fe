@@ -4,7 +4,7 @@ Renders the option rows in a portalled panel anchored under the input, dismissed
 
 Source: [ComboboxPickerContent.vue](ComboboxPickerContent.vue).
 
-Public import: `import { ComboboxPickerContent } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPickerContent } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

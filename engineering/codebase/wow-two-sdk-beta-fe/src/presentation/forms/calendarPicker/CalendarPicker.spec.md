@@ -4,7 +4,7 @@ Renders a month grid where one day is picked, navigated by keyboard and bounded 
 
 Source: [CalendarPicker.vue](CalendarPicker.vue).
 
-Public import: `import { CalendarPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CalendarPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

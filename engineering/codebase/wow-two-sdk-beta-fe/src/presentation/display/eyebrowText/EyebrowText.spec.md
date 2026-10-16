@@ -4,7 +4,7 @@ Renders a tiny uppercase mini-heading above a section, at standard tracking.
 
 Source: [EyebrowText.vue](EyebrowText.vue).
 
-Public import: `import { EyebrowText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { EyebrowText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

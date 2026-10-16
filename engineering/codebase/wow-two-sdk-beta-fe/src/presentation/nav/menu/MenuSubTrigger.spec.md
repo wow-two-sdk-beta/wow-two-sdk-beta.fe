@@ -4,7 +4,7 @@ Renders the menu row that opens its `MenuSub`'s submenu beside it, with a traili
 
 Source: [MenuSubTrigger.vue](MenuSubTrigger.vue).
 
-Public import: `import { MenuSubTrigger } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuSubTrigger } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

@@ -7,7 +7,7 @@ const themeApi = vi.hoisted(() => ({
   getTheme: vi.fn((id: string) => ({ id })),
   themeToCss: vi.fn((theme: { id: string }) => `.theme-${theme.id}{color:red}`),
 }));
-vi.mock('@wow-two-beta/ui-vue/foundation/themes', () => ({
+vi.mock('@wow-two-beta/fe/foundation/themes', () => ({
   ThemeCatalog: [
     { id: 'smart-qr', name: 'Smart QR', status: 'validated' },
     { id: 'wow', name: 'WoW', status: 'candidate' },

@@ -4,7 +4,7 @@ Renders one selectable option row with its check, checkbox, radio or dot indicat
 
 Source: [ListboxPickerItem.vue](ListboxPickerItem.vue).
 
-Public import: `import { ListboxPickerItem } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ListboxPickerItem } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

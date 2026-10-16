@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { defineConfig, json } from '@wow-two-beta/ui-vue/foundation/config';
-import { createFlagClient, useObjectFlag } from '@wow-two-beta/ui-vue/flags';
-import { createAuthBridge } from '@wow-two-beta/ui-vue/auth';
-import { createApiClient, ApiFailureFactory } from '@wow-two-beta/ui-vue/foundation/http';
+import { defineConfig, json } from '@wow-two-beta/fe/foundation/config';
+import { createFlagClient, useObjectFlag } from '@wow-two-beta/fe/flags';
+import { createAuthBridge } from '@wow-two-beta/fe/auth';
+import { createApiClient, ApiFailureFactory } from '@wow-two-beta/fe/foundation/http';
 import { shallowRef } from 'vue';
-import { ExactNumber } from '@wow-two-beta/ui-vue/foundation/numbers';
-import { ResultExtensions } from '@wow-two-beta/ui-vue/foundation/results';
-import { useAppForm } from '@wow-two-beta/ui-vue/forms-engine/house';
-import { useFieldArray } from '@wow-two-beta/ui-vue/forms-engine';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { ExactNumberInput, TextInput, Field } from '@wow-two-beta/ui-vue/presentation/forms';
-import { DataTable, type DataTableColumn } from '@wow-two-beta/ui-vue/presentation/display';
+import { ExactNumber } from '@wow-two-beta/fe/foundation/numbers';
+import { ResultExtensions } from '@wow-two-beta/fe/foundation/results';
+import { useAppForm } from '@wow-two-beta/fe/forms-engine/house';
+import { useFieldArray } from '@wow-two-beta/fe/forms-engine';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { ExactNumberInput, TextInput, Field } from '@wow-two-beta/fe/presentation/forms';
+import { DataTable, type DataTableColumn } from '@wow-two-beta/fe/presentation/display';
 
 const decodeTitle = (value: unknown) =>
   typeof value === 'object' && value !== null && 'title' in value && typeof value.title === 'string'

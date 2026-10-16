@@ -5,10 +5,10 @@ import {
   OptionTilePicker,
   OptionTileGroupField,
   SegmentedPicker,
-} from '@wow-two-beta/ui-vue/presentation/forms';
-import { LinkItem } from '@wow-two-beta/ui-vue/presentation/nav';
+} from '@wow-two-beta/fe/presentation/forms';
+import { LinkItem } from '@wow-two-beta/fe/presentation/nav';
 import { ref } from 'vue';
-import * as actions from '@wow-two-beta/ui-vue/presentation/actions';
+import * as actions from '@wow-two-beta/fe/presentation/actions';
 import { Check, Copy, Pencil, Plus, Share2, Star, Trash2 } from 'lucide-vue-next';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';

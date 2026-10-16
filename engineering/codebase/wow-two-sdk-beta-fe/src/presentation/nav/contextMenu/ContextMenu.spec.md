@@ -4,7 +4,7 @@ Renders only its slot, owning the open state and anchor point of the ContextMenu
 
 Source: [ContextMenu.vue](ContextMenu.vue).
 
-Public import: `import { ContextMenu } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { ContextMenu } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

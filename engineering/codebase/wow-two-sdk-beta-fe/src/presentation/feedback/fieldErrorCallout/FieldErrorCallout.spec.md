@@ -4,7 +4,7 @@ Renders an invalid control's error copy — every merged context error, or one h
 
 Source: [FieldErrorCallout.vue](FieldErrorCallout.vue).
 
-Public import: `import { FieldErrorCallout } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { FieldErrorCallout } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

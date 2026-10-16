@@ -4,7 +4,7 @@ Renders a box locked to an aspect ratio (width / height).
 
 Source: [AspectRatioLayout.vue](AspectRatioLayout.vue).
 
-Public import: `import { AspectRatioLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AspectRatioLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the hint text under a form control, registering its id with the control'
 
 Source: [FieldHelperText.vue](FieldHelperText.vue).
 
-Public import: `import { FieldHelperText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { FieldHelperText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

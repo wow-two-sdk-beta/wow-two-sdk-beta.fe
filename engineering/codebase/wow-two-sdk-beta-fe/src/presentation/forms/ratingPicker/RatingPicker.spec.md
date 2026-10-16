@@ -4,7 +4,7 @@ Renders a row of marks that picks one rating from 1 to `max`, in whole or half s
 
 Source: [RatingPicker.vue](RatingPicker.vue).
 
-Public import: `import { RatingPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RatingPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders one checklist row and registers it with the enclosing `OnboardingCheckli
 
 Source: [OnboardingChecklistCardTask.vue](OnboardingChecklistCardTask.vue).
 
-Public import: `import { OnboardingChecklistCardTask } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { OnboardingChecklistCardTask } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

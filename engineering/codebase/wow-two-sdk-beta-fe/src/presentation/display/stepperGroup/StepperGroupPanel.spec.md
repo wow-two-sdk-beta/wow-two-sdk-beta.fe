@@ -4,7 +4,7 @@ Renders one step's panel, and only while that step is the active one — the res
 
 Source: [StepperGroupPanel.vue](StepperGroupPanel.vue).
 
-Public import: `import { StepperGroupPanel } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { StepperGroupPanel } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

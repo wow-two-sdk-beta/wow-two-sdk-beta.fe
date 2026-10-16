@@ -4,7 +4,7 @@ Renders the application menu bar — one composite tab stop holding a single men
 
 Source: [Menubar.vue](Menubar.vue).
 
-Public import: `import { Menubar } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { Menubar } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

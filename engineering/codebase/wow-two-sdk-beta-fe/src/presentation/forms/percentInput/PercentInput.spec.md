@@ -4,7 +4,7 @@ Renders a `NumberInput` with a trailing `%` decoration; the typed value stays th
 
 Source: [PercentInput.vue](PercentInput.vue).
 
-Public import: `import { PercentInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { PercentInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

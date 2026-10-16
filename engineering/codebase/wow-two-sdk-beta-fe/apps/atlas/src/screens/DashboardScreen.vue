@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, h, shallowRef } from 'vue';
 import { Activity, Boxes, Gauge, Rocket, Settings } from 'lucide-vue-next';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { Badge, CountBadge, DataTable, Sparkline, StatCard } from '@wow-two-beta/ui-vue/presentation/display';
-import { Alert } from '@wow-two-beta/ui-vue/presentation/feedback';
-import { ToggleGroup, ToggleInput } from '@wow-two-beta/ui-vue/presentation/forms';
-import { SidebarMenu, SidebarMenuItem, SidebarMenuSection } from '@wow-two-beta/ui-vue/presentation/nav';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { Badge, CountBadge, DataTable, Sparkline, StatCard } from '@wow-two-beta/fe/presentation/display';
+import { Alert } from '@wow-two-beta/fe/presentation/feedback';
+import { ToggleGroup, ToggleInput } from '@wow-two-beta/fe/presentation/forms';
+import { SidebarMenu, SidebarMenuItem, SidebarMenuSection } from '@wow-two-beta/fe/presentation/nav';
 
 /* Dashboard archetype: a sidebar shell, a KPI row, trend tiles and a table tile holding the records behind the
    numbers. The period switch re-slices every series, so the tiles stay one story. */

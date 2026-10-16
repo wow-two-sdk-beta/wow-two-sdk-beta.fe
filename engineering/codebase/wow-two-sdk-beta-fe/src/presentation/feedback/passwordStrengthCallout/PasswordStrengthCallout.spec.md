@@ -4,7 +4,7 @@ Renders a four-bar password strength meter from naive 0–4 scoring, or from a `
 
 Source: [PasswordStrengthCallout.vue](PasswordStrengthCallout.vue).
 
-Public import: `import { PasswordStrengthCallout } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { PasswordStrengthCallout } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

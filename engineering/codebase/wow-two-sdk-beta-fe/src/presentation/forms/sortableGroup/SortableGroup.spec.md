@@ -4,7 +4,7 @@ Renders a drag-to-reorder list, headless — consumers render their own rows.
 
 Source: [SortableGroup.vue](SortableGroup.vue).
 
-Public import: `import { SortableGroup } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SortableGroup } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a trigger opening a panel with a saturation/value area, hue and alpha sl
 
 Source: [ColorPicker.vue](ColorPicker.vue).
 
-Public import: `import { ColorPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ColorPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

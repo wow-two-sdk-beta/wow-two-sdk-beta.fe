@@ -4,7 +4,7 @@ Renders a severity-tinted alert container around free-form children.
 
 Source: [AlertSimple.vue](AlertSimple.vue).
 
-Public import: `import { AlertSimple } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { AlertSimple } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a pill with an optional close button, shown only when the consumer binds
 
 Source: [Tag.vue](Tag.vue).
 
-Public import: `import { Tag } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Tag } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

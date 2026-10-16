@@ -4,7 +4,7 @@ Renders the pagination dot row, one dot per slide.
 
 Source: [CarouselDots.vue](CarouselDots.vue).
 
-Public import: `import { CarouselDots } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselDots } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

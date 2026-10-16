@@ -4,7 +4,7 @@ Renders one reorderable row, `draggable` only while its `SortableGroupHandle` is
 
 Source: [SortableGroupItem.vue](SortableGroupItem.vue).
 
-Public import: `import { SortableGroupItem } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SortableGroupItem } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

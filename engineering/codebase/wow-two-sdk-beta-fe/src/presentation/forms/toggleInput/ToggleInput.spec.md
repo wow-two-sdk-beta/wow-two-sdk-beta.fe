@@ -4,7 +4,7 @@ Renders a two-state action button that shows and announces whether it is current
 
 Source: [ToggleInput.vue](ToggleInput.vue).
 
-Public import: `import { ToggleInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ToggleInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

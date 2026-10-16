@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { shallowRef, useTemplateRef } from 'vue';
-import { Callout } from '@wow-two-beta/ui-vue/presentation/feedback';
-import { CodeText, KbdText } from '@wow-two-beta/ui-vue/presentation/display';
-import { NavItem, TableOfContents } from '@wow-two-beta/ui-vue/presentation/nav';
+import { Callout } from '@wow-two-beta/fe/presentation/feedback';
+import { CodeText, KbdText } from '@wow-two-beta/fe/presentation/display';
+import { NavItem, TableOfContents } from '@wow-two-beta/fe/presentation/nav';
 
 /* Docs archetype: section navigation, an article held to a readable measure, and an on-this-page outline that
    follows the reader. The atlas routes by hash, so the outline scrolls in place instead of rewriting the URL. */

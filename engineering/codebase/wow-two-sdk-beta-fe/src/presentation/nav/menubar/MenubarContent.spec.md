@@ -4,7 +4,7 @@ Renders the menu surface for one bar entry.
 
 Source: [MenubarContent.vue](MenubarContent.vue).
 
-Public import: `import { MenubarContent } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenubarContent } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

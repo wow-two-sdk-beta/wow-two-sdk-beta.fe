@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue';
-import { ThemeCatalog, getTheme, themeToCss } from '@wow-two-beta/ui-vue/foundation/themes';
+import { ThemeCatalog, getTheme, themeToCss } from '@wow-two-beta/fe/foundation/themes';
 
 /** The pilot theme is also the gallery default; lifecycle status comes from the catalog. */
 export const DEFAULT_THEME = 'smart-qr';

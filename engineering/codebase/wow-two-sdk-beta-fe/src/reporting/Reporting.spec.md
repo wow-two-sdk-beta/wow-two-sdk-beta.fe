@@ -4,7 +4,7 @@ Headless incident reporting — the trail of what the user did, frozen when some
 
 Source: [CreateReporter.ts](CreateReporter.ts) · [IncidentReport.ts](IncidentReport.ts) · [ReportSink.ts](ReportSink.ts).
 
-Public import: `import { createReporter, httpReportSink } from '@wow-two-beta/ui-vue/reporting';`.
+Public import: `import { createReporter, httpReportSink } from '@wow-two-beta/fe/reporting';`.
 
 ## Wiring
 

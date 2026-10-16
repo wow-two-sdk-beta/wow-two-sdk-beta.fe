@@ -4,7 +4,7 @@ Renders the read-mode surface; clicking it, or pressing Enter or Space, enters e
 
 Source: [EditableInputPreview.vue](EditableInputPreview.vue).
 
-Public import: `import { EditableInputPreview } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EditableInputPreview } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a nested-frame glyph — an outer frame plus inner pupil, or the enlarge
 
 Source: [FrameGlyph.vue](FrameGlyph.vue).
 
-Public import: `import { FrameGlyph } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { FrameGlyph } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a single-pointer and keyboard alternative to dragging an item.
 
 Source: [SortableGroupMoveButton.vue](SortableGroupMoveButton.vue).
 
-Public import: `import { SortableGroupMoveButton } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SortableGroupMoveButton } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

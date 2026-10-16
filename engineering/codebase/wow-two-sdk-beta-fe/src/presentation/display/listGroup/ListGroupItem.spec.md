@@ -4,7 +4,7 @@ Renders a `ListGroup` row with an optional check marker and leading / trailing a
 
 Source: [ListGroupItem.vue](ListGroupItem.vue).
 
-Public import: `import { ListGroupItem } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ListGroupItem } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

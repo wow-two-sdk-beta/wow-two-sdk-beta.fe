@@ -4,7 +4,7 @@ Renders a numbered "how it works" step — faint step number, tinted icon badge,
 
 Source: [StepCard.vue](StepCard.vue).
 
-Public import: `import { StepCard } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { StepCard } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

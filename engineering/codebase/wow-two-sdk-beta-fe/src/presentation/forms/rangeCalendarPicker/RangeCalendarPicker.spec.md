@@ -4,7 +4,7 @@ Renders a month grid where two clicks set a range, previewing the span under the
 
 Source: [RangeCalendarPicker.vue](RangeCalendarPicker.vue).
 
-Public import: `import { RangeCalendarPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RangeCalendarPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

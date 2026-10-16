@@ -4,7 +4,7 @@ Renders the clickable step strip, where already-visited steps stay re-selectable
 
 Source: [WizardFormSteps.vue](WizardFormSteps.vue).
 
-Public import: `import { WizardFormSteps } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { WizardFormSteps } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

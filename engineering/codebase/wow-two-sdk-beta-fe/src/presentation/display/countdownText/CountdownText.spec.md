@@ -4,7 +4,7 @@ Renders the time left until a target instant as ticking text, and reports when i
 
 Source: [CountdownText.vue](CountdownText.vue).
 
-Public import: `import { CountdownText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CountdownText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

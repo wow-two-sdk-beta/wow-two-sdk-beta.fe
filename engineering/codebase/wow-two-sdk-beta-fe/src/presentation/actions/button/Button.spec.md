@@ -4,7 +4,7 @@ Renders a button that runs one command, carrying tone and size variants plus loa
 
 Source: [Button.vue](Button.vue).
 
-Public import: `import { Button } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { Button } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

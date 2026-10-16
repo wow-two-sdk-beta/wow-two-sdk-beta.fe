@@ -4,7 +4,7 @@ Renders an inline trend chart — line, area, bar, or dot — as bare SVG with n
 
 Source: [Sparkline.vue](Sparkline.vue).
 
-Public import: `import { Sparkline } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Sparkline } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

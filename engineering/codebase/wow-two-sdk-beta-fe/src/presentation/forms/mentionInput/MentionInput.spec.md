@@ -4,7 +4,7 @@ Renders a multi-line text field that suggests people or items after a trigger ch
 
 Source: [MentionInput.vue](MentionInput.vue).
 
-Public import: `import { MentionInput, type MentionOption } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MentionInput, type MentionOption } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

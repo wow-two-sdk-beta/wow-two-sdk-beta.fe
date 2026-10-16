@@ -4,7 +4,7 @@ Renders the Back and Next control row, where Next turns into Finish on the wizar
 
 Source: [WizardFormFooter.vue](WizardFormFooter.vue).
 
-Public import: `import { WizardFormFooter } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { WizardFormFooter } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a standalone heading row inside a menu — no `role`, purely visual.
 
 Source: [MenuLabel.vue](MenuLabel.vue).
 
-Public import: `import { MenuLabel } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuLabel } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

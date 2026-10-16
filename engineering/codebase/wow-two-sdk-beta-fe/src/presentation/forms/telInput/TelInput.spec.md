@@ -4,7 +4,7 @@ Renders an `<input type="tel">` with `inputmode="tel"` and `autocomplete="tel"` 
 
 Source: [TelInput.vue](TelInput.vue).
 
-Public import: `import { TelInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TelInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, shallowRef } from 'vue';
-import { Avatar, ChatBubbleCard, CountBadge, DescriptionGroup, Tag } from '@wow-two-beta/ui-vue/presentation/display';
-import { ChatComposerInput, SearchInput } from '@wow-two-beta/ui-vue/presentation/forms';
+import { Avatar, ChatBubbleCard, CountBadge, DescriptionGroup, Tag } from '@wow-two-beta/fe/presentation/display';
+import { ChatComposerInput, SearchInput } from '@wow-two-beta/fe/presentation/forms';
 
 /* Inbox archetype: the conversation list, the open thread with its composer, and the customer in context. Opening
    a conversation reads it; sending appends to the open thread. */

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef } from 'vue';
 import { Plus } from 'lucide-vue-next';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
 import {
   Avatar,
   EmptyState,
@@ -9,8 +9,8 @@ import {
   KanbanCard,
   KanbanColumn,
   Tag,
-} from '@wow-two-beta/ui-vue/presentation/display';
-import { SearchInput, ToggleGroup, ToggleInput } from '@wow-two-beta/ui-vue/presentation/forms';
+} from '@wow-two-beta/fe/presentation/display';
+import { SearchInput, ToggleGroup, ToggleInput } from '@wow-two-beta/fe/presentation/forms';
 
 /* Board archetype: filters shared with the list view above stage columns. Filtering hides cards without
    reordering them, so a move made in a filtered view lands relative to the visible neighbours. */

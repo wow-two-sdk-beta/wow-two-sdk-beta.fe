@@ -4,7 +4,7 @@ Renders a video player whose custom controls auto-hide 3s into playback.
 
 Source: [VideoPlayer.vue](VideoPlayer.vue).
 
-Public import: `import { VideoPlayer } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { VideoPlayer } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

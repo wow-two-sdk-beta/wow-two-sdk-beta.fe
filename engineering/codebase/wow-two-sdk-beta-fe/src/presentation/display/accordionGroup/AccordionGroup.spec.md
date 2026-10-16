@@ -4,7 +4,7 @@ Renders a vertical disclosure group that owns the open set and shares it with it
 
 Source: [AccordionGroup.vue](AccordionGroup.vue).
 
-Public import: `import { AccordionGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AccordionGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

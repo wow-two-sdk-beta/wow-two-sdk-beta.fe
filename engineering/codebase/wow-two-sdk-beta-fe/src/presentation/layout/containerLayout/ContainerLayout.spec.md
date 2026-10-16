@@ -4,7 +4,7 @@ Renders a centered max-width wrapper with horizontal padding.
 
 Source: [ContainerLayout.vue](ContainerLayout.vue).
 
-Public import: `import { ContainerLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ContainerLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

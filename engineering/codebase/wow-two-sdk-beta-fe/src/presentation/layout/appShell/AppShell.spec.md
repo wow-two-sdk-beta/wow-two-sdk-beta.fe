@@ -4,7 +4,7 @@ Renders the top-level page frame.
 
 Source: [AppShell.vue](AppShell.vue).
 
-Public import: `import { AppShell } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShell } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders only its slot, owning the open state and placement of the Popover tree b
 
 Source: [Popover.vue](Popover.vue).
 
-Public import: `import { Popover } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { Popover } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

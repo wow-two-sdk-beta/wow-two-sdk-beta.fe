@@ -4,7 +4,7 @@ Renders only its slot, pairing one `MenubarTrigger` with its `MenubarContent`.
 
 Source: [MenubarMenu.vue](MenubarMenu.vue).
 
-Public import: `import { MenubarMenu } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenubarMenu } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

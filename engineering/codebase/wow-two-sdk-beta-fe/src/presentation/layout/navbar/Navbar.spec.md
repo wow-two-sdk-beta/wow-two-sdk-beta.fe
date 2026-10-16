@@ -4,7 +4,7 @@ Renders a lightweight header band (`<header>`) with `start` / `center` / `end` s
 
 Source: [Navbar.vue](Navbar.vue).
 
-Public import: `import { Navbar } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { Navbar } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

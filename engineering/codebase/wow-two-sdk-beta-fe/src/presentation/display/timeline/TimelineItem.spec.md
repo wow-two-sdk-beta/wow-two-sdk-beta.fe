@@ -4,7 +4,7 @@ Renders one rail node — marker and connector column, then the content column.
 
 Source: [TimelineItem.vue](TimelineItem.vue).
 
-Public import: `import { TimelineItem } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TimelineItem } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

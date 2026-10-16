@@ -8,11 +8,11 @@ import {
   CommandPaletteModalItem,
   CommandPaletteModalEmpty,
   CommandPaletteModalSeparator,
-} from '@wow-two-beta/ui-vue/presentation/overlays';
+} from '@wow-two-beta/fe/presentation/overlays';
 import { ref } from 'vue';
-import * as nav from '@wow-two-beta/ui-vue/presentation/nav';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { CountBadge } from '@wow-two-beta/ui-vue/presentation/display';
+import * as nav from '@wow-two-beta/fe/presentation/nav';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { CountBadge } from '@wow-two-beta/fe/presentation/display';
 import { FolderKanban, Home, Inbox, Settings } from 'lucide-vue-next';
 import Demo from '../gallery/Demo.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';

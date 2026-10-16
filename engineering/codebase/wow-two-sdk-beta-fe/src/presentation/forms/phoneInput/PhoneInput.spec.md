@@ -4,7 +4,7 @@ Renders a country dial-code select beside a national-number field, emitting one 
 
 Source: [PhoneInput.vue](PhoneInput.vue).
 
-Public import: `import { PhoneInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { PhoneInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

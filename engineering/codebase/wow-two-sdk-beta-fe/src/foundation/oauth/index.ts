@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/foundation/oauth — third-party sign-in scripts, wrapped as composables.
+// @wow-two-beta/fe/foundation/oauth — third-party sign-in scripts, wrapped as composables.
 // Foundation rather than `auth`: this layer knows nothing about sessions, strategies, or the
 // backend. It loads a provider's client script, hands its global a config, and surfaces the
 // credential the provider hands back. Turning that credential into a session is `auth`'s job, and

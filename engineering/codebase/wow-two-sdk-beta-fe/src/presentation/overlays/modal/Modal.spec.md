@@ -4,7 +4,7 @@ Renders only its slot, owning the open state and a11y ids of the Modal tree belo
 
 Source: [Modal.vue](Modal.vue).
 
-Public import: `import { Modal } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { Modal } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

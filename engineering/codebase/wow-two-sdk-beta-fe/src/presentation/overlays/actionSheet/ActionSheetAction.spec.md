@@ -4,7 +4,7 @@ Renders one action row of an `ActionSheet`; it fires `select`, then closes the s
 
 Source: [ActionSheetAction.vue](ActionSheetAction.vue).
 
-Public import: `import { ActionSheetAction } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { ActionSheetAction } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

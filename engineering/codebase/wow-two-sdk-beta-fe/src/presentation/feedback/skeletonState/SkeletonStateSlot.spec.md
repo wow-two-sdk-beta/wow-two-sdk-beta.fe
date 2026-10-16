@@ -4,7 +4,7 @@ Wraps a real value and, while loading, paints a placeholder exactly its size.
 
 Source: [SkeletonStateSlot.vue](SkeletonStateSlot.vue).
 
-Public import: `import { SkeletonStateSlot } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { SkeletonStateSlot } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

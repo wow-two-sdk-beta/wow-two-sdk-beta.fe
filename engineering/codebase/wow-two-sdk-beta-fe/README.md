@@ -1,12 +1,12 @@
-# @wow-two-beta/ui-vue
+# @wow-two-beta/fe
 
-Vue 3 components, application adapters and browser capabilities for the wow-two ecosystem.
+The wow-two fe sdk: Vue 3 components, application adapters and browser capabilities.
 This beta package evolves independently of React. Pin an exact version when upgrading.
 
 ## Install
 
 ```bash
-pnpm add @wow-two-beta/ui-vue vue
+pnpm add @wow-two-beta/fe vue
 ```
 
 Vue is required. Install optional peers only for the entries you use:
@@ -26,8 +26,8 @@ The manifest's `exports` map is the entry inventory; builds fail for missing sou
 
 ```vue
 <script setup lang="ts">
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import '@wow-two-beta/ui-vue/styles.css';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import '@wow-two-beta/fe/styles.css';
 </script>
 
 <template>
@@ -49,10 +49,10 @@ The root exports presentation components and the `styles`, `dom`, `optionals`, `
 `color` and `emoji` namespaces. Dedicated subpaths expose application adapters:
 
 ```ts
-import { createAppRouter } from '@wow-two-beta/ui-vue/router';
-import { queryPlugin, useAppQuery } from '@wow-two-beta/ui-vue/query';
-import { useAppForm } from '@wow-two-beta/ui-vue/forms-engine/house';
-import { THEMES } from '@wow-two-beta/ui-vue/foundation/themes';
+import { createAppRouter } from '@wow-two-beta/fe/router';
+import { queryPlugin, useAppQuery } from '@wow-two-beta/fe/query';
+import { useAppForm } from '@wow-two-beta/fe/forms-engine/house';
+import { THEMES } from '@wow-two-beta/fe/foundation/themes';
 ```
 
 Use capability names `/foundation/formatters`, `/foundation/channels`, `/foundation/history`
@@ -65,9 +65,9 @@ or `bigint`; native safe integers have an explicit factory. Native floating-poin
 precision already lost. Operations return the SDK `Result`:
 
 ```ts
-import { ExactNumber, NumberRounding } from '@wow-two-beta/ui-vue/foundation/numbers';
-import { LosslessJson } from '@wow-two-beta/ui-vue/foundation/json';
-import { createApiClient } from '@wow-two-beta/ui-vue/foundation/http';
+import { ExactNumber, NumberRounding } from '@wow-two-beta/fe/foundation/numbers';
+import { LosslessJson } from '@wow-two-beta/fe/foundation/json';
+import { createApiClient } from '@wow-two-beta/fe/foundation/http';
 
 const left = ExactNumber.parse('0.1');
 const right = ExactNumber.parse('0.2');
@@ -105,7 +105,7 @@ requests. A token issued before a sign-in or sign-out is refreshed once through 
 Writes that return `ApiResponse<T>.Ok(data, warnings)` decode with `decodeWarned` and `unwrap: false`:
 
 ```ts
-import { createApiClient, decodeWarned, wowTwoEnvelope } from '@wow-two-beta/ui-vue/foundation/http';
+import { createApiClient, decodeWarned, wowTwoEnvelope } from '@wow-two-beta/fe/foundation/http';
 
 const api = createApiClient({
   envelope: wowTwoEnvelope,
@@ -171,8 +171,11 @@ Playground source aliases derive from the same public export manifest as the lib
 
 ## Release
 
-The repository's `release-vue` workflow validates, bumps the beta patch version, builds, checks the packed
-consumer and publishes that verified tarball. Tags use `ui-vue-v`. React has an independent release.
+The repository's `release-fe` workflow validates, bumps the beta patch version, builds, checks the packed
+consumer and publishes that verified tarball. Tags use `fe-v`. React is parked.
+
+The package was published as `@wow-two-beta/ui-vue` through `0.0.17` (tags `ui-vue-v*`); `@wow-two-beta/fe`
+continues the same `0.0.y` sequence from `0.0.18`.
 
 ## License
 
@@ -180,7 +183,7 @@ MIT
 
 ## Public runtime support matrix
 
-This matrix covers all **72 manifest export keys**: 68 JavaScript entries and four asset/metadata entries. Public paths below are relative to `@wow-two-beta/ui-vue`; `.` means the package root. The package gate imports/types **64 JavaScript entries without optional adapter peers**, then all **68 with the selected peers installed**, in Node without DOM globals. Those are import/declaration checks: they do not invoke every browser operation or prove component server rendering. The final release artifact must rerun `check:package` after source changes.
+This matrix covers all **72 manifest export keys**: 68 JavaScript entries and four asset/metadata entries. Public paths below are relative to `@wow-two-beta/fe`; `.` means the package root. The package gate imports/types **64 JavaScript entries without optional adapter peers**, then all **68 with the selected peers installed**, in Node without DOM globals. Those are import/declaration checks: they do not invoke every browser operation or prove component server rendering. The final release artifact must rerun `check:package` after source changes.
 
 Verified baseline: Node **20.10.0**, Vue **3.5.41**, TypeScript **5.9.3**, ES2022 ESM build output, and Chromium **151.0.7922.34** with Playwright **1.62.1**. Chromium normal/forced-colors checks pass **30 tests across six project files**. Firefox and WebKit behavior is unverified; **no broader browser minimum is verified**. ES2022 is a compilation target, not evidence of browser API/CSS availability. Peer ranges describe install compatibility, not an assertion that every allowed version was tested. Optional adapters' tested versions appear above.
 

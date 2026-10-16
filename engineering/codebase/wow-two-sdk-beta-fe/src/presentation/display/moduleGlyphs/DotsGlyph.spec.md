@@ -4,7 +4,7 @@ Renders a three-dot glyph.
 
 Source: [DotsGlyph.vue](DotsGlyph.vue).
 
-Public import: `import { DotsGlyph } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { DotsGlyph } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

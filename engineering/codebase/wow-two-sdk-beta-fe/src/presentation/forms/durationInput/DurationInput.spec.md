@@ -4,7 +4,7 @@ Renders a duration as one numeric segment per unit — `1 h 30 m` — balanced o
 
 Source: [DurationInput.vue](DurationInput.vue).
 
-Public import: `import { DurationInput, DurationUnit } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { DurationInput, DurationUnit } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

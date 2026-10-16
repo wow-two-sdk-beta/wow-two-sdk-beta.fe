@@ -67,7 +67,7 @@ const inNavigationMenuItem = (node: VNode): VNode =>
   inNavigationMenuList(h(NavigationMenuItem, { value: 'products' }, () => node));
 
 /**
- * Every component `@wow-two-beta/ui-vue/presentation/nav` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/presentation/nav` exports, as smoke cases.
  * Imported through the public barrel on purpose — a component missing from `index.ts` fails
  * here before a consumer finds it.
  */

@@ -4,7 +4,7 @@ Renders the mobile bottom navigation bar — three to five top-level destination
 
 Source: [BottomNavMenu.vue](BottomNavMenu.vue) · [BottomNavMenuItem.vue](BottomNavMenuItem.vue).
 
-Public import: `import { BottomNavMenu, BottomNavMenuItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { BottomNavMenu, BottomNavMenuItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

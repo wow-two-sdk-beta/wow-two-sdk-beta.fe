@@ -4,7 +4,7 @@ Renders a full-bleed `<section>` band with an inner centered `ContainerLayout`.
 
 Source: [Section.vue](Section.vue).
 
-Public import: `import { Section } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { Section } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { SeparatorLayout } from '@wow-two-beta/ui-vue/presentation/layout';
-import { Tooltip } from '@wow-two-beta/ui-vue/presentation/overlays';
-import * as display from '@wow-two-beta/ui-vue/presentation/display';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
+import { SeparatorLayout } from '@wow-two-beta/fe/presentation/layout';
+import { Tooltip } from '@wow-two-beta/fe/presentation/overlays';
+import * as display from '@wow-two-beta/fe/presentation/display';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
 import { Inbox } from 'lucide-vue-next';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
@@ -447,7 +447,7 @@ const selectedRows = ref<Array<string | number>>([]);
         <div class="space-y-2">
           <p class="text-sm">InlineLayout <CodeText>pnpm build</CodeText> in a sentence.</p>
           <CodeText variant="block">const x = 1;\nconst y = 2;</CodeText>
-          <SnippetText text="pnpm add @wow-two-beta/ui-vue" />
+          <SnippetText text="pnpm add @wow-two-beta/fe" />
           <SnippetText variant="block" text="pnpm --filter playground dev" />
         </div>
       </Demo>

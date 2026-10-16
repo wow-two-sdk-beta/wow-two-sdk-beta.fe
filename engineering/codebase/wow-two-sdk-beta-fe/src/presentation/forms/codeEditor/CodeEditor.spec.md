@@ -4,7 +4,7 @@ Renders a source-code textarea with a synced line-number gutter and Tab/Shift-Ta
 
 Source: [CodeEditor.vue](CodeEditor.vue).
 
-Public import: `import { CodeEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CodeEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

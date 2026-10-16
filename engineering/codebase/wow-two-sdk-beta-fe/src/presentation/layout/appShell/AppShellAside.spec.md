@@ -4,7 +4,7 @@ Renders the right-hand rail inside `AppShellMain`, and nothing at all below `asi
 
 Source: [AppShellAside.vue](AppShellAside.vue).
 
-Public import: `import { AppShellAside } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShellAside } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

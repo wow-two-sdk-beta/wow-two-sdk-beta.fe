@@ -2,7 +2,7 @@
    `vite.config.ts`, so it is the live source, not `dist/`. It carries
    `@import "tailwindcss"`, the `@theme` token block (default `wow` theme), the
    `dark` custom variant, and the component CSS. */
-@import '@wow-two-beta/ui-vue/styles.css';
+@import '@wow-two-beta/fe/styles.css';
 
 /* Tailwind v4 auto-detects sources from the ROOT css file's directory — which
    here is `apps/playground/src`. The library's own classes live two levels up

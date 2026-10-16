@@ -4,7 +4,7 @@ Renders one `role="option"` row, hiding itself while the current filter excludes
 
 Source: [CommandPaletteModalItem.vue](CommandPaletteModalItem.vue).
 
-Public import: `import { CommandPaletteModalItem } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalItem } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

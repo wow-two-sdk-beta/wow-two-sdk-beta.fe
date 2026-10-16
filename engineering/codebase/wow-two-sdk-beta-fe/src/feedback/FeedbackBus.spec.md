@@ -2,7 +2,7 @@
 
 Headless notice delivery with explicit in-memory retained history.
 
-Public import: `@wow-two-beta/ui-vue/feedback`.
+Public import: `@wow-two-beta/fe/feedback`.
 
 ## Notice payload
 

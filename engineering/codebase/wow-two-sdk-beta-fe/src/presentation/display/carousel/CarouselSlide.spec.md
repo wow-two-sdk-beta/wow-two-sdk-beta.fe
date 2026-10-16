@@ -4,7 +4,7 @@ Renders one slide's content box.
 
 Source: [CarouselSlide.vue](CarouselSlide.vue).
 
-Public import: `import { CarouselSlide } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselSlide } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

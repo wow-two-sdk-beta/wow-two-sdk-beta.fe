@@ -4,7 +4,7 @@ Renders a user image avatar that falls back to initials, with tone, ring, and lo
 
 Source: [Avatar.vue](Avatar.vue).
 
-Public import: `import { Avatar } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Avatar } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

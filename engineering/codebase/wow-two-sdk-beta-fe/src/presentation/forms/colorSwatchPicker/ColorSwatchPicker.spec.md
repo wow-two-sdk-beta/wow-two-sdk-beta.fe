@@ -4,7 +4,7 @@ Renders an inline palette of selectable color swatches, arrow-key navigable in b
 
 Source: [ColorSwatchPicker.vue](ColorSwatchPicker.vue).
 
-Public import: `import { ColorSwatchPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ColorSwatchPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

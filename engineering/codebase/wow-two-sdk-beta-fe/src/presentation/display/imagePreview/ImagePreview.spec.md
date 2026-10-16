@@ -4,7 +4,7 @@ Renders an `<img>` that swaps to the fallback slot when the source fails to load
 
 Source: [ImagePreview.vue](ImagePreview.vue).
 
-Public import: `import { ImagePreview } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ImagePreview } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

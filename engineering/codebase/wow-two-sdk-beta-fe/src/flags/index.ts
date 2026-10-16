@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/flags — headless feature-flag evaluation, OpenFeature-SHAPED but dependency-free
+// @wow-two-beta/fe/flags — headless feature-flag evaluation, OpenFeature-SHAPED but dependency-free
 // (the vocabulary is mirrored structurally, exactly as `forms-engine/StandardSchema.ts` vendors the
 // Standard Schema spec — see FlagTypes.ts for the three deliberate divergences).
 //

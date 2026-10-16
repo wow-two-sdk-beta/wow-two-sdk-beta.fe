@@ -4,7 +4,7 @@ Renders the supporting copy under a `TimelineTitle`, at muted body scale.
 
 Source: [TimelineDescription.vue](TimelineDescription.vue).
 
-Public import: `import { TimelineDescription } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TimelineDescription } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

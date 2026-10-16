@@ -4,7 +4,7 @@ Renders a radio as a whole clickable card carrying a title, description and opti
 
 Source: [ChoiceCard.vue](ChoiceCard.vue).
 
-Public import: `import { ChoiceCard } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ChoiceCard } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a native radio behind a custom visual; same-`name` siblings form one mut
 
 Source: [RadioInput.vue](RadioInput.vue).
 
-Public import: `import { RadioInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RadioInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

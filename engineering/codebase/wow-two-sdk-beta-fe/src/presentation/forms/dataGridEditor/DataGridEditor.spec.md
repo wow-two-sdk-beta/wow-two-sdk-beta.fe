@@ -4,7 +4,7 @@ Renders an editable data grid with keyboard navigation between cells and per-cel
 
 Source: [DataGridEditor.vue](DataGridEditor.vue).
 
-Public import: `import { DataGridEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { DataGridEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

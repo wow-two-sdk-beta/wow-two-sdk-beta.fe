@@ -4,7 +4,7 @@ Renders caller content on a plane that pans and zooms inside a fixed box.
 
 Source: [CanvasArea.vue](CanvasArea.vue).
 
-Public import: `import { CanvasArea } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { CanvasArea } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

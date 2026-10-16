@@ -6,7 +6,7 @@ import {
   ThemeSeeds,
   type Theme,
   type ThemeSeed,
-} from '@wow-two-beta/ui-vue/foundation/themes';
+} from '@wow-two-beta/fe/foundation/themes';
 
 /** The id the studio's theme is generated under; its CSS is scoped to `.theme-atlas-generated`. */
 export const GeneratedThemeId = 'atlas-generated';
@@ -121,7 +121,7 @@ export function seedSnippet(seed: ThemeSeed): string {
     ...SeedAxes.flatMap((axis) => (shipped[axis] === undefined ? [] : [`  ${axis}: '${shipped[axis]}',`])),
   ];
   return [
-    `import { generateTheme, themeToCss } from '@wow-two-beta/ui-vue/foundation/themes';`,
+    `import { generateTheme, themeToCss } from '@wow-two-beta/fe/foundation/themes';`,
     ``,
     `const theme = generateTheme({`,
     ...fields,

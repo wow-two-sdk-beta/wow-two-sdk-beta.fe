@@ -4,7 +4,7 @@ Renders the grab affordance of a `SortableGroupItem` — pointer arms the drag, 
 
 Source: [SortableGroupHandle.vue](SortableGroupHandle.vue).
 
-Public import: `import { SortableGroupHandle } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SortableGroupHandle } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

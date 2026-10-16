@@ -4,7 +4,7 @@ Renders children as masonry — items of uneven height flow down balanced column
 
 Source: [MasonryLayout.vue](MasonryLayout.vue).
 
-Public import: `import { MasonryLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { MasonryLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

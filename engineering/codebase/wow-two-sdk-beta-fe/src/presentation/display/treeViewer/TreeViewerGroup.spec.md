@@ -4,7 +4,7 @@ Renders an expandable branch of a `TreeViewer`.
 
 Source: [TreeViewerGroup.vue](TreeViewerGroup.vue).
 
-Public import: `import { TreeViewerGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TreeViewerGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

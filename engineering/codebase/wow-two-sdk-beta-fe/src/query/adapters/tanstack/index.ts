@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/query — data layer over TanStack Query v5. A thin, opinionated wrapper: house
+// @wow-two-beta/fe/query — data layer over TanStack Query v5. A thin, opinionated wrapper: house
 // QueryClient defaults + a configurable retry policy (from `foundation/resilience`), raw→domain
 // query / mutation / batch / paginated / lazy / infinite / suspense composables that coerce failures
 // to the SDK `ApiFailure`, an imperative cache accessor, intent-based prefetch, opt-in localStorage
@@ -18,7 +18,7 @@
 // TanStack-free (mirrors how `/router` isolates vue-router). Apps declare their own per-resource
 // endpoint factories over `defineEndpoint` (key + fetcher typed once — the data-layer parallel to the
 // router's `paths`/`definePath`); the factories and their `queryKeys` hierarchies stay app-local and
-// are NOT exported here. Test helpers live at `@wow-two-beta/ui-vue/query/testing` (kept out of this
+// are NOT exported here. Test helpers live at `@wow-two-beta/fe/query/testing` (kept out of this
 // runtime barrel).
 
 // Foundation

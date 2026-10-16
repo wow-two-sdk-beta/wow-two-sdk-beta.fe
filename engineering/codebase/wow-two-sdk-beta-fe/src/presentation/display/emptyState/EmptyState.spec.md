@@ -4,7 +4,7 @@ Renders plain, muted, centered no-results copy within the owning collection regi
 
 Source: [EmptyState.vue](EmptyState.vue).
 
-Public import: `import { EmptyState } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { EmptyState } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the step strip, its arrow-key navigation coming from the surrounding `Ro
 
 Source: [StepperGroupList.vue](StepperGroupList.vue).
 
-Public import: `import { StepperGroupList } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { StepperGroupList } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

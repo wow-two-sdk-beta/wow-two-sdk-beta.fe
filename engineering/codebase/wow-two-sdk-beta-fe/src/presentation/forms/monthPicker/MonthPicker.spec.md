@@ -4,7 +4,7 @@ Renders a trigger that opens a year page of months and shows the picked month.
 
 Source: [MonthPicker.vue](MonthPicker.vue) · shared parts: [PeriodPicker.vue](../PeriodPicker.vue), [PeriodGrid.vue](../PeriodGrid.vue).
 
-Public import: `import { MonthPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MonthPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

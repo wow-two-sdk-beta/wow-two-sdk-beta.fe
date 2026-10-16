@@ -18,10 +18,10 @@
     // to source. Mirror that here so the editor resolves the same files the
     // bundler does — `dist/` may be stale or absent during a port.
     "paths": {
-      "@wow-two-beta/ui-vue": ["../../src/index.ts"],
-      "@wow-two-beta/ui-vue/foundation/*": ["../../src/foundation/*/index.ts"],
-      "@wow-two-beta/ui-vue/domain/*": ["../../src/domain/*/index.ts"],
-      "@wow-two-beta/ui-vue/presentation/*": ["../../src/presentation/*/index.ts"]
+      "@wow-two-beta/fe": ["../../src/index.ts"],
+      "@wow-two-beta/fe/foundation/*": ["../../src/foundation/*/index.ts"],
+      "@wow-two-beta/fe/domain/*": ["../../src/domain/*/index.ts"],
+      "@wow-two-beta/fe/presentation/*": ["../../src/presentation/*/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "../playground/src/gallery/**/*.ts", "../playground/src/gallery/**/*.vue"],

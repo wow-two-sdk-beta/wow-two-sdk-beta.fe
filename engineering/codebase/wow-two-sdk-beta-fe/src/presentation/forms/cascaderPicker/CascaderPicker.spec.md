@@ -4,7 +4,7 @@ Renders a trigger that opens side-by-side columns — each pick opens the next l
 
 Source: [CascaderPicker.vue](CascaderPicker.vue).
 
-Public import: `import { CascaderPicker, type CascaderOption } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { CascaderPicker, type CascaderOption } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, shallowRef } from 'vue';
-import { createApiClient } from '@wow-two-beta/ui-vue/foundation/http';
-import { createFeedbackBus, feedbackQueryErrors } from '@wow-two-beta/ui-vue/feedback';
-import { createReporter, memoryReportSink, type IncidentReport } from '@wow-two-beta/ui-vue/reporting';
-import { FeedbackToastHost, ToastTimer, toastHost } from '@wow-two-beta/ui-vue/presentation/feedback';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
+import { createApiClient } from '@wow-two-beta/fe/foundation/http';
+import { createFeedbackBus, feedbackQueryErrors } from '@wow-two-beta/fe/feedback';
+import { createReporter, memoryReportSink, type IncidentReport } from '@wow-two-beta/fe/reporting';
+import { FeedbackToastHost, ToastTimer, toastHost } from '@wow-two-beta/fe/presentation/feedback';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
 
 /* One host for the whole demo: direct `toastHost` toasts and bus notices render in the same viewport. */
 const bus = createFeedbackBus();

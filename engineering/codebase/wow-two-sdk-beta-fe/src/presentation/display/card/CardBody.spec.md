@@ -4,7 +4,7 @@ Renders the main content region of a `Card`, padded to match its header and foot
 
 Source: [CardBody.vue](CardBody.vue).
 
-Public import: `import { CardBody } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CardBody } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

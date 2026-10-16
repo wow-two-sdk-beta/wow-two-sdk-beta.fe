@@ -4,7 +4,7 @@ Renders a tip arrow tinted to the popover surface; pair with Floating UI's `arro
 
 Source: [PopoverArrow.vue](PopoverArrow.vue).
 
-Public import: `import { PopoverArrow } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { PopoverArrow } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

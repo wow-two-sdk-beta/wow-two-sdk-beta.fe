@@ -4,7 +4,7 @@ Renders an iOS-style connected pill row of mutually exclusive options.
 
 Source: [SegmentedPicker.vue](SegmentedPicker.vue).
 
-Public import: `import { SegmentedPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SegmentedPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

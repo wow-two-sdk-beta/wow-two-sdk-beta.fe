@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/analytics — headless analytics event bus. App code reports the three canonical
+// @wow-two-beta/fe/analytics — headless analytics event bus. App code reports the three canonical
 // calls (`track('signup_completed')` / `identify(userId)` / `page('/pricing')` on the default client, or
 // `createAnalytics()` for isolation) and a sink adapter ships them — `register(provider)` plugs in GA,
 // PostHog, Segment, `consoleAnalyticsProvider()` in dev, or `memoryAnalyticsProvider()` in a test.

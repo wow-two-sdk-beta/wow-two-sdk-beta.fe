@@ -4,7 +4,7 @@ Renders a full-width, severity-tinted banner that broadcasts app-level status.
 
 Source: [BannerSimple.vue](BannerSimple.vue).
 
-Public import: `import { BannerSimple } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { BannerSimple } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

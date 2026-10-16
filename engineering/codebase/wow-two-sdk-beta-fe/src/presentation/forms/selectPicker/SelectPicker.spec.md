@@ -4,7 +4,7 @@ Renders a single-choice dropdown — the popover hosting trigger and panel, plus
 
 Source: [SelectPicker.vue](SelectPicker.vue).
 
-Public import: `import { SelectPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SelectPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

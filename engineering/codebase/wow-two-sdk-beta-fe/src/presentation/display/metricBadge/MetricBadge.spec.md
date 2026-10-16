@@ -4,7 +4,7 @@ Renders an inline-flex label-value chip with a tone-tinted leading icon and an u
 
 Source: [MetricBadge.vue](MetricBadge.vue).
 
-Public import: `import { MetricBadge } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { MetricBadge } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

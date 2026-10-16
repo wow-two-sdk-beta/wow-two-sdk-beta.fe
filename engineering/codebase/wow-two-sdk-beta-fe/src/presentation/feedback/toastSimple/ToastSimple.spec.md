@@ -4,7 +4,7 @@ Renders the atomic toast card — a single tone-driven notification around free-
 
 Source: [ToastSimple.vue](ToastSimple.vue).
 
-Public import: `import { ToastSimple } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ToastSimple } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

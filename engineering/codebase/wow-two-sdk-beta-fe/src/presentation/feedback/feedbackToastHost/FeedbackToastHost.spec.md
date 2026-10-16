@@ -4,7 +4,7 @@ Renders the toast viewport and forwards every `/feedback` bus notice into `toast
 
 Source: [FeedbackToastHost.vue](FeedbackToastHost.vue).
 
-Public import: `import { FeedbackToastHost } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { FeedbackToastHost } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

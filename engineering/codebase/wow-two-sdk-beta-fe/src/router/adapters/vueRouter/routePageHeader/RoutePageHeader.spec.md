@@ -4,7 +4,7 @@ Renders a `PageHeader` whose title and description follow the current route.
 
 Source: [RoutePageHeader.vue](RoutePageHeader.vue).
 
-Public import: `import { RoutePageHeader } from '@wow-two-beta/ui-vue/router';`.
+Public import: `import { RoutePageHeader } from '@wow-two-beta/fe/router';`.
 
 ## Contract
 

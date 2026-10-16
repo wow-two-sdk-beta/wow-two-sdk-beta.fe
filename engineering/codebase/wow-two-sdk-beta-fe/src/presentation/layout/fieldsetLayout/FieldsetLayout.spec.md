@@ -4,7 +4,7 @@ Renders a semantic `<fieldset>` grouping related controls, labelled by a `Legend
 
 Source: [FieldsetLayout.vue](FieldsetLayout.vue).
 
-Public import: `import { FieldsetLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { FieldsetLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

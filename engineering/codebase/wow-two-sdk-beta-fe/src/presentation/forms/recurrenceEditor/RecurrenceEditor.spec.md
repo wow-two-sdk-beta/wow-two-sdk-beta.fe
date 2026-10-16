@@ -4,7 +4,7 @@ Renders a visual RRULE editor — frequency, interval, weekdays, month day, and 
 
 Source: [RecurrenceEditor.vue](RecurrenceEditor.vue).
 
-Public import: `import { RecurrenceEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RecurrenceEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the table root and its scroll wrapper, sharing density and striping with
 
 Source: [Table.vue](Table.vue).
 
-Public import: `import { Table } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Table } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

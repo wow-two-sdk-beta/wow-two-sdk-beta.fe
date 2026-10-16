@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ExactNumberInput } from '@wow-two-beta/ui-vue/presentation/forms';
-import { useAppForm } from '@wow-two-beta/ui-vue/forms-engine/house';
-import { ResultExtensions } from '@wow-two-beta/ui-vue/foundation/results';
+import { ExactNumberInput } from '@wow-two-beta/fe/presentation/forms';
+import { useAppForm } from '@wow-two-beta/fe/forms-engine/house';
+import { ResultExtensions } from '@wow-two-beta/fe/foundation/results';
 const form = useAppForm({ defaultValues: { title: '' }, onSubmit: async () => ResultExtensions.ok(undefined) });
 </script>
 <template>

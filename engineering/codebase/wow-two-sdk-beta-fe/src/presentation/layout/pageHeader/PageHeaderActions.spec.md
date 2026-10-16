@@ -4,7 +4,7 @@ Places a page's primary actions in the app's `PageHeader`, wherever the page ren
 
 Source: [PageHeaderActions.vue](PageHeaderActions.vue).
 
-Public import: `import { PageHeaderActions } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { PageHeaderActions } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

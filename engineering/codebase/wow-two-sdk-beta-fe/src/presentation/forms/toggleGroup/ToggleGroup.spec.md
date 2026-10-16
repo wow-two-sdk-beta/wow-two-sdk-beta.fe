@@ -4,7 +4,7 @@ Renders a row of toggle buttons sharing one selection — at most one active, or
 
 Source: [ToggleGroup.vue](ToggleGroup.vue).
 
-Public import: `import { ToggleGroup } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ToggleGroup } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

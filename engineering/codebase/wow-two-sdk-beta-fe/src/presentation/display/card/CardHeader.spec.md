@@ -4,7 +4,7 @@ Renders the stacked header region of a `Card` — title above description.
 
 Source: [CardHeader.vue](CardHeader.vue).
 
-Public import: `import { CardHeader } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CardHeader } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

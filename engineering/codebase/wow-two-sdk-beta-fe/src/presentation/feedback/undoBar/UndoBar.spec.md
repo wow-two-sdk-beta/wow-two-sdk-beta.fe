@@ -4,7 +4,7 @@ Renders a snackbar carrying one message and a single "Undo" action.
 
 Source: [UndoBar.vue](UndoBar.vue).
 
-Public import: `import { UndoBar } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { UndoBar } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

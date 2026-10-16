@@ -4,7 +4,7 @@ Renders the floating panel below the trigger, hosting the rows as a multi-select
 
 Source: [MultiSelectPickerContent.vue](MultiSelectPickerContent.vue).
 
-Public import: `import { MultiSelectPickerContent } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MultiSelectPickerContent } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

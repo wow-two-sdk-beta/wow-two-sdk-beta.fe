@@ -4,7 +4,7 @@ Renders the separated dismiss row of an `ActionSheet`.
 
 Source: [ActionSheetCancel.vue](ActionSheetCancel.vue).
 
-Public import: `import { ActionSheetCancel } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { ActionSheetCancel } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

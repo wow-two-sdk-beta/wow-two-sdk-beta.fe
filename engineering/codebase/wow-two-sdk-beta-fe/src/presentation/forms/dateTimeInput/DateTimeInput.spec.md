@@ -4,7 +4,7 @@ Renders a typed `YYYY-MM-DD HH:MM` field with a `CalendarPicker` plus hour/minut
 
 Source: [DateTimeInput.vue](DateTimeInput.vue).
 
-Public import: `import { DateTimeInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { DateTimeInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

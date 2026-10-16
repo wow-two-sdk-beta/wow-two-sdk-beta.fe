@@ -2,13 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "ui-vue-playground",
+      "name": "fe-playground",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "playground", "dev"],
       "port": 5176
     },
     {
-      "name": "ui-vue-atlas",
+      "name": "fe-atlas",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "atlas", "dev"],
       "port": 5178

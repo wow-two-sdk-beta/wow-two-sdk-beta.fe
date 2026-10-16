@@ -4,7 +4,7 @@ Renders a burst of SVG confetti particles, animated by rAF from an imperative `f
 
 Source: [ConfettiOverlay.vue](ConfettiOverlay.vue).
 
-Public import: `import { ConfettiOverlay } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ConfettiOverlay } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

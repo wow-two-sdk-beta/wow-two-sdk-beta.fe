@@ -174,7 +174,7 @@ const inCarousel = (node: VNode): VNode => h(Carousel, null, () => node);
 const inCarouselViewport = (node: VNode): VNode => inCarousel(h(CarouselViewport, null, () => node));
 
 /**
- * Every component `@wow-two-beta/ui-vue/presentation/display` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/presentation/display` exports, as smoke cases.
  * Imported through the public barrel on purpose — a component missing from `index.ts` fails
  * here before a consumer finds it.
  */
@@ -231,7 +231,7 @@ export const displayExamples: readonly SmokeCase[] = [
 
   smokeCase('RelativeTime', RelativeTime, { value: Date.UTC(2026, 9, 12), now: Date.UTC(2026, 9, 15) }),
 
-  smokeCase('SnippetText', SnippetText, { text: 'pnpm add @wow-two-beta/ui-vue' }),
+  smokeCase('SnippetText', SnippetText, { text: 'pnpm add @wow-two-beta/fe' }),
 
   smokeCase('NotificationIndicator', NotificationIndicator, {}),
 

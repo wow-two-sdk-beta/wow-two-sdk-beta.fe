@@ -1,11 +1,11 @@
 # PointControl
 
 Normalized two-axis point selection for texture anchors and spatial form values.
-Public import: `import { PointControl } from '@wow-two-beta/ui-vue/presentation/forms'`.
+Public import: `import { PointControl } from '@wow-two-beta/fe/presentation/forms'`.
 Source: [PointControl.vue](PointControl.vue).
 
 Consumers that do not import the global SDK stylesheet import
-`@wow-two-beta/ui-vue/presentation/forms/point-control/styles.css` beside their own Tailwind and semantic tokens.
+`@wow-two-beta/fe/presentation/forms/point-control/styles.css` beside their own Tailwind and semantic tokens.
 
 ## Value
 

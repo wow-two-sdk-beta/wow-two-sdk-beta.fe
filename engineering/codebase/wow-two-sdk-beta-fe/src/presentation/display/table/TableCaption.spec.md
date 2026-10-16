@@ -4,7 +4,7 @@ Renders the `caption` of a `Table`, placed below the grid.
 
 Source: [TableCaption.vue](TableCaption.vue).
 
-Public import: `import { TableCaption } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableCaption } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

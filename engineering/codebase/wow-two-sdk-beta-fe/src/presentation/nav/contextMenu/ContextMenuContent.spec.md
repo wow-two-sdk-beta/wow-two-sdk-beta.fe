@@ -4,7 +4,7 @@ Renders the menu surface, anchored to the point the gesture happened at.
 
 Source: [ContextMenuContent.vue](ContextMenuContent.vue).
 
-Public import: `import { ContextMenuContent } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { ContextMenuContent } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

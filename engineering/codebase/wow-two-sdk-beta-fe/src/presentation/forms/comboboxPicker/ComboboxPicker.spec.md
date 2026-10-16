@@ -4,7 +4,7 @@ Renders a type-to-filter picker — the input and panel children, plus the hidde
 
 Source: [ComboboxPicker.vue](ComboboxPicker.vue).
 
-Public import: `import { ComboboxPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

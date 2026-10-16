@@ -4,7 +4,7 @@ Renders a color chip over a checkerboard backdrop — a `<button>` when given a 
 
 Source: [ColorSwatchPreview.vue](ColorSwatchPreview.vue).
 
-Public import: `import { ColorSwatchPreview } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ColorSwatchPreview } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

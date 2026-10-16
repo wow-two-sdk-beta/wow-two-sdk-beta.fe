@@ -4,7 +4,7 @@ Renders a loading region that switches every `SkeletonStateSlot` inside at the s
 
 Source: [SkeletonStateGroup.vue](SkeletonStateGroup.vue).
 
-Public import: `import { SkeletonStateGroup } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { SkeletonStateGroup } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

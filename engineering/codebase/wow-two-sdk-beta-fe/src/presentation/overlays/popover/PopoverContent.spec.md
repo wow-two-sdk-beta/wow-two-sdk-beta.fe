@@ -4,7 +4,7 @@ Renders the anchored, dismissable popover panel.
 
 Source: [PopoverContent.vue](PopoverContent.vue).
 
-Public import: `import { PopoverContent } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { PopoverContent } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

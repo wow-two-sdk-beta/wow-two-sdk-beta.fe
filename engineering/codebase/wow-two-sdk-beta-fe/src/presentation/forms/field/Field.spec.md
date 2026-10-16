@@ -4,7 +4,7 @@ Renders label, control, helper and error as one block, wiring the control throug
 
 Source: [Field.vue](Field.vue).
 
-Public import: `import { Field } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { Field } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

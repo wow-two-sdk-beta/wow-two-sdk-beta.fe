@@ -37,7 +37,7 @@ import {
 import { smokeCase, type SmokeCase } from './Example';
 
 /**
- * Every component `@wow-two-beta/ui-vue/presentation/feedback` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/presentation/feedback` exports, as smoke cases.
  * Imported through the public barrel on purpose — a component missing from `index.ts` fails
  * here before a consumer finds it.
  */

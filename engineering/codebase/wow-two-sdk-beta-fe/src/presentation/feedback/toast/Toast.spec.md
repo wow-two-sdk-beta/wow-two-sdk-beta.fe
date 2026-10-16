@@ -4,7 +4,7 @@ Renders a toast card — icon, title, description, actions, and a close button.
 
 Source: [Toast.vue](Toast.vue).
 
-Public import: `import { Toast } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { Toast } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

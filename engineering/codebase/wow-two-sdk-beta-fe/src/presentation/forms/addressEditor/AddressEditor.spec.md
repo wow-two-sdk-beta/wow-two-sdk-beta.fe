@@ -4,7 +4,7 @@ Renders a country-aware address block whose country select relabels the region a
 
 Source: [AddressEditor.vue](AddressEditor.vue).
 
-Public import: `import { AddressEditor } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { AddressEditor } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

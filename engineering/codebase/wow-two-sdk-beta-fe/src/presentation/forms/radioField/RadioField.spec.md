@@ -4,7 +4,7 @@ Renders a radio, its right-side label and an optional description in one clickab
 
 Source: [RadioField.vue](RadioField.vue).
 
-Public import: `import { RadioField } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RadioField } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

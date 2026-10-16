@@ -4,7 +4,7 @@ Renders the `tfoot` section of a `Table`, for summary rows under the body.
 
 Source: [TableFooter.vue](TableFooter.vue).
 
-Public import: `import { TableFooter } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableFooter } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

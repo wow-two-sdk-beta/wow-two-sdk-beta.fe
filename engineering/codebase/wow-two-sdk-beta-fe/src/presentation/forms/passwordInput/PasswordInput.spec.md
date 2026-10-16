@@ -4,7 +4,7 @@ Renders a password field with an optional eye button that reveals the typed char
 
 Source: [PasswordInput.vue](PasswordInput.vue).
 
-Public import: `import { PasswordInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { PasswordInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

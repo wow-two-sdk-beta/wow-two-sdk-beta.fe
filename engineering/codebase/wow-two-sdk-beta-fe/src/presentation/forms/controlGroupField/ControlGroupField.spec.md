@@ -4,7 +4,7 @@ Renders a labelled group of controls — a muted label bound to its control(s), 
 
 Source: [ControlGroupField.vue](ControlGroupField.vue).
 
-Public import: `import { ControlGroupField } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ControlGroupField } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

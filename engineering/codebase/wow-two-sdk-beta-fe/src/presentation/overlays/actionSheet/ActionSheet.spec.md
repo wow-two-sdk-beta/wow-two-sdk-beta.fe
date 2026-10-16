@@ -4,7 +4,7 @@ Renders an iOS-style action sheet — a bottom `Drawer` of stacked button rows a
 
 Source: [ActionSheet.vue](ActionSheet.vue).
 
-Public import: `import { ActionSheet } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { ActionSheet } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

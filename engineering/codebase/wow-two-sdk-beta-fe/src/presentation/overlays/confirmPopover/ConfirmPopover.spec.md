@@ -4,7 +4,7 @@ Renders its trigger and, once pressed, an anchored panel that asks the reader to
 
 Source: [ConfirmPopover.vue](ConfirmPopover.vue).
 
-Public import: `import { ConfirmPopover } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { ConfirmPopover } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

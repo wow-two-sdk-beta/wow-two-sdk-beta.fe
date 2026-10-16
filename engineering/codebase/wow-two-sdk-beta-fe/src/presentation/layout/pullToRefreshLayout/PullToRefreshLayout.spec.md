@@ -4,7 +4,7 @@ Renders a pull-to-refresh wrapper.
 
 Source: [PullToRefreshLayout.vue](PullToRefreshLayout.vue).
 
-Public import: `import { PullToRefreshLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { PullToRefreshLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the palette's search field — a `role="combobox"` driving the option li
 
 Source: [CommandPaletteModalInput.vue](CommandPaletteModalInput.vue).
 
-Public import: `import { CommandPaletteModalInput } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalInput } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

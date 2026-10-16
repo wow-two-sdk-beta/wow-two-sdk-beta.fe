@@ -4,7 +4,7 @@ Renders the emoji size as a tile set — each tile previews the given glyph at t
 
 Source: [EmojiSizePicker.vue](EmojiSizePicker.vue).
 
-Public import: `import { EmojiSizePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EmojiSizePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

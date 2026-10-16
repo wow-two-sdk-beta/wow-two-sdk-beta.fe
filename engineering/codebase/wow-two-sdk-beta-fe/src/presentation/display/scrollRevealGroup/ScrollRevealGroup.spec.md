@@ -4,7 +4,7 @@ Renders children hidden until they enter the viewport, then fades and slides the
 
 Source: [ScrollRevealGroup.vue](ScrollRevealGroup.vue).
 
-Public import: `import { ScrollRevealGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { ScrollRevealGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

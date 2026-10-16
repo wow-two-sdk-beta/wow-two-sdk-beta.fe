@@ -1,6 +1,6 @@
 # ExactNumber
 
-Immutable finite decimal values and explicit arithmetic. Public entry: `@wow-two-beta/ui-vue/foundation/numbers`.
+Immutable finite decimal values and explicit arithmetic. Public entry: `@wow-two-beta/fe/foundation/numbers`.
 
 ## Creation and identity
 

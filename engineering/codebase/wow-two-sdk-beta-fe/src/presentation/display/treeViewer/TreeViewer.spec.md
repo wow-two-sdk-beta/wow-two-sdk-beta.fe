@@ -4,7 +4,7 @@ Renders the tree root that owns selection and expansion for its branches and lea
 
 Source: [TreeViewer.vue](TreeViewer.vue).
 
-Public import: `import { TreeViewer } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TreeViewer } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

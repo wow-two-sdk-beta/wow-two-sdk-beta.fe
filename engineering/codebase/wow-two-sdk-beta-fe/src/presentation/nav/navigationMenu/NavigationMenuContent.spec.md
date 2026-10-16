@@ -4,7 +4,7 @@ Renders the anchored panel for one item.
 
 Source: [NavigationMenuContent.vue](NavigationMenuContent.vue).
 
-Public import: `import { NavigationMenuContent } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavigationMenuContent } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders one selectable option row with a tick when selected, registering itself 
 
 Source: [ComboboxPickerItem.vue](ComboboxPickerItem.vue).
 
-Public import: `import { ComboboxPickerItem } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPickerItem } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

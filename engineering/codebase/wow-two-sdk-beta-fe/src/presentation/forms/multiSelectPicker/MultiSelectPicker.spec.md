@@ -4,7 +4,7 @@ Renders a many-choice dropdown — the popover hosting trigger and panel, plus o
 
 Source: [MultiSelectPicker.vue](MultiSelectPicker.vue).
 
-Public import: `import { MultiSelectPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MultiSelectPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

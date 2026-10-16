@@ -4,7 +4,7 @@ Renders a `tr` in a `Table`; `data-selected` tints it with the selection fill.
 
 Source: [TableRow.vue](TableRow.vue).
 
-Public import: `import { TableRow } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TableRow } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

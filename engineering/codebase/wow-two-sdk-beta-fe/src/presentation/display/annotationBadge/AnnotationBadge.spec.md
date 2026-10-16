@@ -4,7 +4,7 @@ Renders a focusable annotation marker around content, or a bare numbered chip wi
 
 Source: [AnnotationBadge.vue](AnnotationBadge.vue).
 
-Public import: `import { AnnotationBadge } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AnnotationBadge } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

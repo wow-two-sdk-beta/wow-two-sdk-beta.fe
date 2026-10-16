@@ -4,7 +4,7 @@ Renders one `role="menuitem"` button in the bar, and anchors its menu.
 
 Source: [MenubarTrigger.vue](MenubarTrigger.vue).
 
-Public import: `import { MenubarTrigger } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenubarTrigger } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

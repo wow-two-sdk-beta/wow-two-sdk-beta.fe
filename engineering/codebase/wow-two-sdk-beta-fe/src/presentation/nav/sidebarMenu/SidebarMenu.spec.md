@@ -4,7 +4,7 @@ Renders the app's vertical sidebar navigation — destinations, labelled section
 
 Source: [SidebarMenu.vue](SidebarMenu.vue) · [SidebarMenuItem.vue](SidebarMenuItem.vue) · [SidebarMenuGroup.vue](SidebarMenuGroup.vue) · [SidebarMenuSection.vue](SidebarMenuSection.vue) · [SidebarMenuContext.ts](SidebarMenuContext.ts).
 
-Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, SidebarMenuSection } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, SidebarMenuSection } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

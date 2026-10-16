@@ -4,7 +4,7 @@ Renders a labelled `role="group"` band whose `MenuRadioItem` rows choose exactly
 
 Source: [MenuRadioGroup.vue](MenuRadioGroup.vue).
 
-Public import: `import { MenuRadioGroup } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { MenuRadioGroup } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a PDF inline with page and zoom controls over the browser built-in viewe
 
 Source: [PdfViewer.vue](PdfViewer.vue).
 
-Public import: `import { PdfViewer } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { PdfViewer } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the tablist strip, taking arrow-key navigation from `RovingFocusGroup`.
 
 Source: [TabsGroupList.vue](TabsGroupList.vue).
 
-Public import: `import { TabsGroupList } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TabsGroupList } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

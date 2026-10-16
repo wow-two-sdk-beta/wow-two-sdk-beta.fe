@@ -25,7 +25,7 @@ function check(spec: LayoutSpec, name: string): void {
   const code = scaffold(spec);
   expect(() => compile(code), name).not.toThrow();
   const imported = new Map<string, string>();
-  for (const match of code.matchAll(/import \{ ([^}]+) \} from '@wow-two-beta\/ui-vue\/presentation\/(\w+)';/gu)) {
+  for (const match of code.matchAll(/import \{ ([^}]+) \} from '@wow-two-beta\/fe\/presentation\/(\w+)';/gu)) {
     for (const component of match[1]!.split(', ')) imported.set(component, match[2]!);
   }
   const template = code.slice(code.indexOf('<template>'));

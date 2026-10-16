@@ -4,7 +4,7 @@ Renders one comment: avatar and collapse rail, header line, body, actions, and n
 
 Source: [Comment.vue](Comment.vue).
 
-Public import: `import { Comment } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Comment } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

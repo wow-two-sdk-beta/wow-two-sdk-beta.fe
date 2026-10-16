@@ -1,7 +1,7 @@
-// @wow-two-beta/ui-vue/query/testing — test-only helpers for the query layer, kept out of the
+// @wow-two-beta/fe/query/testing — test-only helpers for the query layer, kept out of the
 // runtime `/query` barrel so `@vue/test-utils` never leaks into a shipped app bundle. Imported only
 // from tests: `import { mountWithQuery, createTestQueryClient, runWithQuery } from
-// '@wow-two-beta/ui-vue/query/testing'`.
+// '@wow-two-beta/fe/query/testing'`.
 //
 // React's half of this sat on `@testing-library/react`, which has no Vue equivalent; `@vue/test-utils`
 // is the counterpart and MOUNTS a component instead of rendering an element, so `renderWithQuery`

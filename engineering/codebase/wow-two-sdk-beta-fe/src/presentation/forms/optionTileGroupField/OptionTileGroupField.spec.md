@@ -4,7 +4,7 @@ Renders a named `<fieldset>` around a row of option tiles, disabling every tile 
 
 Source: [OptionTileGroupField.vue](OptionTileGroupField.vue).
 
-Public import: `import { OptionTileGroupField } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { OptionTileGroupField } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

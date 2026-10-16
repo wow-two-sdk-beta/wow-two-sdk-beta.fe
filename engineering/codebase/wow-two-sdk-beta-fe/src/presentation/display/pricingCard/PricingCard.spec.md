@@ -4,7 +4,7 @@ Renders a pricing tier: name, price baseline, tagline, checked feature list, bot
 
 Source: [PricingCard.vue](PricingCard.vue).
 
-Public import: `import { PricingCard } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { PricingCard } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

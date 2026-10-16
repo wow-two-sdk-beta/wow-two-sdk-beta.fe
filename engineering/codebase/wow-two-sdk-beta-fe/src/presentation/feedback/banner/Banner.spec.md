@@ -4,7 +4,7 @@ Renders a full-width banner with icon, title, description, and action slots.
 
 Source: [Banner.vue](Banner.vue).
 
-Public import: `import { Banner } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { Banner } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

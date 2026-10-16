@@ -4,7 +4,7 @@ Renders the primary column into the `main` grid area — also the skip-link's ta
 
 Source: [AppShellMain.vue](AppShellMain.vue).
 
-Public import: `import { AppShellMain } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShellMain } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

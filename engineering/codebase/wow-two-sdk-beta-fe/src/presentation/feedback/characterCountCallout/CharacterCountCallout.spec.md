@@ -4,7 +4,7 @@ Renders the live character count for a limited field, going destructive once `va
 
 Source: [CharacterCountCallout.vue](CharacterCountCallout.vue).
 
-Public import: `import { CharacterCountCallout } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { CharacterCountCallout } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

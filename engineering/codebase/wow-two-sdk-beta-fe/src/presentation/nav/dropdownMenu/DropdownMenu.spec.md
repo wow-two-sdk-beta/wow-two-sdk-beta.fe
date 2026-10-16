@@ -4,7 +4,7 @@ Renders only its slot, owning the open state and placement of the DropdownMenu t
 
 Source: [DropdownMenu.vue](DropdownMenu.vue).
 
-Public import: `import { DropdownMenu } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { DropdownMenu } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

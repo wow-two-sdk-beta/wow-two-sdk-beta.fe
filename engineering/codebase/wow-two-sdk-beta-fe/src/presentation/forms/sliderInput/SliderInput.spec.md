@@ -4,7 +4,7 @@ Renders one draggable thumb on a horizontal track, as a cross-browser-styled nat
 
 Source: [SliderInput.vue](SliderInput.vue).
 
-Public import: `import { SliderInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SliderInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

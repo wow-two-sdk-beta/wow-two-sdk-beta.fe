@@ -4,7 +4,7 @@ Renders the element that opens the enclosing `HoverCard` on hover or focus, and 
 
 Source: [HoverCardTrigger.vue](HoverCardTrigger.vue).
 
-Public import: `import { HoverCardTrigger } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { HoverCardTrigger } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a scrim and centered spinner that block interaction with a region during
 
 Source: [LoadingOverlay.vue](LoadingOverlay.vue).
 
-Public import: `import { LoadingOverlay } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { LoadingOverlay } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

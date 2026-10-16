@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
-import { ControlGroupField } from '@wow-two-beta/ui-vue/presentation/forms';
-import * as layout from '@wow-two-beta/ui-vue/presentation/layout';
-import { cn } from '@wow-two-beta/ui-vue/foundation/styles';
+import { ControlGroupField } from '@wow-two-beta/fe/presentation/forms';
+import * as layout from '@wow-two-beta/fe/presentation/layout';
+import { cn } from '@wow-two-beta/fe/foundation/styles';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';

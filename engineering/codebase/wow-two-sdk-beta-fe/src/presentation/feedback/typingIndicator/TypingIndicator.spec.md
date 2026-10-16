@@ -4,7 +4,7 @@ Renders an optional "who" label beside three animating dots — the "someone is 
 
 Source: [TypingIndicator.vue](TypingIndicator.vue).
 
-Public import: `import { TypingIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { TypingIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

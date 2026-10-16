@@ -4,7 +4,7 @@ Renders one label-value row with an optional leading icon.
 
 Source: [InfoRow.vue](InfoRow.vue).
 
-Public import: `import { InfoRow } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { InfoRow } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

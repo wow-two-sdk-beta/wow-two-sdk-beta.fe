@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, shallowRef } from 'vue';
 import { Bell, CreditCard, Shield, User } from 'lucide-vue-next';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { DescriptionGroup, LegendText } from '@wow-two-beta/ui-vue/presentation/display';
-import { Field, SwitchField, TextAreaInput, TextInput } from '@wow-two-beta/ui-vue/presentation/forms';
-import { FieldsetLayout } from '@wow-two-beta/ui-vue/presentation/layout';
-import { NavItem } from '@wow-two-beta/ui-vue/presentation/nav';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { DescriptionGroup, LegendText } from '@wow-two-beta/fe/presentation/display';
+import { Field, SwitchField, TextAreaInput, TextInput } from '@wow-two-beta/fe/presentation/forms';
+import { FieldsetLayout } from '@wow-two-beta/fe/presentation/layout';
+import { NavItem } from '@wow-two-beta/fe/presentation/nav';
 
 /* Settings archetype: a section list beside grouped forms. Edits stay a draft until "Save", which states what
    happened — the save feedback the archetype names. */

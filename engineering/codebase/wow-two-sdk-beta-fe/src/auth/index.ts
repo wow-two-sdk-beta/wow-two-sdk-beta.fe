@@ -1,4 +1,4 @@
-// @wow-two-beta/ui-vue/auth — headless session client over the wow-two backend identity baseline.
+// @wow-two-beta/fe/auth — headless session client over the wow-two backend identity baseline.
 // `AuthProvider` owns the session state machine (unknown → resolving → authenticated | anonymous):
 // me-resolve on mount (deduped through a shared in-flight promise), signIn / signOut / refresh /
 // setUser actions, generic `TUser` typing. `createAuthBridge` is the app-owned hub for the

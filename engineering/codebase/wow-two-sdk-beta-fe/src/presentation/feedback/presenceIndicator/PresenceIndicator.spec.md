@@ -4,7 +4,7 @@ Renders a colored dot encoding a person's presence — online / idle / busy / of
 
 Source: [PresenceIndicator.vue](PresenceIndicator.vue).
 
-Public import: `import { PresenceIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { PresenceIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

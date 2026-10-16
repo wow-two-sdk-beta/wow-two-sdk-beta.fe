@@ -4,7 +4,7 @@ Renders a native scrollable container with stable visuals.
 
 Source: [ScrollArea.vue](ScrollArea.vue).
 
-Public import: `import { ScrollArea } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { ScrollArea } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the dismissing button of an `AlertModal`; it closes the dialog without f
 
 Source: [AlertModalCancel.vue](AlertModalCancel.vue).
 
-Public import: `import { AlertModalCancel } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { AlertModalCancel } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a scrolling message viewport with sticky auto-scroll and a jump-to-lates
 
 Source: [MessageGroup.vue](MessageGroup.vue).
 
-Public import: `import { MessageGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { MessageGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

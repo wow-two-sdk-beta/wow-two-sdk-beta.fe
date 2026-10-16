@@ -4,7 +4,7 @@ Renders the clickable header of an `AccordionGroupItem` — toggles its panel an
 
 Source: [AccordionGroupTrigger.vue](AccordionGroupTrigger.vue).
 
-Public import: `import { AccordionGroupTrigger } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AccordionGroupTrigger } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

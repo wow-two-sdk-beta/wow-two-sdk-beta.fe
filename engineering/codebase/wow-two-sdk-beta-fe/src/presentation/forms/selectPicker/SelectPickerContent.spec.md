@@ -4,7 +4,7 @@ Renders the floating panel below the trigger — an optional search box over the
 
 Source: [SelectPickerContent.vue](SelectPickerContent.vue).
 
-Public import: `import { SelectPickerContent } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SelectPickerContent } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

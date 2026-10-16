@@ -4,7 +4,7 @@ Renders the button that opens the dropdown, showing the selected chips and a che
 
 Source: [MultiSelectPickerTrigger.vue](MultiSelectPickerTrigger.vue).
 
-Public import: `import { MultiSelectPickerTrigger } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { MultiSelectPickerTrigger } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

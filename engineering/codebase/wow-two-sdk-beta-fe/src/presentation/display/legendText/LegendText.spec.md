@@ -4,7 +4,7 @@ Renders a `<legend>` styled to match `LabelText`, naming the group of controls a
 
 Source: [LegendText.vue](LegendText.vue).
 
-Public import: `import { LegendText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { LegendText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

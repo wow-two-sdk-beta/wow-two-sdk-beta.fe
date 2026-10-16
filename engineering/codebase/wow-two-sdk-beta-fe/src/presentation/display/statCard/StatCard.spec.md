@@ -4,7 +4,7 @@ Renders a KPI tile — label, big value, optional trend and helper — for dashb
 
 Source: [StatCard.vue](StatCard.vue).
 
-Public import: `import { StatCard } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { StatCard } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

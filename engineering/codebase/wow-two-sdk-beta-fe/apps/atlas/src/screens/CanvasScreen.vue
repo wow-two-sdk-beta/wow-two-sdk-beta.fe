@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, shallowRef } from 'vue';
 import { Circle, Minus, MousePointer2, PanelRightClose, PanelRightOpen, Plus, Square, Type } from 'lucide-vue-next';
-import { Button, ButtonGroup, Toolbar, ToolbarButton } from '@wow-two-beta/ui-vue/presentation/actions';
-import { ColorInput, SliderInput, SwitchField } from '@wow-two-beta/ui-vue/presentation/forms';
+import { Button, ButtonGroup, Toolbar, ToolbarButton } from '@wow-two-beta/fe/presentation/actions';
+import { ColorInput, SliderInput, SwitchField } from '@wow-two-beta/fe/presentation/forms';
 
 /* Canvas-islands archetype: the work fills the screen and every tool floats above it — a tool strip, an inspector
    that folds away, and zoom at the bottom. Islands leave the canvas visible around them, the Figma/Excalidraw feel. */

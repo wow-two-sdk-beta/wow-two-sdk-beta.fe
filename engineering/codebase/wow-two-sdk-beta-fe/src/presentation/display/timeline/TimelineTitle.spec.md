@@ -4,7 +4,7 @@ Renders the headline of a `TimelineItem`, at the rail title weight.
 
 Source: [TimelineTitle.vue](TimelineTitle.vue).
 
-Public import: `import { TimelineTitle } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { TimelineTitle } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

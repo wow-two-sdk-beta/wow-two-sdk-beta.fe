@@ -4,7 +4,7 @@ Renders a notification panel — title and count header, a scrolling item list, 
 
 Source: [NotificationCenterGroup.vue](NotificationCenterGroup.vue).
 
-Public import: `import { NotificationCenterGroup } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { NotificationCenterGroup } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders the scrollable `role="listbox"` the search input drives.
 
 Source: [CommandPaletteModalList.vue](CommandPaletteModalList.vue).
 
-Public import: `import { CommandPaletteModalList } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModalList } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

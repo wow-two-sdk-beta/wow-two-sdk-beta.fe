@@ -4,7 +4,7 @@ Renders a track with two thumbs that edit one numeric range, dragged or stepped 
 
 Source: [RangeSliderInput.vue](RangeSliderInput.vue).
 
-Public import: `import { RangeSliderInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { RangeSliderInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

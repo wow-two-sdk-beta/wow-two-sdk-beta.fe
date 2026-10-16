@@ -4,7 +4,7 @@ Renders a searchable emoji catalog with a recents bucket and a swappable categor
 
 Source: [EmojiPicker.vue](EmojiPicker.vue).
 
-Public import: `import { EmojiPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EmojiPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

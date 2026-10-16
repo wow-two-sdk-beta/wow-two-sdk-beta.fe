@@ -4,7 +4,7 @@ Renders a sidebar / nav row — icon, label, trailing slot, and an active state.
 
 Source: [NavItem.vue](NavItem.vue).
 
-Public import: `import { NavItem } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavItem } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

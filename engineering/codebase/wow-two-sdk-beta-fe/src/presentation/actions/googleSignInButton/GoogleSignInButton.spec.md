@@ -4,7 +4,7 @@ Renders the Google sign-in button — the Google-owned control for the GIS ID-to
 
 Source: [GoogleSignInButton.vue](GoogleSignInButton.vue).
 
-Public import: `import { GoogleSignInButton } from '@wow-two-beta/ui-vue/presentation/actions';`.
+Public import: `import { GoogleSignInButton } from '@wow-two-beta/fe/presentation/actions';`.
 
 ## Contract
 

@@ -4,9 +4,9 @@ Renders the toast viewport — subscribes to the global `toastHost` store and st
 
 Source: [ToastHost.vue](ToastHost.vue).
 
-Public import: `import { ToastHost } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ToastHost } from '@wow-two-beta/fe/presentation/feedback';`.
 
-Component-only import: `@wow-two-beta/ui-vue/presentation/feedback/toast-host` with `@wow-two-beta/ui-vue/presentation/feedback/toast-host/styles.css`, which scans only the toast chunks (host, card, severity glyphs, the Report action's button) and supplies overridable stacking and slide-motion fallbacks. The consumer provides Tailwind and the semantic colour tokens.
+Component-only import: `@wow-two-beta/fe/presentation/feedback/toast-host` with `@wow-two-beta/fe/presentation/feedback/toast-host/styles.css`, which scans only the toast chunks (host, card, severity glyphs, the Report action's button) and supplies overridable stacking and slide-motion fallbacks. The consumer provides Tailwind and the semantic colour tokens.
 
 ## Contract
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, shallowRef } from 'vue';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
-import { DescriptionGroup } from '@wow-two-beta/ui-vue/presentation/display';
-import { Alert } from '@wow-two-beta/ui-vue/presentation/feedback';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
+import { DescriptionGroup } from '@wow-two-beta/fe/presentation/display';
+import { Alert } from '@wow-two-beta/fe/presentation/feedback';
 import {
   ChoiceCard,
   EmailInput,
@@ -14,7 +14,7 @@ import {
   WizardFormFooter,
   WizardFormStep,
   WizardFormSteps,
-} from '@wow-two-beta/ui-vue/presentation/forms';
+} from '@wow-two-beta/fe/presentation/forms';
 
 /* Wizard archetype: one task per step, visible steps, a steady footer. Each step validates before Next moves on,
    so an error stays beside the field that caused it. */

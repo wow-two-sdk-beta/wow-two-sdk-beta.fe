@@ -4,7 +4,7 @@ Renders the scrolling region inside `AppShellMain` — header, sidebar and foote
 
 Source: [AppShellContent.vue](AppShellContent.vue).
 
-Public import: `import { AppShellContent } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShellContent } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

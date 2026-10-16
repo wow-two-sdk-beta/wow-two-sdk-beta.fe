@@ -4,7 +4,7 @@ Renders the shell's sticky top bar into the `header` grid area.
 
 Source: [AppShellHeader.vue](AppShellHeader.vue).
 
-Public import: `import { AppShellHeader } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { AppShellHeader } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

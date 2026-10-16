@@ -4,7 +4,7 @@ Renders leading and trailing addons welded to an input's border — protocol pre
 
 Source: [InputAddonLayout.vue](InputAddonLayout.vue).
 
-Public import: `import { InputAddonLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { InputAddonLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

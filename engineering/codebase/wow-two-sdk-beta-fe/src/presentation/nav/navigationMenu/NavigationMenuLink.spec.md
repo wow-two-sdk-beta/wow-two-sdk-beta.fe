@@ -4,7 +4,7 @@ Renders a plain link that joins the strip's roving tab stop.
 
 Source: [NavigationMenuLink.vue](NavigationMenuLink.vue).
 
-Public import: `import { NavigationMenuLink } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { NavigationMenuLink } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

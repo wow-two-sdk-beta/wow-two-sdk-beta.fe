@@ -4,7 +4,7 @@ Renders one pagination dot that jumps to its slide.
 
 Source: [CarouselDot.vue](CarouselDot.vue).
 
-Public import: `import { CarouselDot } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselDot } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders one disclosure panel, pairing an `AccordionGroupTrigger` with its `Accor
 
 Source: [AccordionGroupItem.vue](AccordionGroupItem.vue).
 
-Public import: `import { AccordionGroupItem } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { AccordionGroupItem } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

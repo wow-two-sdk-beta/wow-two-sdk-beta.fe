@@ -4,7 +4,7 @@ Renders a drag-drop zone that also opens the native picker on click, Enter or Sp
 
 Source: [FileUploadPicker.vue](FileUploadPicker.vue).
 
-Public import: `import { FileUploadPicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { FileUploadPicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

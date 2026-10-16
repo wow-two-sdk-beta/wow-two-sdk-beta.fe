@@ -4,7 +4,7 @@ Renders text filled with a gradient through `background-clip: text`.
 
 Source: [GradientText.vue](GradientText.vue).
 
-Public import: `import { GradientText } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { GradientText } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

@@ -1,6 +1,6 @@
 # LosslessJson
 
-JSON transport without passing numeric tokens through JavaScript Number. Public entry: `@wow-two-beta/ui-vue/foundation/json`.
+JSON transport without passing numeric tokens through JavaScript Number. Public entry: `@wow-two-beta/fe/foundation/json`.
 
 ## API
 

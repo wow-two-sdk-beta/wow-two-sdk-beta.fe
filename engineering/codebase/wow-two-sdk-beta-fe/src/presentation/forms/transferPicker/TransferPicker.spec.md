@@ -4,7 +4,7 @@ Renders two lists side by side — what is available and what is selected — wi
 
 Source: [TransferPicker.vue](TransferPicker.vue) · lists: [ListboxPicker](../listboxPicker/ListboxPicker.spec.md).
 
-Public import: `import { TransferPicker, type TransferOption } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TransferPicker, type TransferOption } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

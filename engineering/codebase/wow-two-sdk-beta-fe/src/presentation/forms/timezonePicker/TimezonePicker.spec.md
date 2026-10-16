@@ -4,7 +4,7 @@ Renders a searchable picker of IANA time zones, each labelled with its UTC offse
 
 Source: [TimezonePicker.vue](TimezonePicker.vue).
 
-Public import: `import { TimezonePicker } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TimezonePicker } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

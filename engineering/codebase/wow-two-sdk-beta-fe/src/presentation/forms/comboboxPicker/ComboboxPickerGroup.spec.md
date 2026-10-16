@@ -4,7 +4,7 @@ Renders a heading above a subset of options and wires it as that group's accessi
 
 Source: [ComboboxPickerGroup.vue](ComboboxPickerGroup.vue).
 
-Public import: `import { ComboboxPickerGroup } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ComboboxPickerGroup } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

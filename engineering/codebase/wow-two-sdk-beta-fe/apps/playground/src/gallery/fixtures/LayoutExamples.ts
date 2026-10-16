@@ -55,7 +55,7 @@ const inAppShell = (node: VNode): VNode => h(AppShell, null, () => node);
 const inAppShellMain = (node: VNode): VNode => inAppShell(h(AppShellMain, null, () => node));
 
 /**
- * Every component `@wow-two-beta/ui-vue/presentation/layout` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/presentation/layout` exports, as smoke cases.
  * Imported through the public barrel on purpose — a component missing from `index.ts` fails
  * here before a consumer finds it.
  */

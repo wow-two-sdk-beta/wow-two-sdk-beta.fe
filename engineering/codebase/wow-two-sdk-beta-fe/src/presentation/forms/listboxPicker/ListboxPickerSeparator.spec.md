@@ -4,7 +4,7 @@ Renders a decorative rule between groups of items, hidden from the accessibility
 
 Source: [ListboxPickerSeparator.vue](ListboxPickerSeparator.vue).
 
-Public import: `import { ListboxPickerSeparator } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ListboxPickerSeparator } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

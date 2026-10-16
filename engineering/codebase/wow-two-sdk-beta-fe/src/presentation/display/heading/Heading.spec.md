@@ -4,7 +4,7 @@ Renders a semantic heading whose tag (`h1`-`h6`) and visual size are set indepen
 
 Source: [Heading.vue](Heading.vue).
 
-Public import: `import { Heading } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Heading } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

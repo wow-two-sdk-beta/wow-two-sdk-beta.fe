@@ -4,7 +4,7 @@ Renders a single-line text input; email, tel, url, number, password and search h
 
 Source: [TextInput.vue](TextInput.vue).
 
-Public import: `import { TextInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TextInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

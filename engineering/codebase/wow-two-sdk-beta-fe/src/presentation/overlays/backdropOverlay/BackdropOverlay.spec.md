@@ -4,7 +4,7 @@ Renders a fixed-position scrim behind an overlay, optionally blurred and click-t
 
 Source: [BackdropOverlay.vue](BackdropOverlay.vue).
 
-Public import: `import { BackdropOverlay } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { BackdropOverlay } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

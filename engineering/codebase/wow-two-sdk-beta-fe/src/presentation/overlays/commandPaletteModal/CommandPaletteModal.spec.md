@@ -4,7 +4,7 @@ Renders the command palette inside a `Modal`, owning open state, search text, an
 
 Source: [CommandPaletteModal.vue](CommandPaletteModal.vue).
 
-Public import: `import { CommandPaletteModal } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { CommandPaletteModal } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

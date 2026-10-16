@@ -4,7 +4,7 @@ Renders a compact page-number row with prev / next arrows and ellipses for skipp
 
 Source: [Pagination.vue](Pagination.vue).
 
-Public import: `import { Pagination } from '@wow-two-beta/ui-vue/presentation/nav';`.
+Public import: `import { Pagination } from '@wow-two-beta/fe/presentation/nav';`.
 
 ## Contract
 

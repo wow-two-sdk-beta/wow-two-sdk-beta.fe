@@ -4,7 +4,7 @@ Renders the sliding track, wrapping each child in its own `role="group"` slide f
 
 Source: [CarouselSlides.vue](CarouselSlides.vue).
 
-Public import: `import { CarouselSlides } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { CarouselSlides } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

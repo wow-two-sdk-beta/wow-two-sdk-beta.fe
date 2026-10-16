@@ -4,7 +4,7 @@ Renders a flex shorthand that centers its children on both axes.
 
 Source: [CenterLayout.vue](CenterLayout.vue).
 
-Public import: `import { CenterLayout } from '@wow-two-beta/ui-vue/presentation/layout';`.
+Public import: `import { CenterLayout } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Contract
 

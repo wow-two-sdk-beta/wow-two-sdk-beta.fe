@@ -5,7 +5,7 @@ the root.
 
 Source: [AlertModalContent.vue](AlertModalContent.vue).
 
-Public import: `import { AlertModalContent } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { AlertModalContent } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

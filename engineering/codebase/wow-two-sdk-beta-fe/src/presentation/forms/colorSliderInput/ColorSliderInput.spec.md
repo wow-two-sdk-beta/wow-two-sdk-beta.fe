@@ -4,7 +4,7 @@ Renders a single-channel hue/saturation/value/alpha track, pointer-draggable and
 
 Source: [ColorSliderInput.vue](ColorSliderInput.vue).
 
-Public import: `import { ColorSliderInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { ColorSliderInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a native checkbox as an iOS-style track and thumb toggle, carrying no la
 
 Source: [SwitchInput.vue](SwitchInput.vue).
 
-Public import: `import { SwitchInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { SwitchInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

@@ -4,7 +4,7 @@ Renders a typed `HH:MM` field with a design-system popover on the trailing clock
 
 Source: [TimeInput.vue](TimeInput.vue).
 
-Public import: `import { TimeInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TimeInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

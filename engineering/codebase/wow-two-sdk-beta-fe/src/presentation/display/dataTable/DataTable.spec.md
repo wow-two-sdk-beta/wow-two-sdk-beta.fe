@@ -4,7 +4,7 @@ Renders a sortable table from a `columns` descriptor, wrapping the `Table` primi
 
 Source: [DataTable.vue](DataTable.vue).
 
-Public import: `import { DataTable } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { DataTable } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

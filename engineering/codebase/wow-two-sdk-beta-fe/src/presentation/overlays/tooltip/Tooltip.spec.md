@@ -4,7 +4,7 @@ Renders a hover- or focus-triggered tooltip into a Portal, positioned by Floatin
 
 Source: [Tooltip.vue](Tooltip.vue).
 
-Public import: `import { Tooltip } from '@wow-two-beta/ui-vue/presentation/overlays';`.
+Public import: `import { Tooltip } from '@wow-two-beta/fe/presentation/overlays';`.
 
 ## Contract
 

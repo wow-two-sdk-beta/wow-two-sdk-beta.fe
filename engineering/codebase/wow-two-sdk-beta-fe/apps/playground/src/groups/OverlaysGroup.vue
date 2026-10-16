@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import * as overlays from '@wow-two-beta/ui-vue/presentation/overlays';
-import { Button } from '@wow-two-beta/ui-vue/presentation/actions';
+import * as overlays from '@wow-two-beta/fe/presentation/overlays';
+import { Button } from '@wow-two-beta/fe/presentation/actions';
 import Demo from '../gallery/Demo.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
 import { overlaysExamples } from '../gallery/fixtures/OverlaysExamples';

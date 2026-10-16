@@ -4,7 +4,7 @@ Renders a circular SVG progress ring with an optional label at its centre.
 
 Source: [ProgressCircleIndicator.vue](ProgressCircleIndicator.vue).
 
-Public import: `import { ProgressCircleIndicator } from '@wow-two-beta/ui-vue/presentation/feedback';`.
+Public import: `import { ProgressCircleIndicator } from '@wow-two-beta/fe/presentation/feedback';`.
 
 ## Contract
 

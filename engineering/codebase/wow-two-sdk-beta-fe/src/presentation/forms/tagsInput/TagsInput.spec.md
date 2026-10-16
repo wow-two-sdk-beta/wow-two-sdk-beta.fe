@@ -4,7 +4,7 @@ Renders committed tags as chips beside a free-form input — Enter, comma or Tab
 
 Source: [TagsInput.vue](TagsInput.vue).
 
-Public import: `import { TagsInput } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { TagsInput } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

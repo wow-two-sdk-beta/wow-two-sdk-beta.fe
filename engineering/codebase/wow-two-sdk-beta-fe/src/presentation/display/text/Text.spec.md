@@ -4,7 +4,7 @@ Renders body text as a `<p>`, or as any element given to `as` to match surroundi
 
 Source: [Text.vue](Text.vue).
 
-Public import: `import { Text } from '@wow-two-beta/ui-vue/presentation/display';`.
+Public import: `import { Text } from '@wow-two-beta/fe/presentation/display';`.
 
 ## Contract
 

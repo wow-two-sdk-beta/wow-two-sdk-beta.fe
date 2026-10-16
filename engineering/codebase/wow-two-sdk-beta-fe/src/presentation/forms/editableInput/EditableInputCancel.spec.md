@@ -4,7 +4,7 @@ Renders the discard button, shown only while editing, that drops the draft and l
 
 Source: [EditableInputCancel.vue](EditableInputCancel.vue).
 
-Public import: `import { EditableInputCancel } from '@wow-two-beta/ui-vue/presentation/forms';`.
+Public import: `import { EditableInputCancel } from '@wow-two-beta/fe/presentation/forms';`.
 
 ## Contract
 

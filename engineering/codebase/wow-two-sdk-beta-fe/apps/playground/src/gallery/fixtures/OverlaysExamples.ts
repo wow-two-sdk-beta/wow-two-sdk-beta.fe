@@ -82,7 +82,7 @@ const inPopover = (node: VNode): VNode => h(Popover, { defaultOpen: true }, () =
 const inHoverCard = (node: VNode): VNode => h(HoverCard, { defaultOpen: true }, () => node);
 
 /**
- * Every component `@wow-two-beta/ui-vue/presentation/overlays` exports, as smoke cases.
+ * Every component `@wow-two-beta/fe/presentation/overlays` exports, as smoke cases.
  *
  * The deprecated `Dialog*` aliases are deliberately absent: they re-export the very same SFCs
  * as `Modal*`, so mounting them again asserts nothing the `Modal*` rows do not. That the
