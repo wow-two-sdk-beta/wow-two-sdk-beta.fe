@@ -116,15 +116,16 @@ Spec before code. Stories cover every visual state in spec. Components without v
 
 ## Vue package
 
-`@wow-two-beta/ui-vue` (`engineering/codebase/wow-two-sdk-beta-fe/`) is the active package; React
-implementation and release are parked. Settled decisions:
+`@wow-two-beta/fe` (`engineering/codebase/wow-two-sdk-beta-fe/`), the fe sdk, is the active package (npm name
+`@wow-two-beta/ui-vue` through `0.0.17`); React implementation and release are parked. Settled decisions:
 
-- Package `@wow-two-beta/ui-vue`, `0.x.y` beta-forever — the React package's release contract.
+- Package `@wow-two-beta/fe`, `0.x.y` beta-forever — the React package's release contract; the patch sequence
+  continues across the rename.
 - Vue 3.5+ `<script setup>` SFCs, not TSX — the DX gain is the point of the port.
 - Vite library mode + `@vitejs/plugin-vue` + `vite-plugin-dts` — `tsup` cannot compile SFCs.
 - Self-contained: the package copies the agnostic layer; no shared `core` package with React.
 - Every public component has a spec and a playground fixture; risky behavior gets focused tests.
-- `release-vue.yml` carries a `paths:` filter, separate from `release.yml` — a React push never publishes Vue.
+- `release-fe.yml` carries a `paths:` filter, separate from `release.yml` — a React push never publishes Vue.
 - The package carries the full React capability surface, `router` and `query` included.
 - Exact decimal and int64 wire representations are agreed per endpoint with the backend; the SDK sets no global
   coercion policy.

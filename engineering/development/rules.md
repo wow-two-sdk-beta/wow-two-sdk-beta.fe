@@ -1,6 +1,6 @@
-# wow-two-sdk-beta.ui — Engineering Rules
+# wow-two-sdk-beta.fe — Engineering Rules
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-16*
 
 > Working rules for agents in this repo — repo-specific deltas only. Shared rules: wow-two-ws/conventions/.
 > Planning: [`backlog.md`](../planning/backlog.md) and the newest [`version-track/`](../planning/version-track/) folder.

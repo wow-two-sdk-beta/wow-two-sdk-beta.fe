@@ -1,6 +1,6 @@
-# wow-two-sdk-beta.ui — Backlog
+# wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-10-15*
+*Last updated: 2026-10-16*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
