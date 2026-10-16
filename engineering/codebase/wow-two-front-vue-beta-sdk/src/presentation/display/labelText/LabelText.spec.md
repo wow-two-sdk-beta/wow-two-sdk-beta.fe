@@ -10,6 +10,8 @@ Public import: `import { LabelText } from '@wow-two-beta/ui-vue/presentation/dis
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Inside a `DataRegion` first load or a skeleton `Field`, the label keeps its line and its copy turns into a bar;
+  the required asterisk keeps its space but hides.
 
 ## Props
 

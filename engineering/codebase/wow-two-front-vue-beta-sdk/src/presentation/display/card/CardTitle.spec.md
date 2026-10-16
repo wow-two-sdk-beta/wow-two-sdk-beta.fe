@@ -10,6 +10,7 @@ Public import: `import { CardTitle } from '@wow-two-beta/ui-vue/presentation/dis
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Inside a skeleton `Card` or a `DataRegion` first load, the title keeps its line and its copy turns into a bar.
 
 ## Props
 

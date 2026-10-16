@@ -75,7 +75,7 @@ export interface AvatarProps {
   /** The focus/emphasis ring tone. */
   readonly ring?: AvatarRing;
 
-  /** The skeleton state — pulses the tile and hides its content. */
+  /** The skeleton state — pulses the tile and hides its content. Defaults to the nearest `DataRegion` first load. */
   readonly isLoading?: boolean;
 
   /** The image source; falls back to `name` initials or `fallback` on error. */
@@ -115,6 +115,7 @@ void _assertAvatarLoading;
 import { UrlExtensions } from '../../../foundation/dom';
 import { computed, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { cn, CssExtensions } from '../../../foundation/styles';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { avatarVariants } from './Avatar.variants';
 
 /**
@@ -152,7 +153,11 @@ watch(
   },
 );
 
-const showImage = computed(() => !!props.src && !errored.value && !props.isLoading);
+/* An absent `isLoading` follows the nearest `DataRegion` first load; an explicit one wins either way. */
+const skeleton = useSkeletonState(() => props.isLoading);
+const loading = computed(() => skeleton.isSkeleton.value);
+
+const showImage = computed(() => !!props.src && !errored.value && !loading.value);
 
 /* Parse union-typed `size` — preset routes to variant class, raw/object routes to inline dims. */
 const parsedSize = computed(() => CssExtensions.parseSizeUnion<AvatarSizePreset>(props.size, AvatarSizePresets));
@@ -191,7 +196,7 @@ const classes = computed(() =>
       tone: effectiveTone.value,
       bgStyle: props.bgStyle,
       ring: props.ring,
-      isLoading: props.isLoading,
+      isLoading: loading.value,
     }),
     autoColorClass.value,
     attrs.class as string | undefined,
@@ -215,8 +220,8 @@ defineExpose({ el });
        still wins, as it did through React's trailing `{...props}` spread. -->
   <span
     ref="el"
-    :data-loading="props.isLoading ? 'true' : undefined"
-    :aria-busy="props.isLoading ? true : undefined"
+    :data-loading="loading ? 'true' : undefined"
+    :aria-busy="loading ? true : undefined"
     :role="!showImage && fallbackName ? 'img' : undefined"
     :aria-label="!showImage ? fallbackName : undefined"
     :aria-hidden="isDecorative ? 'true' : undefined"

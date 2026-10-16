@@ -27,7 +27,7 @@ Public import: `import { Avatar } from '@wow-two-beta/ui-vue/presentation/displa
 | `tone` | `AvatarTone` | no | — | The tone palette (`none` cedes color to autoColor). |
 | `bgStyle` | `AvatarBackground` | no | — | The background fill style. |
 | `ring` | `AvatarRing` | no | — | The focus/emphasis ring tone. |
-| `isLoading` | `boolean` | no | `undefined` | The skeleton state — pulses the tile and hides its content. |
+| `isLoading` | `boolean` | no | `undefined` | The skeleton state — keeps the tile's size and shape, hides its content, pulses under `motion-safe`. Defaults to the nearest `DataRegion` first load. |
 | `src` | `string` | no | — | The image source; falls back to `name` initials or `fallback` on error. |
 | `name` | `string` | no | `''` | The person/entity name — used to derive initials when no image. |
 | `fallback` | `string \| number` | no | — | The custom fallback (overrides initials). Rich content goes through the `fallback` slot. |

@@ -94,7 +94,11 @@ export const avatarVariants = tv({
       warning: 'ring-2 ring-offset-2 ring-warning ring-offset-background',
     },
     isLoading: {
-      true: 'animate-pulse bg-muted! text-transparent',
+      /* The tile keeps its size and shape; forced colours keep it visible as a `GrayText` outline. */
+      true:
+        'bg-muted! bg-none! text-transparent [&_*]:invisible motion-safe:animate-pulse ' +
+        'forced-colors:[forced-color-adjust:none] forced-colors:bg-[color:Canvas]! forced-colors:outline-1 ' +
+        'forced-colors:outline-solid forced-colors:-outline-offset-1 forced-colors:outline-[color:GrayText]',
       false: '',
     },
   },

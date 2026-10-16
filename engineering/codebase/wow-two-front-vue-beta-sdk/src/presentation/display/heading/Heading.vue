@@ -12,12 +12,18 @@ export interface HeadingProps {
   readonly weight?: HeadingWeight;
   /** The text alignment. */
   readonly align?: HeadingAlign;
+  /** Draws the heading as one bar per line; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
+  /** The skeleton bar's width, any CSS length; defaults to the heading's own width. */
+  readonly skeletonWidth?: string;
 }
 </script>
 
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 import { headingVariants } from './Heading.variants';
 
 /**
@@ -30,10 +36,11 @@ defineOptions({ name: 'Heading', inheritAttrs: false });
 /** The heading copy — React's `children`. */
 defineSlots<{ default(): unknown }>();
 
-const props = withDefaults(defineProps<HeadingProps>(), { level: 2 });
+const props = withDefaults(defineProps<HeadingProps>(), { level: 2, isSkeleton: undefined });
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLHeadingElement>('el');
+const skeleton = useSkeletonState(() => props.isSkeleton);
 
 const tag = computed(() => `h${props.level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6');
 
@@ -54,5 +61,9 @@ defineExpose({ el });
 </script>
 
 <template>
-  <component :is="tag" ref="el" v-bind="rest" :class="classes"><slot /></component>
+  <component :is="tag" ref="el" :data-skeleton="skeleton.isSkeleton.value || undefined" v-bind="rest" :class="classes"
+    ><SkeletonStateLine v-if="skeleton.isSkeleton.value" is-skeleton :width="props.skeletonWidth"
+      ><slot /></SkeletonStateLine
+    ><slot v-else
+  /></component>
 </template>

@@ -37,6 +37,8 @@ import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { cn, Size as SizeValue } from '../../../foundation/styles';
 import { useFormControl, useFormControlChrome } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 
 /** Renders a `<label>` that takes `htmlFor` and `id` from `FormControl`, plus the required-field asterisk. */
 /* `inheritAttrs: false` so `class` folds into the component's own `cn()` call — plain fallthrough
@@ -67,6 +69,9 @@ const ctx = useFormControl();
    detaches the node from the context's labelId. Passed as a getter to stay reactive. */
 useFormControlChrome('label', () => props.id == null);
 
+/* Follows the nearest `DataRegion` or `Field` skeleton: the label keeps its line and turns into a bar. */
+const skeleton = useSkeletonState();
+
 const isRequired = computed(() => props.isRequired ?? ctx?.isRequired ?? false);
 const labelFor = computed(() => props.for ?? props.htmlFor ?? ctx?.id);
 const labelId = computed(() => props.id ?? ctx?.labelId);
@@ -92,8 +97,20 @@ defineExpose({ el: root });
 </script>
 
 <template>
-  <label ref="root" :for="labelFor" :id="labelId" :class="rootClass" v-bind="passthroughAttrs">
-    <slot />
-    <span v-if="isRequired" class="ml-0.5 text-destructive-soft-foreground" aria-hidden="true">*</span>
+  <label
+    ref="root"
+    :for="labelFor"
+    :id="labelId"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :class="rootClass"
+    v-bind="passthroughAttrs"
+  >
+    <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value"><slot /></SkeletonStateLine>
+    <span
+      v-if="isRequired"
+      :class="cn('ml-0.5 text-destructive-soft-foreground', skeleton.isSkeleton.value && 'invisible')"
+      aria-hidden="true"
+      >*</span
+    >
   </label>
 </template>

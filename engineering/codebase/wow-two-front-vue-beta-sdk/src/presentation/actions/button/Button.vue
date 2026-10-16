@@ -60,7 +60,7 @@ export interface ButtonProps extends /* @vue-ignore */ ButtonAttributes {
   /** The text that replaces the label while loading; omit it to keep the label. Consumer-supplied (i18n). */
   readonly loadingText?: string;
 
-  /** The content-loading state — hides content, keeps dimensions, shimmers. Excludes `isLoading`. */
+  /** The content-loading state — keeps size and radius, masks content; follows a `DataRegion` first load. */
   readonly isSkeleton?: boolean;
 
   /** The disabled state — drops focus order and clicks. Inherited from an enclosing `Field`. */
@@ -138,6 +138,7 @@ import { Primitive } from '../../../foundation/primitives';
 import { useFormControl } from '../../../foundation/primitives/formControlContext/FormControlContext';
 import { Spinner } from '../../../foundation/icons';
 import { useDebounceHandler } from '../../../foundation/async';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { buttonVariants } from './Button.variants';
 
 const ComponentName = 'Button';
@@ -225,7 +226,9 @@ const LoadingSlotProp = nodeProp(() => props.loadingSlot);
 const formControl = useFormControl();
 const resolvedDisabled = computed(() => props.isDisabled ?? formControl?.isDisabled ?? false);
 
-const skeletonActive = computed(() => !!props.isSkeleton);
+/* An absent `isSkeleton` follows the nearest `DataRegion` first load; an explicit one wins either way. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+const skeletonActive = computed(() => skeleton.isSkeleton.value);
 const loadingActive = computed(() => !skeletonActive.value && !!props.isLoading);
 const isInactive = computed(() => loadingActive.value || skeletonActive.value || resolvedDisabled.value);
 

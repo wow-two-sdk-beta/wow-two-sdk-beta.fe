@@ -20,6 +20,7 @@ Public import: `import { SectionHeading } from '@wow-two-beta/ui-vue/presentatio
 | `level` | `SectionHeadingLevel` | no | `2` | The heading element / size. Default level 2, size lg. |
 | `size` | `SectionHeadingSize` | no | `SectionHeadingSize.Lg` | Declared by the source contract. |
 | `isBordered` | `boolean` | no | `true` | The bottom border's visibility. Default true. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps border and layout; the title, description and actions draw their skeletons. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

@@ -28,12 +28,15 @@ export interface CardProps {
   readonly padding?: SurfacePadding;
   /** The shadow depth. */
   readonly elevation?: SurfaceElevation;
+  /** Keeps the card's chrome and draws everything inside as skeletons; defaults to the nearest `DataRegion`. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn, surfaceVariants } from '../../../foundation/styles';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /**
  * Renders a raised surface that groups content, padded to frame its header, body, and footer.
@@ -46,10 +49,14 @@ defineOptions({ name: 'Card', inheritAttrs: false });
 /** The card content — React's `children`. */
 defineSlots<{ default(): unknown }>();
 
-const props = defineProps<CardProps>();
+const props = withDefaults(defineProps<CardProps>(), { isSkeleton: undefined });
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
+
+/* The chrome stays; one flag here switches the title, description and every component inside. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
 
 const classes = computed(() =>
   cn(
@@ -75,5 +82,13 @@ defineExpose({ el });
 </script>
 
 <template>
-  <div ref="el" v-bind="rest" :class="classes"><slot /></div>
+  <div
+    ref="el"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :aria-busy="props.isSkeleton || undefined"
+    v-bind="rest"
+    :class="classes"
+  >
+    <slot />
+  </div>
 </template>

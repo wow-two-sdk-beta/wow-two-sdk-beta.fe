@@ -7,6 +7,8 @@
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 
 /** Renders the `h3` title line of a `Card`, at heading weight and tight leading. */
 defineOptions({ name: 'CardTitle', inheritAttrs: false });
@@ -16,6 +18,9 @@ defineSlots<{ default(): unknown }>();
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLHeadingElement>('el');
+
+/* Follows the nearest `Card` or `DataRegion` skeleton: the title keeps its line and turns into a bar. */
+const skeleton = useSkeletonState();
 
 const classes = computed(() => cn('text-lg font-semibold tracking-tight', attrs.class as string | undefined));
 
@@ -29,5 +34,7 @@ defineExpose({ el });
 </script>
 
 <template>
-  <h3 ref="el" v-bind="rest" :class="classes"><slot /></h3>
+  <h3 ref="el" :data-skeleton="skeleton.isSkeleton.value || undefined" v-bind="rest" :class="classes">
+    <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value"><slot /></SkeletonStateLine>
+  </h3>
 </template>

@@ -56,9 +56,11 @@ export const buttonVariants = tv({
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // loading — dimmed and busy, but still focusable (clicks are swallowed in the handler)
     'data-[state=loading]:opacity-70 data-[state=loading]:cursor-progress',
-    // skeleton state — wins over everything
-    'data-[state=skeleton]:bg-muted! data-[state=skeleton]:text-transparent! data-[state=skeleton]:border-transparent! data-[state=skeleton]:cursor-default! data-[state=skeleton]:!pointer-events-none data-[state=skeleton]:animate-pulse',
+    // skeleton state — wins over everything; the box keeps its size and radius, motion only when allowed
+    'data-[state=skeleton]:bg-muted! data-[state=skeleton]:bg-none! data-[state=skeleton]:shadow-none! data-[state=skeleton]:text-transparent! data-[state=skeleton]:border-transparent! data-[state=skeleton]:cursor-default! data-[state=skeleton]:!pointer-events-none data-[state=skeleton]:motion-safe:animate-pulse',
     'data-[state=skeleton]:[&>*]:!invisible',
+    // forced colours repaint the fill and show the label — the placeholder keeps a `GrayText` outline instead
+    'data-[state=skeleton]:forced-colors:[forced-color-adjust:none] data-[state=skeleton]:forced-colors:bg-[color:Canvas]! data-[state=skeleton]:forced-colors:outline-1 data-[state=skeleton]:forced-colors:outline-solid data-[state=skeleton]:forced-colors:-outline-offset-1 data-[state=skeleton]:forced-colors:outline-[color:GrayText]',
   ],
   variants: {
     variant: {

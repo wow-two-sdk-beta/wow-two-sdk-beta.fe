@@ -7,12 +7,16 @@ export interface BadgeProps {
   readonly variant?: BadgeVariant;
   /** The size step. */
   readonly size?: Size;
+  /** Draws the pill as its placeholder; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
 <script setup lang="ts">
-import { computed, useAttrs, useTemplateRef } from 'vue';
+import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { renderableChildren } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { badgeVariants, type BadgeVariants } from './Badge.variants';
 
 /**
@@ -25,11 +29,17 @@ defineOptions({ name: 'Badge', inheritAttrs: false });
 /** The badge copy — React's `children`. */
 defineSlots<{ default(): unknown }>();
 
-const props = defineProps<BadgeProps>();
+const props = withDefaults(defineProps<BadgeProps>(), { isSkeleton: undefined });
 
 const attrs = useAttrs();
+const slots = useSlots();
 const el = useTemplateRef<HTMLSpanElement>('el');
+const skeleton = useSkeletonState(() => props.isSkeleton);
 
+/** Whether the pill has copy — an empty one still loading keeps a short stand-in width. Read during render. */
+const hasContent = (): boolean => renderableChildren(slots.default?.()).length > 0;
+
+/* The placeholder merges last: the pill keeps its size, padding and radius while its fill and copy are masked. */
 const classes = computed(() =>
   cn(
     badgeVariants({
@@ -37,6 +47,7 @@ const classes = computed(() =>
       size: props.size as BadgeVariants['size'],
     }),
     attrs.class as string | undefined,
+    skeleton.boxClass.value,
   ),
 );
 
@@ -50,5 +61,12 @@ defineExpose({ el });
 </script>
 
 <template>
-  <span ref="el" v-bind="rest" :class="classes"><slot /></span>
+  <span
+    ref="el"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :aria-hidden="skeleton.isSkeleton.value || undefined"
+    v-bind="rest"
+    :class="classes"
+    ><span v-if="skeleton.isSkeleton.value && !hasContent()" class="inline-block w-[4ch]">&nbsp;</span><slot v-else
+  /></span>
 </template>

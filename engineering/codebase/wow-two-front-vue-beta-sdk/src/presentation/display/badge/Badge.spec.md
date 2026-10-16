@@ -10,6 +10,7 @@ Public import: `import { Badge } from '@wow-two-beta/ui-vue/presentation/display
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Skeleton mode keeps the pill's size, padding and radius and masks its fill and copy; the pill is `aria-hidden`.
 
 ## Props
 
@@ -17,6 +18,7 @@ Public import: `import { Badge } from '@wow-two-beta/ui-vue/presentation/display
 |---|---|---|---|---|
 | `variant` | `BadgeVariant` | no | — | The color treatment. |
 | `size` | `Size` | no | — | The size step. |
+| `isSkeleton` | `boolean` | no | `undefined` | Draws the pill as its placeholder; defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

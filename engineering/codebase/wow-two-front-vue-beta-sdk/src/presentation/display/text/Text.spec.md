@@ -10,6 +10,9 @@ Public import: `import { Text } from '@wow-two-beta/ui-vue/presentation/display'
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Skeleton mode keeps the element and its line height: the text stays mounted but transparent under one bar per
+  line, as wide as the text, `skeletonWidth`, or `8em` when empty. The bar is `aria-hidden`; the root carries
+  `data-skeleton`.
 
 ## Props
 
@@ -22,6 +25,8 @@ Public import: `import { Text } from '@wow-two-beta/ui-vue/presentation/display'
 | `align` | `TextAlign` | no | — | The text alignment. |
 | `isTruncated` | `boolean` | no | `undefined` | The single-line truncation with an ellipsis. |
 | `isTabular` | `boolean` | no | `undefined` | The tabular (fixed-width) figures treatment. |
+| `isSkeleton` | `boolean` | no | `undefined` | Draws the text as bars; defaults to the nearest `DataRegion` first load. |
+| `skeletonWidth` | `string` | no | — | The skeleton bar's width, any CSS length; defaults to the text's own width. |
 
 ## Emits
 

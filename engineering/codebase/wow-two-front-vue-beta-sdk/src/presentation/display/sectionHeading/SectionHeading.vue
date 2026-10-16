@@ -32,6 +32,9 @@ export interface SectionHeadingProps {
 
   /** The bottom border's visibility. Default true. */
   readonly isBordered?: boolean;
+
+  /** Keeps the border and layout and draws the title, description and actions as skeletons. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -41,6 +44,7 @@ import { cn, Size } from '../../../foundation/styles';
 import { TextColor } from '../text/Text.variants';
 import Heading from '../heading/Heading.vue';
 import Text from '../text/Text.vue';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /** Renders a section header: a `Heading` title, an optional `Text` description, and an actions slot. */
 defineOptions({ name: 'SectionHeading', inheritAttrs: false });
@@ -60,11 +64,16 @@ const props = withDefaults(defineProps<SectionHeadingProps>(), {
   level: 2,
   size: SectionHeadingSize.Lg,
   isBordered: true,
+  isSkeleton: undefined,
 });
 
 const attrs = useAttrs();
 const slots = useSlots();
 const el = useTemplateRef<HTMLElement>('el');
+
+/* The `Heading`, `Text` and action buttons inside each draw their own skeleton from this one flag. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
 
 const hasDescription = computed(() => Boolean(props.description) || Boolean(slots.description));
 
@@ -86,7 +95,7 @@ defineExpose({ el });
 </script>
 
 <template>
-  <header ref="el" v-bind="rest" :class="classes">
+  <header ref="el" :data-skeleton="skeleton.isSkeleton.value || undefined" v-bind="rest" :class="classes">
     <div class="flex min-w-0 flex-col gap-1">
       <Heading :level="props.level" :size="props.size">
         <slot name="title">{{ props.title }}</slot>

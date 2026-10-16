@@ -17,12 +17,18 @@ export interface TextProps {
   readonly isTruncated?: boolean;
   /** The tabular (fixed-width) figures treatment. */
   readonly isTabular?: boolean;
+  /** Draws the text as one bar per line; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
+  /** The skeleton bar's width, any CSS length; defaults to the text's own width. */
+  readonly skeletonWidth?: string;
 }
 </script>
 
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 import { textVariants } from './Text.variants';
 
 /** Renders body text as a `<p>`, or as any element given to `as` to match surrounding semantics. */
@@ -41,10 +47,12 @@ const props = withDefaults(defineProps<TextProps>(), {
   as: 'p',
   isTruncated: undefined,
   isTabular: undefined,
+  isSkeleton: undefined,
 });
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLElement>('el');
+const skeleton = useSkeletonState(() => props.isSkeleton);
 
 const classes = computed(() =>
   cn(
@@ -70,5 +78,14 @@ defineExpose({ el });
 </script>
 
 <template>
-  <component :is="props.as" ref="el" v-bind="rest" :class="classes"><slot /></component>
+  <component
+    :is="props.as"
+    ref="el"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    v-bind="rest"
+    :class="classes"
+    ><SkeletonStateLine v-if="skeleton.isSkeleton.value" is-skeleton :width="props.skeletonWidth"
+      ><slot /></SkeletonStateLine
+    ><slot v-else
+  /></component>
 </template>

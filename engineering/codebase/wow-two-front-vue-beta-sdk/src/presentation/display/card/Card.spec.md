@@ -10,6 +10,8 @@ Public import: `import { Card } from '@wow-two-beta/ui-vue/presentation/display'
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Skeleton mode keeps the surface, radius, padding and shadow; `CardTitle`, `CardDescription` and every SDK component
+  inside draw their own skeletons. An explicit `isSkeleton` sets `aria-busy`.
 
 ## Props
 
@@ -21,6 +23,7 @@ Public import: `import { Card } from '@wow-two-beta/ui-vue/presentation/display'
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. |
 | `padding` | `SurfacePadding` | no | — | The inner spacing step. |
 | `elevation` | `SurfaceElevation` | no | — | The shadow depth. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the chrome and switches every component inside to its skeleton; defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

@@ -10,6 +10,8 @@ Public import: `import { Heading } from '@wow-two-beta/ui-vue/presentation/displ
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Skeleton mode keeps the heading element, its level and its line height: the text stays mounted but transparent
+  under one bar per line, as wide as the text, `skeletonWidth`, or `8em` when empty.
 
 ## Props
 
@@ -19,6 +21,8 @@ Public import: `import { Heading } from '@wow-two-beta/ui-vue/presentation/displ
 | `size` | `HeadingSize` | no | — | The visual size step. |
 | `weight` | `HeadingWeight` | no | — | The font weight. |
 | `align` | `HeadingAlign` | no | — | The text alignment. |
+| `isSkeleton` | `boolean` | no | `undefined` | Draws the heading as bars; defaults to the nearest `DataRegion` first load. |
+| `skeletonWidth` | `string` | no | — | The skeleton bar's width, any CSS length; defaults to the heading's own width. |
 
 ## Emits
 

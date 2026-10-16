@@ -31,7 +31,7 @@ Inherited contracts: `extends /* @vue-ignore */ ButtonAttributes`. These members
 | `loadingSlot` | `VNodeChild` | no | `undefined` | The indicator replacing the built-in `<Spinner/>` while loading. Prefer the `loading` slot. |
 | `isLoading` | `boolean` | no | `undefined` | The action-loading state — the spinner takes the leading icon's place, the label stays, the button dims, sets aria-busy and blocks clicks. |
 | `loadingText` | `string` | no | — | The text that replaces the label while loading. Omit it to keep the label. No default — consumer supplies (i18n). |
-| `isSkeleton` | `boolean` | no | `undefined` | The content-loading state — hides content, keeps dimensions, shimmers. Excludes `isLoading`. |
+| `isSkeleton` | `boolean` | no | `undefined` | The content-loading state — keeps size and radius, masks content, pulses under `motion-safe`. Defaults to the nearest `DataRegion` first load. Excludes `isLoading`. |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state — drops focus order and clicks. Inherited from an enclosing `Field`. |
 | `isFullWidth` | `boolean` | no | `undefined` | The full-width state — stretches to fill container width. |
 | `isMultiline` | `boolean` | no | `undefined` | The multi-line state — allows label wrap; default truncates to single line. |

@@ -13,6 +13,8 @@ import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { cn } from '../../../foundation/styles';
 import { useFormControl, useFormControlChrome } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 
 /** Renders the hint text under a form control, registering its id with the control's `aria-describedby`. */
 /* `inheritAttrs: false` so `class` folds into the component's own `cn()` call — plain fallthrough
@@ -38,6 +40,9 @@ useFormControlChrome('helper', () => props.id == null);
 
 const helperId = computed(() => props.id ?? ctx?.helperId);
 
+/* Follows the nearest `DataRegion` or `Field` skeleton: the hint keeps its lines and turns into bars. */
+const skeleton = useSkeletonState();
+
 const OwnedAttributes: ReadonlySet<string> = new Set(['class']);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
@@ -52,7 +57,13 @@ defineExpose({ el: root });
 </script>
 
 <template>
-  <p ref="root" :id="helperId" :class="rootClass" v-bind="passthroughAttrs">
-    <slot />
+  <p
+    ref="root"
+    :id="helperId"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :class="rootClass"
+    v-bind="passthroughAttrs"
+  >
+    <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value"><slot /></SkeletonStateLine>
   </p>
 </template>
