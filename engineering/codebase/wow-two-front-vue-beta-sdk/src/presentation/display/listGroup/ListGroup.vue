@@ -10,6 +10,9 @@ export interface ListGroupProps {
 
   /** The vertical spacing between items. */
   readonly spacing?: ListGroupSpacing;
+
+  /** Keeps every row and draws its content as skeletons; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -17,6 +20,7 @@ export interface ListGroupProps {
 import { computed, provide, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
 import { listVariants } from './ListGroup.variants';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { ListGroupKey } from './ListGroupContext';
 
 /**
@@ -29,7 +33,11 @@ defineOptions({ name: 'ListGroup', inheritAttrs: false });
 /** The list items — React's required `children`. */
 defineSlots<{ default(): unknown }>();
 
-const props = withDefaults(defineProps<ListGroupProps>(), { isOrdered: undefined });
+const props = withDefaults(defineProps<ListGroupProps>(), { isOrdered: undefined, isSkeleton: undefined });
+
+/* One flag switches every row: each keeps its box and masks its own content. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLElement>('el');
@@ -58,5 +66,13 @@ defineExpose({ el });
 </script>
 
 <template>
-  <component :is="tag" ref="el" v-bind="rest" :class="classes"><slot /></component>
+  <component
+    :is="tag"
+    ref="el"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :aria-busy="props.isSkeleton || undefined"
+    v-bind="rest"
+    :class="classes"
+    ><slot
+  /></component>
 </template>

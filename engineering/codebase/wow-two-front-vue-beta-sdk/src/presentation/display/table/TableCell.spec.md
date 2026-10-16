@@ -20,6 +20,10 @@ Public import: `import { TableCell } from '@wow-two-beta/ui-vue/presentation/dis
 |---|---|---|---|---|
 | `label` | `string` | no | — | The stacked label; omit it for the column's header text, `''` for none. |
 
+Inside a `DataRegion` first load, plain cell text turns into a bar at the cell's line height, an empty cell draws a
+default bar, and a cell holding components lets them draw their own shapes. Render placeholder rows over
+`useSkeletonItems` stand-ins.
+
 ## Emits
 
 None declared.

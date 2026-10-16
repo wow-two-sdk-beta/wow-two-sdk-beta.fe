@@ -29,6 +29,7 @@ Public import: `import { StatCard } from '@wow-two-beta/ui-vue/presentation/disp
 | `size` | `StatCardSize` | no | `'md'` | The visual size. Default `md`. |
 | `href` | `string` | no | — | Makes the tile a link. |
 | `onClick` | `(event: MouseEvent) => void` | no | — | Makes the tile a button; a prop because its presence picks the element. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the tile's size and draws the label, value, trend and helper as bars; an empty value draws a short bar. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

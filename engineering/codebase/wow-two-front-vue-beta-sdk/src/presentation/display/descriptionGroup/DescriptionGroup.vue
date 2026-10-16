@@ -35,6 +35,9 @@ export interface DescriptionGroupProps {
 
   /** The density between rows. Default `md`. */
   readonly density?: DescriptionGroupDensity;
+
+  /** Keeps every row and draws its term and value as bars; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 
 const RowGap: Record<NonNullable<DescriptionGroupProps['density']>, string> = {
@@ -47,6 +50,8 @@ const RowGap: Record<NonNullable<DescriptionGroupProps['density']>, string> = {
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 
 /**
  * Renders label-value pairs as a semantic `<dl>` for settings and property lists.
@@ -70,7 +75,12 @@ defineSlots<{
 const props = withDefaults(defineProps<DescriptionGroupProps>(), {
   layout: DescriptionGroupLayout.Inline,
   density: DescriptionGroupDensity.Md,
+  isSkeleton: undefined,
 });
+
+/* Terms and plain values turn into bars in place; a value slot holding components lets them draw their own shapes. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDListElement>('el');
@@ -98,13 +108,17 @@ defineExpose({ el });
 </script>
 
 <template>
-  <dl ref="el" v-bind="rest" :class="classes">
+  <dl ref="el" :data-skeleton="skeleton.isSkeleton.value || undefined" v-bind="rest" :class="classes">
     <div v-for="(item, i) in props.items" :key="item.label" :class="rowClasses">
       <dt class="text-muted-foreground">
-        <slot name="label" :item="item" :index="i">{{ item.label }}</slot>
+        <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value"
+          ><slot name="label" :item="item" :index="i">{{ item.label }}</slot></SkeletonStateLine
+        >
       </dt>
       <dd class="text-foreground">
-        <slot name="value" :item="item" :index="i">{{ item.value }}</slot>
+        <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value" :is-text="false"
+          ><slot name="value" :item="item" :index="i">{{ item.value }}</slot></SkeletonStateLine
+        >
       </dd>
     </div>
   </dl>

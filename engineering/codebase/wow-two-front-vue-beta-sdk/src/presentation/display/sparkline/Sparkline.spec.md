@@ -24,6 +24,7 @@ Public import: `import { Sparkline } from '@wow-two-beta/ui-vue/presentation/dis
 | `max` | `number` | no | `undefined` | The upper bound of the value scale. Defaults to the series maximum. |
 | `hasLast` | `boolean` | no | `undefined` | The emphasized dot on the final point. |
 | `ariaLabel` | `string` | no | `'Trend'` | The accessible label summarizing the trend. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the chart's width and height as one `aria-hidden` placeholder with no series. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

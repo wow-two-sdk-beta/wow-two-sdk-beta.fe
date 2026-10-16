@@ -11,6 +11,10 @@ Public import: `import { DataTable } from '@wow-two-beta/ui-vue/presentation/dis
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Undeclared attributes follow Vue fallthrough to the rendered root when the component has a single element root.
+- Inside a `DataRegion` first load, or while an empty table has `isLoading`, the body draws `skeletonRows` rows
+  within the real columns: one text bar per cell at the cell's line height and alignment, a skeleton checkbox in the
+  selection column and the expand control's box. The heading stays as it is. `DataTableColumn.skeletonWidth` sets a
+  column's bar width; the default varies per row and column.
 
 ## Props
 
@@ -36,7 +40,8 @@ Public import: `import { DataTable } from '@wow-two-beta/ui-vue/presentation/dis
 | `isRowExpandable` | `(row: T, index: number) => boolean` | no | every row | Whether a row can expand when the `expanded` slot is set. |
 | `hasStickyHeader` | `boolean` | no | `false` | Pins the header while the body scrolls inside the container. |
 | `isLoading` | `boolean` | no | `false` | Marks the table busy; an empty table draws skeleton rows instead of the empty state. |
-| `loadingRowCount` | `number` | no | `5` | The skeleton rows drawn while an empty table loads. |
+| `skeletonRows` | `number` | no | `5` | The skeleton rows drawn while an empty table loads or its `DataRegion` first-loads. |
+| `loadingRowCount` | `number` | no | `undefined` | Deprecated alias of `skeletonRows`; removed next release. |
 | `containerClassName` | `string` | no | `undefined` | Classes for the scroll container; a height such as `max-h-96` lets the sticky header pin. |
 | `phoneLayout` | `TablePhoneLayout` | no | `stack` | Below `stackBreakpoint`: `stack` (a card per row) or `scroll` (the table, scrolling sideways). |
 | `stackBreakpoint` | `Breakpoint` | no | `md` | Rows stack into cards below this breakpoint. |

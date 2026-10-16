@@ -161,25 +161,33 @@ describe('DataTable expansion, pinning and loading', () => {
   it('shapes skeleton cells like their columns', () => {
     const aligned = [
       { key: 'name', header: 'Name' },
-      { key: 'age', header: 'Age', align: 'right' },
+      { key: 'age', header: 'Age', align: 'right', skeletonWidth: '3ch' },
     ];
     const wrapper = mountTable({
       columns: aligned,
       data: [],
       isLoading: true,
-      loadingRowCount: 2,
+      skeletonRows: 2,
       selectionMode: 'multiple',
     });
     const rows = wrapper.element.querySelectorAll('[data-skeleton-row]');
+    expect(rows).toHaveLength(2);
     const cells = [...rows[0]!.querySelectorAll('td')];
     expect(cells).toHaveLength(3);
     expect(cells[0]!.hasAttribute('data-row-control')).toBe(true);
-    expect(cells[0]!.querySelector('[aria-hidden=true]')!.className).toContain('size-4');
-    const nameLine = cells[1]!.querySelector('[aria-hidden=true]')!;
-    const ageLine = cells[2]!.querySelector('[aria-hidden=true]')!;
-    expect(nameLine.className).toContain('h-4');
-    expect(ageLine.className).toContain('ml-auto');
-    expect(nameLine.className).not.toBe(rows[1]!.querySelectorAll('td')[1]!.firstElementChild!.className);
+    expect(cells[0]!.querySelector('[data-skeleton]')!.hasAttribute('inert')).toBe(true);
+    const nameLine = cells[1]!.querySelector('[data-skeleton-line]') as HTMLElement;
+    const ageLine = cells[2]!.querySelector('[data-skeleton-line]') as HTMLElement;
+    expect(nameLine.getAttribute('aria-hidden')).toBe('true');
+    expect(cells[2]!.className).toContain('text-right');
+    expect(ageLine.style.paddingInlineEnd).toBe('3ch');
+    const nextRowLine = rows[1]!.querySelectorAll('td')[1]!.querySelector('[data-skeleton-line]') as HTMLElement;
+    expect(nameLine.style.paddingInlineEnd).not.toBe(nextRowLine.style.paddingInlineEnd);
+  });
+
+  it('keeps the deprecated row-count alias for one release', () => {
+    const wrapper = mountTable({ data: [], isLoading: true, loadingRowCount: 3 });
+    expect(wrapper.element.querySelectorAll('[data-skeleton-row]')).toHaveLength(3);
   });
 
   it('localizes the control column labels', () => {

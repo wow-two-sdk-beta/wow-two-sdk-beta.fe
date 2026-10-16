@@ -58,6 +58,9 @@ export interface SparklineProps {
 
   /** The accessible label summarizing the trend. */
   readonly ariaLabel?: string;
+
+  /** Keeps the chart's size and draws it as one placeholder; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 
 /** The derived plot geometry — React's `useMemo` payload. */
@@ -96,6 +99,7 @@ import { useLocaleDefaults } from '../../../foundation/i18n';
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
 import { useId } from '../../../foundation/identifiers';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /**
  * Renders an inline trend chart — line, area, bar, or dot — as bare SVG with no scales or axes.
@@ -112,8 +116,12 @@ const componentProps = withDefaults(defineProps<SparklineProps>(), {
   min: undefined,
   max: undefined,
   hasLast: undefined,
+  isSkeleton: undefined,
 });
 const props = useLocaleDefaults(componentProps, 'Sparkline', { ariaLabel: 'Trend' });
+
+/* The chart keeps its width and height; the series hides and the box itself becomes the placeholder. */
+const skeleton = useSkeletonState(() => componentProps.isSkeleton);
 
 const attrs = useAttrs();
 const el = useTemplateRef<SVGSVGElement>('el');
@@ -165,7 +173,12 @@ const geometry = computed<SparklineGeometry>(() => {
 const showLast = computed(() => Boolean(props.hasLast) && props.data.length > 0 && props.variant !== 'dot');
 
 const classes = computed(() =>
-  cn('inline-block overflow-visible', ToneClass[props.tone], attrs.class as string | undefined),
+  cn(
+    'inline-block overflow-visible',
+    ToneClass[props.tone],
+    attrs.class as string | undefined,
+    skeleton.paintClass.value,
+  ),
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */
@@ -186,14 +199,28 @@ defineExpose({ el });
     :height="props.height"
     :viewBox="`0 0 ${props.width} ${props.height}`"
     preserveAspectRatio="none"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :aria-hidden="skeleton.isSkeleton.value || undefined"
     v-bind="rest"
     :class="classes"
   >
-    <title :id="titleId">{{ props.ariaLabel }}</title>
+    <template v-if="!skeleton.isSkeleton.value">
+      <title :id="titleId">{{ props.ariaLabel }}</title>
 
-    <template v-if="props.variant === 'area'">
-      <path :d="geometry.areaPath" fill="currentColor" fill-opacity="0.15" />
+      <template v-if="props.variant === 'area'">
+        <path :d="geometry.areaPath" fill="currentColor" fill-opacity="0.15" />
+        <path
+          :d="geometry.linePath"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </template>
+
       <path
+        v-if="props.variant === 'line'"
         :d="geometry.linePath"
         fill="none"
         stroke="currentColor"
@@ -201,42 +228,32 @@ defineExpose({ el });
         stroke-linecap="round"
         stroke-linejoin="round"
       />
+
+      <g v-if="props.variant === 'bar'">
+        <rect
+          v-for="(point, i) in geometry.points"
+          :key="i"
+          :x="point[0] - geometry.barWidth / 2"
+          :y="point[1]"
+          :width="geometry.barRenderWidth"
+          :height="props.height - point[1]"
+          fill="currentColor"
+          rx="1"
+        />
+      </g>
+
+      <g v-if="props.variant === 'dot'">
+        <circle
+          v-for="(point, i) in geometry.points"
+          :key="i"
+          :cx="point[0]"
+          :cy="point[1]"
+          r="1.5"
+          fill="currentColor"
+        />
+      </g>
+
+      <circle v-if="showLast" :cx="geometry.lastX" :cy="geometry.lastY" r="2.5" fill="currentColor" />
     </template>
-
-    <path
-      v-if="props.variant === 'line'"
-      :d="geometry.linePath"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-
-    <g v-if="props.variant === 'bar'">
-      <rect
-        v-for="(point, i) in geometry.points"
-        :key="i"
-        :x="point[0] - geometry.barWidth / 2"
-        :y="point[1]"
-        :width="geometry.barRenderWidth"
-        :height="props.height - point[1]"
-        fill="currentColor"
-        rx="1"
-      />
-    </g>
-
-    <g v-if="props.variant === 'dot'">
-      <circle
-        v-for="(point, i) in geometry.points"
-        :key="i"
-        :cx="point[0]"
-        :cy="point[1]"
-        r="1.5"
-        fill="currentColor"
-      />
-    </g>
-
-    <circle v-if="showLast" :cx="geometry.lastX" :cy="geometry.lastY" r="2.5" fill="currentColor" />
   </svg>
 </template>

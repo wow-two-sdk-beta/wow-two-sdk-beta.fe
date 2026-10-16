@@ -22,7 +22,8 @@ export interface MeterBarProps {
   /** The readout beside a visible label, e.g. `6.2 of 10 GB`. Default the rounded percentage. */
   readonly valueLabel?: string;
 
-  /** The value is still loading: the bar pulses without a fill and the readout is a placeholder. Default `false`. */
+  /** The value is still loading: the track pulses without a fill, the label and readout turn into bars. Defaults to
+   *  the nearest `DataRegion` first load. */
   readonly isLoading?: boolean;
 }
 </script>
@@ -32,7 +33,8 @@ import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn, Size as SizeToken } from '../../../foundation/styles';
 import { useLocale, useLocaleFormatters } from '../../../foundation/i18n';
 import { useId } from '../../../foundation/identifiers';
-import SkeletonState from '../skeletonState/SkeletonState.vue';
+import { useSkeletonState } from '../skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../skeletonState/SkeletonStateLine';
 
 /* Only the sm/md/lg steps carry a thickness; other `Size` members fall through
    to the `md` default at the lookup below. */
@@ -52,11 +54,15 @@ const props = withDefaults(defineProps<MeterBarProps>(), {
   max: 100,
   size: SizeToken.Md,
   isLabelVisible: false,
-  isLoading: false,
+  isLoading: undefined,
 });
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
+
+/* An absent `isLoading` follows the nearest `DataRegion` first load; the track keeps its size as the placeholder. */
+const skeleton = useSkeletonState(() => props.isLoading);
+const loading = computed(() => skeleton.isSkeleton.value);
 
 const locale = useLocale();
 
@@ -79,7 +85,7 @@ const ZoneLabel = {
   critical: () => locale.t('MeterBar.zoneCritical', undefined, 'critical'),
 } as const;
 const valueText = computed(() =>
-  props.isLoading
+  loading.value
     ? locale.t('MeterBar.loading', undefined, 'Loading')
     : locale.t(
         'MeterBar.valueText',
@@ -98,7 +104,7 @@ const trackClasses = computed(() =>
   cn(
     'w-full overflow-hidden rounded-full bg-muted',
     TrackHeight[props.size] ?? TrackHeight.md,
-    props.isLoading && 'animate-pulse motion-reduce:animate-none',
+    skeleton.paintClass.value,
   ),
 );
 
@@ -121,9 +127,12 @@ defineExpose({ el });
 <template>
   <div v-if="props.isLabelVisible" ref="el" v-bind="rest" :class="classes">
     <div class="flex items-center justify-between gap-3 text-xs">
-      <span :id="labelId" class="min-w-0 truncate text-muted-foreground">{{ props.label }}</span>
-      <SkeletonState v-if="props.isLoading" shape="text" class="h-3 w-10" />
-      <span v-else class="shrink-0 font-medium tabular-nums">{{ readout }}</span>
+      <span :id="labelId" class="min-w-0 truncate text-muted-foreground"
+        ><SkeletonStateLine :is-skeleton="loading">{{ props.label }}</SkeletonStateLine></span
+      >
+      <span class="shrink-0 font-medium tabular-nums"
+        ><SkeletonStateLine :is-skeleton="loading">{{ readout }}</SkeletonStateLine></span
+      >
     </div>
     <div
       role="meter"
@@ -132,12 +141,12 @@ defineExpose({ el });
       :aria-valuemax="props.max"
       :aria-valuenow="props.value"
       :aria-valuetext="valueText"
-      :aria-busy="props.isLoading || undefined"
-      :data-zone="props.isLoading ? undefined : zone"
+      :aria-busy="loading || undefined"
+      :data-zone="loading ? undefined : zone"
       :class="trackClasses"
     >
       <div
-        v-if="!props.isLoading"
+        v-if="!loading"
         :class="cn('h-full rounded-full transition-[width] duration-300', tone)"
         :style="{ width: `${pct}%` }"
       />
@@ -152,13 +161,13 @@ defineExpose({ el });
     :aria-valuemax="props.max"
     :aria-valuenow="props.value"
     :aria-valuetext="valueText"
-    :aria-busy="props.isLoading || undefined"
-    :data-zone="props.isLoading ? undefined : zone"
+    :aria-busy="loading || undefined"
+    :data-zone="loading ? undefined : zone"
     v-bind="rest"
     :class="classes"
   >
     <div
-      v-if="!props.isLoading"
+      v-if="!loading"
       :class="cn('h-full rounded-full transition-[width] duration-300', tone)"
       :style="{ width: `${pct}%` }"
     />

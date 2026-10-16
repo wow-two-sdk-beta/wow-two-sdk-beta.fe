@@ -13,12 +13,19 @@ function hasComponent(node: VNode): boolean {
   return Array.isArray(node.children) && renderableChildren(node.children).some(hasComponent);
 }
 
-/** @internal Whether a rendered child tree holds text a reader would see — else it is an icon or an image. */
-function hasText(node: VNode): boolean {
+/** @internal The phrasing elements a line bar can wrap without breaking its line boxes. */
+const InlineTags: ReadonlySet<string> = new Set(
+  'a abbr b bdi bdo br cite code data del dfn em i ins kbd mark q s samp small span strong sub sup time u var wbr'.split(
+    ' ',
+  ),
+);
+
+/** @internal Whether a rendered child tree is plain inline text — else it holds an icon, an image or a component. */
+function isInlineText(node: VNode): boolean {
   if (node.type === Text) return true;
-  if (typeof node.type !== 'string') return false;
-  if (typeof node.children === 'string') return node.children.trim() !== '';
-  return Array.isArray(node.children) && renderableChildren(node.children).some(hasText);
+  if (typeof node.type !== 'string' || !InlineTags.has(node.type)) return false;
+  if (typeof node.children === 'string' || node.children === null) return true;
+  return Array.isArray(node.children) && renderableChildren(node.children).every(isInlineText);
 }
 
 /**
@@ -51,8 +58,9 @@ export const SkeletonStateLine = defineComponent({
       const children = renderableChildren(nodes);
       if (!props.isText && children.some(hasComponent)) return nodes;
       const isFixed = props.width !== undefined || children.length === 0;
-      /* An icon is a block box a line bar cannot wrap, so icon-only content becomes one box the icon's size. */
-      const isGlyph = !isFixed && !children.some(hasText);
+      /* An icon is a block box a line bar cannot wrap, so content holding one becomes a single box laid out like the
+         content — a row, centred, with its parent's gap — which keeps the height an icon beside text gives. */
+      const isGlyph = !isFixed && !children.every(isInlineText);
       return h(
         'span',
         {
@@ -60,7 +68,7 @@ export const SkeletonStateLine = defineComponent({
           'data-skeleton-line': '',
           class: cn(
             skeletonLineClass(props.animation ?? group?.animation.value),
-            isGlyph && 'inline-flex align-middle',
+            isGlyph && 'inline-flex items-center align-middle [gap:inherit]',
           ),
           style: isFixed ? { paddingInlineEnd: props.width ?? EmptyLineWidth } : undefined,
         },

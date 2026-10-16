@@ -17,6 +17,10 @@ Public import: `import { ListGroupItem } from '@wow-two-beta/ui-vue/presentation
 |---|---|---|---|---|
 | `hasCheckMarker` | `boolean` | no | `undefined` | The check-marker override. Omitted, it follows the parent `ListGroup`'s `marker` — a check appears under `marker="check"` and nowhere else. Set it explicitly to force the marker on or off for one row. |
 
+Inside a skeleton `ListGroup` or a `DataRegion` first load, the row keeps its box and padding: plain text turns into
+bars, an empty row draws a default bar, components in it draw their own shapes, and the check marker keeps its space
+but hides.
+
 ## Emits
 
 None declared.

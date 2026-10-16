@@ -97,8 +97,10 @@ describe('MeterBar header and loading', () => {
     const meter = wrapper.get('[role=meter]');
     expect(meter.attributes('aria-busy')).toBe('true');
     expect(meter.attributes('aria-valuetext')).toBe('Loading');
-    expect(meter.classes()).toContain('animate-pulse');
+    expect(meter.classes()).toContain('motion-safe:animate-pulse');
     expect(meter.element.children).toHaveLength(0);
-    expect(wrapper.text()).not.toContain('%');
+    const bars = wrapper.findAll('[data-skeleton-line]');
+    expect(bars.map((bar) => bar.attributes('aria-hidden'))).toEqual(['true', 'true']);
+    expect(bars[1]!.text()).toContain('%');
   });
 });

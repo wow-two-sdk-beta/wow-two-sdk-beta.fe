@@ -11,6 +11,8 @@ export interface TableCellProps {
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 import { DensityCell, StackedCellClass, stackAttribute, stackRole, useTableContext } from './TableContext';
 
 /** Renders a `td` in a `Table`, padded to the root density. */
@@ -24,6 +26,10 @@ const props = withDefaults(defineProps<TableCellProps>(), { label: undefined });
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLTableCellElement>('el');
 const table = useTableContext();
+
+/* Inside a `DataRegion` first load plain cell text turns into a bar and an empty cell draws one; a cell holding
+   components lets them draw their own shapes. */
+const skeleton = useSkeletonState();
 
 const classes = computed(() =>
   cn(DensityCell[table.density], 'align-middle', StackedCellClass, attrs.class as string | undefined),
@@ -49,6 +55,7 @@ defineExpose({ el });
     v-bind="rest"
     :class="classes"
   >
-    <slot />
+    <SkeletonStateLine v-if="skeleton.isSkeleton.value" is-skeleton :is-text="false"><slot /></SkeletonStateLine>
+    <slot v-else />
   </td>
 </template>

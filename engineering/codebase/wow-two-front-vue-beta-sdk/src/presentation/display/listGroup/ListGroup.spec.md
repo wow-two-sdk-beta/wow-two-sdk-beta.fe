@@ -18,6 +18,7 @@ Public import: `import { ListGroup } from '@wow-two-beta/ui-vue/presentation/dis
 | `isOrdered` | `boolean` | no | `undefined` | The ordered mode — renders `<ol>` instead of `<ul>`. |
 | `marker` | `ListGroupMarker` | no | — | The item marker style. |
 | `spacing` | `ListGroupSpacing` | no | — | The vertical spacing between items. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps every row; each `ListGroupItem` masks its own content. An explicit `true` sets `aria-busy`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

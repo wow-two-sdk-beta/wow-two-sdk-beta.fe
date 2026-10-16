@@ -11,8 +11,9 @@ Public import: `import { MeterBar } from '@wow-two-beta/ui-vue/presentation/feed
 - Without `isLabelVisible` the root is the `role="meter"` bar, named by `label`. With it, the root is a column: a
   row with the label (naming the meter) and the readout — `valueLabel`, else the rounded locale percentage — over
   the bar; `class` and attributes land on that column.
-- `isLoading` drops the fill, pulses the track, marks the meter `aria-busy` with a loading value text, and shows a
-  skeleton in place of the readout.
+- `isLoading` drops the fill, pulses the track under `motion-safe`, marks the meter `aria-busy` with a loading value
+  text, and draws the label and readout as bars that keep their line; an absent `isLoading` follows the nearest
+  `DataRegion` first load.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -27,7 +28,7 @@ Public import: `import { MeterBar } from '@wow-two-beta/ui-vue/presentation/feed
 | `label` | `string` | no | — | The meter's accessible name; drawn above the bar with `isLabelVisible`. |
 | `isLabelVisible` | `boolean` | no | `false` | Draws the label and readout above the bar. |
 | `valueLabel` | `string` | no | rounded percentage | The readout beside a visible label. |
-| `isLoading` | `boolean` | no | `false` | The value is still loading: no fill, pulsing track, placeholder readout. |
+| `isLoading` | `boolean` | no | `undefined` | The value is still loading: no fill, pulsing track, label and readout bars. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

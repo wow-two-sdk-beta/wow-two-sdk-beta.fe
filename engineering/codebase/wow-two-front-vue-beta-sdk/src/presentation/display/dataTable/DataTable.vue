@@ -50,6 +50,8 @@ export interface DataTableColumn<T> {
   readonly compare?: (left: T, right: T) => number;
   readonly align?: DataTableColumnAlign;
   readonly width?: string;
+  /** The skeleton bar's width in this column, any CSS length; defaults to a varied share of the cell. */
+  readonly skeletonWidth?: string;
 }
 
 export interface DataTableProps<T> {
@@ -100,7 +102,10 @@ export interface DataTableProps<T> {
   /** Whether data is loading — marks the table busy and draws skeleton rows while it is empty. */
   readonly isLoading?: boolean;
 
-  /** The skeleton rows drawn while an empty table loads. Default 5. */
+  /** The skeleton rows drawn while an empty table loads or its `DataRegion` first-loads. Default 5. */
+  readonly skeletonRows?: number;
+
+  /** @deprecated Use `skeletonRows`; this alias is removed next release. */
   readonly loadingRowCount?: number;
 
   /** Classes for the scroll container — a height such as `max-h-96` lets a sticky header pin. */
@@ -119,8 +124,11 @@ export interface DataTableProps<T> {
 /** @internal A row-control cell when stacked: inline at the head of its card, with no label. */
 const StackedControlClass = 'w-10 table-stacked:inline-flex table-stacked:w-auto';
 
-/** @internal The skeleton rows drawn while an empty table loads, when `loadingRowCount` is not set. */
-const DefaultLoadingRows = 5;
+/** @internal The skeleton rows drawn while an empty table loads, when `skeletonRows` is not set. */
+const DefaultSkeletonRows = 5;
+
+/** @internal Bar widths a loading cell cycles through, so placeholder rows read as varied text, not a grid of bars. */
+const SkeletonLineWidths = ['min(75%, 12rem)', 'min(50%, 8rem)', 'min(83%, 14rem)', 'min(66%, 10rem)'] as const;
 
 /** @internal Whether two key lists hold the same members. */
 function sameKeys(a: ReadonlyArray<SelectionKey>, b: ReadonlyArray<SelectionKey>): boolean {
@@ -153,7 +161,9 @@ import {
 import { cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import CheckboxInput from '../../forms/checkboxInput/CheckboxInput.vue';
-import SkeletonState from '../../feedback/skeletonState/SkeletonState.vue';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
+import { skeletonBoxClass } from '../../feedback/skeletonState/SkeletonState.variants';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '../table';
 
 /**
@@ -185,7 +195,8 @@ const props = withDefaults(defineProps<DataTableProps<T>>(), {
   isRowExpandable: undefined,
   hasStickyHeader: false,
   isLoading: false,
-  loadingRowCount: DefaultLoadingRows,
+  skeletonRows: undefined,
+  loadingRowCount: undefined,
   containerClassName: undefined,
   phoneLayout: undefined,
   stackBreakpoint: undefined,
@@ -342,11 +353,17 @@ const headerStatus = computed(() =>
   selectionStatus(createSelection(SelectionModeToken.Multiple, selectedKeys.value), selectableKeys.value),
 );
 
-const skeletonRows = computed(() =>
-  Array.from({ length: Math.max(1, Math.round(props.loadingRowCount) || DefaultLoadingRows) }, (_, index) => index),
-);
+const skeletonRowKeys = computed(() => {
+  const count = Math.round(props.skeletonRows ?? props.loadingRowCount ?? DefaultSkeletonRows);
+  return Array.from({ length: Math.max(1, count || DefaultSkeletonRows) }, (_, index) => index);
+});
 
-const isShowingSkeleton = computed(() => props.isLoading && rows.value.length === 0);
+/* A `DataRegion` first load draws placeholder rows whatever the data holds; on its own the table draws them while an
+   empty table loads. */
+const regionSkeleton = useSkeletonState();
+const isShowingSkeleton = computed(
+  () => regionSkeleton.isSkeleton.value || (props.isLoading && rows.value.length === 0),
+);
 
 function cycleSort(columnKey: string): void {
   const active = sort.value;
@@ -365,18 +382,15 @@ function alignClass(align: DataTableColumn<T>['align']): string {
   return 'text-left';
 }
 
-/** Line lengths a loading cell cycles through, so the placeholder reads as varied text rather than a grid of bars. */
-const SkeletonLineWidths = ['w-3/4', 'w-1/2', 'w-5/6', 'w-2/3'] as const;
-
-/** A loading cell's text line, sitting where the column aligns its content. */
-function skeletonLineClass(align: DataTableColumn<T>['align'], row: number, column: number): string {
-  return cn(
-    'max-w-48',
-    SkeletonLineWidths[(row + column) % SkeletonLineWidths.length],
-    align === DataTableColumnAlign.Right && 'ml-auto',
-    align === DataTableColumnAlign.Center && 'mx-auto',
-  );
+/** A loading cell's bar width: the column's own, else a varied share of the cell. The cell's alignment places it. */
+function skeletonLineWidth(column: DataTableColumn<T>, row: number, position: number): string {
+  return column.skeletonWidth ?? SkeletonLineWidths[(row + position) % SkeletonLineWidths.length]!;
 }
+
+/** The expand control's own box, drawn as its placeholder. */
+const skeletonControlClass = computed(() =>
+  cn('inline-flex size-6 rounded-sm align-middle', skeletonBoxClass(regionSkeleton.animation.value)),
+);
 
 const headerCells = computed(() =>
   props.columns.map((column) => {
@@ -481,8 +495,9 @@ const ExpandButtonClass =
     :has-sticky-header="hasStickyHeader"
     :phone-layout="phoneLayout"
     :stack-breakpoint="stackBreakpoint"
-    :aria-busy="isLoading || undefined"
+    :aria-busy="isLoading || isShowingSkeleton || undefined"
   >
+    <!-- The heading stays as it is through a first load; only the body draws placeholder rows. -->
     <TableHead>
       <TableRow>
         <TableHeaderCell v-if="hasExpansion" class="w-10">
@@ -495,6 +510,7 @@ const ExpandButtonClass =
             :model-value="headerStatus === SelectionStatus.All"
             :is-indeterminate="headerStatus === SelectionStatus.Some"
             :is-disabled="selectableKeys.length === 0"
+            :is-skeleton="false"
             :aria-label="locale.t('DataTable.selectAll', undefined, 'Select all rows')"
             @update:model-value="toggleAllRows"
           />
@@ -522,12 +538,12 @@ const ExpandButtonClass =
     <TableBody>
       <template v-if="isShowingSkeleton">
         <slot name="loading">
-          <TableRow v-for="index in skeletonRows" :key="`skeleton-${index}`" data-skeleton-row>
+          <TableRow v-for="index in skeletonRowKeys" :key="`skeleton-${index}`" data-skeleton-row>
             <TableCell v-if="hasExpansion" :class="StackedControlClass" label="" data-row-control>
-              <SkeletonState class="size-4 rounded-sm" />
+              <span aria-hidden="true" :class="skeletonControlClass" />
             </TableCell>
             <TableCell v-if="hasSelection" :class="StackedControlClass" label="" data-row-control>
-              <SkeletonState class="size-4 rounded-sm" />
+              <CheckboxInput size="sm" is-skeleton />
             </TableCell>
             <TableCell
               v-for="(column, position) in columns"
@@ -535,7 +551,7 @@ const ExpandButtonClass =
               :label="String(column.header)"
               :class="alignClass(column.align)"
             >
-              <SkeletonState shape="text" :class="skeletonLineClass(column.align, index, position)" />
+              <SkeletonStateLine is-skeleton :width="skeletonLineWidth(column, index, position)" />
             </TableCell>
           </TableRow>
         </slot>

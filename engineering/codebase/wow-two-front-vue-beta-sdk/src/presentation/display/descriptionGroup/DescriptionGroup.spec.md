@@ -18,6 +18,7 @@ Public import: `import { DescriptionGroup } from '@wow-two-beta/ui-vue/presentat
 | `items` | `ReadonlyArray<DescriptionGroupItem>` | yes | — | Declared by the source contract. |
 | `layout` | `DescriptionGroupLayout` | no | `DescriptionGroupLayout.Inline` | The layout direction. `inline` renders label/value on the same line; `stacked` puts label above. |
 | `density` | `DescriptionGroupDensity` | no | `DescriptionGroupDensity.Md` | The density between rows. Default `md`. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps every row and draws terms and plain values as bars; a value slot holding components lets them draw their own shapes. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

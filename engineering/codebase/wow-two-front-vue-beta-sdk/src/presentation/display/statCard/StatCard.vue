@@ -50,6 +50,9 @@ export interface StatCardProps {
    * its presence picks the element.
    */
   readonly onClick?: (event: MouseEvent) => void;
+
+  /** Keeps the tile's size and masks the label, value, trend and helper; defaults to the nearest `DataRegion`. */
+  readonly isSkeleton?: boolean;
 }
 
 const ValueSize: Record<StatCardSize, '2xl' | '3xl' | '4xl'> = {
@@ -67,6 +70,8 @@ import { useId } from '../../../foundation/identifiers';
 import { Icon } from '../../../foundation/icons';
 import Heading from '../heading/Heading.vue';
 import Text from '../text/Text.vue';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 
 /** Renders a KPI tile — label, big value, optional trend and helper — for dashboard grids. */
 defineOptions({ name: 'StatCard', inheritAttrs: false });
@@ -87,7 +92,15 @@ const props = withDefaults(defineProps<StatCardProps>(), {
   size: 'md',
   href: undefined,
   onClick: undefined,
+  isSkeleton: undefined,
 });
+
+/* The label, value and helper `Text` / `Heading` draw their own bars from this flag; the trend is masked here. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
+
+/** A value that has not arrived yet draws a short bar rather than the heading's long empty-line default. */
+const valueSkeletonWidth = computed(() => (props.value === '' ? '4ch' : undefined));
 
 const attrs = useAttrs();
 const slots = useSlots();
@@ -140,7 +153,14 @@ defineExpose({ el });
 </script>
 
 <template>
-  <div ref="el" v-bind="rest" :class="classes">
+  <div
+    ref="el"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :aria-busy="props.isSkeleton || undefined"
+    :inert="props.isSkeleton || undefined"
+    v-bind="rest"
+    :class="classes"
+  >
     <Text size="sm" color="muted">
       <component
         :is="controlTag"
@@ -154,13 +174,15 @@ defineExpose({ el });
       ><slot v-else name="label">{{ props.label }}</slot>
     </Text>
     <div :id="detailId" class="flex flex-col gap-1">
-      <Heading :level="3" :size="valueSize" weight="bold">
+      <Heading :level="3" :size="valueSize" weight="bold" :skeleton-width="valueSkeletonWidth">
         <slot name="value">{{ props.value }}</slot>
       </Heading>
       <span v-if="props.trend" :class="cn('mt-1', trendClasses)">
-        <Icon :icon="trendIcon" :size="12" />
-        {{ trendReadout }}
-        <span v-if="props.trend.label" class="font-normal text-muted-foreground"> {{ props.trend.label }}</span>
+        <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value">
+          <Icon :icon="trendIcon" :size="12" />
+          {{ trendReadout }}
+          <span v-if="props.trend.label" class="font-normal text-muted-foreground"> {{ props.trend.label }}</span>
+        </SkeletonStateLine>
       </span>
       <Text v-if="hasHelper" size="xs" color="muted" :class="!props.trend && 'mt-1'">
         <slot name="helper">{{ props.helper }}</slot>
