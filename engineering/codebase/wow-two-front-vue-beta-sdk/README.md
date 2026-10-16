@@ -40,6 +40,11 @@ It registers the package's own utility classes, which Tailwind otherwise exclude
 `themes.css` contains generated theme tokens and `themes.json` their manifest.
 Load the theme stylesheet when using a generated theme class.
 
+`platform` is the validated theme every wow-two platform app shares (Wheelhouse's chalk and forest palette).
+A platform app imports `themes.css` after `styles.css` and sets `class="theme-platform"` on its root, plus `dark`
+for dark mode and `surface-ambient` on the page for the backdrop; the `glass` variants of `Navbar`,
+`AppShellHeader` and `Card` take their translucent fill from its card and popover tokens.
+
 The root exports presentation components and the `styles`, `dom`, `optionals`, `state`, `numbers`, `json`, `icons`, `primitives`, `themes`,
 `color` and `emoji` namespaces. Dedicated subpaths expose application adapters:
 
