@@ -62,6 +62,8 @@ export interface ToggleGroupProps<T extends string = string> extends /* @vue-ign
    * @default false
    */
   readonly equalWidth?: boolean;
+  /** Keeps every segment's box and draws their labels as bars, inert; defaults to the nearest `DataRegion`. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -71,6 +73,7 @@ import { computed, provide, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { cn, Orientation as OrientationValue } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { ToggleGroupKey } from './ToggleGroupContext';
 import {
   ToggleGroupVariant as ToggleGroupVariantValue,
@@ -92,7 +95,12 @@ const props = withDefaults(defineProps<ToggleGroupProps<T>>(), {
   type: undefined,
   modelValue: undefined,
   defaultValue: undefined,
+  isSkeleton: undefined,
 });
+
+/* One flag switches every segment: each keeps its box and draws its label as a bar. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
 
 const emit = defineEmits<{
   /** Fires when the reader changes the selection — `T | null` in single mode, the array in multi mode. */
@@ -186,6 +194,8 @@ const rootClass = computed(() =>
       '[&>*]:rounded-md! [&>*]:!ml-0 [&>*]:border-transparent! [&>*]:bg-transparent!',
       '[&>*[data-pressed=true]]:bg-background! [&>*[data-pressed=true]]:text-foreground! [&>*[data-pressed=true]]:shadow-sm',
     ],
+    // Segmented skeleton: every segment lifts like the active one, so its label bar reads against the muted track.
+    isSegmented.value && skeleton.isSkeleton.value && '[&>*]:bg-background!',
     // Pill: fully-rounded detached chips (gap already applied via the non-attached branch above).
     isPill.value && '[&>*]:rounded-full!',
     // Equal-width tiles: every item shares the row/column extent (icon category strip).
@@ -214,6 +224,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     :role="isTablist ? 'tablist' : 'group'"
     :aria-orientation="isTablist ? orientation : undefined"
     :data-orientation="orientation"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
     :class="rootClass"
     v-bind="passthroughAttrs"
   >

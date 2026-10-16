@@ -10,6 +10,8 @@ Public import: `import { TabsGroupTab } from '@wow-two-beta/ui-vue/presentation/
 
 - Mount within the owner supplying `useTabsContext`, `useRovingFocusItem`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Inside a skeleton `TabsGroup` or a `DataRegion` first load, the tab keeps its box, draws its label as a bar, hides
+  the active underline and is `inert`.
 
 ## Props
 

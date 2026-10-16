@@ -20,6 +20,7 @@ Public import: `import { TabsGroup } from '@wow-two-beta/ui-vue/presentation/dis
 | `defaultValue` | `string` | no | `undefined` | The uncontrolled initial tab value. |
 | `orientation` | `Orientation` | no | `OrientationValue.Horizontal` | The layout axis. Default `horizontal`. |
 | `activationMode` | `TabsGroupActivationMode` | no | `TabsGroupActivationModeValue.Automatic` | Whether focus alone activates a tab. Default `automatic`. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps every tab's box and draws its label as a bar; panel content draws its own skeletons. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

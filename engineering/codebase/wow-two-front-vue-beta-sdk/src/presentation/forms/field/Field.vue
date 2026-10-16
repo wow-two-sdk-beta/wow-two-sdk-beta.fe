@@ -21,6 +21,9 @@ export interface FieldProps {
 
   /** The read-only state (also exposes `isReadOnly` to the control). */
   readonly isReadOnly?: boolean;
+
+  /** Keeps the layout and draws the label, control and helper as skeletons; defaults to the nearest `DataRegion`. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -32,6 +35,7 @@ import { FormControlProvider, useFormControl } from '../../../foundation/primiti
 import LabelText from '../../display/labelText/LabelText.vue';
 import FieldHelperText from '../../display/fieldHelperText/FieldHelperText.vue';
 import FieldErrorCallout from '../../feedback/fieldErrorCallout/FieldErrorCallout.vue';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /**
  * Renders label, control, helper and error as one block, wiring the control through form-control context.
@@ -58,7 +62,12 @@ const props = withDefaults(defineProps<FieldProps>(), {
   isRequired: undefined,
   isDisabled: undefined,
   isReadOnly: undefined,
+  isSkeleton: undefined,
 });
+
+/* One flag switches the label, the control and the helper; each draws its own skeleton in its own box. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+provideSkeletonState(skeleton);
 
 /** The single form control (TextInput, SelectPicker, …) — receives wired id/aria via context. */
 defineSlots<{
@@ -113,7 +122,13 @@ defineExpose({ el: root });
     :is-disabled="isDisabled"
     :is-read-only="isReadOnly"
   >
-    <div ref="root" :class="rootClass" v-bind="passthroughAttrs">
+    <div
+      ref="root"
+      :data-skeleton="skeleton.isSkeleton.value || undefined"
+      :aria-busy="props.isSkeleton || undefined"
+      :class="rootClass"
+      v-bind="passthroughAttrs"
+    >
       <LabelText v-if="hasLabel">
         <slot name="label">{{ label }}</slot>
       </LabelText>

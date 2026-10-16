@@ -41,6 +41,9 @@ export interface TextInputProps extends /* @vue-ignore */ NativeInputAttributes 
 
   /** @deprecated Use `isReadOnly`; this alias is removed next release. */
   readonly readonly?: boolean;
+
+  /** Draws the control as its own placeholder, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -51,6 +54,7 @@ import type { ClassValue } from 'clsx';
 import { cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { useFormControl } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { inputBaseVariants, InputState as InputStateValue } from '../InputStyles';
 
 /** Renders a single-line text input; email, tel, url, number, password and search have dedicated components. */
@@ -69,6 +73,7 @@ const props = withDefaults(defineProps<TextInputProps>(), {
   readOnly: undefined,
   isReadOnly: undefined,
   readonly: undefined,
+  isSkeleton: undefined,
 });
 
 const emit = defineEmits<{
@@ -110,6 +115,9 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
+/* The control keeps its height, radius and border width; its fill, border colour, value and placeholder are masked. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+
 const rootClass = computed(() =>
   cn(
     inputBaseVariants({
@@ -119,6 +127,7 @@ const rootClass = computed(() =>
       ring: props.ring,
     }),
     attrs.class as ClassValue,
+    skeleton.boxClass.value,
   ),
 );
 
@@ -143,6 +152,8 @@ defineExpose({ el: root });
     :readonly="finalReadOnly"
     :aria-invalid="isInvalid"
     :aria-describedby="describedBy"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
     :class="rootClass"
     v-bind="passthroughAttrs"
     @input="onInput"

@@ -29,6 +29,7 @@ Inherited contracts: `extends /* @vue-ignore */ ToggleInputAttributes, /* @vue-i
 | `color`        | `ColorProp`          | no       | —                                | The per-instance color override — applies to the active `tone`'s theme tokens. See `ColorProp`. |
 | `tooltip`      | `VNodeChild`         | no       | `undefined`                      | The rich tooltip for icon-only toggles. A string degrades to native `title`; a node is ignored. |
 | `as`           | `ToggleInputElement` | no       | `ToggleInputElementValue.Button` | The render element. `div` (role=button) lets interactive children nest. Default `button`.       |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the segment's box, draws its label as a bar, hides the pressed state, sets `inert`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

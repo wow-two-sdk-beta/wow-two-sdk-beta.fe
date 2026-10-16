@@ -11,6 +11,8 @@ export interface TabsGroupProps {
   readonly orientation?: Orientation;
   /** Whether focus alone activates a tab. Default `automatic`. */
   readonly activationMode?: TabsGroupActivationMode;
+  /** Keeps every tab's box and draws its label as a bar, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -19,6 +21,7 @@ import { computed, provide, useAttrs, useTemplateRef } from 'vue';
 import { cn, Orientation as OrientationValue } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { useId } from '../../../foundation/identifiers';
+import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import {
   TabsGroupActivationMode as TabsGroupActivationModeValue,
   TabsGroupKey,
@@ -42,7 +45,11 @@ const props = withDefaults(defineProps<TabsGroupProps>(), {
   defaultValue: undefined,
   orientation: OrientationValue.Horizontal,
   activationMode: TabsGroupActivationModeValue.Automatic,
+  isSkeleton: undefined,
 });
+
+/* One flag switches the tabs and the panel content; each draws its own skeleton. */
+provideSkeletonState(useSkeletonState(() => props.isSkeleton));
 
 const emit = defineEmits<{
   /** Fires when the reader selects a different tab, with its value. */

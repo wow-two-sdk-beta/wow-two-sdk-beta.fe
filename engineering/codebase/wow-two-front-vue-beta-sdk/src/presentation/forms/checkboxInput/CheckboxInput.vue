@@ -49,6 +49,9 @@ export interface CheckboxInputProps {
 
   /** @deprecated Use `isRequired`; this alias is removed next release. */
   readonly required?: boolean;
+
+  /** Draws the box as its own placeholder, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 
 const ComponentName = 'CheckboxInput';
@@ -134,6 +137,7 @@ import { Check, Minus } from 'lucide-vue-next';
 import { cn, ColorExtensions, CssExtensions, ColorTone as ColorToneValue } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { useFormControl } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { checkboxVariants, CheckboxInputVariant as CheckboxInputVariantValue } from './CheckboxInput.variants';
 
 /** Renders a native checkbox behind a custom visual — 6 variants × 5 tones, plus an indeterminate dash. */
@@ -156,6 +160,7 @@ const props = withDefaults(defineProps<CheckboxInputProps>(), {
   readonly: undefined,
   isRequired: undefined,
   required: undefined,
+  isSkeleton: undefined,
 });
 
 const emit = defineEmits<{
@@ -240,7 +245,16 @@ const passthroughAttrs = computed(() =>
 
 const wrapperClass = computed(() => cn('relative inline-flex shrink-0', boxClass.value, attrs.class as ClassValue));
 
+/* In skeleton mode the box keeps its size, radius and border width as the placeholder; the tick hides. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+
 const visualClass = computed(() =>
+  skeleton.isSkeleton.value
+    ? cn('pointer-events-none grid h-full w-full place-items-center rounded-sm border', skeleton.boxClass.value)
+    : visualStateClass.value,
+);
+
+const visualStateClass = computed(() =>
   cn(
     checkboxVariants({ variant: props.variant, tone: props.tone }),
     props.isIndeterminate
@@ -260,7 +274,12 @@ defineExpose({ el: input });
 </script>
 
 <template>
-  <span :class="wrapperClass" :style="composedStyle">
+  <span
+    :class="wrapperClass"
+    :style="composedStyle"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
+  >
     <input
       ref="input"
       type="checkbox"

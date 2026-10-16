@@ -51,6 +51,8 @@ export interface ToggleInputProps
   readonly as?: ToggleInputElement;
   /** Prevents changing the pressed state while remaining focusable. */
   readonly isReadOnly?: boolean;
+  /** Keeps the segment's box and draws its label as a bar, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 </script>
 
@@ -65,6 +67,8 @@ import { useFormControl } from '../../../foundation/primitives';
 import { useControlled } from '../../../foundation/state';
 import Button from '../../actions/button/Button.vue';
 import { ButtonVariant } from '../../actions/button';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 import { ToggleGroupKey } from '../toggleGroup/ToggleGroupContext';
 import { ToggleItemRole } from '../toggleGroup/ToggleGroup.variants';
 import {
@@ -91,7 +95,12 @@ const props = withDefaults(defineProps<ToggleInputProps>(), {
      check. An explicit `undefined` default suppresses the cast. */
   tooltip: undefined,
   isReadOnly: undefined,
+  isSkeleton: undefined,
 });
+
+/* A segment keeps its own box — border, padding, radius — and only its label turns into a bar; the pressed state
+   hides. The inner `Button` stays out of skeleton mode, so it does not fill the whole segment. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
 
 const emit = defineEmits<{
   /** Fires when the reader turns the toggle on or off, carrying the new pressed state. */
@@ -205,7 +214,10 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     :aria-pressed="pressed"
     :aria-disabled="inactive || undefined"
     :aria-label="resolvedAriaLabel"
-    :data-pressed="pressed ? 'true' : 'false'"
+    :data-pressed="pressed && !skeleton.isSkeleton.value ? 'true' : 'false'"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
+    :is-skeleton="false"
     :title="resolvedTitle"
     :role="itemRole"
     :aria-selected="ariaSelected"
@@ -216,9 +228,9 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     <!-- `as="div"` → render through the asChild merge onto a real <div> so consumers may nest
          interactive children (button-in-button is invalid markup). Keyboard parity added here. -->
     <div v-if="isDiv" role="button" :tabindex="inactive ? -1 : 0" @keydown="handleDivKeyDown">
-      <slot :pressed="pressed" />
+      <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value"><slot :pressed="pressed" /></SkeletonStateLine>
     </div>
-    <slot v-else :pressed="pressed" />
+    <SkeletonStateLine v-else :is-skeleton="skeleton.isSkeleton.value"><slot :pressed="pressed" /></SkeletonStateLine>
   </Button>
   <input
     ref="formResetAnchor"

@@ -29,6 +29,7 @@ Public import: `import { CheckboxInput } from '@wow-two-beta/ui-vue/presentation
 | `disabled` | `boolean` | no | `undefined` | Deprecated alias of `isDisabled`; removed next release. |
 | `isRequired` | `boolean` | no | `undefined` | The required state. Falls back to the surrounding field's `isRequired`. |
 | `required` | `boolean` | no | `undefined` | Deprecated alias of `isRequired`; removed next release. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the box's size, radius and border width as the placeholder, hides the tick, sets `inert`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

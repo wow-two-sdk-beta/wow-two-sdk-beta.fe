@@ -16,6 +16,9 @@ export interface SelectPickerTriggerProps {
 
   /** The trigger width — number = px, string = any CSS length. Wins over `isFullWidth`. */
   readonly width?: SizeValue;
+
+  /** Draws the trigger as its own placeholder, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 
 /** Contains the icon Tailwind classes per trigger size. */
@@ -80,6 +83,7 @@ import { InputState as InputStateValue } from '../InputStyles';
 import { selectTriggerVariants } from './SelectPicker.variants';
 import { useSelectContext, type ItemRegistryEntry } from './SelectPickerContext';
 import SelectPickerValue from './SelectPickerValue.vue';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 const ChevronDownIcon = ChevronDown;
 const LoaderIcon = Loader2;
@@ -93,7 +97,14 @@ defineOptions({ name: 'SelectPickerTrigger', inheritAttrs: false });
 /** The trigger content — defaults to `<SelectPickerValue />`. React's `children`. */
 defineSlots<{ default?(): unknown }>();
 
-const props = withDefaults(defineProps<SelectPickerTriggerProps>(), { isFullWidth: true, width: undefined });
+const props = withDefaults(defineProps<SelectPickerTriggerProps>(), {
+  isFullWidth: true,
+  width: undefined,
+  isSkeleton: undefined,
+});
+
+/* The trigger keeps its height, width, radius and border width; its value, chevron and clear control are masked. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
 
 const attrs = useAttrs();
 
@@ -132,7 +143,9 @@ function handleTriggerKeyDown(event: KeyboardEvent): void {
   }
 }
 
-const showClear = computed(() => ctx.isClearable && ctx.hasSelection && !ctx.isLoading && !ctx.isDisabled);
+const showClear = computed(
+  () => ctx.isClearable && ctx.hasSelection && !ctx.isLoading && !ctx.isDisabled && !skeleton.isSkeleton.value,
+);
 
 const sizeKey = computed<SelectPickerSize>(() => props.size ?? 'md');
 const iconClass = computed(() => TriggerIconClasses[sizeKey.value]);
@@ -167,7 +180,11 @@ const passthroughAttrs = computed(() =>
 );
 
 const buttonClass = computed(() =>
-  cn(selectTriggerVariants({ size: props.size, state: triggerState.value }), attrs.class as ClassValue),
+  cn(
+    selectTriggerVariants({ size: props.size, state: triggerState.value }),
+    attrs.class as ClassValue,
+    skeleton.boxClass.value,
+  ),
 );
 
 /* The wrapper carries the width: the clear button is positioned against its right edge, so the button fills it. */
@@ -185,7 +202,12 @@ defineExpose({ el: root });
 </script>
 
 <template>
-  <span :class="wrapperClass" :style="wrapperStyle">
+  <span
+    :class="wrapperClass"
+    :style="wrapperStyle"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
+  >
     <!--
       Always-mounted polite live region — swapping content (empty ↔ label) makes SRs announce
       the loading transition. `aria-busy` on the button alone isn't announced.

@@ -25,6 +25,7 @@ Public import: `import { SwitchInput } from '@wow-two-beta/ui-vue/presentation/f
 | `disabled` | `boolean` | no | `undefined` | Deprecated alias of `isDisabled`; removed next release. |
 | `isRequired` | `boolean` | no | `undefined` | The required state. Falls back to the surrounding field's `isRequired`. |
 | `required` | `boolean` | no | `undefined` | Deprecated alias of `isRequired`; removed next release. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the track's pill and size as the placeholder, hides the thumb and checked fill, sets `inert`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

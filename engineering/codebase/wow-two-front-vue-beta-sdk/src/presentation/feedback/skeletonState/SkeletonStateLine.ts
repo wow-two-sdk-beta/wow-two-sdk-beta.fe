@@ -1,5 +1,6 @@
-import { defineComponent, h, type PropType, type VNode } from 'vue';
+import { Text, defineComponent, h, type PropType, type VNode } from 'vue';
 import { renderableChildren } from '../../../foundation/primitives';
+import { cn } from '../../../foundation/styles';
 import { skeletonLineClass, type SkeletonStateAnimation } from './SkeletonState.variants';
 import { useSkeletonStateGroup } from './SkeletonStateContext';
 
@@ -10,6 +11,14 @@ const EmptyLineWidth = '8em';
 function hasComponent(node: VNode): boolean {
   if (typeof node.type === 'object' || typeof node.type === 'function') return true;
   return Array.isArray(node.children) && renderableChildren(node.children).some(hasComponent);
+}
+
+/** @internal Whether a rendered child tree holds text a reader would see — else it is an icon or an image. */
+function hasText(node: VNode): boolean {
+  if (node.type === Text) return true;
+  if (typeof node.type !== 'string') return false;
+  if (typeof node.children === 'string') return node.children.trim() !== '';
+  return Array.isArray(node.children) && renderableChildren(node.children).some(hasText);
 }
 
 /**
@@ -42,12 +51,17 @@ export const SkeletonStateLine = defineComponent({
       const children = renderableChildren(nodes);
       if (!props.isText && children.some(hasComponent)) return nodes;
       const isFixed = props.width !== undefined || children.length === 0;
+      /* An icon is a block box a line bar cannot wrap, so icon-only content becomes one box the icon's size. */
+      const isGlyph = !isFixed && !children.some(hasText);
       return h(
         'span',
         {
           'aria-hidden': 'true',
           'data-skeleton-line': '',
-          class: skeletonLineClass(props.animation ?? group?.animation.value),
+          class: cn(
+            skeletonLineClass(props.animation ?? group?.animation.value),
+            isGlyph && 'inline-flex align-middle',
+          ),
           style: isFixed ? { paddingInlineEnd: props.width ?? EmptyLineWidth } : undefined,
         },
         isFixed ? ' ' : nodes,

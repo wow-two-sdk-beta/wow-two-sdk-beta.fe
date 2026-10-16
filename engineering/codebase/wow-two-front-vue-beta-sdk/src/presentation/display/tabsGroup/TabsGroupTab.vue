@@ -12,6 +12,8 @@ import { computed, mergeProps, shallowRef, useAttrs } from 'vue';
 import { cn, Orientation } from '../../../foundation/styles';
 import { dataAttr } from '../../../foundation/dom';
 import { useRovingFocusItem } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import { SkeletonStateLine } from '../../feedback/skeletonState/SkeletonStateLine';
 import { TabsGroupActivationMode, useTabsContext } from './TabsGroupContext';
 
 /** Renders one tab button; the selected tab is the roving tab stop, per APG. */
@@ -26,6 +28,10 @@ const attrs = useAttrs();
 const tabs = useTabsContext();
 
 const selected = computed(() => tabs.value === props.value);
+
+/* Follows the nearest `TabsGroup` or `DataRegion` skeleton: the tab keeps its box, its label turns into a bar and the
+   active underline hides. */
+const skeleton = useSkeletonState();
 
 // Selected tab is the Tab stop (per APG) — seeds/syncs roving focusedId when focus is outside the tablist.
 // Reactive object: bound with `v-bind`, never destructured.
@@ -64,6 +70,7 @@ const classes = computed(() =>
       : 'border-b-2 border-transparent data-[state=active]:border-primary',
     'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
     attrs.class as string | undefined,
+    skeleton.isSkeleton.value && 'border-transparent data-[state=active]:border-transparent',
   ),
 );
 
@@ -99,6 +106,8 @@ defineExpose({ el });
     :aria-controls="panelId"
     :data-state="selected ? 'active' : 'inactive'"
     :data-disabled="dataAttr(isDisabled)"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
     :disabled="isDisabled"
     v-bind="bindings"
     :ref="setRef"
@@ -106,6 +115,6 @@ defineExpose({ el });
     @click="onClick"
     @focus="onFocus"
   >
-    <slot />
+    <SkeletonStateLine :is-skeleton="skeleton.isSkeleton.value"><slot /></SkeletonStateLine>
   </button>
 </template>

@@ -31,6 +31,7 @@ Inherited contracts: `extends /* @vue-ignore */ Omit<
 | `variant` | `ToggleGroupVariant` | no | `ToggleGroupVariantValue.Default` | The visual style. - `default` — standard button row/column (borders + attached radii). - `segmented` — iOS-style connected pill row on a muted track; the active segment lifts to a `background` surface. Forces `isAttached`. - `pill` — individually-separated rounded pills (each item its own detached chip). Forces detached (never attaches). |
 | `itemRole` | `ToggleItemRole` | no | `ToggleItemRoleValue.Group` | The ARIA role wiring. - `group` (default) — `role="group"` of independent toggle buttons. - `tab` — opt into tablist semantics: root renders `role="tablist"` and each item `role="tab"` + `aria-selected`. Pairs naturally with single-select. |
 | `equalWidth` | `boolean` | no | `false` | The equal-width state — lays items out as equal-width tiles (each `flex-1 basis-0`) for an icon category strip where every cell should share the row width. Additive; the default keeps intrinsic item widths. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps every segment's box and draws its label as a bar; a segmented track lifts every segment. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

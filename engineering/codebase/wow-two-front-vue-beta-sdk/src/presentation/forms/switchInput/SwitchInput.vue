@@ -30,6 +30,9 @@ export interface SwitchInputProps {
 
   /** @deprecated Use `isRequired`; this alias is removed next release. */
   readonly required?: boolean;
+
+  /** Draws the track as its own placeholder, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 
 /* Sizes not listed fall back to the `md` row at the call site. */
@@ -58,6 +61,7 @@ import type { ClassValue } from 'clsx';
 import { cn, Size as SizeValue } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { useFormControl } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /** Renders a native checkbox as an iOS-style track and thumb toggle, carrying no label of its own. */
 /* `inheritAttrs: false` so `class` folds into the wrapper's own `cn()` call — plain fallthrough
@@ -76,6 +80,7 @@ const props = withDefaults(defineProps<SwitchInputProps>(), {
   readonly: undefined,
   isRequired: undefined,
   required: undefined,
+  isSkeleton: undefined,
 });
 
 const emit = defineEmits<{
@@ -127,14 +132,19 @@ const wrapperClass = computed(() =>
   cn('relative inline-flex shrink-0', TrackClass[props.size] ?? TrackClass.md, attrs.class as ClassValue),
 );
 
+/* In skeleton mode the track keeps its pill and size as the placeholder; the checked fill and the thumb hide. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+
 const trackClass = computed(() =>
-  cn(
-    'pointer-events-none flex h-full w-full items-center rounded-full bg-input px-0.5 transition-colors',
-    'peer-checked:bg-primary',
-    TrackCheckedClass[props.size] ?? TrackCheckedClass.md,
-    'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1',
-    'peer-disabled:opacity-50',
-  ),
+  skeleton.isSkeleton.value
+    ? cn('pointer-events-none flex h-full w-full items-center rounded-full px-0.5', skeleton.boxClass.value)
+    : cn(
+        'pointer-events-none flex h-full w-full items-center rounded-full bg-input px-0.5 transition-colors',
+        'peer-checked:bg-primary',
+        TrackCheckedClass[props.size] ?? TrackCheckedClass.md,
+        'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1',
+        'peer-disabled:opacity-50',
+      ),
 );
 
 const thumbClass = computed(() =>
@@ -152,7 +162,11 @@ defineExpose({ el: input });
 </script>
 
 <template>
-  <span :class="wrapperClass">
+  <span
+    :class="wrapperClass"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
+  >
     <input
       ref="input"
       type="checkbox"

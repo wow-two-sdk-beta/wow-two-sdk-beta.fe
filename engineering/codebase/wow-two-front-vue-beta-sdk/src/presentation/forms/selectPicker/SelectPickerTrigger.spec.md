@@ -21,6 +21,7 @@ Public import: `import { SelectPickerTrigger } from '@wow-two-beta/ui-vue/presen
 | `state` | `InputState` | no | — | The validity surface. |
 | `isFullWidth` | `boolean` | no | `true` | Stretches the trigger across its container; `false` sizes it to its value. |
 | `width` | `SizeValue` | no | — | The trigger width — number = px, string = any CSS length. Wins over `isFullWidth`. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps height, width, radius and border width as the placeholder, masks the value, chevron and clear control, sets `inert`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

@@ -10,6 +10,8 @@ Public import: `import { Field } from '@wow-two-beta/ui-vue/presentation/forms';
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Skeleton mode keeps the label line, the control's height and radius and the helper lines; one flag here switches
+  every part inside.
 
 ## Props
 
@@ -21,6 +23,7 @@ Public import: `import { Field } from '@wow-two-beta/ui-vue/presentation/forms';
 | `isRequired` | `boolean` | no | `undefined` | The required state (also exposes `isRequired` to the control via context). |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state (also exposes `isDisabled` to the control). |
 | `isReadOnly` | `boolean` | no | `undefined` | The read-only state (also exposes `isReadOnly` to the control). |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps the layout; the label, control and helper each draw their own skeleton. An explicit `true` sets `aria-busy`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

@@ -32,6 +32,7 @@ Public import: `import { TextAreaInput } from '@wow-two-beta/ui-vue/presentation
 | `isReadOnly` | `boolean` | no | `undefined` | Keeps the value but blocks changes. Falls back to the surrounding field's `isReadOnly`. |
 | `readOnly` | `boolean` | no | `undefined` | Deprecated alias of `isReadOnly`; removed next release. |
 | `readonly` | `boolean` | no | `undefined` | Deprecated alias of `isReadOnly`; removed next release. |
+| `isSkeleton` | `boolean` | no | `undefined` | Keeps rows, radius and border width as the placeholder, masks value and placeholder text, sets `inert`. Defaults to the nearest `DataRegion` first load. |
 
 ## Emits
 

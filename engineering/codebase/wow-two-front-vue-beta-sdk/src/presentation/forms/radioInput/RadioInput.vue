@@ -30,6 +30,9 @@ export interface RadioInputProps {
 
   /** @deprecated Use `isRequired`; this alias is removed next release. */
   readonly required?: boolean;
+
+  /** Draws the circle as its own placeholder, inert; defaults to the nearest `DataRegion` first load. */
+  readonly isSkeleton?: boolean;
 }
 
 /* Sizes not listed fall back to the `md` row at the call site. */
@@ -47,6 +50,7 @@ import type { ClassValue } from 'clsx';
 import { cn, Size as SizeValue } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { useFormControl } from '../../../foundation/primitives';
+import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /** Renders a native radio behind a custom visual; same-`name` siblings form one mutually exclusive group. */
 /* `inheritAttrs: false` so `class` folds into the wrapper's own `cn()` call — plain fallthrough
@@ -65,6 +69,7 @@ const props = withDefaults(defineProps<RadioInputProps>(), {
   readonly: undefined,
   isRequired: undefined,
   required: undefined,
+  isSkeleton: undefined,
 });
 
 const emit = defineEmits<{
@@ -116,13 +121,22 @@ const wrapperClass = computed(() =>
   cn('relative inline-flex shrink-0', SizeClass[props.size] ?? SizeClass.md, attrs.class as ClassValue),
 );
 
-const visualClass = cn(
+const VisualClass = cn(
   'pointer-events-none grid h-full w-full place-items-center rounded-full border border-input bg-background transition-colors',
   'peer-checked:border-primary-soft-foreground',
   /* `peer-checked:` cannot reach descendants — the dot's opacity is gated by a child selector on this peer span. */
   '[&>span]:opacity-0 peer-checked:[&>span]:opacity-100',
   'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1',
   'peer-disabled:opacity-50',
+);
+
+/* In skeleton mode the circle keeps its size and border width as the placeholder; the dot hides. */
+const skeleton = useSkeletonState(() => props.isSkeleton);
+
+const visualClass = computed(() =>
+  skeleton.isSkeleton.value
+    ? cn('pointer-events-none grid h-full w-full place-items-center rounded-full border', skeleton.boxClass.value)
+    : VisualClass,
 );
 
 const input = useTemplateRef<HTMLInputElement>('input');
@@ -136,7 +150,11 @@ defineExpose({ el: input });
 </script>
 
 <template>
-  <span :class="wrapperClass">
+  <span
+    :class="wrapperClass"
+    :data-skeleton="skeleton.isSkeleton.value || undefined"
+    :inert="skeleton.isSkeleton.value || undefined"
+  >
     <input
       ref="input"
       type="radio"
