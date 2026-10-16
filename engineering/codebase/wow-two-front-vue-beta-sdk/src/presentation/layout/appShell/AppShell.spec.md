@@ -11,6 +11,7 @@ Public import: `import { AppShell } from '@wow-two-beta/ui-vue/presentation/layo
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - Mount within the owner supplying `useAppShellContext`; a compound part is not an independent root.
 - By default the shell fills the viewport (`h-dvh`) and `AppShellMain` is the one scroll container with a stable gutter; the header, sidebar and footer hold still and span the full window. The sidebar and aside scroll on their own.
+- The content column is `minmax(0, 1fr)`: a wide header nav or wide page content overflows inside its region and never widens the shell.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 

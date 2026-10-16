@@ -52,6 +52,11 @@ describe('app shell scrolling', () => {
     expect(root(wrapper).style.gridTemplate).not.toContain('sidebar');
   });
 
+  it('floors the content column at zero so wide content cannot widen the shell', () => {
+    const wrapper = shell({}, () => [h(AppShellHeader, null, () => 'Top'), h(AppShellMain, null, () => 'Body')]);
+    expect(root(wrapper).style.gridTemplate).toMatch(/minmax\(0(px)?, 1fr\)$/);
+  });
+
   it('places a sidebar column when the children include one, or when told to', async () => {
     // Every breakpoint query answers "wide", so the sidebar sits in the grid instead of a drawer.
     const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(

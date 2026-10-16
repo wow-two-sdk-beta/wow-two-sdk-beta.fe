@@ -202,11 +202,14 @@ const navigation = computed<AppShellNavigation>(
     (hasSidebar(slots.default?.() ?? []) ? AppShellNavigation.Vertical : AppShellNavigation.Horizontal),
 );
 
-/** Collapsed drops the sidebar track entirely; header and footer always span the full width. */
+/**
+ * Collapsed drops the sidebar track entirely; header and footer always span the full width. The content column is
+ * `minmax(0, 1fr)`: a bare `1fr` keeps an `auto` minimum, so a wide header nav or table would widen the whole shell.
+ */
 const gridTemplate = computed(() =>
   isSidebarCollapsed.value || navigation.value === AppShellNavigation.Horizontal
-    ? `'header' auto 'main' 1fr 'footer' auto / 1fr`
-    : `'header header' auto 'sidebar main' 1fr 'sidebar footer' auto / ${props.sidebarWidth} 1fr`,
+    ? `'header' auto 'main' 1fr 'footer' auto / minmax(0, 1fr)`
+    : `'header header' auto 'sidebar main' 1fr 'sidebar footer' auto / ${props.sidebarWidth} minmax(0, 1fr)`,
 );
 
 /* A region shell owns the viewport: its rows fill the window exactly and only the main region scrolls. */
