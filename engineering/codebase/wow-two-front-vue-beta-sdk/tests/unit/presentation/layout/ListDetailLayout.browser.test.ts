@@ -102,6 +102,90 @@ describe('below the breakpoint', () => {
     expect(Math.round(layoutTop)).toBe(Math.round(region().getBoundingClientRect().top));
   });
 
+  it('returns focus to the item tapped last, not the one focus stayed on', async () => {
+    wrapper = mount(Harness, { attachTo: document.body });
+    await nextTick();
+    /* The first return focuses Product 3. A touch tap in iOS Safari clicks without moving focus, so focus stays
+       there; `click()` models that tap in every engine. */
+    await userEvent.click(item('Product 3'));
+    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
+    await expect.poll(() => document.activeElement).toBe(item('Product 3'));
+    item('Product 7').click();
+    await expect.poll(() => document.querySelector('h2')?.textContent).toBe('Product 7');
+    await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
+    await expect.poll(() => document.activeElement).toBe(item('Product 7'));
+  });
+
+  it('returns focus to the item activated from the keyboard', async () => {
+    wrapper = mount(Harness, { attachTo: document.body });
+    await nextTick();
+    item('Product 4').focus();
+    await userEvent.keyboard('{Enter}');
+    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
+    await expect.poll(() => document.activeElement).toBe(item('Product 4'));
+  });
+
+  it('names a keyed option the activator over a click just before it', async () => {
+    const open = ref<number | null>(null);
+    wrapper = mount(
+      defineComponent({
+        setup: () => () =>
+          h(
+            ListDetailLayout,
+            { isDetailOpen: open.value !== null, onBack: () => (open.value = null) },
+            {
+              list: () => [
+                h('button', { type: 'button', 'data-filter': '' }, 'Filter'),
+                ...Items.slice(0, 5).map((name, index) =>
+                  h(
+                    'div',
+                    {
+                      role: 'option',
+                      tabindex: 0,
+                      onKeydown: (event: KeyboardEvent) => {
+                        if (event.key === 'Enter') open.value = index;
+                      },
+                    },
+                    name,
+                  ),
+                ),
+              ],
+              detail: () => h('h2', null, open.value === null ? 'None' : Items[open.value]),
+            },
+          ),
+      }),
+      { attachTo: document.body },
+    );
+    await nextTick();
+    document.querySelector<HTMLElement>('[data-filter]')!.click();
+    const option = [...document.querySelectorAll<HTMLElement>('[role=option]')][2]!;
+    option.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
+    await expect.poll(() => document.activeElement).toBe(option);
+  });
+
+  it('pads the back row through backClass', async () => {
+    wrapper = mount(
+      defineComponent({
+        setup: () => () =>
+          h(
+            ListDetailLayout,
+            { isDetailOpen: true, backClass: 'px-4' },
+            { list: () => h('p', null, 'List'), detail: () => h('h2', null, 'Detail') },
+          ),
+      }),
+      { attachTo: document.body },
+    );
+    await nextTick();
+    const root = document.querySelector('[data-view]')!.getBoundingClientRect();
+    const control = document.querySelector('[data-list-detail-back]')!.getBoundingClientRect();
+    expect(Math.round(control.left)).toBeGreaterThan(Math.round(root.left));
+  });
+
   it('returns focus to the selected item when the detail opened from the route', async () => {
     selected.value = 5;
     wrapper = mount(Harness, { attachTo: document.body });

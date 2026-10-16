@@ -15,7 +15,8 @@ Public import: `import { ListDetailLayout } from '@wow-two-beta/ui-vue/presentat
 - Below `breakpoint` exactly one pane shows: the list while `isDetailOpen` is `false`, the detail while it is `true`.
   The hidden pane stays mounted, so list state (search text, loaded pages) survives the swap.
 - Below `breakpoint` a back control heads the detail pane. It emits `back`; the layout never closes the detail itself.
-  The `back` slot replaces the control and receives `back` and the resolved `label`.
+  The `back` slot replaces the control and receives `back` and the resolved `label`. `backClass` pads the row that
+  holds it to match padded detail content; it cannot show the row side by side.
 - The breakpoint is read from CSS, so the layout follows an app's own `@theme` breakpoints; it renders the same markup on
   the server and the client.
 - Focus and scroll move only when the panes swap below `breakpoint`; a change while side by side moves nothing, and the
@@ -24,9 +25,10 @@ Public import: `import { ListDetailLayout } from '@wow-two-beta/ui-vue/presentat
     top is scrolled into view if the list had scrolled past it, and focus moves to the detail's
     `[data-list-detail-heading]`, else its first `h1`–`h6`, else the detail pane. A heading without `tabindex` gains
     `tabindex="-1"`.
-  - Returning: the saved offsets are restored, then focus moves to the list control that opened the detail (a focused
-    or clicked control within the last second), else the item marked `aria-current`, `aria-selected="true"`,
-    `aria-pressed="true"` or `data-selected`, else the list pane.
+  - Returning: the saved offsets are restored, then focus moves to the list control that opened the detail — the one
+    last clicked, tapped or activated with Enter / Space within the last second, else the focused one — else the item
+    marked `aria-current`, `aria-selected="true"`, `aria-pressed="true"` or `data-selected`, else the list pane. The
+    activation outranks focus because WebKit never focuses a clicked button and an iOS tap leaves focus in place.
 - Scrolling is instant, never smooth, so reduced motion needs no branch.
 - The root carries `data-view` (`list` · `detail`); each pane carries `data-list-detail-pane`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
@@ -39,6 +41,7 @@ Public import: `import { ListDetailLayout } from '@wow-two-beta/ui-vue/presentat
 | `breakpoint` | `Breakpoint` | no | `lg` | The panes sit side by side from this breakpoint. |
 | `listWidth` | `string` | no | `20rem` | The list column's width from `breakpoint` up, any CSS length. |
 | `backLabel` | `string` | no | locale `Back` | The back control's label. |
+| `backClass` | `HTMLAttributes['class']` | no | — | The back row's class, merged over the default `mb-2`. |
 
 ## Emits
 

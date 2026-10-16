@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { HTMLAttributes } from 'vue';
 import type { Breakpoint } from '../appShell/AppShell.vue';
 
 export interface ListDetailLayoutProps {
@@ -13,6 +14,9 @@ export interface ListDetailLayoutProps {
 
   /** The back control's label. Default the locale's `Back`. */
   readonly backLabel?: string;
+
+  /** The back row's class — pad it to match padded detail content. Merged over the default `mb-2`. */
+  readonly backClass?: HTMLAttributes['class'];
 }
 
 /* Static per-breakpoint classes, so Tailwind finds every one in the source. */
@@ -47,7 +51,7 @@ const SelectedItemSelector =
 /** The controls a click in the list may have activated. */
 const ActivatorSelector = 'a[href], button, input, select, textarea, summary, [tabindex]';
 
-/** How long a click in the list stays the activator of a detail that opens after it (a route push in between). */
+/** How long an activation in the list names the activator of a detail that opens after it (a route push between). */
 const ActivatorWindowMs = 1000;
 
 /** The detail's focus target on open: an explicit marker first, then its first heading. */
@@ -86,6 +90,7 @@ const props = withDefaults(defineProps<ListDetailLayoutProps>(), {
   breakpoint: 'lg',
   listWidth: '20rem',
   backLabel: undefined,
+  backClass: undefined,
 });
 
 const emit = defineEmits<{
@@ -115,7 +120,8 @@ const detailClasses = computed(() =>
   cn('min-w-0 outline-none', !props.isDetailOpen && NarrowHiddenClass[props.breakpoint]),
 );
 
-const backRowClasses = computed(() => cn('mb-2', WideHiddenClass[props.breakpoint]));
+/* The caller's class lands before the breakpoint's hiding class, so it can pad the row but never show it side by side. */
+const backRowClasses = computed(() => cn('mb-2', props.backClass, WideHiddenClass[props.breakpoint]));
 
 /** Everything but `class` / `style`, both re-applied above. */
 const rest = computed(() => {
@@ -131,18 +137,31 @@ function back(): void {
 let activator: Element | null = null;
 let scrollMarks: ScrollMark[] = [];
 
-/* The last click in the list. WebKit never focuses a clicked button, so focus alone cannot name the activator. */
-let lastClick: { readonly target: Element; readonly at: number } | null = null;
+/*
+ * The last activation in the list: a click or tap, or Enter / Space. It outranks focus: WebKit never focuses a clicked
+ * button and an iOS tap leaves focus where it was — often on the item the previous return focused.
+ */
+let lastActivation: { readonly target: Element; readonly at: number } | null = null;
+
+function remember(target: EventTarget | null): void {
+  const control = (target as Element | null)?.closest?.(ActivatorSelector);
+  lastActivation = control ? { target: control, at: performance.now() } : null;
+}
 
 function rememberClick(event: Event): void {
-  const target = (event.target as Element | null)?.closest?.(ActivatorSelector);
-  lastClick = target ? { target, at: performance.now() } : null;
+  remember(event.target);
+}
+
+function rememberKey(event: KeyboardEvent): void {
+  if (event.key === 'Enter' || event.key === ' ') remember(event.target);
 }
 
 function activatorIn(list: Element): Element | null {
+  const activation = lastActivation;
+  lastActivation = null;
+  if (activation && performance.now() - activation.at <= ActivatorWindowMs) return activation.target;
   const focused = document.activeElement;
   if (focused && focused !== list && list.contains(focused)) return focused;
-  if (lastClick && performance.now() - lastClick.at <= ActivatorWindowMs) return lastClick.target;
   return null;
 }
 
@@ -239,7 +258,14 @@ defineExpose({ el });
 
 <template>
   <div ref="el" v-bind="rest" :style="rootStyle" :class="classes" :data-view="props.isDetailOpen ? 'detail' : 'list'">
-    <div ref="listPane" data-list-detail-pane="list" tabindex="-1" :class="listClasses" @click.capture="rememberClick">
+    <div
+      ref="listPane"
+      data-list-detail-pane="list"
+      tabindex="-1"
+      :class="listClasses"
+      @click.capture="rememberClick"
+      @keydown.capture="rememberKey"
+    >
       <slot name="list" />
     </div>
     <div ref="detailPane" data-list-detail-pane="detail" tabindex="-1" :class="detailClasses">

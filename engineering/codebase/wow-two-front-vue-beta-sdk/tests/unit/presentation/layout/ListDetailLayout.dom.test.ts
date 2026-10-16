@@ -77,6 +77,14 @@ describe('ListDetailLayout', () => {
     expect(wrapper.emitted('back')).toHaveLength(1);
   });
 
+  it('merges backClass onto the back row without unhiding it side by side', () => {
+    const row = render({ isDetailOpen: true, backClass: 'mb-4 px-4 lg:block' }).get('[data-list-detail-back]').element
+      .parentElement!;
+    expect(row.className.split(' ')).toEqual(expect.arrayContaining(['mb-4', 'px-4', 'lg:hidden']));
+    expect(row.className).not.toContain('mb-2');
+    expect(row.className).not.toContain('lg:block');
+  });
+
   it('merges a caller class onto the grid', () => {
     const wrapper = mount(ListDetailLayout, { attrs: { class: 'gap-5' } });
     wrappers.push(wrapper);
