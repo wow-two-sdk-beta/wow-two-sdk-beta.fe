@@ -78,7 +78,7 @@ describe('DataRegion first load', () => {
     });
     wrappers.push(wrapper);
     expect(wrapper.get('.probe').attributes('data-skeleton')).toBe('true');
-    expect(wrapper.find('[data-region-error]').exists()).toBe(false);
+    expect(wrapper.find('[data-state="unavailable"]').exists()).toBe(false);
   });
 
   it('keeps a refresh group inside a loading region painting', () => {
@@ -108,37 +108,39 @@ describe('DataRegion settled states', () => {
     expect(wrapper.get('.value').attributes('data-loading')).toBeUndefined();
   });
 
-  it('replaces empty content with an error state and a retry', async () => {
-    const onRetry = vi.fn();
-    const wrapper = region({ error: { message: 'Hosts are unreachable' }, onRetry });
-    expect(wrapper.attributes('data-state')).toBe('error');
-    const alert = wrapper.get('[role="alert"]');
-    expect(alert.text()).toContain('Hosts are unreachable');
+  it('settles a failed first load into neutral copy and leaves the failure text to the toast host', () => {
+    const wrapper = region({ error: { message: 'Hosts are unreachable' } });
+    expect(wrapper.attributes('data-state')).toBe('unavailable');
+    expect(wrapper.text()).toContain('Not available right now');
+    expect(wrapper.text()).not.toContain('Hosts are unreachable');
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+    expect(wrapper.find('button').exists()).toBe(false);
     expect(wrapper.find('.probe').exists()).toBe(false);
-    await alert.get('button').trigger('click');
+  });
+
+  it('renders a retry only when the region opts in', async () => {
+    const onRetry = vi.fn();
+    const wrapper = region({ error: 'Down', unavailableTitle: 'Hosts are unavailable', onRetry });
+    expect(wrapper.text()).toContain('Hosts are unavailable');
+    await wrapper.get('button').trigger('click');
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('renders no retry button nobody can act on', () => {
-    const wrapper = region({ error: 'Hosts are unreachable' });
+  it('keeps the last good content when a refresh fails, with no failure card', () => {
+    const wrapper = region({ error: 'Refresh failed', hasData: true, onRetry: () => undefined });
+    expect(wrapper.attributes('data-state')).toBe('ready');
+    expect(wrapper.attributes('data-stale')).toBe('true');
+    expect(wrapper.find('.probe').exists()).toBe(true);
+    expect(wrapper.text()).not.toContain('Refresh failed');
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
     expect(wrapper.find('button').exists()).toBe(false);
   });
 
-  it('shows a failure above data that is still on screen', () => {
-    const wrapper = region({ error: 'Refresh failed', hasData: true, onRetry: () => undefined });
-    expect(wrapper.attributes('data-state')).toBe('ready');
-    expect(wrapper.get('[role="alert"]').text()).toContain('Refresh failed');
-    expect(wrapper.find('.probe').exists()).toBe(true);
-    expect(wrapper.get('[role="alert"]').element.compareDocumentPosition(wrapper.get('.probe').element)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-  });
-
-  it('lets the error and retry slots replace the defaults', () => {
+  it('lets an opted-in unavailable slot render its own copy', () => {
     const wrapper = region(
       { error: 'Down' },
       {
-        error: ({ message, retry }: { message: string; retry: () => void }) =>
+        unavailable: ({ message, retry }: { message: string; retry: () => void }) =>
           h('button', { class: 'custom', onClick: retry }, `Again: ${message}`),
       },
     );
@@ -146,22 +148,24 @@ describe('DataRegion settled states', () => {
     expect(wrapper.emitted('retry')).toBeUndefined();
   });
 
-  it('replaces loaded-but-empty content with the plain empty state', () => {
-    const wrapper = region(
-      { isEmpty: true, emptyTitle: 'No hosts', emptyDescription: 'Add one to start.' },
-      { emptyActions: () => h('button', { class: 'add' }, 'Add host') },
-    );
+  it('replaces loaded-but-empty content with plain empty copy', () => {
+    const wrapper = region({ isEmpty: true, emptyTitle: 'No hosts', emptyDescription: 'Add one to start.' });
     expect(wrapper.attributes('data-state')).toBe('empty');
     expect(wrapper.text()).toContain('No hosts');
     expect(wrapper.text()).toContain('Add one to start.');
-    expect(wrapper.find('.add').exists()).toBe(true);
+    expect(wrapper.find('button').exists()).toBe(false);
     expect(wrapper.find('.probe').exists()).toBe(false);
+  });
+
+  it('renders empty actions only when the region opts in', () => {
+    const wrapper = region({ isEmpty: true }, { emptyActions: () => h('button', { class: 'add' }, 'Add host') });
+    expect(wrapper.find('.add').exists()).toBe(true);
   });
 
   it('puts the first load before a failure and an empty result', () => {
     const wrapper = region({ isFirstLoad: true, error: 'Down', isEmpty: true });
     expect(wrapper.attributes('data-state')).toBe('first-load');
-    expect(wrapper.find('[data-region-error]').exists()).toBe(false);
+    expect(wrapper.find('.probe').exists()).toBe(true);
   });
 });
 
