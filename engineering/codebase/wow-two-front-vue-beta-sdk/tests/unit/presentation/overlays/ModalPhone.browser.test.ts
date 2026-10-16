@@ -53,15 +53,17 @@ async function open(root: Component, content: Component, contentProps: Record<st
   });
   await nextTick();
   await expect.poll(() => panel() !== null).toBe(true);
-  /* Let the rise settle so geometry reads the resting box; WebKit keeps a filled animation listed once finished. */
-  await expect
-    .poll(() =>
-      panel()!
-        .getAnimations()
-        .every((a) => a.playState === 'finished'),
-    )
-    .toBe(true);
+  await settle(panel()!);
   return panel()!;
+}
+
+/**
+ * Waits for the open state, then jumps its rise to the resting frame: headless WebKit on Linux can leave CSS
+ * animations unstarted, so waiting for them to finish never ends there.
+ */
+async function settle(element: Element): Promise<void> {
+  await expect.poll(() => element.closest('[data-state]')?.getAttribute('data-state')).toBe('open');
+  for (const animation of element.getAnimations()) animation.finish();
 }
 
 function box(element: Element): { left: number; top: number; right: number; bottom: number } {
@@ -109,13 +111,7 @@ describe('form dialog on a phone', () => {
       attachTo: document.body,
     });
     await expect.poll(() => panel() !== null).toBe(true);
-    await expect
-      .poll(() =>
-        panel()!
-          .getAnimations()
-          .every((a) => a.playState === 'finished'),
-      )
-      .toBe(true);
+    await settle(panel()!);
     const paddingBottom = Math.round(parseFloat(getComputedStyle(panel()!).paddingBottom));
     expect(box(panel()!.querySelector('.footer')!).bottom).toBe(Phone.height - paddingBottom);
   });
@@ -145,13 +141,7 @@ describe('confirmation on a phone', () => {
       attachTo: document.body,
     });
     await expect.poll(() => panel() !== null).toBe(true);
-    await expect
-      .poll(() =>
-        panel()!
-          .getAnimations()
-          .every((a) => a.playState === 'finished'),
-      )
-      .toBe(true);
+    await settle(panel()!);
     const rect = box(panel()!);
     expect(rect.left).toBe(0);
     expect(rect.right).toBe(Phone.width);
