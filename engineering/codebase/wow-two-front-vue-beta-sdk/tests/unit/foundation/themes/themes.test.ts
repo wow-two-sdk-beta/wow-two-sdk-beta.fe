@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  candidateThemes,
   contrastPairRatio,
   contrastPairs,
   contrastRatio,
+  emitThemesManifest,
   generateTheme,
   getTheme,
   Oklch,
@@ -10,9 +12,12 @@ import {
   parseColor,
   readableForeground,
   SemanticTokens,
+  ThemeCatalog,
+  ThemeIds,
   THEMES,
   themeToCss,
   ThemeStatus,
+  validatedThemes,
   validateTheme,
 } from '@src/foundation/themes';
 
@@ -119,6 +124,68 @@ it('ships the Wheelhouse directions with their glass backdrops, AA in both modes
   expect(dark).toContain('--theme-ambient: radial-gradient(');
   expect(light).not.toEqual(dark);
   expect(themeToCss(getTheme('bento-deck')!)).not.toContain('--theme-ambient');
+});
+
+describe('the platform theme', () => {
+  const theme = getTheme('platform')!;
+
+  it('is the validated shared theme, listed first', () => {
+    expect(theme).toBeDefined();
+    expect(theme.name).toBe('Platform');
+    expect(theme.status).toBe(ThemeStatus.Validated);
+    expect(ThemeIds[0]).toBe('platform');
+    expect(ThemeCatalog[0]).toEqual({ id: 'platform', name: 'Platform', status: ThemeStatus.Validated });
+    expect(validatedThemes()).toContain(theme);
+    expect(candidateThemes()).not.toContain(theme);
+  });
+
+  it('defines every token of the contract in both modes and clears AA', () => {
+    for (const token of SemanticTokens) {
+      expect(theme.light[token], `light \`${token}\``).toMatch(/^#[0-9a-f]{6}$/u);
+      expect(theme.dark[token], `dark \`${token}\``).toMatch(/^#[0-9a-f]{6}$/u);
+    }
+    expect(theme.meta, theme.meta.failures?.join('; ')).toEqual({ contrastAA: true });
+    expect(validateTheme(theme)).toEqual({ contrastAA: true });
+  });
+
+  it('keeps the palette surfaces, fills and fields unchanged', () => {
+    expect(theme.light).toMatchObject({
+      background: '#f4f4ef',
+      card: '#ffffff',
+      field: '#ffffff',
+      muted: '#eaece5',
+      border: '#dde2d8',
+      input: '#758579',
+      primary: '#285c4b',
+      accent: '#806235',
+    });
+    expect(theme.dark).toMatchObject({
+      background: '#121917',
+      card: '#1b2420',
+      field: '#121917',
+      muted: '#29352e',
+      border: '#344138',
+      input: '#7b8d7f',
+      primary: '#a6d4bd',
+      accent: '#d9bd8c',
+    });
+    expect(theme.radius).toBeUndefined();
+  });
+
+  it('emits light and dark blocks, each with its own ambient backdrop', () => {
+    const [light, dark] = themeToCss(theme).split('\n\n');
+    expect(light).toMatch(/^\.theme-platform \{/u);
+    expect(dark).toMatch(/^\.dark\.theme-platform, \.dark \.theme-platform \{/u);
+    expect(light).toContain('--color-field: #ffffff;');
+    expect(dark).toContain('--color-field: #121917;');
+    expect(light).toContain('--theme-ambient: radial-gradient(');
+    expect(dark).toContain('--theme-ambient: radial-gradient(');
+    expect(theme.ambient!.light).not.toBe(theme.ambient!.dark);
+  });
+
+  it('appears in the manifest as validated and AA-proven', () => {
+    expect(emitThemesManifest(THEMES)[0]).toMatchObject({ id: 'platform', status: 'validated', contrastAA: true });
+  });
 });
 
 describe('readableForeground', () => {

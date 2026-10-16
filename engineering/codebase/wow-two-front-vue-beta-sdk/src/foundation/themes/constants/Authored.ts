@@ -1,4 +1,7 @@
 /* Authored palettes.
+ * Platform: the shared theme of the wow-two platform apps, taken from Wheelhouse's live chalk/forest palette and
+ * validated there. Every value is locked; the few foregrounds and the strong border nudged to clear the SDK's
+ * contrast pairs are listed beside their Wheelhouse originals.
  * Glass Harbor, Frost, Bento Deck and Harbor Frost: the Wheelhouse design directions. Surfaces, fills and borders are
  * authored verbatim; text and required indicators pass through `ensureForegroundContrast`, because this SDK checks
  * placeholders, input boundaries and translucent tones the React validator did not. The glass directions carry an
@@ -13,6 +16,124 @@ import { ThemeRadius, ThemeStatus } from '../Theme';
 import type { TokenSet } from '../Tokens';
 import { ensureForegroundContrast } from '../ForegroundContrast';
 import { validateTheme } from '../Validate';
+
+/* ---------------------------------------------------------------------------
+ * Platform — forest actions on warm chalk, pine charcoal at night, under a faint forest-and-gold backdrop.
+ * Wheelhouse's values verbatim, except where a comment gives its original: those foregrounds and the strong
+ * border moved in lightness only, by the least that clears the declared pairs.
+ * ------------------------------------------------------------------------- */
+
+const platformLight: TokenSet = {
+  background: '#f4f4ef',
+  foreground: '#202d27',
+  card: '#ffffff',
+  'card-foreground': '#202d27',
+  popover: '#ffffff',
+  'popover-foreground': '#202d27',
+  field: '#ffffff',
+  muted: '#eaece5',
+  'muted-foreground': '#56665d',
+  'subtle-foreground': '#5e6d64',
+  inverse: '#202d27',
+  'inverse-foreground': '#f4f4ef',
+  border: '#dde2d8',
+  'border-strong': '#80897e', // #b8c2b6: 1.54–1.84:1 on the neutral surfaces
+  input: '#758579',
+  ring: '#285c4b',
+  primary: '#285c4b',
+  'primary-foreground': '#ffffff',
+  'primary-soft': '#e2eee6',
+  'primary-soft-foreground': '#215545', // #285c4b, and each soft foreground below: under 4.5:1 on its 30% tone wash
+  accent: '#806235',
+  'accent-foreground': '#ffffff',
+  'accent-soft': '#f1eade',
+  'accent-soft-foreground': '#6a4b15', // #755521
+  destructive: '#b44745',
+  'destructive-foreground': '#ffffff',
+  'destructive-soft': '#f9e8e5',
+  'destructive-soft-foreground': '#8f2d2b', // #a13d39
+  info: '#306a83',
+  'info-foreground': '#ffffff',
+  'info-soft': '#e4eef4',
+  'info-soft-foreground': '#20556d', // #2d6179
+  success: '#26704c',
+  'success-foreground': '#ffffff',
+  'success-soft': '#e3f0e5',
+  'success-soft-foreground': '#1b5a35', // #25633d
+  warning: '#966014',
+  'warning-foreground': '#ffffff',
+  'warning-soft': '#faf0d9',
+  'warning-soft-foreground': '#704900', // #7d5511
+};
+
+const platformDark: TokenSet = {
+  background: '#121917',
+  foreground: '#edf1eb',
+  card: '#1b2420',
+  'card-foreground': '#edf1eb',
+  popover: '#1b2420',
+  'popover-foreground': '#edf1eb',
+  field: '#121917',
+  muted: '#29352e',
+  'muted-foreground': '#b2beb4',
+  'subtle-foreground': '#a1aea3',
+  inverse: '#edf1eb',
+  'inverse-foreground': '#121917',
+  border: '#344138',
+  'border-strong': '#6c8072', // #536659: 2.08–2.90:1 on the neutral surfaces
+  input: '#7b8d7f',
+  ring: '#a6d4bd',
+  primary: '#a6d4bd',
+  'primary-foreground': '#14352a',
+  'primary-soft': '#283e33',
+  'primary-soft-foreground': '#bde3cc', // #b6dcc5, and each soft foreground below: under 4.5:1 on its wash over muted
+  accent: '#d9bd8c',
+  'accent-foreground': '#36280e',
+  'accent-soft': '#3d3424',
+  'accent-soft-foreground': '#edd2a5', // #e4c99c
+  destructive: '#efa69c',
+  'destructive-foreground': '#3c1715',
+  'destructive-soft': '#442c29',
+  'destructive-soft-foreground': '#fdc3b8', // #efb5aa
+  info: '#9dcce1',
+  'info-foreground': '#102731',
+  'info-soft': '#293b44',
+  'info-soft-foreground': '#bdddee', // #b6d6e7
+  success: '#a1d7b3',
+  'success-foreground': '#11281a',
+  'success-soft': '#243c2b',
+  'success-soft-foreground': '#bce4c7', // #b4dcbf
+  warning: '#eac582',
+  'warning-foreground': '#382709',
+  'warning-soft': '#3e3320',
+  'warning-soft-foreground': '#f4d6a0', // #edcf99
+};
+
+/* Two still glows from the top corners: forest at the left, gold at the right. */
+const platformAmbient: ThemeAmbient = {
+  light: [
+    'radial-gradient(ellipse 70rem 42rem at 0% 0%, #80aa9210, transparent 72%)',
+    'radial-gradient(ellipse 58rem 42rem at 100% 10%, #d6b6750f, transparent 74%)',
+  ].join(', '),
+  dark: [
+    'radial-gradient(ellipse 70rem 42rem at 0% 0%, #3d7b6229, transparent 72%)',
+    'radial-gradient(ellipse 58rem 42rem at 100% 10%, #aa854d1a, transparent 74%)',
+  ].join(', '),
+};
+
+/** Platform — the shared look of the wow-two platform apps, proven in Wheelhouse. */
+const platform: Theme = {
+  id: 'platform',
+  name: 'Platform',
+  description:
+    'Forest actions on warm chalk (light) / pine charcoal (dark) under a faint forest-and-gold backdrop — the shared theme of the wow-two platform apps, proven in Wheelhouse.',
+  tags: ['platform', 'validated', 'product', 'forest', 'chalk', 'warm', 'glass', 'aa'],
+  light: platformLight,
+  dark: platformDark,
+  ambient: platformAmbient,
+  status: ThemeStatus.Validated,
+  meta: validateTheme({ light: platformLight, dark: platformDark }),
+};
 
 // Original inherited palette retained as the authored base; explicit foreground corrections follow below.
 const SmartQrBaseLight: TokenSet = {
@@ -644,5 +765,13 @@ const harborFrost: Theme = {
   meta: validateTheme({ light: frostLight, dark: glassHarborDark }),
 };
 
-/** The authored themes: the two app palettes, then the four Wheelhouse design directions. */
-export const AuthoredThemes: ReadonlyArray<Theme> = [smartQr, ocharo, glassHarbor, frost, bentoDeck, harborFrost];
+/** The authored themes: the validated platform theme, the two app palettes, then the four Wheelhouse directions. */
+export const AuthoredThemes: ReadonlyArray<Theme> = [
+  platform,
+  smartQr,
+  ocharo,
+  glassHarbor,
+  frost,
+  bentoDeck,
+  harborFrost,
+];
