@@ -26,7 +26,17 @@ export interface TooltipProps {
 </script>
 
 <script setup lang="ts">
-import { cloneVNode, computed, onBeforeUnmount, ref, shallowRef, useSlots, watch } from 'vue';
+import {
+  cloneVNode,
+  computed,
+  createCommentVNode,
+  onBeforeUnmount,
+  ref,
+  shallowRef,
+  useSlots,
+  watch,
+  type VNode,
+} from 'vue';
 import { AriaAttribute, resolveElement } from '../../../foundation/dom';
 import { cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
@@ -164,13 +174,17 @@ function setAnchor(value: unknown): void {
  * consumer already put on the trigger is chained rather than replaced — the job React's
  * explicit `trigger.props.onPointerEnter?.(e)` forwarding did.
  *
+ * Called from the template, never from a `computed`: a vnode `ref` records the instance rendering
+ * at creation as its owner. The scheduler refreshes a dirty computed before the render runs, while
+ * no instance renders, and production Vue then throws reading the missing owner's `refs`.
+ *
  * The listener keys are all-lowercase after `on` (`onPointerenter`, not `onPointerEnter`):
  * Vue hyphenates the remainder to derive the DOM event name, so the React casing would
  * register `pointer-enter` and never fire.
  */
-const trigger = computed(() => {
+function renderTrigger(): VNode {
   const child = renderableChildren(slots.default?.())[0];
-  if (!child) return null;
+  if (!child) return createCommentVNode('');
   const own = child.props?.[AriaAttribute.DescribedBy] as string | undefined;
   return cloneVNode(
     child,
@@ -184,7 +198,7 @@ const trigger = computed(() => {
     },
     true,
   );
-});
+}
 
 const contentClasses = cn(
   'z-tooltip rounded-md bg-inverse px-2.5 py-1.5 text-xs text-inverse-foreground shadow-md',
@@ -194,8 +208,7 @@ const contentClasses = cn(
 </script>
 
 <template>
-  <component :is="trigger" v-if="trigger" />
-  <slot v-else />
+  <component :is="renderTrigger()" />
   <Portal v-if="mounted">
     <!-- Exit animation bubbles up from the body; once the closed-state pop-out ends, tear down
          the Portal shell. Also covers the reduced-motion path, where no animation runs and

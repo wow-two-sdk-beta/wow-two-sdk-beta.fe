@@ -12,6 +12,7 @@ Public import: `import { Tooltip } from '@wow-two-beta/ui-vue/presentation/overl
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- The trigger clone is built during render, so its anchor ref is owned by the rendering tooltip; a consumer ref on the trigger is kept beside it.
 
 ## Props
 
