@@ -53,8 +53,14 @@ async function open(root: Component, content: Component, contentProps: Record<st
   });
   await nextTick();
   await expect.poll(() => panel() !== null).toBe(true);
-  /* Let the rise settle so geometry reads the resting box. */
-  await expect.poll(() => panel()!.getAnimations().length).toBe(0);
+  /* Let the rise settle so geometry reads the resting box; WebKit keeps a filled animation listed once finished. */
+  await expect
+    .poll(() =>
+      panel()!
+        .getAnimations()
+        .every((a) => a.playState === 'finished'),
+    )
+    .toBe(true);
   return panel()!;
 }
 
@@ -103,7 +109,13 @@ describe('form dialog on a phone', () => {
       attachTo: document.body,
     });
     await expect.poll(() => panel() !== null).toBe(true);
-    await expect.poll(() => panel()!.getAnimations().length).toBe(0);
+    await expect
+      .poll(() =>
+        panel()!
+          .getAnimations()
+          .every((a) => a.playState === 'finished'),
+      )
+      .toBe(true);
     const paddingBottom = Math.round(parseFloat(getComputedStyle(panel()!).paddingBottom));
     expect(box(panel()!.querySelector('.footer')!).bottom).toBe(Phone.height - paddingBottom);
   });
@@ -133,7 +145,13 @@ describe('confirmation on a phone', () => {
       attachTo: document.body,
     });
     await expect.poll(() => panel() !== null).toBe(true);
-    await expect.poll(() => panel()!.getAnimations().length).toBe(0);
+    await expect
+      .poll(() =>
+        panel()!
+          .getAnimations()
+          .every((a) => a.playState === 'finished'),
+      )
+      .toBe(true);
     const rect = box(panel()!);
     expect(rect.left).toBe(0);
     expect(rect.right).toBe(Phone.width);

@@ -135,7 +135,8 @@ describe('below the stack breakpoint', () => {
     await expect.poll(() => sort.closest('th')!.getAttribute('aria-sort')).toBe('ascending');
     expect(rows(root)[0]!.textContent).toContain('Acme');
     const checkbox = rows(root)[0]!.querySelector<HTMLInputElement>('input[type=checkbox]')!;
-    await userEvent.click(checkbox);
+    /* A DOM click: Firefox names stacked rows with their cell labels, so a generated row locator never resolves. */
+    checkbox.click();
     await expect.poll(() => rows(root)[0]!.getAttribute('aria-selected')).toBe('true');
     /* The control cell heads the card without a label of its own. */
     expect(checkbox.closest('td')!.hasAttribute('data-label')).toBe(false);
