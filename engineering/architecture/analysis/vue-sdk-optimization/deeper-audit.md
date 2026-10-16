@@ -44,8 +44,8 @@ Start a request while Alice is authenticated, replace the authenticated user wit
 The HTTP callback carries no originating session revision, and the provider invalidates whichever session
 is currently active.
 
-Sources: [CreateApiClient.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/http/CreateApiClient.ts)
-line 239; [AuthProvider.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/auth/providers/AuthProvider.vue)
+Sources: [CreateApiClient.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/http/CreateApiClient.ts)
+line 239; [AuthProvider.vue](../../../codebase/wow-two-sdk-beta-fe/src/auth/providers/AuthProvider.vue)
 lines 151–157.
 
 Introduce explicit session identity/revision captured at request start. Compare it before handling unauthorized
@@ -61,8 +61,8 @@ Clear the query client and unmount its provider while a mutation waits. Its late
 still writes Alice's private result back into the cleared cache. Separately, unmounting AuthProvider leaves
 its bridge's last authenticated snapshot readable.
 
-Sources: [UseAppMutation.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/query/adapters/tanstack/hooks/UseAppMutation.ts)
-lines 63–66; [AuthProvider.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/auth/providers/AuthProvider.vue)
+Sources: [UseAppMutation.ts](../../../codebase/wow-two-sdk-beta-fe/src/query/adapters/tanstack/hooks/UseAppMutation.ts)
+lines 63–66; [AuthProvider.vue](../../../codebase/wow-two-sdk-beta-fe/src/auth/providers/AuthProvider.vue)
 lines 142–145.
 
 Define one explicit session lifetime across HTTP, auth, query and persistence. A new QueryClient per identity
@@ -78,7 +78,7 @@ Bridge detach must use ownership tokens so an old provider cannot detach its rep
 Mount sign-in instances A and B, then unmount B. Google's active callback still belongs to B, whose disposed
 guard drops the token; surviving A never receives it. While both mount, the last initialization owns credentials.
 
-Source: [GoogleIdentity.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/oauth/GoogleIdentity.ts)
+Source: [GoogleIdentity.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/oauth/GoogleIdentity.ts)
 lines 232–239, 257–260. Google's [JavaScript reference](https://developers.google.com/identity/gsi/web/reference/js-reference)
 documents replacement of page-wide configuration by repeated initialization. The probe models that behavior;
 it does not perform live Google authentication.
@@ -94,8 +94,8 @@ Start async `form.validate()` with valid values, edit them to invalid values, th
 successful validator. TanStack returns `true` while the live form is invalid. Scoped validation compares
 snapshots, but whole-form validation does not.
 
-Source: [UseAppForm.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/formsEngine/adapters/tanstack/UseAppForm.ts)
-lines 526–533; [AppForm.spec.md](../../../codebase/wow-two-front-vue-beta-sdk/src/formsEngine/AppForm.spec.md)
+Source: [UseAppForm.ts](../../../codebase/wow-two-sdk-beta-fe/src/formsEngine/adapters/tanstack/UseAppForm.ts)
+lines 526–533; [AppForm.spec.md](../../../codebase/wow-two-sdk-beta-fe/src/formsEngine/AppForm.spec.md)
 line 13 promises false after edits.
 
 Unify stale-validation handling across both adapters. Test edits, reset, disposal, session invalidation,
@@ -109,7 +109,7 @@ Two `useFieldArray(form, 'rules')` bindings start with identical keys. Swapping 
 shared values and only its keys. The second view attaches existing child state to different logical rows.
 Same-length external replacement/reset similarly needs an explicit identity policy.
 
-Source: [UseFieldArray.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/formsEngine/UseFieldArray.ts)
+Source: [UseFieldArray.ts](../../../codebase/wow-two-sdk-beta-fe/src/formsEngine/UseFieldArray.ts)
 lines 185–210.
 
 Centralize structural row identity per form/path, or expose one canonical binding with derived views.
@@ -131,18 +131,18 @@ this audit did not demonstrate an additional discriminator-guard defect.
 
 Sources:
 
-- A06: [Composites.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/validators/Composites.ts)
-  lines 130, 137; [FieldErrors.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/http/FieldErrors.ts)
-  lines 29, 38; [Messages.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/validators/Messages.ts)
+- A06: [Composites.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/validators/Composites.ts)
+  lines 130, 137; [FieldErrors.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/http/FieldErrors.ts)
+  lines 29, 38; [Messages.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/validators/Messages.ts)
   lines 296–315.
-- A07: [Validator.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/validators/Validator.ts)
+- A07: [Validator.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/validators/Validator.ts)
   lines 124–135.
-- A08: [Messages.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/validators/Messages.ts)
+- A08: [Messages.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/validators/Messages.ts)
   lines 150–155.
-- A09/A10/A20: [CreateApiClient.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/http/CreateApiClient.ts)
+- A09/A10/A20: [CreateApiClient.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/http/CreateApiClient.ts)
   lines 118, 145–150, 164, 183, 203, 228–230.
-- A24: [ExactNumberFormatter.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/i18n/ExactNumberFormatter.ts)
-  lines 4–10; [LocaleFormatters.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/i18n/LocaleFormatters.ts)
+- A24: [ExactNumberFormatter.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/i18n/ExactNumberFormatter.ts)
+  lines 4–10; [LocaleFormatters.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/i18n/LocaleFormatters.ts)
   lines 16–18.
 
 No additional precision corruption was demonstrated in numeric arithmetic/JSON during this pass.
@@ -164,38 +164,38 @@ Preserve lossless representation and explicit arithmetic; narrower native-number
 
 Sources:
 
-- A11: [Button.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/actions/button/Button.vue)
-  lines 418, 462–464; [Slot.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/primitives/slot/Slot.ts)
-  line 49; [ToggleInput.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/toggleInput/ToggleInput.vue)
+- A11: [Button.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/actions/button/Button.vue)
+  lines 418, 462–464; [Slot.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/primitives/slot/Slot.ts)
+  line 49; [ToggleInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/toggleInput/ToggleInput.vue)
   line 160.
-- A12: [ColorPicker.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/colorPicker/ColorPicker.vue)
+- A12: [ColorPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/colorPicker/ColorPicker.vue)
   lines 138–146.
-- A13: [DateTimeInput.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/dateTimeInput/DateTimeInput.vue)
+- A13: [DateTimeInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/dateTimeInput/DateTimeInput.vue)
   lines 21, 138, 178–195, 250, 296.
-- A14/A19: [TimeColumns.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/TimeColumns.vue)
-  lines 47, 122, 143; [ColorArea.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/colorArea/ColorArea.vue)
+- A14/A19: [TimeColumns.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/TimeColumns.vue)
+  lines 47, 122, 143; [ColorArea.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/colorArea/ColorArea.vue)
   line 207.
-- A15: [SortableGroupItem.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/sortableGroup/SortableGroupItem.vue)
-  line 59; [SortableGroup.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/sortableGroup/SortableGroup.vue)
+- A15: [SortableGroupItem.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/sortableGroup/SortableGroupItem.vue)
+  line 59; [SortableGroup.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/sortableGroup/SortableGroup.vue)
   line 69.
-- A16: [SelectPicker.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/selectPicker/SelectPicker.vue)
-  line 375; [DateTimeInput.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/dateTimeInput/DateTimeInput.vue)
-  line 301; [ColorPicker.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/colorPicker/ColorPicker.vue)
-  line 302; [TimePicker.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/timePicker/TimePicker.vue)
+- A16: [SelectPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/selectPicker/SelectPicker.vue)
+  line 375; [DateTimeInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/dateTimeInput/DateTimeInput.vue)
+  line 301; [ColorPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/colorPicker/ColorPicker.vue)
+  line 302; [TimePicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/timePicker/TimePicker.vue)
   line 169.
-- A17: [SelectPicker.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/selectPicker/SelectPicker.vue)
-  lines 131, 161, 188, 253; [SelectPickerItem.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/selectPicker/SelectPickerItem.vue)
-  lines 37, 75; [SelectPickerContent.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/selectPicker/SelectPickerContent.vue)
+- A17: [SelectPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/selectPicker/SelectPicker.vue)
+  lines 131, 161, 188, 253; [SelectPickerItem.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/selectPicker/SelectPickerItem.vue)
+  lines 37, 75; [SelectPickerContent.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/selectPicker/SelectPickerContent.vue)
   lines 61, 137, 163.
-- A18: [RouteAnnouncer.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/router/adapters/vueRouter/routeAnnouncer/RouteAnnouncer.vue)
+- A18: [RouteAnnouncer.vue](../../../codebase/wow-two-sdk-beta-fe/src/router/adapters/vueRouter/routeAnnouncer/RouteAnnouncer.vue)
   lines 51–61.
 
 ## D. Measured optimizations
 
 ### A21 — Remove the duplicate Tailwind merge engine
 
-[Cn.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/styles/Cn.ts) imports standalone
-`tailwind-merge`; [Tv.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/styles/Tv.ts)
+[Cn.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/styles/Cn.ts) imports standalone
+`tailwind-merge`; [Tv.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/styles/Tv.ts)
 re-exports full `tailwind-variants`, whose installed 3.3.1 build contains another merge implementation.
 
 A production Vite consumer build, with Vue external and all other dependencies included, measured:
@@ -222,11 +222,11 @@ records this run. Add regression budgets around minimal consumer entrypoints aft
 
 ### A22 — Reuse bounded Intl caches for exact formatting
 
-[ExactNumberFormatter.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/i18n/ExactNumberFormatter.ts)
+[ExactNumberFormatter.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/i18n/ExactNumberFormatter.ts)
 lines 42–50, 91–111 constructs three Intl formatters per positive call, four for signed values, and reconstructs
 localized digits. Two equal positive calls created six instances in the probe.
 
-Use the existing [IntlCache.ts](../../../codebase/wow-two-front-vue-beta-sdk/src/foundation/i18n/IntlCache.ts)
+Use the existing [IntlCache.ts](../../../codebase/wow-two-sdk-beta-fe/src/foundation/i18n/IntlCache.ts)
 pattern for formatter and locale-digit metadata. Verify equivalent options reuse entries, locale/options
 changes do not collide, and eviction remains bounded. A one-run 1,000-value sample took about 71 ms locally;
 that timing is context only, not a portable benchmark or CI threshold.
@@ -239,10 +239,10 @@ Presentation and router sources contain no calls to `useLocale`, `useLocaleForma
 The foundation provider exists, but defaults such as LoadingState's title, NumberInput increment/decrement
 labels, SelectPicker's empty result and AppErrorBoundary text stay English.
 
-Sources: [LoadingState.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/feedback/loadingState/LoadingState.vue)
-line 31; [NumberInput.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/numberInput/NumberInput.vue)
-lines 70–71; [SelectPickerContent.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/presentation/forms/selectPicker/SelectPickerContent.vue)
-line 72; [AppErrorBoundary.vue](../../../codebase/wow-two-front-vue-beta-sdk/src/router/adapters/vueRouter/appErrorBoundary/AppErrorBoundary.vue)
+Sources: [LoadingState.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/feedback/loadingState/LoadingState.vue)
+line 31; [NumberInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/numberInput/NumberInput.vue)
+lines 70–71; [SelectPickerContent.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/selectPicker/SelectPickerContent.vue)
+line 72; [AppErrorBoundary.vue](../../../codebase/wow-two-sdk-beta-fe/src/router/adapters/vueRouter/appErrorBoundary/AppErrorBoundary.vue)
 lines 106–109.
 
 Connect SDK-authored messages and default formatting to the provider, retaining explicit per-component
@@ -252,7 +252,7 @@ not a proposal to add a new translation framework.
 
 ### A25 — Verify real consumer compositions and browser contracts
 
-The packed gate [check-package.mjs](../../../codebase/wow-two-front-vue-beta-sdk/scripts/check-package.mjs)
+The packed gate [check-package.mjs](../../../codebase/wow-two-sdk-beta-fe/scripts/check-package.mjs)
 lines 113–136 imports declarations into `consumer.mts` and runs strict TypeScript. It does not compile a real
 consumer Vue template against the tarball. Current tests contain no `.vue` template inference fixture,
 despite the track already recording template-specific generic widening.
@@ -261,7 +261,7 @@ Add positive/negative packed SFC fixtures for typed fields, union arrays, ExactN
 Exercise an SDK-only integration fixture combining auth → HTTP → query → form → route behavior.
 Use deterministic deferred promises for races rather than timing sleeps.
 
-The current [vitest.config.ts](../../../codebase/wow-two-front-vue-beta-sdk/vitest.config.ts) browser matrix
+The current [vitest.config.ts](../../../codebase/wow-two-sdk-beta-fe/vitest.config.ts) browser matrix
 contains Chromium and Chromium forced-colors. Add WebKit and Firefox coverage for native/custom controls,
 focus, portals, datetime and forms; declare supported baselines. This is a coverage gap, not proof those
 browsers currently fail. Include real keyboard/accessibility assertions and selected visual states.

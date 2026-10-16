@@ -1,6 +1,6 @@
 # Vue SDK component and primitive audit
 
-Scope: `engineering/codebase/wow-two-front-vue-beta-sdk` in `wow-two-sdk-beta.ui`. Source ownership for this lane was `src/presentation/**`, `src/foundation/primitives/**`, then `src/foundation/dom/**` and `src/foundation/icons/**`, plus matching tests. No apps, CI, package configuration, Git mutations, or commits were performed by this lane.
+Scope: `engineering/codebase/wow-two-sdk-beta-fe` in `wow-two-sdk-beta.ui`. Source ownership for this lane was `src/presentation/**`, `src/foundation/primitives/**`, then `src/foundation/dom/**` and `src/foundation/icons/**`, plus matching tests. No apps, CI, package configuration, Git mutations, or commits were performed by this lane.
 
 ## Evidence boundary and coverage
 

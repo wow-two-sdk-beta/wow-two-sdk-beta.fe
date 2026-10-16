@@ -2,7 +2,7 @@
 
 *Last updated: 2026-09-28*
 
-> Research behind the **Atlas** app (`engineering/codebase/wow-two-front-vue-beta-sdk/apps/atlas`): which layout,
+> Research behind the **Atlas** app (`engineering/codebase/wow-two-sdk-beta-fe/apps/atlas`): which layout,
 > navigation, panel and collection patterns exist, what our own products teach, and where each pattern shines.
 > The app renders this taxonomy as grey wireframes plus a live layout lab. It is a place to brainstorm, not a
 > set of locked decisions.

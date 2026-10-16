@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
 
-const pkg = fileURLToPath(new URL('../../../codebase/wow-two-front-vue-beta-sdk/', import.meta.url));
+const pkg = fileURLToPath(new URL('../../../codebase/wow-two-sdk-beta-fe/', import.meta.url));
 const { build } = await import(pathToFileURL(join(pkg, 'node_modules/vite/dist/node/index.js')).href);
 const scratch = mkdtempSync(join(tmpdir(), 'vue-consumer-bundle-'));
 const cases = [

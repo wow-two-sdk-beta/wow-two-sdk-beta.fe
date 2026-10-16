@@ -1,14 +1,14 @@
 name: release-vue
 
 # Vue package release. Mirrors `release.yml` (the React package) but is scoped to
-# `engineering/codebase/wow-two-front-vue-beta-sdk/` via the `paths:` filter below, so a
+# `engineering/codebase/wow-two-sdk-beta-fe/` via the `paths:` filter below, so a
 # React-only push never publishes `@wow-two-beta/ui-vue` and vice versa. Tags carry a
 # `ui-vue-v` prefix so the two packages' tag namespaces never collide.
 on:
   push:
     branches: [main]
     paths:
-      - 'engineering/codebase/wow-two-front-vue-beta-sdk/**'
+      - 'engineering/codebase/wow-two-sdk-beta-fe/**'
       - '.github/workflows/release-vue.yml'
       - '.github/scripts/vue-release-version*'
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
       version: ${{ steps.bump.outputs.version }}
     defaults:
       run:
-        working-directory: engineering/codebase/wow-two-front-vue-beta-sdk
+        working-directory: engineering/codebase/wow-two-sdk-beta-fe
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
@@ -44,14 +44,14 @@ jobs:
         uses: pnpm/action-setup@v6.1.0
         with:
           # version inferred from packageManager field in the nested package.json
-          package_json_file: engineering/codebase/wow-two-front-vue-beta-sdk/package.json
+          package_json_file: engineering/codebase/wow-two-sdk-beta-fe/package.json
 
       - name: Setup Node
         uses: actions/setup-node@v7.0.0
         with:
           node-version: '24'
           cache: 'pnpm'
-          cache-dependency-path: engineering/codebase/wow-two-front-vue-beta-sdk/pnpm-lock.yaml
+          cache-dependency-path: engineering/codebase/wow-two-sdk-beta-fe/pnpm-lock.yaml
 
       - name: Install
         run: pnpm install --frozen-lockfile

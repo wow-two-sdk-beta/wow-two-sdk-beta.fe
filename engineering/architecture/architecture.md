@@ -116,7 +116,7 @@ Spec before code. Stories cover every visual state in spec. Components without v
 
 ## Vue package
 
-`@wow-two-beta/ui-vue` (`engineering/codebase/wow-two-front-vue-beta-sdk/`) is the active package; React
+`@wow-two-beta/ui-vue` (`engineering/codebase/wow-two-sdk-beta-fe/`) is the active package; React
 implementation and release are parked. Settled decisions:
 
 - Package `@wow-two-beta/ui-vue`, `0.x.y` beta-forever — the React package's release contract.

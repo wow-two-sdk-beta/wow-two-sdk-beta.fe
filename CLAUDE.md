@@ -3,14 +3,14 @@
 ## What is this
 
 Two independently built beta packages: React `@wow-two-beta/ui` and Vue `@wow-two-beta/ui-vue`, under
-`engineering/codebase/wow-two-front-beta-sdk/` and `engineering/codebase/wow-two-front-vue-beta-sdk/`.
+`engineering/codebase/wow-two-front-beta-sdk/` and `engineering/codebase/wow-two-sdk-beta-fe/`.
 Both remain intentionally pre-1.0. The active sweep is Vue; the legacy React-specific sections below apply only to React.
 
 > **Beta-forever rules**: no CHANGELOG, no PR gates, direct main releases, fix-forward when broken. Package-scoped CI auto-bumps `0.0.y`. Vue release CI gates types, lint, format, tests, build and the actual packed consumer; the legacy React workflow and guidance remain separate.
 
 ## Vue sweep scope
 
-- The active conventions sweep targets `engineering/codebase/wow-two-front-vue-beta-sdk/` (`@wow-two-beta/ui-vue`).
+- The active conventions sweep targets `engineering/codebase/wow-two-sdk-beta-fe/` (`@wow-two-beta/ui-vue`).
 - React implementation and release are parked; the React-specific guidance below does not override the Vue sweep.
 - Vue source follows the workspace frontend conventions; instance API contracts live in adjacent `*.spec.md` files.
 - Vue tests and executable demos live under `tests/` and `apps/playground/`; do not add colocated React stories.

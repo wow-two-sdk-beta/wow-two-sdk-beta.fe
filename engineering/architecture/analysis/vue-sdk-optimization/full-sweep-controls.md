@@ -2,7 +2,7 @@
 
 # Vue forms, form engines, navigation and overlay implementation
 
-Package: `engineering/codebase/wow-two-front-vue-beta-sdk`
+Package: `engineering/codebase/wow-two-sdk-beta-fe`
 Date: 2026-09-25
 Status: source stable; no staging, commits, package build or full-suite run performed by this lane.
 

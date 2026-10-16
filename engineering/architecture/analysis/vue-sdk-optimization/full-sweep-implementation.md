@@ -29,7 +29,7 @@ The local manifest remains `0.0.6`; this candidate has not been published. CI ow
 | Localization/style | Reactive component defaults, complete localized count messages, source message catalogue, one class-merge owner, native icon class precedence, ancestor dark-theme selectors. |
 | Delivery | Positive/negative packed Vue templates, JS consumer bundle budgets, Firefox/WebKit CI matrix, release-helper regression verification. |
 
-Public changes and migration recipes are in [MIGRATION.md](../../../codebase/wow-two-front-vue-beta-sdk/MIGRATION.md).
+Public changes and migration recipes are in [MIGRATION.md](../../../codebase/wow-two-sdk-beta-fe/MIGRATION.md).
 The [message catalogue](component-messages.md) records statically discoverable defaults.
 The [original audit](deeper-audit.md) remains historical evidence; its defect descriptions are not current status.
 
@@ -58,7 +58,7 @@ credential exchange or device-permission proof is claimed.
 ## Combined verification
 
 Final gate results below ran after all source lanes settled. Commands operate from
-`engineering/codebase/wow-two-front-vue-beta-sdk` unless otherwise stated.
+`engineering/codebase/wow-two-sdk-beta-fe` unless otherwise stated.
 
 | Gate | Result |
 |---|---|
