@@ -14,7 +14,7 @@ export interface SkeletonStateGroupProps {
 <script setup lang="ts">
 import { computed, provide, useTemplateRef } from 'vue';
 import { useLocale } from '../../../foundation/i18n';
-import { skeletonStateGroupKey } from './SkeletonStateContext';
+import { skeletonStateGroupKey, useSkeletonStateGroup } from './SkeletonStateContext';
 
 /**
  * Renders a loading region: marks itself `aria-busy`, announces once, and switches every
@@ -32,9 +32,13 @@ defineSlots<{
 const locale = useLocale();
 const el = useTemplateRef<HTMLDivElement>('el');
 
+/* A group inside a loading region follows it: its slots keep painting and its components keep their skeletons until
+   the outer region settles, whatever this group's own flag says. */
+const parent = useSkeletonStateGroup();
 provide(skeletonStateGroupKey, {
-  isLoading: computed(() => props.isLoading),
-  animation: computed(() => props.animation),
+  isLoading: computed(() => props.isLoading || (parent?.isLoading.value ?? false)),
+  isSkeleton: computed(() => parent?.isSkeleton.value ?? false),
+  animation: computed(() => props.animation ?? parent?.animation.value),
 });
 
 defineExpose({ el });

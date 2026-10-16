@@ -7,6 +7,7 @@ import {
   Banner,
   BannerSimple,
   Callout,
+  DataRegion,
   FeedbackToastHost,
   InlineSpinner,
   LiveCursorIndicator,
@@ -50,6 +51,8 @@ export const feedbackExamples: readonly SmokeCase[] = [
   smokeCase('SkeletonStateGroup', SkeletonStateGroup, { isLoading: true }, { slot: true }),
 
   smokeCase('SkeletonStateText', SkeletonStateText, { lines: 2 }),
+
+  smokeCase('DataRegion', DataRegion, { isFirstLoad: true }, { slot: true }),
 
   smokeCase('ProgressBar', ProgressBar, {}),
 

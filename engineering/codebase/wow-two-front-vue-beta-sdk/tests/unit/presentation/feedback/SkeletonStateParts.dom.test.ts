@@ -75,9 +75,9 @@ describe('skeleton slots keep the region shape', () => {
       () => [h(SkeletonState, { class: 'block-one' }), h(SkeletonStateSlot, { class: 'slot-one' }, () => 'x')],
       { animation: 'shimmer' },
     );
-    expect(wrapper.get('.block-one').classes().join(' ')).toContain('before:animate-(--animate-shimmer)');
-    expect(wrapper.get('.slot-one').classes().join(' ')).toContain('before:animate-(--animate-shimmer)');
-    expect(wrapper.get('.block-one').classes()).not.toContain('animate-pulse');
+    expect(wrapper.get('.block-one').classes().join(' ')).toContain('motion-safe:animate-(--animate-skeleton-sweep)');
+    expect(wrapper.get('.slot-one').classes().join(' ')).toContain('motion-safe:animate-(--animate-skeleton-sweep)');
+    expect(wrapper.get('.block-one').classes()).not.toContain('motion-safe:animate-pulse');
   });
 
   it('sketches a paragraph with a shorter last line', () => {

@@ -11,7 +11,9 @@ Public import: `import { SkeletonStateGroup } from '@wow-two-beta/ui-vue/present
 - The region's labels, headings and actions render as they are; only values inside `SkeletonStateSlot` turn into placeholders.
 - Sets `aria-busy` and renders one `role="status"` announcement while loading; the placeholders stay decorative.
 - Shares its `animation` with every `SkeletonState`, `SkeletonStateSlot` and `SkeletonStateText` inside that sets none.
-- Drive it with the query's first load, or with `useRefresh` for a refresh the user asked for.
+- Drive it with `useRefresh` for a refresh the user asked for; a region's first load belongs in `DataRegion`.
+- Inside a loading region it keeps loading until the outer region settles: its slots keep painting and its
+  components keep their skeletons, whatever its own `isLoading` says.
 
 ## Props
 

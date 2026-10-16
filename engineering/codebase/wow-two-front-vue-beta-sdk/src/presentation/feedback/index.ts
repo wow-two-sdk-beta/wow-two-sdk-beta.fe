@@ -1,5 +1,6 @@
 export * from './spinner';
 export * from './skeletonState';
+export * from './dataRegion';
 export * from './progressBar';
 export * from './progressCircleIndicator';
 export * from './alertSimple';

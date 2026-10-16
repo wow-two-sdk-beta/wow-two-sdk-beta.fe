@@ -175,6 +175,9 @@
   /* Skeleton shimmer — a light band sweeping across a placeholder; keyframes defined below */
   --animate-shimmer: shimmer 1.6s ease-in-out infinite;
 
+  /* Skeleton sweep — a band moving across a placeholder's own background, so wrapping text bars sweep too */
+  --animate-skeleton-sweep: skeleton-sweep 1.6s ease-in-out infinite;
+
   /* ---------- Motion (enter/exit transitions) ----------
    * Durations + easings + composable enter/exit animations. Consume via `animate-(--animate-*)`
    * gated on `data-[state=open|closed]`, hosted by `Presence`/`Overlay` (defers unmount for exits).
@@ -464,6 +467,16 @@ body {
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
+  }
+}
+
+/* Pairs with a background three times the placeholder's width: the band enters on the left and leaves on the right. */
+@keyframes skeleton-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
   }
 }
 

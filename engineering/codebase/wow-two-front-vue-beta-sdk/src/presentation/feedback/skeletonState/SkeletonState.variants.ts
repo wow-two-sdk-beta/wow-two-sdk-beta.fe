@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from '../../../foundation/styles';
+import { cn, tv, type VariantProps } from '../../../foundation/styles';
 
 /** Defines the SkeletonState placeholder shape. */
 export const SkeletonStateShape = {
@@ -24,17 +24,50 @@ export const SkeletonStateAnimation = {
 
 export type SkeletonStateAnimation = (typeof SkeletonStateAnimation)[keyof typeof SkeletonStateAnimation];
 
+/*
+ * Motion runs under `motion-safe:` only. The shimmer sweeps a background band rather than a pseudo-element, so it
+ * needs neither `relative` nor `overflow-hidden` on the host and works on inline text bars that wrap.
+ */
 const Animation = {
-  pulse: 'animate-pulse motion-reduce:animate-none',
+  pulse: 'motion-safe:animate-pulse',
   shimmer:
-    'relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-(--animate-shimmer) ' +
-    'before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent ' +
-    'dark:before:via-white/10 motion-reduce:before:hidden',
+    'bg-linear-to-r from-transparent via-background/60 to-transparent bg-no-repeat [background-size:300%_100%] ' +
+    'motion-safe:animate-(--animate-skeleton-sweep)',
   none: '',
 } as const;
 
+/*
+ * The placeholder surface. Forced colours would repaint the fill as `Canvas` and show the hidden text, so the
+ * placeholder opts out of forced colours and draws a `GrayText` outline on a `Canvas` fill instead.
+ */
+const Paint =
+  'bg-muted forced-colors:[forced-color-adjust:none] forced-colors:bg-none forced-colors:bg-[color:Canvas] ' +
+  'forced-colors:text-transparent forced-colors:outline-1 forced-colors:outline-solid forced-colors:-outline-offset-1 ' +
+  'forced-colors:outline-[color:GrayText]';
+
+/** Hides a placeholder's own content while its box keeps the content's size. */
+const Mask = 'select-none text-transparent [&_*]:invisible';
+
+/** The classes that paint a placeholder surface — fill, forced-colours outline and the motion-safe animation. */
+export function skeletonPaintClass(animation: SkeletonStateAnimation = SkeletonStateAnimation.Pulse): string {
+  return cn(Paint, Animation[animation]);
+}
+
+/**
+ * The classes that turn a component's own box into its placeholder: the box keeps its size, radius and padding,
+ * while its border, text and children are masked. Merge them last so they win over the component's colours.
+ */
+export function skeletonBoxClass(animation: SkeletonStateAnimation = SkeletonStateAnimation.Pulse): string {
+  return cn('border-transparent placeholder:text-transparent', Mask, skeletonPaintClass(animation));
+}
+
+/** The classes for an inline text bar: one rounded bar per line box, as wide as the text it hides. */
+export function skeletonLineClass(animation: SkeletonStateAnimation = SkeletonStateAnimation.Pulse): string {
+  return cn('rounded-sm box-decoration-clone', Mask, skeletonPaintClass(animation));
+}
+
 export const skeletonVariants = tv({
-  base: 'bg-muted',
+  base: Paint,
   variants: {
     shape: {
       rect: 'rounded-md',
@@ -53,7 +86,7 @@ export type SkeletonStateVariants = VariantProps<typeof skeletonVariants>;
 
 /** A content-shaped slot takes its size from the content it hides, so its shapes set corners only. */
 export const skeletonSlotVariants = tv({
-  base: 'pointer-events-none select-none bg-muted text-transparent [&_*]:invisible',
+  base: `pointer-events-none ${Mask} ${Paint}`,
   variants: {
     shape: {
       rect: 'rounded-md',
