@@ -3,7 +3,7 @@ name: release
 # React package release. Scoped to `engineering/codebase/wow-two-front-beta-sdk/` so a
 # Vue-only push never republishes `@wow-two-beta/ui`. Without this filter every push to
 # `main` bumped and republished React with no React source change — ui-vue's first release
-# alone cost a no-op `0.0.106`. Mirrors the `paths:` block in `release-vue.yml`.
+# alone cost a no-op `0.0.106`. Mirrors the `paths:` block in `release-fe.yml`.
 on:
   push:
     branches: [main]
@@ -83,7 +83,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json
           git commit -m "chore: release v${{ steps.bump.outputs.version }} [skip ci]"
-          # `release-vue.yml` bumps the sibling package on the same push and races us to `main`.
+          # `release-fe.yml` bumps the sibling package on the same push and races us to `main`.
           # Whoever lands second gets `! [rejected] main -> main (fetch first)`. Rebasing the
           # one-line bump onto whatever landed first is always safe; the two touch different files.
           #

@@ -1,23 +1,24 @@
-name: release-vue
+name: release-fe
 
-# Vue package release. Mirrors `release.yml` (the React package) but is scoped to
-# `engineering/codebase/wow-two-sdk-beta-fe/` via the `paths:` filter below, so a
-# React-only push never publishes `@wow-two-beta/ui-vue` and vice versa. Tags carry a
-# `ui-vue-v` prefix so the two packages' tag namespaces never collide.
+# fe sdk release (`@wow-two-beta/fe`, the Vue package). Mirrors `release.yml` (the parked React
+# package) but is scoped to `engineering/codebase/wow-two-sdk-beta-fe/` via the `paths:` filter
+# below, so a React-only push never publishes `@wow-two-beta/fe` and vice versa. Tags carry an
+# `fe-v` prefix (`ui-vue-v` up to 0.0.17, under the old npm name `@wow-two-beta/ui-vue`) so the
+# two packages' tag namespaces never collide.
 on:
   push:
     branches: [main]
     paths:
       - 'engineering/codebase/wow-two-sdk-beta-fe/**'
-      - '.github/workflows/release-vue.yml'
-      - '.github/scripts/vue-release-version*'
+      - '.github/workflows/release-fe.yml'
+      - '.github/scripts/fe-release-version*'
   workflow_dispatch:
 
 permissions:
   contents: write   # commit version bump + push tags + create GitHub Releases
 
 concurrency:
-  group: release-vue-${{ github.ref }}
+  group: release-fe-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -27,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write # npm trusted publisher for release-vue.yml
+      id-token: write # npm trusted publisher for release-fe.yml + provenance
     outputs:
       version: ${{ steps.bump.outputs.version }}
     defaults:
@@ -71,14 +72,16 @@ jobs:
       - name: Tests
         run: pnpm test
 
+      # Next patch = one past the highest of package.json and every version npm holds under
+      # `@wow-two-beta/fe` or the old name `@wow-two-beta/ui-vue`, so the rename never restarts it.
       - name: Bump patch version
         id: bump
         run: |
-          node --test ../../../.github/scripts/vue-release-version.test.mjs
-          VERSION=$(node ../../../.github/scripts/vue-release-version.mjs)
+          node --test ../../../.github/scripts/fe-release-version.test.mjs
+          VERSION=$(node ../../../.github/scripts/fe-release-version.mjs)
           pnpm version "$VERSION" --no-git-tag-version
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "::notice::Releasing @wow-two-beta/ui-vue v$VERSION"
+          echo "::notice::Releasing @wow-two-beta/fe v$VERSION"
 
       - name: Build
         run: pnpm build
@@ -90,7 +93,7 @@ jobs:
         run: node apps/playground/tests/gallery-smoke.mjs
 
       - name: Packed consumer
-        run: pnpm check:package --install --output "$RUNNER_TEMP/ui-vue.tgz"
+        run: pnpm check:package --install --output "$RUNNER_TEMP/fe.tgz"
 
       # Stop if main changed while this checkout was being verified.
       - name: Verify release source
@@ -100,21 +103,21 @@ jobs:
 
       # Publish exactly the artifact exercised by the consumer gate.
       # npm authorizes this repository/workflow through its trusted publisher.
-      # No stored npm token or token-bearing setup-node npmrc is needed.
+      # No stored npm token or token-bearing setup-node npmrc is needed; the OIDC token also signs provenance.
       - name: Publish to npm
-        run: npm publish "$RUNNER_TEMP/ui-vue.tgz" --access public --registry=https://registry.npmjs.org
+        run: npm publish "$RUNNER_TEMP/fe.tgz" --access public --provenance --registry=https://registry.npmjs.org
 
       - name: Commit + tag version bump
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json
-          git commit -m "chore: release ui-vue v${{ steps.bump.outputs.version }} [skip ci]"
+          git commit -m "chore: release fe v${{ steps.bump.outputs.version }} [skip ci]"
           # Never rebase the release after packing: the tag must identify the tested source.
           # If a human advances main, the atomic push fails without moving either ref.
           # A later run selects a patch beyond any already-published npm version.
-          git tag -a "ui-vue-v${{ steps.bump.outputs.version }}" -m "ui-vue v${{ steps.bump.outputs.version }}"
-          git push --atomic origin HEAD:refs/heads/main "refs/tags/ui-vue-v${{ steps.bump.outputs.version }}"
+          git tag -a "fe-v${{ steps.bump.outputs.version }}" -m "fe v${{ steps.bump.outputs.version }}"
+          git push --atomic origin HEAD:refs/heads/main "refs/tags/fe-v${{ steps.bump.outputs.version }}"
 
       - name: Create GitHub Release
         env:
@@ -122,11 +125,11 @@ jobs:
           VERSION: ${{ steps.bump.outputs.version }}
         run: |
           set -euo pipefail
-          TAG="ui-vue-v${VERSION}"
+          TAG="fe-v${VERSION}"
 
-          # Previous ui-vue tag (the one before this just-pushed tag). `--match` keeps the
-          # React package's `v*` tags out. Empty on first release.
-          PREV=$(git describe --tags --abbrev=0 --match 'ui-vue-v*' "${TAG}^" 2>/dev/null || true)
+          # Previous fe tag (the one before this just-pushed tag); `ui-vue-v*` covers releases before
+          # the rename. `--match` keeps the React package's `v*` tags out. Empty on first release.
+          PREV=$(git describe --tags --abbrev=0 --match 'fe-v*' --match 'ui-vue-v*' "${TAG}^" 2>/dev/null || true)
           if [ -n "$PREV" ]; then
             RANGE="${PREV}..HEAD"
             echo "::notice::Changelog range ${RANGE}"
@@ -154,7 +157,7 @@ jobs:
           }
 
           {
-            echo "Published \`@wow-two-beta/ui-vue\` v${VERSION} to npm."
+            echo "Published \`@wow-two-beta/fe\` v${VERSION} to npm."
             echo
             CHANGELOG=$(
               section 'feat'     'Features'
