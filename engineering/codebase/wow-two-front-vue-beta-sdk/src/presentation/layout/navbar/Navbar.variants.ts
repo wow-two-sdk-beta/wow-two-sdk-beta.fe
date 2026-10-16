@@ -22,6 +22,16 @@ export const NavbarOrientation = {
 
 export type NavbarOrientation = (typeof NavbarOrientation)[keyof typeof NavbarOrientation];
 
+/** Defines the element a `Navbar` renders as. */
+export const NavbarElement = {
+  /** Refers to a `<header>` — a banner landmark at page level. */
+  Header: 'header',
+  /** Refers to a `<div>` — no landmark, for a bar inside a host that already is the banner. */
+  Div: 'div',
+} as const;
+
+export type NavbarElement = (typeof NavbarElement)[keyof typeof NavbarElement];
+
 /** Defines the surface a `Navbar` paints. A `tone` overrides it with the tinted subtle surface. */
 export const NavbarVariant = {
   /** Refers to the opaque card surface — the default. */

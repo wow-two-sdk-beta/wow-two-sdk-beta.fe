@@ -10,12 +10,14 @@ Public import: `import { Navbar } from '@wow-two-beta/ui-vue/presentation/layout
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Shares its orientation with the `NavItem`s inside: in a top bar each sizes to its label, in a rail each fills the row.
+- Renders a `<header>` banner on its own. Inside an `AppShellHeader`, which is already the banner, it renders a `<div>` that fills the bar's row and defaults to no border, a `transparent` surface and the host's height; explicit `as`, `hasBorder`, `variant`, `tone` and `height` still win.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
 
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
+| `as` | `NavbarElement` | no | `header`; `div` in an `AppShellHeader` | The element: `header` (a banner landmark) or `div` (none). |
 | `containerAttrs` | `HTMLAttributes` | no | — | Native attributes forwarded to the inner `ContainerLayout`; its `class` is merged last. |
 | `containerClass` | `HTMLAttributes['class']` | no | — | Convenience class for the inner `ContainerLayout`, merged after `containerAttrs.class`. |
 | `containerSize` | `ContainerLayoutProps['size']` | no | — | The max-width of the inner centered `ContainerLayout`. Passthrough to `ContainerLayout.size`. Default `lg`. |
@@ -23,10 +25,10 @@ Public import: `import { Navbar } from '@wow-two-beta/ui-vue/presentation/layout
 | `isSticky` | `boolean` | no | `false` | The sticky pinning of the bar to the top of the scroll container. Default `false` (non-sticky). |
 | `sticky` | `boolean` | no | —       | Deprecated — use `isSticky`; removed next release.                                              |
 | `tone` | `SurfaceTone` | no | — | The tinted background tone for the band — applies the shadow-less `subtle` surface treatment. Omit for a transparent bar (relies on `bordered` / page bg). |
-| `hasBorder` | `boolean` | no | `true` | The bottom border under the bar (the end border for a rail). Default `true`. |
+| `hasBorder` | `boolean` | no | `true`; `false` in an `AppShellHeader` | The bottom border under the bar (the end border for a rail). |
 | `bordered` | `boolean` | no | —      | Deprecated — use `hasBorder`; removed next release.                          |
 | `orientation` | `NavbarOrientation` | no | `horizontal` | A full-width top bar (`start` / `center` / `end` in a row) or a full-height rail (`start` at the top, `center` scrolling, `end` at the foot). |
-| `variant` | `NavbarVariant` | no | `solid` | The surface: `solid`, `glass` (blurred, opaque where blur or transparency is unavailable or unwanted) or `transparent`. A `tone` overrides it. |
+| `variant` | `NavbarVariant` | no | `solid`; `transparent` in an `AppShellHeader` | The surface: `solid`, `glass` (blurred, opaque where blur or transparency is unavailable or unwanted) or `transparent`. A `tone` overrides it. |
 
 ## Emits
 

@@ -36,17 +36,23 @@ export interface AppShellHeaderProps {
 </script>
 
 <script setup lang="ts">
-import { computed, useAttrs, useTemplateRef } from 'vue';
+import { computed, provide, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
 import { NavbarSurfaceClass } from '../navbar/Navbar.variants';
+import { bannerHostKey } from '../navbar/NavbarContext';
 
-/** Renders the shell's sticky top bar into the `header` grid area. */
+/**
+ * Renders the shell's sticky top bar into the `header` grid area. It is the page's banner, so a `Navbar` inside renders
+ * a plain row rather than a second banner.
+ */
 defineOptions({ name: 'AppShellHeader', inheritAttrs: false });
 
 /** The header content — React's `children`. */
 defineSlots<{ default?(): unknown }>();
 
 const props = withDefaults(defineProps<AppShellHeaderProps>(), { height: 'md', variant: 'solid' });
+
+provide(bannerHostKey, true);
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLElement>('el');

@@ -2,9 +2,14 @@
 import type { HTMLAttributes } from 'vue';
 import type { SurfaceTone } from '../../../foundation/styles';
 import type { ContainerLayoutProps } from '../containerLayout';
-import type { NavbarHeight, NavbarOrientation, NavbarVariant } from './Navbar.variants';
+import type { NavbarElement, NavbarHeight, NavbarOrientation, NavbarVariant } from './Navbar.variants';
 
 export interface NavbarProps {
+  /**
+   * The element: `header` (a banner landmark) or `div` (none). Default: `div` inside an `AppShellHeader`, which is
+   * already the banner, and `header` elsewhere.
+   */
+  readonly as?: NavbarElement;
   /** Native attributes forwarded to the inner `ContainerLayout`; its `class` is merged last. */
   readonly containerAttrs?: HTMLAttributes;
   /** Convenience class for the inner `ContainerLayout`, merged after `containerAttrs.class`. */
@@ -34,17 +39,25 @@ export interface NavbarProps {
 </script>
 
 <script setup lang="ts">
-import { computed, provide, useAttrs, useSlots, useTemplateRef } from 'vue';
+import { computed, inject, provide, useAttrs, useSlots, useTemplateRef } from 'vue';
 import { cn, surfaceVariants } from '../../../foundation/styles';
 import ContainerLayout from '../containerLayout/ContainerLayout.vue';
-import { NavbarOrientation as Orientation, NavbarSurfaceClass, navbarVariants } from './Navbar.variants';
-import { navbarContextKey } from './NavbarContext';
+import {
+  NavbarElement as Element,
+  NavbarOrientation as Orientation,
+  NavbarSurfaceClass,
+  navbarVariants,
+} from './Navbar.variants';
+import { bannerHostKey, navbarContextKey } from './NavbarContext';
 
 /**
  * Renders a lightweight header band (`<header>`) with `start` / `center` / `end` slots
  * laid out in a row inside a centered `ContainerLayout`. The everyday "navbar +
  * centered content" need that `AppShell` (a 5-slot dashboard grid w/ sidebar)
  * overshoots. Non-sticky by default; pass `isSticky` to pin it.
+ *
+ * Inside an `AppShellHeader` it renders a plain row filling the bar: the host is the banner and owns the band's
+ * height, border and surface, so the bar adds none of its own unless the props ask for them.
  */
 defineOptions({ name: 'Navbar', inheritAttrs: false });
 
@@ -64,15 +77,21 @@ defineSlots<{
 }>();
 
 const props = withDefaults(defineProps<NavbarProps>(), {
+  as: undefined,
   isSticky: undefined,
   sticky: undefined,
   hasBorder: undefined,
   bordered: undefined,
   orientation: Orientation.Horizontal,
-  variant: 'solid',
+  variant: undefined,
 });
 
 const isVertical = computed(() => props.orientation === Orientation.Vertical);
+
+/** True inside a host that already is the banner — `AppShellHeader`. */
+const isHosted = inject(bannerHostKey, false);
+
+const tag = computed<Element>(() => props.as ?? (isHosted ? Element.Div : Element.Header));
 
 provide(navbarContextKey, { orientation: computed(() => props.orientation) });
 
@@ -87,11 +106,14 @@ const classes = computed(() =>
       sticky: props.isSticky ?? props.sticky ?? false,
       height: props.height,
     }),
-    (props.hasBorder ?? props.bordered ?? true) &&
+    /* A hosted bar fills the host's row at the host's height. */
+    isHosted && 'min-w-0 flex-1 self-stretch',
+    isHosted && props.height === undefined && 'h-auto',
+    (props.hasBorder ?? props.bordered ?? !isHosted) &&
       (isVertical.value ? 'border-e border-border' : 'border-b border-border'),
     props.tone
       ? surfaceVariants({ variant: 'subtle', tone: props.tone, radius: 'none' })
-      : NavbarSurfaceClass[props.variant],
+      : NavbarSurfaceClass[props.variant ?? (isHosted ? 'transparent' : 'solid')],
     attrs.class as string | undefined,
   ),
 );
@@ -129,7 +151,7 @@ defineExpose({ el });
 </script>
 
 <template>
-  <header v-if="isVertical" ref="el" v-bind="rest" :class="classes">
+  <component :is="tag" v-if="isVertical" ref="el" v-bind="rest" :class="classes">
     <div v-bind="containerRest" :class="railClasses">
       <slot v-if="$slots.default" />
       <template v-else>
@@ -144,8 +166,8 @@ defineExpose({ el });
         </div>
       </template>
     </div>
-  </header>
-  <header v-else ref="el" v-bind="rest" :class="classes">
+  </component>
+  <component :is="tag" v-else ref="el" v-bind="rest" :class="classes">
     <ContainerLayout v-bind="containerRest" :size="props.containerSize" :class="containerClasses">
       <slot v-if="$slots.default" />
       <template v-else>
@@ -160,5 +182,5 @@ defineExpose({ el });
         </div>
       </template>
     </ContainerLayout>
-  </header>
+  </component>
 </template>
