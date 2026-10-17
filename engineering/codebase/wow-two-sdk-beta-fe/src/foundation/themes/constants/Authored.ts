@@ -8,8 +8,9 @@
  * `ambient` backdrop for `surface-ambient`.
  * Smart QR: brand fills and neutral backgrounds preserve the original app colors; foreground tokens were corrected
  * for the SDK's declared text/placeholder/glass contrast pairs and await visual review in the app.
- * Ocharo: the Ocharo Studio palette (paper, linen, green-slate ink, pomegranate) with harmonised status tones.
- * Both are candidates until a shipping app validates them through the registry. */
+ * Ocharo: the owner-approved Ink and Raspberry (light) and Neutral graphite (dark) palette under a raspberry-and-blue
+ * backdrop; the tones the approval left open are derived to match it.
+ * Smart QR and Ocharo stay candidates until a shipping app validates them through the registry. */
 
 import type { Theme, ThemeAmbient } from '../Theme';
 import { ThemeRadius, ThemeStatus } from '../Theme';
@@ -298,104 +299,128 @@ const smartQr: Theme = {
   meta: validateTheme({ light: smartQrLight, dark: smartQrDark }),
 };
 
-// Ocharo Studio light: warm paper and linen surfaces, green-slate ink, pomegranate brand.
+/* ---------------------------------------------------------------------------
+ * Ocharo — raspberry actions on cool white and ink (light) / neutral graphite (dark), under a raspberry-and-blue
+ * backdrop. The owner approved Ink and Raspberry and Neutral graphite on 2026-10-02 and the glass-and-gradient
+ * direction on 2026-10-17. Approved values are verbatim, except where a comment gives the original: those moved in
+ * lightness only, by the least that clears the declared pairs. The approval left muted, subtle, inverse, field,
+ * accent and the status families open; they are derived here (muted and the status tones start from Catalogue's
+ * shipped values). The approved header and menu materials (light: white at 84% and 92%; dark: #29292d at 90% and
+ * 96%) set the popover colour; the SDK's glass recipes apply their own fixed 70% alpha to it.
+ * ------------------------------------------------------------------------- */
+
 const ocharoLight: TokenSet = {
-  background: '#f1f0eb',
-  foreground: '#303b37',
-  card: '#fffefa',
-  'card-foreground': '#303b37',
-  popover: '#fffefa',
-  'popover-foreground': '#303b37',
-  field: '#fffefa',
-  muted: '#f5f5ef',
-  'muted-foreground': '#596259',
-  'subtle-foreground': '#5f675f',
-  inverse: '#303b37',
-  'inverse-foreground': '#fffefa',
-  border: '#e7e7df',
-  'border-strong': '#7f877f',
-  input: '#7f877f',
-  ring: '#7a3944',
-  primary: '#7a3944',
-  'primary-foreground': '#fffefa',
-  'primary-soft': '#f6e9e9',
-  'primary-soft-foreground': '#6c3039',
-  accent: '#4a6356',
-  'accent-foreground': '#fffefa',
-  'accent-soft': '#e7eee9',
-  'accent-soft-foreground': '#3a5045',
-  destructive: '#a8322d',
-  'destructive-foreground': '#fffefa',
-  'destructive-soft': '#f8e6e3',
-  'destructive-soft-foreground': '#8e2a26',
-  info: '#2f5f86',
-  'info-foreground': '#fffefa',
-  'info-soft': '#e5eef5',
-  'info-soft-foreground': '#264f6f',
-  success: '#2f6a47',
-  'success-foreground': '#fffefa',
-  'success-soft': '#e4f0e8',
-  'success-soft-foreground': '#255638',
-  warning: '#8a5a0a',
-  'warning-foreground': '#fffefa',
-  'warning-soft': '#f7ecd8',
-  'warning-soft-foreground': '#6c4506',
+  background: '#f5f6fa',
+  foreground: '#181b25',
+  card: '#ffffff',
+  'card-foreground': '#181b25',
+  popover: '#ffffff',
+  'popover-foreground': '#181b25',
+  field: '#ffffff',
+  muted: '#eef0f6',
+  'muted-foreground': '#555e72',
+  'subtle-foreground': '#5f687b',
+  inverse: '#181b25',
+  'inverse-foreground': '#f5f6fa',
+  border: '#dfe3ed',
+  'border-strong': '#828b9f', // #858ea3: 2.88:1 on muted
+  input: '#828b9f', // #858ea3
+  ring: '#9d2e6a',
+  primary: '#8b2459',
+  'primary-foreground': '#ffffff',
+  'primary-soft': '#f8e9f0',
+  'primary-soft-foreground': '#892257', // #8b2459: 4.39:1 on its 30% tone wash over muted
+  accent: '#2457ce',
+  'accent-foreground': '#ffffff',
+  'accent-soft': '#e8eefc',
+  'accent-soft-foreground': '#1545bb',
+  destructive: '#a0443d',
+  'destructive-foreground': '#ffffff',
+  'destructive-soft': '#fae9e6',
+  'destructive-soft-foreground': '#8d322d',
+  info: '#176d8b',
+  'info-foreground': '#ffffff',
+  'info-soft': '#e3f1f9',
+  'info-soft-foreground': '#005974',
+  success: '#426553',
+  'success-foreground': '#ffffff',
+  'success-soft': '#e9f0e9',
+  'success-soft-foreground': '#365847',
+  warning: '#906623',
+  'warning-foreground': '#ffffff',
+  'warning-soft': '#f8efdd',
+  'warning-soft-foreground': '#744c00',
 };
 
-// Ocharo Studio dark: deep green-slate surfaces, pale linen ink, rose brand.
 const ocharoDark: TokenSet = {
-  background: '#242b29',
-  foreground: '#eceee5',
-  card: '#303835',
-  'card-foreground': '#eceee5',
-  popover: '#303835',
-  'popover-foreground': '#eceee5',
-  field: '#242b29',
-  muted: '#39423d',
-  'muted-foreground': '#b8c1b5',
-  'subtle-foreground': '#aeb7ab',
-  inverse: '#eceee5',
-  'inverse-foreground': '#242b29',
-  border: '#46504a',
-  'border-strong': '#86918a',
-  input: '#86918a',
-  ring: '#daa0aa',
-  primary: '#daa0aa',
-  'primary-foreground': '#2a1c1f',
-  'primary-soft': '#4d3c40',
-  'primary-soft-foreground': '#f6dde1',
-  accent: '#a9c4b4',
-  'accent-foreground': '#1c2621',
-  'accent-soft': '#344640',
-  'accent-soft-foreground': '#dcebe1',
-  destructive: '#f0968d',
-  'destructive-foreground': '#3a0f0c',
-  'destructive-soft': '#4f2f2d',
-  'destructive-soft-foreground': '#fbdad6',
-  info: '#93bddf',
-  'info-foreground': '#0f2233',
-  'info-soft': '#2c3f4d',
-  'info-soft-foreground': '#cfe3f2',
-  success: '#93cda9',
-  'success-foreground': '#0f2a1a',
-  'success-soft': '#2c4236',
-  'success-soft-foreground': '#d6f0df',
-  warning: '#e3b660',
-  'warning-foreground': '#2e1f00',
-  'warning-soft': '#4a3d25',
-  'warning-soft-foreground': '#f8e6c1',
+  background: '#141416',
+  foreground: '#f4f2f5',
+  card: '#1d1d20',
+  'card-foreground': '#f4f2f5',
+  popover: '#29292d',
+  'popover-foreground': '#f4f2f5',
+  field: '#141416',
+  muted: '#262629',
+  'muted-foreground': '#b7b3bd',
+  'subtle-foreground': '#a29ea8',
+  inverse: '#f4f2f5',
+  'inverse-foreground': '#141416',
+  border: '#3d3b42',
+  'border-strong': '#85808c',
+  input: '#85808c',
+  ring: '#e69abc',
+  primary: '#c24783',
+  'primary-foreground': '#ffffff',
+  'primary-soft': '#392330',
+  'primary-soft-foreground': '#e69abc',
+  accent: '#5b6cc8',
+  'accent-foreground': '#ffffff',
+  'accent-soft': '#262c44',
+  'accent-soft-foreground': '#b5c2f2',
+  destructive: '#efaaa1',
+  'destructive-foreground': '#3c1715',
+  'destructive-soft': '#492b28',
+  'destructive-soft-foreground': '#ffd0c8',
+  info: '#94c6e1',
+  'info-foreground': '#08222f',
+  'info-soft': '#20333c',
+  'info-soft-foreground': '#b8daed',
+  success: '#a6cfb4',
+  'success-foreground': '#11281a',
+  'success-soft': '#263d30',
+  'success-soft-foreground': '#c1e1ca',
+  warning: '#e1bd79',
+  'warning-foreground': '#382709',
+  'warning-soft': '#473b25',
+  'warning-soft-foreground': '#f0d299',
 };
 
-/** Ocharo Studio's palette as a theme; its island layout and typography stay in the product. */
+/* The approved prototype's medium backdrop: a raspberry glow from the top left (16%), a cool blue one from the bottom
+ * right (11%) and a faint rose one near the top right (8%), at the same alphas in both modes. */
+const ocharoAmbient: ThemeAmbient = {
+  light: [
+    'radial-gradient(ellipse 60% 55% at 0% 0%, #8b245929, transparent 70%)',
+    'radial-gradient(ellipse 55% 60% at 100% 100%, #2457ce1c, transparent 70%)',
+    'radial-gradient(ellipse 40% 35% at 70% 8%, #c2478314, transparent 75%)',
+  ].join(', '),
+  dark: [
+    'radial-gradient(ellipse 60% 55% at 0% 0%, #c2478329, transparent 70%)',
+    'radial-gradient(ellipse 55% 60% at 100% 100%, #5b6cc81c, transparent 70%)',
+    'radial-gradient(ellipse 40% 35% at 70% 8%, #8a6f9e14, transparent 75%)',
+  ].join(', '),
+};
+
+/** Ocharo — the shared look of the Ocharo apps; the product keeps its layout and typography. */
 const ocharo: Theme = {
   id: 'ocharo',
   name: 'Ocharo',
   description:
-    'Pomegranate brand and sage accent on warm paper and linen (light) / deep green-slate (dark) — authored from Ocharo Studio.',
-  tags: ['brand', 'pomegranate', 'sage', 'warm', 'paper', 'candidate', 'aa', 'product'],
+    'Raspberry actions and a cobalt accent on cool white and ink (light) / neutral graphite (dark) under a raspberry-and-blue glass backdrop — the owner-approved Ocharo palette, awaiting validation in Desk.',
+  tags: ['brand', 'raspberry', 'ink', 'graphite', 'cobalt', 'glass', 'cool', 'neutral', 'candidate', 'aa', 'product'],
   light: ocharoLight,
   dark: ocharoDark,
   radius: ThemeRadius.Lg,
+  ambient: ocharoAmbient,
   status: ThemeStatus.Candidate,
   meta: validateTheme({ light: ocharoLight, dark: ocharoDark }),
 };

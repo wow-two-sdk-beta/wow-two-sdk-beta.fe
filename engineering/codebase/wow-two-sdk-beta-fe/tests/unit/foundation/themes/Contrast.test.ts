@@ -133,8 +133,9 @@ describe('supported text and translucent-surface contrast', () => {
       ),
     ]);
     const hash = createHash('sha256').update(JSON.stringify(palette)).digest('hex');
-    // Adding a theme changes this on purpose; re-pin it from the message, never for an edit to an existing theme.
-    expect(hash, `palette hash ${hash}`).toBe('388870bc1b8d51dfbc98aa19a1d5787663f1dededf889ed92ddd246b2852ee3d');
+    // Adding a theme or an owner-approved palette changes this on purpose; re-pin it from the message, never for an
+    // incidental edit to an existing theme.
+    expect(hash, `palette hash ${hash}`).toBe('13edc49040ea850ed8aac3ddad7d20a7de451657fe33aaccf0dc9977106e3a73');
   });
 
   it('derives every field fill from an existing surface: the popover in light mode, the page in dark mode', () => {

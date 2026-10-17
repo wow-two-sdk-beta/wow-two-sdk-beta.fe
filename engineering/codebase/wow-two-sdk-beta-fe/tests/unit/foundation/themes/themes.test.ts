@@ -188,6 +188,88 @@ describe('the platform theme', () => {
   });
 });
 
+describe('the ocharo theme', () => {
+  const theme = getTheme('ocharo')!;
+
+  it('is an AA-proven candidate with the large radius', () => {
+    expect(theme.name).toBe('Ocharo');
+    expect(theme.status).toBe(ThemeStatus.Candidate);
+    expect(theme.radius).toBe('lg');
+    expect(theme.tags).toEqual(expect.arrayContaining(['raspberry', 'ink', 'graphite', 'glass']));
+    for (const token of SemanticTokens) {
+      expect(theme.light[token], `light \`${token}\``).toMatch(/^#[0-9a-f]{6}$/u);
+      expect(theme.dark[token], `dark \`${token}\``).toMatch(/^#[0-9a-f]{6}$/u);
+    }
+    expect(theme.meta, theme.meta.failures?.join('; ')).toEqual({ contrastAA: true });
+  });
+
+  it('carries the approved Ink and Raspberry and Neutral graphite values', () => {
+    expect(theme.light).toMatchObject({
+      background: '#f5f6fa',
+      card: '#ffffff',
+      popover: '#ffffff',
+      foreground: '#181b25',
+      'muted-foreground': '#555e72',
+      primary: '#8b2459',
+      'primary-foreground': '#ffffff',
+      'primary-soft': '#f8e9f0',
+      border: '#dfe3ed',
+      ring: '#9d2e6a',
+      // Approved #858ea3 and #8b2459, moved in lightness only to clear their declared pairs over `muted`.
+      input: '#828b9f',
+      'border-strong': '#828b9f',
+      'primary-soft-foreground': '#892257',
+    });
+    expect(theme.dark).toMatchObject({
+      background: '#141416',
+      card: '#1d1d20',
+      popover: '#29292d',
+      foreground: '#f4f2f5',
+      'muted-foreground': '#b7b3bd',
+      primary: '#c24783',
+      'primary-foreground': '#ffffff',
+      'primary-soft': '#392330',
+      'primary-soft-foreground': '#e69abc',
+      border: '#3d3b42',
+      input: '#85808c',
+      'border-strong': '#85808c',
+      ring: '#e69abc',
+    });
+  });
+
+  it('no longer carries the Studio pomegranate candidate', () => {
+    const values = [...Object.values(theme.light), ...Object.values(theme.dark)];
+    for (const studio of ['#7a3944', '#daa0aa', '#f1f0eb', '#242b29']) expect(values).not.toContain(studio);
+  });
+
+  it('paints the approved medium backdrop in both modes', () => {
+    expect(theme.ambient).toEqual({
+      light:
+        'radial-gradient(ellipse 60% 55% at 0% 0%, #8b245929, transparent 70%), ' +
+        'radial-gradient(ellipse 55% 60% at 100% 100%, #2457ce1c, transparent 70%), ' +
+        'radial-gradient(ellipse 40% 35% at 70% 8%, #c2478314, transparent 75%)',
+      dark:
+        'radial-gradient(ellipse 60% 55% at 0% 0%, #c2478329, transparent 70%), ' +
+        'radial-gradient(ellipse 55% 60% at 100% 100%, #5b6cc81c, transparent 70%), ' +
+        'radial-gradient(ellipse 40% 35% at 70% 8%, #8a6f9e14, transparent 75%)',
+    });
+    const [light, dark] = themeToCss(theme).split('\n\n');
+    expect(light).toMatch(/^\.theme-ocharo \{/u);
+    expect(dark).toMatch(/^\.dark\.theme-ocharo, \.dark \.theme-ocharo \{/u);
+    expect(light).toContain('--color-primary: #8b2459;');
+    expect(dark).toContain('--color-primary: #c24783;');
+    expect(light).toContain(`--theme-ambient: ${theme.ambient!.light};`);
+    expect(dark).toContain(`--theme-ambient: ${theme.ambient!.dark};`);
+  });
+
+  it('appears in the manifest as an AA-proven candidate', () => {
+    expect(emitThemesManifest(THEMES).find((entry) => entry.id === 'ocharo')).toMatchObject({
+      status: 'candidate',
+      contrastAA: true,
+    });
+  });
+});
+
 describe('readableForeground', () => {
   it('picks the text pole with more contrast, and reads AA on saturated fills', () => {
     for (const fill of ['#1e3a8a', '#b91c1c', '#15803d', '#7c3aed', '#fde68a', '#e0f2fe', '#f97316']) {

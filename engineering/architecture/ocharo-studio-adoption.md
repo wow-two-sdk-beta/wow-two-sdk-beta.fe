@@ -89,10 +89,10 @@ reuses a cached tarball whose file name and version are unchanged. The package r
 
 ## Theme
 
-The Vue SDK registers the studio palette as the authored candidate theme `ocharo`
-(`src/foundation/themes/constants/Authored.ts`, radius `lg`): warm paper and linen surfaces, green-slate ink, pomegranate
-primary and a sage accent, with harmonised status tones in both modes. Every declared contrast pair passes in light and
-dark; the palette guard hash in `Contrast.test.ts` now covers it, and the earlier palettes are unchanged. The studio still
-uses its own `tokens.css`; the theme stays `candidate` until the product adopts `.theme-ocharo` and validates it. The
-island layout, header, library and inspector composition remain product-owned; the theme contract carries colours and
-radius only.
+The Vue SDK registers the Ocharo palette as the authored candidate theme `ocharo`
+(`src/foundation/themes/constants/Authored.ts`, radius `lg`). It carries the owner-approved Ink and Raspberry (light) and
+Neutral graphite (dark) tokens and the approved raspberry-and-blue `ambient` backdrop; the Studio-derived pomegranate
+candidate it replaces was never approved. Accent, muted and status tones are derived to match. Every declared contrast
+pair passes in both modes. The theme stays `candidate` until an app (Desk first) adopts `.theme-ocharo` and validates
+it. The island layout, header, library and inspector composition remain product-owned; the theme contract carries
+colours, radius and the backdrop only.
