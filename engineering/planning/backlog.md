@@ -138,6 +138,15 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to use styled `SortableGroupMoveButton` and `SortableGroupHandle` | feature | Wheelhouse `PinEditor` and `WorkspacesPanel` style them locally |
 | Ability to split `SidebarMenuGroup` into a link and a separate toggle | feature | Wheelhouse workspace rows open their page and fold with a chevron (`WorkspaceNavGroup.vue`) |
 | Fix dist chunks pulling unrelated components into a single import | fix | Wheelhouse boot: `Badge`/`Avatar` pull temporal-polyfill and Kanban, layout pulls Masonry, formatters pull bignumber; per-component chunks or side-effect-free output |
+| Ability to draw `HeatmapCalendarGrid` over any range with per-cell tone, mark and live state | feature | Wheelhouse deployments grid: today ring, running pulse, sticky labels, sideways scroll, arrow keys, selected cell (local `ActivityGrid`) |
+| Ability to multi-select branches and leaves in `TreeSelectPicker` with chips | feature | Wheelhouse deployments entity picker: workspace, product and service mixed, partial and implied states |
+| Ability to pick a date-time range with presets | feature | Wheelhouse uses a native `datetime-local`; `DateRangePicker` is date-only and `DateTimeInput` needs Temporal |
+| Ability to show one panel as a popover on desktop and a bottom sheet on phones | feature | Wheelhouse filter pickers |
+| Ability to give infinite queries first-load and refreshing states for `DataRegion` | feature | Wheelhouse deployments list |
+| Ability to render `TabsGroupTab` as a router link | feature | Wheelhouse product tabs are buttons, so they can't open in a new tab |
+| Ability to use a link item in menus | feature | Wheelhouse's profile menu navigates with `router.push` on select |
+| Ability to size `BottomSheet` to its content | feature | Wheelhouse's profile sheet uses a fixed 540px |
+| Ability to give `NavItem` a chip variant | feature | Wheelhouse workspace chips use local classes |
 | Fix `PageHeader` actions not wrapping on narrow screens | fix | `shrink-0` and no `flex-wrap` |
 
 ## Vectors
