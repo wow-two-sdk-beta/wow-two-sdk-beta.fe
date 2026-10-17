@@ -10,6 +10,7 @@ Public import: `import { SelectPickerItem } from '@wow-two-beta/fe/presentation/
 
 - Mount within the owner supplying `useSelectContext`; a compound part is not an independent root.
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
+- Inside a closed panel's off-document collection the item registers its entry and renders no row.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

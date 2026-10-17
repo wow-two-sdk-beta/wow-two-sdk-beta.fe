@@ -28,12 +28,10 @@ export interface MultiSelectPickerContextValue {
   unregisterLabel: (value: string) => void;
 
   /**
-   * Resolves a chip label for a value the registry has never seen — `null` when it cannot.
+   * Resolves a chip label for a value no row carries, and for the server render — `null` when it cannot.
    *
-   * Rows only register while the panel is mounted, so a preselected value has no registered
-   * label until the dropdown has been opened once and the trigger shows the raw key. Same
-   * gap `SelectPicker` closes with `getOptionLabel`; this is that escape hatch, and the registry
-   * still wins where it has an entry.
+   * A closed panel mounts its rows off-document, so rows label a preselected value before the first
+   * open; the registry wins where it has an entry.
    */
   getOptionLabel: (value: string) => string | number | null;
 

@@ -39,6 +39,7 @@ import type { ClassValue } from 'clsx';
 import { cn } from '../../../foundation/styles';
 import { PopoverContent } from '../../overlays';
 import { ListboxPicker } from '../listboxPicker';
+import { OptionCollection } from '../OptionCollection';
 import { useMultiSelectContext } from './MultiSelectPickerContext';
 
 /** Renders the floating panel below the trigger, hosting the rows as a multi-selection listbox. */
@@ -85,4 +86,6 @@ function onValueChange(next: unknown): void {
       <slot />
     </ListboxPicker>
   </PopoverContent>
+  <!-- The closed panel's rows, mounted off-document so the tags label the selection before the first open. -->
+  <OptionCollection :is-active="!ctx.open"><slot /></OptionCollection>
 </template>

@@ -48,9 +48,13 @@ export interface SelectPickerContextValue {
   onSelect: (entry: ItemRegistryEntry) => void;
   onClear: () => void;
   readonly keyEquals: EqualityComparer<unknown>;
+  /** The registered options, one per key. A closed panel's options register from an off-document collection. */
   readonly items: ReadonlyArray<ItemRegistryEntry>;
-  registerItem: (entry: ItemRegistryEntry) => void;
-  unregisterItem: (itemKey: unknown) => void;
+  /** Registers or replaces the entry of one mounted option; `owner` identifies the option instance. */
+  registerItem: (owner: symbol, entry: ItemRegistryEntry) => void;
+  unregisterItem: (owner: symbol) => void;
+  /** Reports whether a closed panel mounts its options off-document — false when `options` labels the selection. */
+  readonly needsOptionCollection: boolean;
   /** Resolves a label last seen for a key from the persistent cache (survives unmount). */
   getCachedLabel: (key: unknown) => string | number | undefined;
   readonly query: string;

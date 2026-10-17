@@ -29,6 +29,7 @@ export interface SelectPickerItemProps {
 <script setup lang="ts">
 import { computed, onBeforeUnmount, watch } from 'vue';
 import ListboxPickerItem from '../listboxPicker/ListboxPickerItem.vue';
+import { useOptionCollection } from '../OptionCollection';
 import { extractText, useSelectContext } from './SelectPickerContext';
 
 /** Renders one selectable option row, hidden while it misses the panel's search query. */
@@ -46,6 +47,10 @@ defineSlots<{
 /* `ctx` is a live-getter object — read fields off it, never destructure. */
 const ctx = useSelectContext();
 
+/* Inside a closed panel's collection the item only registers, so the trigger can label it before the first open. */
+const isCollected = useOptionCollection();
+const owner = Symbol('SelectPickerItem');
+
 const resolvedValue = computed(() => (props.value === undefined ? props.itemKey : props.value));
 
 /* Explicit `text` wins; otherwise the label's plain text. */
@@ -59,20 +64,17 @@ watch(
     text: itemText.value,
     isDisabled: props.isDisabled,
   }),
-  (entry, previous) => {
-    if (previous && !Object.is(previous.itemKey, entry.itemKey)) ctx.unregisterItem(previous.itemKey);
-    ctx.registerItem(entry);
-  },
+  (entry) => ctx.registerItem(owner, entry),
   { immediate: true },
 );
-onBeforeUnmount(() => ctx.unregisterItem(props.itemKey));
+onBeforeUnmount(() => ctx.unregisterItem(owner));
 
 const matchesQuery = computed(() => !ctx.query || itemText.value.toLowerCase().includes(ctx.query.toLowerCase()));
 </script>
 
 <template>
   <!-- ListboxPickerItem compares via the wired keyEquals — same equality math as SelectPicker. -->
-  <ListboxPickerItem v-if="matchesQuery" v-bind="$attrs" :value="itemKey" :is-disabled="isDisabled">
+  <ListboxPickerItem v-if="!isCollected && matchesQuery" v-bind="$attrs" :value="itemKey" :is-disabled="isDisabled">
     <slot>{{ label }}</slot>
   </ListboxPickerItem>
 </template>

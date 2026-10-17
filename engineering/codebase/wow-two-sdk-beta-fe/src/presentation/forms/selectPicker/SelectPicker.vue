@@ -38,16 +38,13 @@ export interface SelectPickerProps<K, V = K> {
   /** The key serializer for the hidden form input; defaults to `String(key)`. */
   readonly serializeKey?: (key: K) => string;
 
-  /** The label resolver for a `modelValue`/`defaultValue` before items register
-   *  (the trigger otherwise shows the raw serialized key until the first open). */
+  /** The label resolver for a key no option carries, and for the server render; options win when present.
+   *  Slotted `SelectPickerItem`s label a closed trigger on their own. */
   readonly getOptionLabel?: (key: K) => string | number | null;
 
-  /** The option set seeded eagerly into the item registry + label cache on mount — before the
-   *  popover ever opens. Lets `SelectPickerValue` resolve the selected label and closed-trigger
-   *  typeahead work without a first open, so `getOptionLabel` is unnecessary. Compound
-   *  `<SelectPickerItem>` children still render the list and remain fully supported; `options` is an
-   *  alternative/supplement. When both supply the same key, the mounted child wins (deduped via
-   *  `keyEquals`). Each entry mirrors what a `SelectPickerItem` registers. */
+  /** The option set seeded into the item registry + label cache on mount, server render included.
+   *  `<SelectPickerItem>` children still render the list; a mounted child wins on a shared key (via
+   *  `keyEquals`). When it labels the selection, the closed panel skips its off-document item mount. */
   readonly options?: ReadonlyArray<SelectPickerOption<K, V>>;
 
   /** The invalid state, styling the trigger as invalid (red border, error ring). */
@@ -147,8 +144,9 @@ const keyCtl = useControlled<K | null>({
 });
 
 /* Reactive, unlike ListboxPicker's plain array: `SelectPickerValue` resolves its label from this set and
-   `SelectPickerContent` counts visible rows off it, both at render time. */
-const items = shallowRef<ItemRegistryEntry[]>([]);
+   `SelectPickerContent` counts visible rows off it, both at render time. Keyed by option instance: a closed
+   panel's off-document collection and the panel's own rows overlap while the panel opens or animates out. */
+const registrations = shallowRef<ReadonlyArray<{ owner: symbol; entry: ItemRegistryEntry }>>([]);
 
 /* Labels survive panel unmount. Keys retain identity; serialization is only a wire concern. */
 const labelCache = new Map<unknown, string | number>();
@@ -166,8 +164,8 @@ const activeDescendant = ref<string | null>(null);
 const listboxId = useId('select-listbox');
 const listboxEl = shallowRef<HTMLElement | null>(null);
 
-/* Captures `{ itemKey, label }` at selection time — items unmount on popover close, so the
-   registry alone can't label the trigger before the first open. */
+/* Captures `{ itemKey, label }` at selection time, keeping the label while the panel's rows hand over to
+   the closed panel's collection. */
 const selectedEntry = shallowRef<{ itemKey: unknown; label: string | number } | null>(null);
 
 const keyEqualsFn = computed<EqualityComparer<unknown>>(
@@ -183,48 +181,54 @@ function getOptionLabelFn(key: unknown): string | number | null {
   return fn ? fn(key) : null;
 }
 
-function registerItem(entry: ItemRegistryEntry): void {
+function registerItem(owner: symbol, entry: ItemRegistryEntry): void {
   /* Persist the label so a closed trigger can still resolve it after this item unmounts. */
   cacheLabel(entry.itemKey, entry.label);
-  const list = items.value;
-  const idx = list.findIndex((i) => Object.is(i.itemKey, entry.itemKey));
-  if (idx >= 0) {
-    const existing = list[idx];
-    if (
-      existing &&
-      existing.label === entry.label &&
-      existing.text === entry.text &&
-      existing.isDisabled === entry.isDisabled &&
-      Object.is(existing.value, entry.value)
-    ) {
-      return;
-    }
-    const next = list.slice();
-    next[idx] = entry;
-    items.value = next;
+  const list = registrations.value;
+  const idx = list.findIndex((r) => r.owner === owner);
+  if (idx === -1) {
+    registrations.value = [...list, { owner, entry }];
     return;
   }
-  items.value = [...list, entry];
+  const existing = list[idx]?.entry;
+  if (
+    existing &&
+    Object.is(existing.itemKey, entry.itemKey) &&
+    existing.label === entry.label &&
+    existing.text === entry.text &&
+    existing.isDisabled === entry.isDisabled &&
+    Object.is(existing.value, entry.value)
+  ) {
+    return;
+  }
+  const next = list.slice();
+  next[idx] = { owner, entry };
+  registrations.value = next;
 }
 
-/* Drops the item from the live mounted set on unmount so a removed option (popover close OR
-   option-set change) no longer satisfies search / typeahead / value resolution. The label
-   stays in `labelCache`, so the trigger keeps its label after close. */
-function unregisterItem(itemKey: unknown): void {
-  const idx = items.value.findIndex((i) => Object.is(i.itemKey, itemKey));
-  if (idx === -1) return;
-  const next = items.value.slice();
-  next.splice(idx, 1);
-  items.value = next;
+/* Drops the option instance on unmount so a removed option no longer satisfies search, typeahead or value
+   resolution. The label stays in `labelCache`, so the trigger keeps its label after close. */
+function unregisterItem(owner: symbol): void {
+  const list = registrations.value;
+  if (!list.some((r) => r.owner === owner)) return;
+  registrations.value = list.filter((r) => r.owner !== owner);
 }
+
+/* One entry per key, first registration first, so the collection and the open panel never list a row twice. */
+const items = computed<ReadonlyArray<ItemRegistryEntry>>(() => {
+  const equals = keyEqualsFn.value;
+  const unique: ItemRegistryEntry[] = [];
+  for (const { entry } of registrations.value) {
+    if (!unique.some((i) => equals(i.itemKey, entry.itemKey))) unique.push(entry);
+  }
+  return unique;
+});
 
 function getCachedLabel(key: unknown): string | number | undefined {
   return labelCache.get(cachedKey(key));
 }
 
-/* Maps the eager `options` prop to registry entries, mirroring what a `SelectPickerItem` registers.
-   Seeding these lets `SelectPickerValue` + closed-trigger typeahead resolve before the popover's
-   first open, so `getOptionLabel` is unnecessary when `options` is supplied. */
+/* Maps the eager `options` prop to registry entries, mirroring what a `SelectPickerItem` registers. */
 const seedItems = computed<ReadonlyArray<ItemRegistryEntry>>(() => {
   if (!props.options) return [];
   return props.options.map((option) => ({
@@ -266,6 +270,15 @@ watch(
 );
 
 const hasSelection = computed(() => keyCtl.value.value !== null && keyCtl.value.value !== undefined);
+
+/* A closed panel mounts its options off-document so the trigger labels the selection before the first open.
+   Skipped when `options` already labels the selection, so a long seeded list mounts no second copy. */
+const needsOptionCollection = computed(() => {
+  const seeds = seedItems.value;
+  if (seeds.length === 0) return true;
+  if (!hasSelection.value) return false;
+  return !seeds.some((seed) => keyEqualsFn.value(seed.itemKey, keyCtl.value.value));
+});
 
 /* Drops the captured label when the key changed externally (controlled updates). */
 const selectedLabel = computed<string | number | null>(() => {
@@ -321,6 +334,9 @@ const context: SelectPickerContextValue = {
   },
   registerItem,
   unregisterItem,
+  get needsOptionCollection() {
+    return needsOptionCollection.value;
+  },
   getCachedLabel,
   get query() {
     return query.value;

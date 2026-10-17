@@ -130,7 +130,6 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to set `retry` per `useAppQuery` | feature | Wheelhouse: a failing vitals snapshot makes 3 requests |
 | Ability to show `MeterBar` as unavailable for a null value | feature | Wheelhouse resource meters |
 | Fix `StatCard` optional props rejecting `undefined` | fix | Breaks under `exactOptionalPropertyTypes` |
-| Fix `SelectPickerValue` showing the raw key without `get-option-label` | fix | Wheelhouse filters showed "all" and "day" |
 | Ability to route `Breadcrumb` links and keep one line on phones | feature | Wheelhouse v0.5 `ScopeBar` routes clicks and truncates to the last two crumbs locally (`.wh-scope-trail`) |
 | Ability to place `PageHeaderActions` in the app top bar | feature | Wheelhouse v0.5 mounts a hidden `PageHeader` in the top bar to host page actions (`.wh-page-actions`) |
 | Ability to give `SidebarMenuSection` a header action | feature | Wheelhouse's Pinned "Edit" button is absolutely positioned |

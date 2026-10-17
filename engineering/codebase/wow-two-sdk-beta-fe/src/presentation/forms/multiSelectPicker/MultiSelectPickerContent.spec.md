@@ -10,6 +10,7 @@ Public import: `import { MultiSelectPickerContent } from '@wow-two-beta/fe/prese
 
 - Mount within the owner supplying `useMultiSelectContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- While the panel is closed, the default slot also mounts on the client into a detached element: each `MultiSelectPickerItem` registers its label and renders no row, so the tags label a preselected value before the first open. The collection stops if its subtree throws.
 
 ## Props
 

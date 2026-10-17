@@ -10,6 +10,7 @@ Public import: `import { SelectPickerValue } from '@wow-two-beta/fe/presentation
 
 - Mount within the owner supplying `useSelectContext`; a compound part is not an independent root.
 - Undeclared attributes follow Vue fallthrough to the rendered root when the component has a single element root.
+- The label resolves from the registry (`options`, the open panel's rows, or the closed panel's off-document collection), then the label captured at selection, the label cache, `getOptionLabel`, and last the serialized key. A never-opened trigger therefore shows the label, not the key.
 
 ## Props
 
@@ -36,4 +37,5 @@ No explicit exposed handle.
 ## Verification
 
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
+- Focused test references: [PickerClosedLabel.browser.test.ts](../../../../tests/unit/presentation/forms/PickerClosedLabel.browser.test.ts).
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

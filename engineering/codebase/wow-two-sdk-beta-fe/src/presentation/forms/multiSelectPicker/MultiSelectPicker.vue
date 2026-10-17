@@ -29,11 +29,10 @@ export interface MultiSelectPickerProps {
   readonly placement?: Placement;
 
   /**
-   * Resolves a chip label for a value whose row has not mounted yet — `null` when unknown.
+   * Resolves a chip label for a value no row carries, and for the server render — `null` when unknown.
    *
-   * `MultiSelectPickerItem` registers its label only while the panel is open, so a preselected
-   * value renders as its raw key until the first open. Supply this (or open the panel) to
-   * label a closed trigger. The mirror of `SelectPicker`'s prop of the same name.
+   * A closed panel mounts its `MultiSelectPickerItem` rows off-document, so rows already label a
+   * preselected value before the first open. The mirror of `SelectPicker`'s prop of the same name.
    */
   readonly getOptionLabel?: (value: string) => string | number | null;
 }

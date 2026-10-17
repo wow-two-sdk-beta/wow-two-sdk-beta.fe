@@ -10,6 +10,7 @@ Public import: `import { SelectPickerContent } from '@wow-two-beta/fe/presentati
 
 - Mount within the owner supplying `useSelectContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- While the panel is closed, the default slot also mounts on the client into a detached element: each `SelectPickerItem` registers its label and renders nothing, so the trigger labels the selection before the first open. Slot content therefore mounts while closed as well. The collection is skipped when the root's `options` labels the selection, and stops if its subtree throws.
 
 ## Props
 

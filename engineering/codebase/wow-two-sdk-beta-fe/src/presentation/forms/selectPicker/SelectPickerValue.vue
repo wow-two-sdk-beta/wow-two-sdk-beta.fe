@@ -36,8 +36,9 @@ const ctx = useSelectContext();
 
 const hasOverride = computed(() => Boolean(props.label) || Boolean(slots.default));
 
-/* Resolution order: live registry → label captured at selection → persistent cache (labels a
-   closed trigger post-unmount) → `getOptionLabel` (human label before first open) → serialized key. */
+/* Resolution order: registry (`options`, the open panel's rows, or the closed panel's off-document
+   collection) → label captured at selection → persistent cache → `getOptionLabel` (a key no option
+   carries, or the server render) → serialized key. */
 const resolvedLabel = computed<string | number | null>(() => {
   if (!ctx.hasSelection) return null;
   const match = ctx.items.find((i) => ctx.keyEquals(i.itemKey, ctx.selectedKey));

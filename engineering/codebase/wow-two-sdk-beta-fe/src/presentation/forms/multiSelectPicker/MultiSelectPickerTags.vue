@@ -44,8 +44,8 @@ const stripClass = computed(() =>
   cn('flex min-w-0 flex-1 items-center gap-1', isCapped.value ? 'flex-nowrap overflow-hidden' : 'flex-wrap'),
 );
 
-/* Registry (rows currently mounted) → `getOptionLabel` (a value whose row has never mounted,
-   which is every preselected one before the first open) → the raw value. */
+/* Registry (rows of the open panel or the closed panel's off-document collection) → `getOptionLabel`
+   (a value no row carries, or the server render) → the raw value. */
 function tagLabel(value: string): string | number {
   return ctx.labels[value] ?? ctx.getOptionLabel(value) ?? value;
 }

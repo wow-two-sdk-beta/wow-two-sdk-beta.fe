@@ -59,6 +59,7 @@ import { PopoverContent } from '../../overlays';
 import ListboxPicker from '../listboxPicker/ListboxPicker.vue';
 import ListboxPickerEmpty from '../listboxPicker/ListboxPickerEmpty.vue';
 import SearchInput from '../searchInput/SearchInput.vue';
+import { OptionCollection } from '../OptionCollection';
 import { useSelectContext } from './SelectPickerContext';
 
 const LoaderIcon = Loader2;
@@ -191,4 +192,6 @@ const selectedForListbox = computed(() => ctx.selectedKey ?? undefined);
       <ListboxPickerEmpty v-if="!ctx.isLoading && showEmpty">{{ props.noResultsLabel }}</ListboxPickerEmpty>
     </ListboxPicker>
   </PopoverContent>
+  <!-- The closed panel's options, mounted off-document so the trigger labels the selection before the first open. -->
+  <OptionCollection :is-active="!ctx.open && ctx.needsOptionCollection"><slot /></OptionCollection>
 </template>
