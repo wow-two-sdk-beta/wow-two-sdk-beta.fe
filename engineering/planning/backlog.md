@@ -147,6 +147,9 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to use a link item in menus | feature | Wheelhouse's profile menu navigates with `router.push` on select |
 | Ability to size `BottomSheet` to its content | feature | Wheelhouse's profile sheet uses a fixed 540px |
 | Ability to give `NavItem` a chip variant | feature | Wheelhouse workspace chips use local classes |
+| Fix `StatCard`'s trend row splitting its figure and caption into columns on narrow tiles | fix | Wheelhouse phone stat tiles wrap the caption under the figure with a local class |
+| Ability to size `DeleteConfirm`'s trigger | feature | Wheelhouse added a local `size` prop: `md` in dialog footers, `sm` in rows |
+| Fix `DialogFooter`'s `sm:justify-end` overriding a split footer | fix | Wheelhouse dialogs keep Delete on the left with a local override |
 | Fix `PageHeader` actions not wrapping on narrow screens | fix | `shrink-0` and no `flex-wrap` |
 
 ## Vectors
