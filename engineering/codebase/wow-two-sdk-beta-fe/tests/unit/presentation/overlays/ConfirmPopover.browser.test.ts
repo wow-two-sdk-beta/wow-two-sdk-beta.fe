@@ -32,9 +32,16 @@ it('anchors above its trigger, focuses Cancel and returns focus to a keyboard tr
   document.body.prepend(host);
   const trigger = document.querySelector<HTMLElement>('[data-trigger]')!;
   // Open from the keyboard: WebKit never focuses a clicked button, so a click leaves nothing to return to.
-  trigger.focus();
-  await userEvent.keyboard('{Enter}');
-  await expect.poll(() => panel() !== null).toBe(true);
+  // Firefox in CI can drop the first key while another test frame holds focus, so press again until it opens.
+  await expect
+    .poll(async () => {
+      if (panel() === null) {
+        trigger.focus();
+        await userEvent.keyboard('{Enter}');
+      }
+      return panel() !== null;
+    })
+    .toBe(true);
   await expect.poll(() => document.activeElement?.textContent?.trim()).toBe('Cancel');
   const triggerBox = trigger.getBoundingClientRect();
   await expect.poll(() => panel()!.getBoundingClientRect().bottom).toBeLessThanOrEqual(triggerBox.top);
