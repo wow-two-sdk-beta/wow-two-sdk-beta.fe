@@ -1,6 +1,6 @@
 {
   "name": "@wow-two-beta/fe",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Beta-forever Vue 3 fe sdk for the wow-two ecosystem — components, application adapters and browser capabilities.",
   "license": "MIT",
   "repository": {
