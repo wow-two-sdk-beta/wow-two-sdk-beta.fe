@@ -136,6 +136,8 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to give `SidebarMenuSection` a header action | feature | Wheelhouse's Pinned "Edit" button is absolutely positioned |
 | Fix `AppShellSidebar` nesting a `<nav>` around `SidebarMenu`'s own landmark | fix | Wheelhouse v0.5 sidebar has nested nav landmarks |
 | Ability to use styled `SortableGroupMoveButton` and `SortableGroupHandle` | feature | Wheelhouse `PinEditor` and `WorkspacesPanel` style them locally |
+| Ability to split `SidebarMenuGroup` into a link and a separate toggle | feature | Wheelhouse workspace rows open their page and fold with a chevron (`WorkspaceNavGroup.vue`) |
+| Fix dist chunks pulling unrelated components into a single import | fix | Wheelhouse boot: `Badge`/`Avatar` pull temporal-polyfill and Kanban, layout pulls Masonry, formatters pull bignumber; per-component chunks or side-effect-free output |
 | Fix `PageHeader` actions not wrapping on narrow screens | fix | `shrink-0` and no `flex-wrap` |
 
 ## Vectors
