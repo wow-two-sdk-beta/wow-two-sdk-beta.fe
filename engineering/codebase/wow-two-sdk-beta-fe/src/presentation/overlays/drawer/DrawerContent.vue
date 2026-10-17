@@ -170,7 +170,15 @@ const rest = computed(() => {
 const backdropClasses =
   'motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out) data-[state=closed]:opacity-0';
 
-function handleBackdropClick(): void {
+/**
+ * The outside layer spans the window above the scrim and holds the panel. The panel's modal FocusScope marks every
+ * body branch outside it inert, the scrim beside it included, so a click on the scrim reached nothing; an ancestor of
+ * the panel stays live, so clicks outside the panel land on this layer. Closed, it lets every pointer through.
+ */
+const outsideClasses = computed(() => cn('fixed inset-0 z-modal', !isOpen.value && 'pointer-events-none'));
+
+/** A click on the outside layer itself (`.self`), not on the panel inside it. */
+function handleOutsideClick(): void {
   if (context.dismissOnOutsideClick.value) context.setOpen(false);
 }
 
@@ -192,42 +200,44 @@ function handleEscape(): void {
   <Portal>
     <ScrollLockProvider :is-enabled="isOpen">
       <!-- The scrim runs on `BackdropOverlay`'s own `Presence` (its `isOpen` prop); React
-           mirrored the panel's `data-state` onto it by hand for the same effect. -->
+           mirrored the panel's `data-state` onto it by hand for the same effect. It is inert while the panel is up;
+           the outside layer takes the clicks. -->
       <BackdropOverlay
         v-if="hasBackdrop"
         is-inline
         :is-open="isOpen"
         :is-blurred="props.isBlurred"
         :class="backdropClasses"
-        @click="handleBackdropClick"
       />
-      <Presence :is-present="isOpen">
-        <!--
-          `FocusScope as-child` merges into `DismissableLayer`, whose own root div
-          *is* the dialog panel — React kept the layer div and the panel div
-          separate and forwarded `data-state` down to the inner one. Collapsing
-          them keeps every attribute of React's panel (`role`, `aria-modal`,
-          `aria-labelledby`, `aria-describedby`, `data-state`, `data-side`, the
-          surface classes) on one node, which is also the node `Presence` clones
-          and whose `transition-transform` end defers the unmount.
-        -->
-        <FocusScope as-child is-trapped can-loop is-modal>
-          <DismissableLayer
-            :is-escape-disabled="!dismissOnEscape"
-            is-outside-click-disabled
-            :on-escape="handleEscape"
-            role="dialog"
-            aria-modal="true"
-            :aria-labelledby="context.titleId"
-            :aria-describedby="context.descriptionId"
-            :data-side="side"
-            v-bind="rest"
-            :class="classes"
-          >
-            <slot />
-          </DismissableLayer>
-        </FocusScope>
-      </Presence>
+      <div :class="outsideClasses" data-drawer-outside @click.self="handleOutsideClick">
+        <Presence :is-present="isOpen">
+          <!--
+            `FocusScope as-child` merges into `DismissableLayer`, whose own root div
+            *is* the dialog panel — React kept the layer div and the panel div
+            separate and forwarded `data-state` down to the inner one. Collapsing
+            them keeps every attribute of React's panel (`role`, `aria-modal`,
+            `aria-labelledby`, `aria-describedby`, `data-state`, `data-side`, the
+            surface classes) on one node, which is also the node `Presence` clones
+            and whose `transition-transform` end defers the unmount.
+          -->
+          <FocusScope as-child is-trapped can-loop is-modal>
+            <DismissableLayer
+              :is-escape-disabled="!dismissOnEscape"
+              is-outside-click-disabled
+              :on-escape="handleEscape"
+              role="dialog"
+              aria-modal="true"
+              :aria-labelledby="context.titleId"
+              :aria-describedby="context.descriptionId"
+              :data-side="side"
+              v-bind="rest"
+              :class="classes"
+            >
+              <slot />
+            </DismissableLayer>
+          </FocusScope>
+        </Presence>
+      </div>
     </ScrollLockProvider>
   </Portal>
 </template>

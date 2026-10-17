@@ -19,7 +19,13 @@ Public import: `import { BottomSheet } from '@wow-two-beta/fe/presentation/overl
   from the lowest snap with `dragToDismiss`, closes the sheet.
 - The handle is a named, focusable separator (`BottomSheet.resize`) whose `aria-valuetext` speaks the height as
   `BottomSheet.snapPosition` ("Height {index} of {count}").
-- Regression: `tests/unit/presentation/overlays/SheetsAndHoverCard.dom.test.ts`.
+- A tap outside the panel closes the sheet (`canDismissOnOutsideClick`). The panel's modal FocusScope makes the scrim
+  inert, so the taps land on a transparent full-window layer that holds the panel; closed, the layer lets every
+  pointer through.
+- The handle takes `touch-action: none`, so a finger drag stays with the sheet instead of becoming a page scroll. A
+  release below the lowest snap by more than 60px closes the sheet; a cancelled drag returns to its snap.
+- Regression: `tests/unit/presentation/overlays/SheetsAndHoverCard.dom.test.ts`,
+  `tests/unit/presentation/overlays/SheetDismissal.browser.test.ts` (real touch and outside taps).
 
 ## Props
 

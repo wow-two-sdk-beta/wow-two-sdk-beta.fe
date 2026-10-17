@@ -12,6 +12,12 @@ Public import: `import { DrawerContent } from '@wow-two-beta/fe/presentation/ove
 - Mount within the owner supplying `useDrawerContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Behavior
+
+- A click outside the panel closes the drawer while `canDismissOnOutsideClick` is on. The modal FocusScope makes the
+  scrim inert, so the clicks land on a transparent full-window layer that holds the panel; closed, the layer lets
+  every pointer through. Regression: `tests/unit/presentation/overlays/SheetDismissal.browser.test.ts`.
+
 ## Props
 
 | Prop | Type | Required | Default | Meaning |

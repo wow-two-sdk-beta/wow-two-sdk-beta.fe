@@ -204,10 +204,15 @@ function panelEl(): HTMLElement | null {
 }
 
 function handlePointerDown(event: PointerEvent): void {
+  if (event.button !== 0) return;
   startY = event.clientY;
   const rect = panelEl()?.getBoundingClientRect();
   startHeight = rect ? rect.height : 0;
-  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  try {
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  } catch {
+    /* A synthetic or already-released pointer has nothing to capture; the drag still tracks moves on the handle. */
+  }
 }
 
 function handlePointerMove(event: PointerEvent): void {
@@ -216,10 +221,17 @@ function handlePointerMove(event: PointerEvent): void {
   dragHeight.value = Math.max(0, startHeight - dy);
 }
 
+/** A cancelled drag — the browser took the pointer back — returns to the snap it started from. */
+function handlePointerCancel(): void {
+  startY = null;
+  dragHeight.value = null;
+}
+
 function handlePointerUp(event: PointerEvent): void {
   if (startY === null) return;
   startY = null;
-  (event.currentTarget as HTMLElement).releasePointerCapture?.(event.pointerId);
+  const handleElement = event.currentTarget as HTMLElement;
+  if (handleElement.hasPointerCapture?.(event.pointerId)) handleElement.releasePointerCapture(event.pointerId);
 
   const viewport = typeof window !== 'undefined' ? window.innerHeight : 800;
   const heights = props.snapPoints.map((point) => resolveSnapPx(point, viewport));
@@ -274,7 +286,8 @@ const handleValueText = computed(() =>
   ),
 );
 
-function handleBackdropClick(): void {
+/** A click on the outside layer itself (`.self`), not on the panel inside it. */
+function handleOutsideClick(): void {
   if (dismissesOnOutsideClick.value) controlled.setValue(false);
 }
 
@@ -300,6 +313,13 @@ const panelStyle = computed(() =>
     attrs.style,
   ]),
 );
+
+/**
+ * The outside layer spans the window above the scrim and holds the panel. The panel's modal FocusScope marks every
+ * body branch outside it inert, the scrim beside it included, so a tap on the scrim reached nothing; an ancestor of
+ * the panel stays live, so taps outside the panel land on this layer. Closed, it lets every pointer through.
+ */
+const outsideClasses = computed(() => cn('fixed inset-0 z-modal', !resolvedOpen.value && 'pointer-events-none'));
 
 const classes = computed(() =>
   cn(
@@ -342,52 +362,54 @@ defineExpose({ el });
   <Portal>
     <ScrollLockProvider :is-enabled="resolvedOpen">
       <!-- The scrim runs on `BackdropOverlay`'s own `Presence` (its `open` prop) so the
-           fade-out plays before it unmounts. -->
-      <BackdropOverlay is-inline :is-open="resolvedOpen" @click="handleBackdropClick" />
-      <Presence :is-present="resolvedOpen">
-        <!--
-          `FocusScope as-child` merges into `DismissableLayer`, whose own root div
-          *is* the sheet panel — React kept the layer div and the panel div separate
-          and forwarded `data-state` down to the inner one. Collapsing them keeps
-          every attribute of React's panel on the node `Presence` clones.
-        -->
-        <FocusScope as-child is-trapped can-loop is-modal :on-mount-auto-focus="handleMountAutoFocus">
-          <DismissableLayer
-            ref="panel"
-            :is-escape-disabled="!dismissesOnEscape"
-            is-outside-click-disabled
-            :on-escape="handleEscape"
-            role="dialog"
-            aria-modal="true"
-            :aria-labelledby="titleId"
-            :aria-describedby="descriptionId"
-            :style="panelStyle"
-            v-bind="rest"
-            :class="classes"
-          >
-            <div
-              ref="handle"
-              role="separator"
-              aria-orientation="horizontal"
-              :aria-valuenow="currentSnap"
-              :aria-valuemin="0"
-              :aria-valuemax="props.snapPoints.length - 1"
-              :aria-valuetext="handleValueText"
-              :aria-label="locale.t('BottomSheet.resize', undefined, 'Resize sheet')"
-              tabindex="0"
-              class="flex h-7 cursor-ns-resize items-center justify-center focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-              @pointerdown="handlePointerDown"
-              @pointermove="handlePointerMove"
-              @pointerup="handlePointerUp"
-              @pointercancel="handlePointerUp"
-              @keydown="handleKeyDown"
+           fade-out plays before it unmounts. It is inert while the panel is up; the outside layer takes the taps. -->
+      <BackdropOverlay is-inline :is-open="resolvedOpen" />
+      <div :class="outsideClasses" data-bottom-sheet-outside @click.self="handleOutsideClick">
+        <Presence :is-present="resolvedOpen">
+          <!--
+            `FocusScope as-child` merges into `DismissableLayer`, whose own root div
+            *is* the sheet panel — React kept the layer div and the panel div separate
+            and forwarded `data-state` down to the inner one. Collapsing them keeps
+            every attribute of React's panel on the node `Presence` clones.
+          -->
+          <FocusScope as-child is-trapped can-loop is-modal :on-mount-auto-focus="handleMountAutoFocus">
+            <DismissableLayer
+              ref="panel"
+              :is-escape-disabled="!dismissesOnEscape"
+              is-outside-click-disabled
+              :on-escape="handleEscape"
+              role="dialog"
+              aria-modal="true"
+              :aria-labelledby="titleId"
+              :aria-describedby="descriptionId"
+              :style="panelStyle"
+              v-bind="rest"
+              :class="classes"
             >
-              <span class="h-1 w-10 rounded-full bg-border-strong" aria-hidden="true" />
-            </div>
-            <div class="flex-1 overflow-y-auto px-4 pb-4"><slot /></div>
-          </DismissableLayer>
-        </FocusScope>
-      </Presence>
+              <div
+                ref="handle"
+                role="separator"
+                aria-orientation="horizontal"
+                :aria-valuenow="currentSnap"
+                :aria-valuemin="0"
+                :aria-valuemax="props.snapPoints.length - 1"
+                :aria-valuetext="handleValueText"
+                :aria-label="locale.t('BottomSheet.resize', undefined, 'Resize sheet')"
+                tabindex="0"
+                class="flex h-7 cursor-ns-resize touch-none items-center justify-center focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                @pointerdown="handlePointerDown"
+                @pointermove="handlePointerMove"
+                @pointerup="handlePointerUp"
+                @pointercancel="handlePointerCancel"
+                @keydown="handleKeyDown"
+              >
+                <span class="h-1 w-10 rounded-full bg-border-strong" aria-hidden="true" />
+              </div>
+              <div class="flex-1 overflow-y-auto px-4 pb-4"><slot /></div>
+            </DismissableLayer>
+          </FocusScope>
+        </Presence>
+      </div>
     </ScrollLockProvider>
   </Portal>
 </template>
