@@ -10,6 +10,12 @@ export interface PasswordInputProps extends /* @vue-ignore */ NativeInputAttribu
   /** The visibility-toggle button's presence. Default true. */
   readonly hasToggle?: boolean;
 
+  /** The toggle's name while the password is hidden. Default `"Show password"`, localized. */
+  readonly revealLabel?: string;
+
+  /** The toggle's name while the password is visible. Default `"Hide password"`, localized. */
+  readonly concealLabel?: string;
+
   /** The value, controlled. The `v-model` binding target. */
   readonly modelValue?: string | number;
 
@@ -54,6 +60,7 @@ import { computed, ref, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Eye, EyeOff } from 'lucide-vue-next';
 import { cn } from '../../../foundation/styles';
+import { useLocaleDefaults } from '../../../foundation/i18n';
 import { Icon } from '../../../foundation/icons';
 import { useControlled } from '../../../foundation/state';
 import { useFormControl } from '../../../foundation/primitives';
@@ -64,7 +71,7 @@ import { inputBaseVariants, InputState as InputStateValue } from '../InputStyles
    appends outside it and loses tailwind-merge conflict resolution. */
 defineOptions({ name: 'PasswordInput', inheritAttrs: false });
 
-const props = withDefaults(defineProps<PasswordInputProps>(), {
+const componentProps = withDefaults(defineProps<PasswordInputProps>(), {
   hasToggle: true,
   autocomplete: undefined,
   autoComplete: undefined,
@@ -77,6 +84,11 @@ const props = withDefaults(defineProps<PasswordInputProps>(), {
   readOnly: undefined,
   isReadOnly: undefined,
   readonly: undefined,
+});
+
+const props = useLocaleDefaults(componentProps, 'PasswordInput', {
+  revealLabel: 'Show password',
+  concealLabel: 'Hide password',
 });
 
 const emit = defineEmits<{
@@ -111,7 +123,7 @@ function toggle(): void {
 }
 
 const inputType = computed(() => (visible.value ? 'text' : 'password'));
-const toggleLabel = computed(() => (visible.value ? 'Hide password' : 'Show password'));
+const toggleLabel = computed(() => (visible.value ? props.concealLabel : props.revealLabel));
 const toggleIcon = computed(() => (visible.value ? EyeOff : Eye));
 
 const autocompleteValue = computed(() => props.autocomplete ?? props.autoComplete ?? 'current-password');

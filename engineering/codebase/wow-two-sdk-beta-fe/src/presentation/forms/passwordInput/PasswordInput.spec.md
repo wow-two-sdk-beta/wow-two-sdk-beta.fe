@@ -11,6 +11,8 @@ Public import: `import { PasswordInput } from '@wow-two-beta/fe/presentation/for
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - Native form reset requests the original seed through the state owner and restores the resulting DOM representation; a cancelled reset changes nothing.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
+- The toggle is a pressed-state button named by `revealLabel` while hidden and `concealLabel` while visible; omitted
+  names resolve through the nearest `LocaleProvider`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
@@ -20,6 +22,8 @@ Public import: `import { PasswordInput } from '@wow-two-beta/fe/presentation/for
 | `size`         | `InputSize`        | no       | —           | The control size.                                                                             |
 | `state`        | `InputState`       | no       | —           | The validity surface.                                                                         |
 | `hasToggle`    | `boolean`          | no       | `true`      | The visibility-toggle button's presence. Default true.                                        |
+| `revealLabel` | `string` | no | locale `Show password` | The toggle's name while the password is hidden; key `PasswordInput.revealLabel`. |
+| `concealLabel` | `string` | no | locale `Hide password` | The toggle's name while the password is visible; key `PasswordInput.concealLabel`. |
 | `modelValue`   | `string \| number` | no       | —           | The value, controlled. The `v-model` binding target.                                          |
 | `defaultValue` | `string \| number` | no       | —           | The initial value when uncontrolled.                                                          |
 | `autocomplete` | `string`           | no       | `undefined` | The autofill hint. Defaults to `current-password`.                                            |
@@ -50,6 +54,7 @@ None declared.
 ## Verification
 
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
+- Focused test references: [LocalizedNames.dom.test.ts](../../../../tests/unit/presentation/forms/LocalizedNames.dom.test.ts). Consult the named test assertions for the behavior actually covered.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
 
 Native input attributes and event listeners (including `name`, `form`, `autocomplete`, `onBlur`, `onInput` and keyboard/composition/clipboard events) are represented in the public props type. They remain fallthrough attrs at runtime. Canonical model value, visual size, fixed native type and declared Temporal bounds retain component ownership. Autocomplete accepts its native extensible token string.

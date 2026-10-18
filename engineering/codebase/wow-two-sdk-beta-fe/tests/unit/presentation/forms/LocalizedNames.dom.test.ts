@@ -3,7 +3,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { defineComponent, h, type Component } from 'vue';
 import { Star } from 'lucide-vue-next';
 import { LocaleProvider } from '@src/foundation/i18n';
-import { IconPicker, JsonEditor, KnobInput } from '@src/presentation/forms';
+import { IconPicker, JsonEditor, KnobInput, PasswordInput } from '@src/presentation/forms';
 
 const wrappers: VueWrapper[] = [];
 afterEach(() => {
@@ -31,6 +31,31 @@ describe('localized fallback names', () => {
     expect(plain.get('[role=group]').attributes('aria-label')).toBe('Icons');
     const german = localized({ 'IconPicker.icons': 'Symbole' }, () => h(IconPicker as Component, { icons }));
     expect(german.get('[role=group]').attributes('aria-label')).toBe('Symbole');
+  });
+
+  it('names the password visibility toggle from the locale, with props winning', async () => {
+    const plain = localized({}, () => h(PasswordInput as Component));
+    const toggle = plain.get('button');
+    expect(toggle.attributes('aria-label')).toBe('Show password');
+    expect(toggle.attributes('aria-pressed')).toBe('false');
+    await toggle.trigger('click');
+    expect(toggle.attributes('aria-label')).toBe('Hide password');
+    expect(plain.get('input').attributes('type')).toBe('text');
+
+    const uzbek = localized(
+      { 'PasswordInput.revealLabel': 'Parolni ko‘rsatish', 'PasswordInput.concealLabel': 'Parolni yashirish' },
+      () => h(PasswordInput as Component),
+    );
+    expect(uzbek.get('button').attributes('aria-label')).toBe('Parolni ko‘rsatish');
+    await uzbek.get('button').trigger('click');
+    expect(uzbek.get('button').attributes('aria-label')).toBe('Parolni yashirish');
+
+    const russian = localized({ 'PasswordInput.revealLabel': 'Parolni ko‘rsatish' }, () =>
+      h(PasswordInput as Component, { revealLabel: 'Показать пароль', concealLabel: 'Скрыть пароль' }),
+    );
+    expect(russian.get('button').attributes('aria-label')).toBe('Показать пароль');
+    await russian.get('button').trigger('click');
+    expect(russian.get('button').attributes('aria-label')).toBe('Скрыть пароль');
   });
 
   it('names JSON tree toggles from the locale', () => {
