@@ -149,6 +149,12 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Fix `StatCard`'s trend row splitting its figure and caption into columns on narrow tiles | fix | Wheelhouse phone stat tiles wrap the caption under the figure with a local class |
 | Ability to size `DeleteConfirm`'s trigger | feature | Wheelhouse added a local `size` prop: `md` in dialog footers, `sm` in rows |
 | Fix `DialogFooter`'s `sm:justify-end` overriding a split footer | fix | Wheelhouse dialogs keep Delete on the left with a local override |
+| Ability to show an info button with a stepped first-run intro | feature | Wheelhouse local `InfoPopover` + `createIntroMemory` (popover on desktop, sheet on phones, target ring); convention `domains/guidance/guidance.md` |
+| Ability to put rich content in `TourPopover` steps | feature | Steps are plain text, so Wheelhouse's intro can't show swatches |
+| Ability to turn off `PopoverContent`'s auto-focus on open | feature | Wheelhouse intros keep focus on the page |
+| Ability to hide `DataTable`'s select-all and share column widths across grouped tables | feature | Wheelhouse catalog groups |
+| Ability to draw several series in `Sparkline` | feature | Wheelhouse product cards stack dev and prod weekly bars locally (`WeeklyBars`) |
+| Fix `RadioGroup`/`RadioInput` not showing the selected option inside a bottom sheet | fix | Wheelhouse phone sort sheet uses local `ChoiceChips` |
 | Fix `PageHeader` actions not wrapping on narrow screens | fix | `shrink-0` and no `flex-wrap` |
 
 ## Vectors
