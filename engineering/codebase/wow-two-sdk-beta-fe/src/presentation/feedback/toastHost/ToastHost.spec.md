@@ -20,6 +20,8 @@ Component-only import: `@wow-two-beta/fe/presentation/feedback/toast-host` with 
 - `showProgress` (host) and `progress` (toast) are deprecated aliases: `true` resolves to `bar`, a toast's `false` to `none`. A set `timer` wins over either.
 - A non-neutral toast without an `icon` shows its severity glyph; `showSeverityIcon` switches that off for the host, and a toast's own `showSeverityIcon` overrides the host.
 - A toast carrying `report` (a captured incident's `send` from `/reporting`) renders a `ReportAction` after its `action`. Clicking it focuses the button, which pauses the stack while the report is in flight.
+- The stack is a `region` landmark named by the localized `ToastHost.notifications` (`'Notifications'`), present
+  while any toast shows.
 - Every countdown display is `aria-hidden`; the polite announcement region carries the latest toast's title.
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.

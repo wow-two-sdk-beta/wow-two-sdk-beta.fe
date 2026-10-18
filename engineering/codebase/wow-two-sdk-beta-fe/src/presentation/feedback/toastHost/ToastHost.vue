@@ -641,6 +641,7 @@ const stackStyle = computed(() => ({ gap: `${props.gap}px` }));
   <Portal>
     <div
       v-if="rendered.length > 0"
+      role="region"
       :aria-label="locale.t('ToastHost.notifications', undefined, 'Notifications')"
       :style="stackStyle"
       :class="stackClasses"
