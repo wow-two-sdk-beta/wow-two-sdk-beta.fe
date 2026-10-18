@@ -1,11 +1,60 @@
-# Vue convention-sweep migration
+# @wow-two-beta/fe migration
 
-*Last updated: 2026-09-26*
+*Last updated: 2026-10-18*
 
-This records the published `0.0.6` and `0.0.7` migrations and the unreleased gap-close batch below.
-React is parked and has a different public API; importing the Vue package is not a symbol-for-symbol package swap.
+Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
+`0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
+importing the Vue package is not a symbol-for-symbol package swap.
 
-## Unreleased gap-close batch
+## 0.0.23 — app switcher, toast landmark, password labels
+
+Additive; no import moves and no renamed props.
+
+| Area | Change |
+|---|---|
+| `presentation/nav` | `AppSwitcherMenu` + `AppSwitcherKind` + `AppSwitcherItem`: one trigger naming the current app; a popover from `md`, a full-screen dialog below it; app tiles, new-tab sites, HTTPS-only hrefs. [Spec](src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.spec.md) |
+| `ToastHost` | The stack is a `role="region"` landmark named `ToastHost.notifications`. Drop any local patch that added the role. |
+| `PasswordInput` | `revealLabel` / `concealLabel` name the visibility toggle; omitted, they resolve `PasswordInput.revealLabel` (`Show password`) and `PasswordInput.concealLabel` (`Hide password`) through `LocaleProvider`. |
+
+New message keys: `AppSwitcherMenu.title` (`Apps`), `.sitesLabel` (`Sites`), `.closeLabel` (`Close`),
+`.newTabLabel` (`(opens in a new tab)`), `.triggerLabel` (`{app} — switch app`) and the two `PasswordInput` keys.
+
+```vue
+<AppSwitcherMenu :items="apps" current="desk" subtitle="Ocharo" @select="track">
+  <template #mark><span class="brand-mark" aria-hidden="true">O</span></template>
+</AppSwitcherMenu>
+```
+
+## 0.0.18 — renamed to `@wow-two-beta/fe`
+
+- Install `@wow-two-beta/fe` and remove `@wow-two-beta/ui-vue`; npm marks the old name deprecated at `0.0.17`.
+- Replace the `@wow-two-beta/ui-vue` specifier prefix with `@wow-two-beta/fe` in every import, stylesheet and
+  Tailwind `@source` path; every subpath (`/presentation/nav`, `/styles.css`, `/themes.css`, …) stays the same.
+- The rename changes no API. `0.0.18` was published by hand; CI releases from `0.0.19` under `fe-v*` tags.
+- The source moved to `engineering/codebase/wow-two-sdk-beta-fe/` in the `wow-two-sdk-beta.fe` repository.
+
+## 0.0.8 – 0.0.22 releases
+
+Each release is additive unless its row says otherwise; the gap-close batch below details `0.0.8` – `0.0.11`.
+
+| Version | Consumer-facing change |
+|---|---|
+| `0.0.22` | Closed `SelectPicker` triggers carry their label before the first open. |
+| `0.0.21` | The `ocharo` theme takes the approved palette and backdrop. |
+| `0.0.20` | `BottomSheet` and `Drawer` close on outside taps and drags. |
+| `0.0.19` | First CI release as `@wow-two-beta/fe`; no API change. |
+| `0.0.17` | List-detail refocuses the last activated item; `Navbar` renders as a plain row inside `AppShellHeader`; the shell content column floors at zero; tooltip trigger refs keep their owner. |
+| `0.0.16` | The shared `platform` theme. |
+| `0.0.15` | `DataRegion` draws component-shaped skeletons on load; failures settle into neutral copy with opt-in retry. |
+| `0.0.14` | `ModalContent` `phoneLayout` (`fullscreen` default · `sheet` · `card`); `ListDetailLayout`; `DataTable` stacks rows into labelled cards on phones by default. |
+| `0.0.13` | `ModalContent` `size`; retained notifications with toasts anchored top-right; `PageHeader`, `RelativeTime`, `useFormDialogSession`; `useAppQuery` first-load, refreshing and keep-previous states; `AppShell` header heights, glass and gutters; raised menus and popovers; `SelectPicker` `width` / `isFullWidth`; the pre-paint colour-mode script. |
+| `0.0.12` | Reusable image-editing and text controls (`domain/imageEditing`). |
+| `0.0.11` | Boolean props renamed to `is` / `has` / `can` / `show` (table below). |
+| `0.0.10` | Drydock references renamed to Wheelhouse; no API change. |
+| `0.0.9` | `SplashScreen` for first loads. |
+| `0.0.8` | The gap-close components, toast timers, shell scrolling, density, skeletons and the glass themes below. |
+
+## 0.0.8 – 0.0.11 gap-close batch
 
 Additive components from the [gap analysis](../../architecture/analysis/vue-sdk-gap-analysis.md); no import moves.
 
@@ -26,8 +75,8 @@ Additive components from the [gap analysis](../../architecture/analysis/vue-sdk-
 | Toasts | `ToastHost` `timer` + toast `timer` (`ToastTimer`: `none` · `bar` · `ring` · `seconds`); `durations` per severity (`DefaultToastDurations`); severity glyphs (`showSeverityIcon`, `SeverityIcons` in `foundation/icons`); toast `report` → `ReportAction`; `Toast` `trailing` slot |
 | Reporting | `/reporting` — `createReporter` (trail, `wrapFetch`, `trackRouter`, `trackNotices`, `captureClicks`, `captureErrors`, `capture(error).send`), `IncidentReport` schema 1, `httpReportSink` · `memoryReportSink` · `consoleReportSink`; `feedbackQueryErrors(bus, { reporter })`; `FeedbackNotice.report`; `ApiFailure.request`; `redactUrl` (`foundation/logger`) |
 
-Boolean props renamed to the `is` / `has` / `can` / `show` vocabulary. The old names still work this release
-and are removed in the next; the new name wins when both are set.
+Boolean props renamed to the `is` / `has` / `can` / `show` vocabulary in `0.0.11`. The old names remain deprecated
+aliases, still accepted in `0.0.23`; the new name wins when both are set.
 
 | Component | Old → new |
 |---|---|
@@ -63,8 +112,8 @@ Behavioral changes to existing parts:
   Pass `durations` to set the table; it replaces the default rather than merging.
 - Non-neutral toasts show a severity glyph when given no `icon`; pass `showSeverityIcon: false` to the host or a
   toast for the previous bare card.
-- `showProgress` (host) and `progress` (toast) are deprecated for `timer`; they still resolve to the bar this
-  release and are removed in the next.
+- `showProgress` (host) and `progress` (toast) are deprecated for `timer`; they still resolve to the bar in
+  `0.0.23`.
 - A toast updated in place (`update`, a settled `promise`, a dedup `key`) now renders a description, action or
   icon it gained; the card used to keep the slots it first rendered with.
 - A failed `createApiClient` request carries `request` (`method` + URL without its query) on its `ApiFailure`.
@@ -79,13 +128,13 @@ Behavioral changes to existing parts:
   layer no longer grows past the window.
 
 - Form state flags follow the props convention (`isDisabled`, `isReadOnly`, `isRequired`) on the 30 inputs that
-  owned `disabled` / `readonly` / `readOnly` / `required`. The old names still work this release and are removed in
-  the next; the `is*` name wins when both are set, and both fall back to the surrounding `Field`.
+  owned `disabled` / `readonly` / `readOnly` / `required`. The old names remain deprecated aliases, still accepted in
+  `0.0.23`; the `is*` name wins when both are set, and both fall back to the surrounding `Field`.
 - `DateRangePicker` opened over a saved complete range no longer closes the moment it opens; it closes when a
   pick completes a new range.
 - The date family (`DatePicker`, `DateRangePicker`, `CalendarPicker`, `RangeCalendarPicker`) moves its per-day
   predicate to `isDateDisabled`; `isDisabled` is now the boolean. A function passed as `isDisabled` still works as
-  the predicate this release.
+  the predicate in `0.0.23`.
 
 - A mouse moving over a menu row now focuses it, so pointer and keyboard share one highlight; leaving a row
   returns focus to the menu surface. Touch and pen only activate.

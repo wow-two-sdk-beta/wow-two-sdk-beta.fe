@@ -1,6 +1,7 @@
 # Vue component message catalogue
 
-*Source snapshot: 2026-09-25 full SDK sweep; gap-close keys added 2026-09-26 and 2026-09-28.*
+*Source snapshot: 2026-09-25 full SDK sweep; gap-close keys added 2026-09-26 and 2026-09-28; app switcher and
+password toggle keys added 2026-10-18.*
 
 Static component keys and English fallbacks extracted from source. Supply overrides through
 `LocaleProvider.messages`. Placeholders retain their names; complete messages can reorder them.
@@ -19,6 +20,11 @@ in their capability specifications and are not inferred by this catalogue.
 | `AgendaView.noUpcomingEvents` | No upcoming events. | [AgendaView.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/eventCalendarViewer/AgendaView.vue) |
 | `Alert.closeLabel` | Dismiss | [Alert.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/feedback/alert/Alert.vue) |
 | `AppShell.skipToContent` | Skip to content | [AppShell.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/layout/appShell/AppShell.vue) |
+| `AppSwitcherMenu.closeLabel` | Close | [AppSwitcherMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.vue) |
+| `AppSwitcherMenu.newTabLabel` | (opens in a new tab) | [AppSwitcherMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.vue) |
+| `AppSwitcherMenu.sitesLabel` | Sites | [AppSwitcherMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.vue) |
+| `AppSwitcherMenu.title` | Apps | [AppSwitcherMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.vue) |
+| `AppSwitcherMenu.triggerLabel` | {app} — switch app | [AppSwitcherMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.vue) |
 | `AudioPlayer.audioPlayer` | Audio player | [AudioPlayer.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/audioPlayer/AudioPlayer.vue) |
 | `AudioPlayer.playbackSpeed` | Playback speed | [AudioPlayer.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/audioPlayer/AudioPlayer.vue) |
 | `AudioPlayer.seek` | Seek | [AudioPlayer.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/audioPlayer/AudioPlayer.vue) |
@@ -160,6 +166,8 @@ in their capability specifications and are not inferred by this catalogue.
 | `Pagination.nextPage` | Next page | [Pagination.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/pagination/Pagination.vue) |
 | `Pagination.pagination` | Pagination | [Pagination.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/pagination/Pagination.vue) |
 | `Pagination.previousPage` | Previous page | [Pagination.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/pagination/Pagination.vue) |
+| `PasswordInput.concealLabel` | Hide password | [PasswordInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/passwordInput/PasswordInput.vue) |
+| `PasswordInput.revealLabel` | Show password | [PasswordInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/passwordInput/PasswordInput.vue) |
 | `PdfViewer.downloadPDF` | Download PDF | [PdfViewer.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/pdfViewer/PdfViewer.vue) |
 | `PdfViewer.nextPage` | Next page | [PdfViewer.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/pdfViewer/PdfViewer.vue) |
 | `PdfViewer.pageNumber` | Page {page} | [PdfViewer.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/pdfViewer/PdfViewer.vue) |
