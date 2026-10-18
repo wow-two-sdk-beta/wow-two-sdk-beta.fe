@@ -38,6 +38,8 @@ import {
   SidebarMenuItem,
   SidebarMenuGroup,
   SidebarMenuSection,
+  AppSwitcherMenu,
+  AppSwitcherKind,
 } from '../../../../../src/presentation/nav';
 import { h, type VNode } from 'vue';
 import { smokeCase, type SmokeCase } from './Example';
@@ -163,4 +165,33 @@ export const navExamples: readonly SmokeCase[] = [
   smokeCase('TableOfContents', TableOfContents, {}),
 
   smokeCase('LinkItem', LinkItem, {}, { slot: true }),
+
+  smokeCase('AppSwitcherMenu', AppSwitcherMenu, {
+    current: 'desk',
+    subtitle: 'Northwind',
+    items: [
+      {
+        key: 'desk',
+        label: 'Desk',
+        description: 'Events and orders',
+        href: 'https://desk.example.com/',
+        kind: AppSwitcherKind.App,
+      },
+      {
+        key: 'catalogue',
+        label: 'Catalogue',
+        description: 'Products and prices',
+        href: 'https://catalogue.example.com/',
+        kind: AppSwitcherKind.App,
+      },
+      {
+        key: 'studio',
+        label: 'Studio',
+        description: 'Garments and fabric',
+        href: 'https://studio.example.com/',
+        kind: AppSwitcherKind.App,
+      },
+      { key: 'blog', label: 'Blog', href: 'https://blog.example.com/', kind: AppSwitcherKind.Site },
+    ],
+  }),
 ];

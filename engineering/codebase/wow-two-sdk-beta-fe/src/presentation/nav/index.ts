@@ -11,3 +11,4 @@ export * from './tableOfContents';
 export * from './linkItem';
 export * from './bottomNavMenu';
 export * from './sidebarMenu';
+export * from './appSwitcherMenu';
