@@ -4,8 +4,11 @@ import {
   type ClipboardCopyOptions,
   type ClipboardWriteResult,
 } from './ClipboardResult';
-import { clipboardMethod } from './ClipboardSupport';
+import { canCopy, clipboardMethod } from './ClipboardSupport';
 import { withLegacyFallback } from './LegacyCopy';
+
+/** The write outcome when the engine has no Clipboard API to try. */
+const UnsupportedWrite: ClipboardWriteResult = { ok: false, failure: { status: 'unsupported' } };
 
 /** Runs the Clipboard API write, mapping every outcome onto the result union. Never throws. */
 async function writeTextThroughApi(text: string): Promise<ClipboardWriteResult> {
@@ -43,7 +46,10 @@ export async function copyText(text: string, options?: ClipboardCopyOptions): Pr
       );
     }
 
-    const result = withLegacyFallback(await writeTextThroughApi(text), text, options);
+    // With no Clipboard API there is nothing to await: the legacy copy runs in the same tick as the click, which
+    // is the only window older Safari and a non-secure context grant it.
+    const modern = canCopy() ? await writeTextThroughApi(text) : UnsupportedWrite;
+    const result = withLegacyFallback(modern, text, options);
     return reportClipboardOutcome(result, options?.onError);
   } catch (error) {
     // Unreachable by design — every helper above is itself total. Kept so a future edit to one of them cannot

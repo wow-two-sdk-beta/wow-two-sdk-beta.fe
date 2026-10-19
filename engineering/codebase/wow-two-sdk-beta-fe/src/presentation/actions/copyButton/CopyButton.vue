@@ -25,6 +25,9 @@ export interface CopyButtonProps extends /* @vue-ignore */ CopyButtonAttributes 
   /** The accessible name to announce while `copied` is true. Falls back to `aria-label` when omitted. */
   readonly copiedAriaLabel?: string;
 
+  /** The accessible name to announce while the last copy has failed. Falls back to `aria-label` when omitted. */
+  readonly failedAriaLabel?: string;
+
   /** The visual surface style. Default `ghost`. */
   readonly variant?: ButtonVariant;
 }
@@ -32,7 +35,7 @@ export interface CopyButtonProps extends /* @vue-ignore */ CopyButtonAttributes 
 
 <script setup lang="ts">
 import { computed, useAttrs, watch } from 'vue';
-import { Check, Copy } from 'lucide-vue-next';
+import { Check, Copy, X } from 'lucide-vue-next';
 
 import { Icon } from '../../../foundation/icons';
 import { useClipboard } from '../../../foundation/clipboard';
@@ -50,12 +53,12 @@ const props = withDefaults(defineProps<CopyButtonProps>(), {
 });
 
 const emit = defineEmits<{
-  /** Fires when `navigator.clipboard.writeText` rejects, once per error transition. */
+  /** Fires when the copy fails — the Clipboard API and the legacy fallback both refused — once per failure. */
   error: [error: Error];
 }>();
 
 const slots = defineSlots<{
-  /** The content — receives `{ copied, error }` for a state-driven swap. Icon-only Copy/Check when omitted. */
+  /** The content — receives `{ copied, error }` for a state-driven swap. Icon-only Copy/Check/X when omitted. */
   default?: (props: { copied: boolean; error: Error | null }) => unknown;
 }>();
 
@@ -71,23 +74,24 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributeLookup.has(key))),
 );
 
-/** The accessible name for the current state — `copiedAriaLabel` while copied, `aria-label` otherwise. */
+/** The accessible name for the current state — `copiedAriaLabel` while copied, `failedAriaLabel` after a failure. */
 const effectiveAriaLabel = computed(() => {
   const label = attrs[AriaAttribute.Label] as string | undefined;
-  return copied.value ? (props.copiedAriaLabel ?? label) : label;
+  if (copied.value) return props.copiedAriaLabel ?? label;
+  return error.value ? (props.failedAriaLabel ?? label) : label;
 });
 
-/** The state icon shown when the consumer supplies no content. */
-const fallbackIcon = computed(() => (copied.value ? Check : Copy));
+/** The state icon shown when the consumer supplies no content: Check once copied, X once the copy failed. */
+const fallbackIcon = computed(() => (copied.value ? Check : error.value ? X : Copy));
 
 /** Emits `error` on each transition into a failed copy. */
 watch(error, (next) => {
   if (next) emit(DomEvent.Error, next);
 });
 
-/** Copies the current text, discarding the settled promise. */
-function handleClick(): void {
-  void copy(props.text);
+/** Copies the current text from the clicked button, discarding the settled promise. */
+function handleClick(event: MouseEvent): void {
+  void copy(props.text, event.target instanceof Element ? event.target : null);
 }
 </script>
 
@@ -96,6 +100,8 @@ function handleClick(): void {
     :variant="variant"
     :aria-label="effectiveAriaLabel"
     :data-copied="OptionalExtensions.from(copied, AttributeValue.True)"
+    :data-error="OptionalExtensions.from(error !== null, AttributeValue.True)"
+    :class="error ? 'text-destructive-soft-foreground' : undefined"
     v-bind="passthroughAttrs"
     @click="handleClick"
   >

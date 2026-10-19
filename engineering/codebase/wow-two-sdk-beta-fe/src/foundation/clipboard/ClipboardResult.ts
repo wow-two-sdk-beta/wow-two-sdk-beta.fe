@@ -43,6 +43,14 @@ export interface ClipboardCopyOptions extends ClipboardReadOptions {
    * `LegacyCopy.ts` for the deprecation caveats and for exactly when the retry runs.
    */
   readonly legacyFallback?: boolean;
+
+  /**
+   * The element the copy was triggered from, usually the clicked button. The legacy path mounts its temporary
+   * textarea inside this element's open dialog, so a modal's focus trap cannot steal the selection. Needed
+   * because Safari does not focus a clicked button, leaving `document.activeElement` on the body. Defaults to the
+   * focused element.
+   */
+  readonly anchor?: Element | null;
 }
 
 /** The shape every result family shares, so one reporter can serve every entry point. */
