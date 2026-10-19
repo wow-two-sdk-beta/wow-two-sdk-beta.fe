@@ -33,18 +33,18 @@ jobs:
         working-directory: engineering/codebase/wow-two-front-beta-sdk
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           # version inferred from packageManager field in the nested package.json
           package_json_file: engineering/codebase/wow-two-front-beta-sdk/package.json
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -175,7 +175,7 @@ jobs:
           cp -r apps/theme-studio/dist storybook-static/theme-studio
 
       - name: Upload Storybook artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: engineering/codebase/wow-two-front-beta-sdk/storybook-static
 
@@ -189,4 +189,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
