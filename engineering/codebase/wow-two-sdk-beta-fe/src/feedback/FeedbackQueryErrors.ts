@@ -29,9 +29,10 @@ export function toErrorNotice(error: AppError): FeedbackNotice {
 }
 
 /**
- * Creates the explicit query failure-to-notice adapter; cancellation stays quiet. With a `reporter`, a
- * reportable failure is captured the moment it happens — freezing the trail and the request behind it — and
- * the notice carries the incident's send, so the user reports it with one click.
+ * Creates the explicit query failure-to-notice adapter. Cancellation and 401 stay quiet: an unauthorized
+ * request belongs to the session-expiry path (`bridge.subscribeExpired`), never an error toast. With a
+ * `reporter`, a reportable failure is captured the moment it happens — freezing the trail and the request
+ * behind it — and the notice carries the incident's send, so the user reports it with one click.
  */
 export function feedbackQueryErrors(
   bus: FeedbackBus = feedbackBus,
@@ -40,7 +41,7 @@ export function feedbackQueryErrors(
   const { reporter } = options;
   const isReportable = options.isReportable ?? ((error: AppError) => DefaultReportableErrorTypes.includes(error.type));
   return (error) => {
-    if (error.type === AppErrorType.Cancelled) return;
+    if (error.type === AppErrorType.Cancelled || error.type === AppErrorType.Unauthorized) return;
     const notice = toErrorNotice(error);
     bus.notify(reporter && isReportable(error) ? { ...notice, report: reporter.capture(error).send } : notice);
   };

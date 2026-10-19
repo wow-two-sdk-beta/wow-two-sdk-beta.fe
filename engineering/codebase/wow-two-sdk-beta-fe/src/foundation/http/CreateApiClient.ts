@@ -40,6 +40,7 @@ export interface ApiClientOptions {
   readonly baseUrl?: string;
   readonly getAuthToken?: () => string | null | Promise<string | null>;
   readonly credentials?: RequestCredentials;
+  /** Receives a current-session 401; when it invalidates `scope`, this request resolves cancelled. */
   readonly onUnauthorized?: (failure: ApiFailure, origin?: RequestSnapshot) => void;
   /** Explicit session lifetime; captures once before credentials, retries and response decoding. */
   readonly scope?: RequestScope;
@@ -351,7 +352,12 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
           previousDelayMs = delayMs;
           continue;
         }
-        if (failure.status === 401 && (!origin || origin.isCurrent())) options.onUnauthorized?.(failure, origin);
+        if (failure.status === 401 && (!origin || origin.isCurrent())) {
+          options.onUnauthorized?.(failure, origin);
+          // A 401 that ended its own session resolves cancelled, like every other request of that session.
+          const ended = interruption(init.signal);
+          if (ended) return ResultExtensions.fail(ended);
+        }
         return result;
       }
     } finally {

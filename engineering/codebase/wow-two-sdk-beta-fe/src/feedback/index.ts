@@ -36,3 +36,6 @@ export {
   DefaultReportableErrorTypes,
   type FeedbackQueryErrorsOptions,
 } from './FeedbackQueryErrors';
+
+// Session expiry — one neutral notice for `bridge.subscribeExpired`; a 401 never becomes an error toast
+export { feedbackSessionExpiry, SessionExpiredNotice } from './FeedbackSessionExpiry';

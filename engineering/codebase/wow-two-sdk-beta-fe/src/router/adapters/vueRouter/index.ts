@@ -66,7 +66,14 @@ export type { PathBuilder, PathBuilderArgs, PathParamName, PathParams } from '..
 export { useTypedSearchParams, type TypedSearchParams } from './hooks/UseTypedSearchParams';
 
 // Guards + returnTo
-export { requireAuth, buildReturnTo, resolveReturnTo, useReturnTo, type ReturnToSource } from './Guards';
+export {
+  requireAuth,
+  buildReturnTo,
+  resolveReturnTo,
+  useReturnTo,
+  signInRedirect,
+  type ReturnToSource,
+} from './Guards';
 
 // Nav helpers
 export { default as AppLink, type AppLinkProps } from './appLink/AppLink.vue';

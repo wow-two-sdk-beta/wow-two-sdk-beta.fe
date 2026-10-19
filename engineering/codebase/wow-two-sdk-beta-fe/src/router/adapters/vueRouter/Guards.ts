@@ -1,7 +1,7 @@
 // returnTo round-trip — capture the page a user wanted before being bounced to login,
 // then restore them there after auth.
 import { computed, toValue, type ComputedRef, type MaybeRefOrGetter } from 'vue';
-import { useRoute, type LocationQuery } from 'vue-router';
+import { useRoute, type LocationQuery, type Router } from 'vue-router';
 
 import type { GuardContext, GuardDecision, RouteGuard } from './RouteConfig';
 
@@ -34,6 +34,19 @@ export function requireAuth(isAuthenticated: () => boolean | Promise<boolean>, l
  */
 export function buildReturnTo(loginPath: string, from: string): string {
   return `${loginPath}?returnTo=${encodeURIComponent(toPathAndSearch(from))}`;
+}
+
+/**
+ * Creates a `bridge.subscribeExpired` listener that replaces the current route with `{loginPath}?returnTo=…`.
+ * Reads the router's own location, so a base path and memory history stay correct; restore with `useReturnTo`.
+ */
+export function signInRedirect(router: Pick<Router, 'currentRoute' | 'replace'>, loginPath = '/login'): () => void {
+  return () => {
+    const from = router.currentRoute.value;
+    if (from.path === loginPath) return;
+    // The router reports a navigation error through `onError`; the caller is an expiry, not a navigation.
+    router.replace(buildReturnTo(loginPath, from.fullPath)).catch(() => undefined);
+  };
 }
 
 /** Resolves the safe same-origin return path from a `returnTo` param, rejecting open-redirect targets → `fallback`. */

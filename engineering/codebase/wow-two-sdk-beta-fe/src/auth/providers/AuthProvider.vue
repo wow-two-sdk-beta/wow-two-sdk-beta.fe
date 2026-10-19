@@ -23,7 +23,7 @@ export interface AuthProviderProps<TUser = unknown, TSignInInput = unknown> {
   /** @deprecated Use `canResolveOnMount`; this alias is removed next release. */
   readonly resolveOnMount?: boolean;
 
-  /** Fires after a bridged 401 flips the session to `anonymous` — wire redirect-to-login here. */
+  /** Fires after a bridged 401 flips the session to `anonymous`; route an expiry through `bridge.subscribeExpired`. */
   readonly onUnauthorized?: (error?: unknown) => void;
 
   /** Fires when the me-resolve returns an expected failure — the session still settles `anonymous`. */

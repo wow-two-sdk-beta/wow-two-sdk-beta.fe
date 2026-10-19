@@ -1,23 +1,35 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
 
-## 0.0.23 — app switcher, toast landmark, password labels
+## 0.0.23 — app switcher, toast landmark, password labels, session expiry
 
-Additive; no import moves and no renamed props.
+No import moves and no renamed props. The session-expiry rows change behavior; wire them as shown below.
 
 | Area | Change |
 |---|---|
+| `auth` | Session expiry: a signed-in session's first current 401, or `bridge.expire(reason)`, expires it once — anonymous, `scope` invalidated, then `bridge.subscribeExpired(({ returnUrl, error }) => …)`. Later 401s while signed out are swallowed. A bare bridge (no `AuthProvider`) now settles itself anonymous on that 401. `createAuthBridge({ getReturnUrl })` overrides the browser location. |
+| `foundation/http` | The 401 whose `onUnauthorized` ended its session resolves `cancelled`, like every other request of that session. |
+| `feedback` | `feedbackQueryErrors` never toasts a 401. `feedbackSessionExpiry(bus?, notice?)` publishes one neutral `SessionExpiredNotice` (`Signed out — sign in again`, id `session-expired`). |
+| `router` | `signInRedirect(router, loginPath = '/login')` replaces the route with `{loginPath}?returnTo=…` from the router's own location; restore with `useReturnTo()`. |
 | `presentation/nav` | `AppSwitcherMenu` + `AppSwitcherKind` + `AppSwitcherItem`: one trigger naming the current app; a popover from `md`, a full-screen dialog below it; app tiles, new-tab sites, HTTPS-only hrefs. [Spec](src/presentation/nav/appSwitcherMenu/AppSwitcherMenu.spec.md) |
 | `ToastHost` | The stack is a `role="region"` landmark named `ToastHost.notifications`. Drop any local patch that added the role. |
 | `PasswordInput` | `revealLabel` / `concealLabel` name the visibility toggle; omitted, they resolve `PasswordInput.revealLabel` (`Show password`) and `PasswordInput.concealLabel` (`Hide password`) through `LocaleProvider`. |
 
 New message keys: `AppSwitcherMenu.title` (`Apps`), `.sitesLabel` (`Sites`), `.closeLabel` (`Close`),
 `.newTabLabel` (`(opens in a new tab)`), `.triggerLabel` (`{app} — switch app`) and the two `PasswordInput` keys.
+
+```ts
+const bridge = createAuthBridge<User>({ getIdentity: (user) => user.id });
+const http = createApiClient({ scope: bridge.scope, onUnauthorized: bridge.onUnauthorized });
+const queries = createQueryClient({ scope: bridge.scope, onError: feedbackQueryErrors() });
+bridge.subscribeExpired(feedbackSessionExpiry());
+bridge.subscribeExpired(signInRedirect(router));
+```
 
 ```vue
 <AppSwitcherMenu :items="apps" current="desk" subtitle="Ocharo" @select="track">
