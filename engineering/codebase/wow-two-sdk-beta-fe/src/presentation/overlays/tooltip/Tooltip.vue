@@ -201,7 +201,7 @@ function renderTrigger(): VNode {
 }
 
 const contentClasses = cn(
-  'z-tooltip rounded-md bg-inverse px-2.5 py-1.5 text-xs text-inverse-foreground shadow-md',
+  'rounded-md bg-inverse px-2.5 py-1.5 text-xs text-inverse-foreground shadow-md',
   'motion-safe:data-[state=open]:animate-(--animate-pop-in)',
   'motion-safe:data-[state=closed]:animate-(--animate-pop-out)',
 );
@@ -212,8 +212,17 @@ const contentClasses = cn(
   <Portal v-if="mounted">
     <!-- Exit animation bubbles up from the body; once the closed-state pop-out ends, tear down
          the Portal shell. Also covers the reduced-motion path, where no animation runs and
-         `Presence` has already unmounted the body. -->
-    <AnchoredPositioner :anchor="anchor" :placement="props.placement" :offset="6" @animationend="onAnimationEnd">
+         `Presence` has already unmounted the body.
+         z-tooltip (100) sits on this positioned root, as Popover and Menu put their layer on theirs: its
+         transform makes the stacking context, so a z-index on the body inside never lifts it above a sticky
+         bar (z-sticky, 30) or a modal (z-modal, 70). -->
+    <AnchoredPositioner
+      :anchor="anchor"
+      :placement="props.placement"
+      :offset="6"
+      class="z-tooltip"
+      @animationend="onAnimationEnd"
+    >
       <!-- `Presence` clones `data-state` ("open" | "closed") + its tracking ref onto the body,
            which is what gates the pop-in / pop-out keyframes. Motion sits behind `motion-safe:`
            so reduced-motion users get an instant show/hide. -->

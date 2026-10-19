@@ -13,6 +13,7 @@ Public import: `import { Tooltip } from '@wow-two-beta/fe/presentation/overlays'
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - The trigger clone is built during render, so its anchor ref is owned by the rendering tooltip; a consumer ref on the trigger is kept beside it.
+- The positioned floating root carries the `z-tooltip` layer (100), above sticky bars, menus, popovers and modals; the body inside sets no z-index of its own.
 
 ## Props
 
