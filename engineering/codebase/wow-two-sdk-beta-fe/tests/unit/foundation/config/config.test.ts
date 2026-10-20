@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { bool, ConfigError, defineConfig, num, oneOf, staticSource, str } from '@src/foundation/config';
 
 /*
- * Smoke depth, `unit` project (node). `staticSource` keeps the resolution off the ambient
- * `import.meta.env` / `window.__APP_CONFIG__`, so the assertions are about the slice's own
+ * Smoke depth, `unit` project (node). `staticSource` keeps the resolution off the build env and
+ * `window.__APP_CONFIG__`, so the assertions are about the slice's own
  * policy: a missing required key FAILS LOUDLY AT BOOT with every issue at once, rather than
  * handing the app an `undefined` that surfaces three screens later.
  */

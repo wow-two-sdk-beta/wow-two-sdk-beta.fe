@@ -18,7 +18,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { build } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const scratch = mkdtempSync(join(tmpdir(), 'fe-package-'));
@@ -322,6 +322,39 @@ try {
     if (size > maximumGzip) throw new Error(`${symbol} consumer exceeds gzip budget: ${size} > ${maximumGzip}`);
     console.log(`check-package: ${symbol} JS consumer ${size}/${maximumGzip} gzip bytes.`);
   }
+  // A production consumer reads its own build env. A bundler inlines `import.meta.env` only in the app's own
+  // modules, so the app passes it in; the packed config source must resolve a value from that argument.
+  const envDir = join(scratch, 'config-env');
+  mkdirSync(envDir);
+  writeFileSync(join(envDir, '.env.production'), 'VITE_SDK_SENTINEL=packed-consumer-sentinel\n');
+  const envEntry = join(scratch, 'config-env.mjs');
+  writeFileSync(
+    envEntry,
+    `import { defineConfig, importMetaEnvSource, str } from '${published.name}/foundation/config';\n` +
+      `export const config = defineConfig({ SDK_SENTINEL: str() }, { prefix: 'VITE_', env: import.meta.env });\n` +
+      `export const source = importMetaEnvSource(import.meta.env).VITE_SDK_SENTINEL;\n`,
+  );
+  const envResult = await build({
+    root: scratch,
+    configFile: false,
+    logLevel: 'silent',
+    mode: 'production',
+    envDir,
+    build: { write: false, minify: 'esbuild', lib: { entry: envEntry, formats: ['es'], fileName: 'config-env' } },
+  });
+  const envCode = (Array.isArray(envResult) ? envResult : [envResult])
+    .flatMap((bundle) => bundle.output)
+    .filter((item) => item.type === 'chunk')
+    .map((item) => item.code)
+    .join('\n');
+  const envBundle = join(scratch, 'config-env-bundle.mjs');
+  writeFileSync(envBundle, envCode);
+  const envModule = await import(pathToFileURL(envBundle).href);
+  if (envModule.config.SDK_SENTINEL !== 'packed-consumer-sentinel' || envModule.source !== 'packed-consumer-sentinel') {
+    throw new Error('Packed config source did not read the consumer build env passed to it.');
+  }
+  console.log('check-package: production consumer config reads its own import.meta.env through the packed source.');
+
   if (process.argv.includes('--install')) {
     // Separate root prevents Node/TypeScript resolving through the linked fixture's ancestor node_modules.
     installed = mkdtempSync(join(tmpdir(), 'fe-installed-'));

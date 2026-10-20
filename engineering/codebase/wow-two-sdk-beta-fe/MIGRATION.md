@@ -1,10 +1,23 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-20*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## 0.0.28 — build env for config
+
+No import moves and no renamed props. The `foundation/config` row changes a signature; wire it as shown below.
+
+| Area | Change |
+|---|---|
+| `foundation/config` | `importMetaEnvSource(env)` takes the app's `import.meta.env`: a bundler inlines it only in the app's own modules, so the old no-argument call returned `{}` in every consumer build and in vitest. `defineConfig` options take `env`; `defaultSources(env?)` reads `window.__APP_CONFIG__` alone without it. Values copy as strings into a frozen snapshot. New type `ConfigEnv`. |
+
+```ts
+const config = defineConfig({ API_URL: url() }, { prefix: 'VITE_', env: import.meta.env });
+const sources = [windowConfigSource(), importMetaEnvSource(import.meta.env)];
+```
 
 ## 0.0.23 — app switcher, toast landmark, password labels, session expiry
 

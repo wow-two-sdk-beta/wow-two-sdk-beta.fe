@@ -5,7 +5,7 @@
 // deploy surfaces all its problems at once, not one boot-crash at a time.
 
 import type { AnyConfigField, ConfigField } from './ConfigField';
-import { defaultSources, resolveRaw, type ConfigSource } from './ConfigSource';
+import { defaultSources, resolveRaw, type ConfigEnv, type ConfigSource } from './ConfigSource';
 
 /** A schema: a map from output key to its field spec. */
 export type ConfigSchema = Readonly<Record<string, AnyConfigField>>;
@@ -19,8 +19,14 @@ export type InferConfig<S extends ConfigSchema> = { readonly [K in keyof S]: Inf
 
 /** Tunes where `defineConfig` reads from and how keys are namespaced. */
 export interface DefineConfigOptions {
-  /** The ordered source list; earlier wins. Defaults to `[window.__APP_CONFIG__, import.meta.env]`. */
+  /** The ordered source list; earlier wins. Defaults to `defaultSources(env)`. */
   readonly sources?: ReadonlyArray<ConfigSource>;
+
+  /**
+   * The app's build-time env — pass `import.meta.env` from the app's own module. Read after the runtime
+   * `window.__APP_CONFIG__` when `sources` is omitted; ignored when `sources` is given.
+   */
+  readonly env?: ConfigEnv;
 
   /** A prefix prepended to every schema key on lookup (e.g. `'VITE_'` → key `API_URL` reads `VITE_API_URL`). */
   readonly prefix?: string;
@@ -60,11 +66,11 @@ export class ConfigError extends Error {
  * Resolves a typed configuration object from `schema`. Each key is looked up across the source list (prefix
  * applied), parsed through its field, and defaulted when absent. Empty strings count as absent. All missing /
  * invalid problems are aggregated and thrown together as a single {@link ConfigError}; on success the returned
- * object is frozen. Pass an explicit `sources` (e.g. `[staticSource({...})]`) to make resolution deterministic
- * in tests.
+ * object is frozen. Pass the app's `env: import.meta.env`, or an explicit `sources` (e.g.
+ * `[staticSource({...})]`) to make resolution deterministic in tests.
  */
 export function defineConfig<const S extends ConfigSchema>(schema: S, options?: DefineConfigOptions): InferConfig<S> {
-  const sources = options?.sources ?? defaultSources();
+  const sources = options?.sources ?? defaultSources(options?.env);
   const prefix = options?.prefix ?? '';
 
   const resolved: Record<string, unknown> = Object.create(null);

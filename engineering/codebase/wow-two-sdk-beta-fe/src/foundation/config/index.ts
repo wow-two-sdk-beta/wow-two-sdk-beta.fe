@@ -1,8 +1,9 @@
 // config — foundation seam. A typed, fail-fast reader for application configuration: `defineConfig(schema)`
 // validates each declared key against a `ConfigField` spec (`str`/`num`/`bool`/`oneOf`/`url`/`port`/`json`/
-// `list`), reading through an ordered source list — runtime `window.__APP_CONFIG__` layered ahead of build-time
-// `import.meta.env` by default — and throws one aggregated `ConfigError` at startup when anything is missing or
-// invalid. No Vue, no peer deps; consumed by any app that wants its env parsed once into a frozen typed object.
+// `list`), reading through an ordered source list — runtime `window.__APP_CONFIG__` layered ahead of the app's
+// build-time `import.meta.env`, passed in as `env` — and throws one aggregated `ConfigError` at startup when
+// anything is missing or invalid. No Vue, no peer deps; consumed by any app that wants its env parsed once into
+// a frozen typed object.
 
 export {
   type ConfigField,
@@ -21,6 +22,7 @@ export {
 } from './ConfigField';
 
 export {
+  type ConfigEnv,
   type ConfigSource,
   DefaultRuntimeConfigKey,
   importMetaEnvSource,
