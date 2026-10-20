@@ -40,6 +40,13 @@ It registers the package's own utility classes, which Tailwind otherwise exclude
 `themes.css` contains generated theme tokens and `themes.json` their manifest.
 Load the theme stylesheet when using a generated theme class.
 
+`styles.css` also themes every scrollbar on fine-pointer devices (mouse or trackpad; touch keeps its overlay bars).
+Chromium and Safari draw a slim bar with a rounded, inset thumb that follows the theme tokens (`--color-border-strong`,
+hover `--color-muted-foreground`) in light and dark; Firefox draws a thin bar in the same colours. Opt one element out
+with `class="scrollbar-native"`, or tune a subtree with `--scrollbar-size`, `--scrollbar-inset`, `--scrollbar-track`,
+`--scrollbar-thumb` and `--scrollbar-thumb-hover`. The rules sit in `@layer base`, so an application's own scrollbar
+CSS wins. Setting `scrollbar-width` or `scrollbar-color` on an element makes Chromium ignore the rounded style there.
+
 `platform` is the validated theme every wow-two platform app shares (Wheelhouse's chalk and forest palette).
 A platform app imports `themes.css` after `styles.css` and sets `class="theme-platform"` on its root, plus `dark`
 for dark mode and `surface-ambient` on the page for the backdrop; the `glass` variants of `Navbar`,
