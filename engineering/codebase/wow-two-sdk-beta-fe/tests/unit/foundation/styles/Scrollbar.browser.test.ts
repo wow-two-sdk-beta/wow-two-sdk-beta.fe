@@ -36,12 +36,13 @@ function styleRules(rules: readonly CSSRule[]): CSSStyleRule[] {
   });
 }
 
+const pageRules = (): CSSStyleRule[] =>
+  Array.from(document.styleSheets).flatMap((sheet) => styleRules(Array.from(sheet.cssRules)));
+
 /** The hover state is not reachable through `getComputedStyle`, so it is read from the rule that declares it. */
 function hoverFill(): string {
-  const rules = Array.from(document.styleSheets).flatMap((sheet) => styleRules(Array.from(sheet.cssRules)));
-  return (
-    rules.find((rule) => rule.selectorText.includes('::-webkit-scrollbar-thumb:hover'))?.style.backgroundColor ?? ''
-  );
+  const rule = pageRules().find((r) => r.selectorText.includes('::-webkit-scrollbar-thumb:hover'));
+  return rule?.style.backgroundColor ?? '';
 }
 
 describe.skipIf(!finePointer)('themed scrollbar', () => {
@@ -101,16 +102,15 @@ describe.skipIf(!finePointer)('themed scrollbar', () => {
   });
 
   describe.skipIf(hasWebkitScrollbar)('standard properties', () => {
+    // The headless test browser reports `scrollbar-width: none` on every element, so the width is read from the
+    // rule that declares it and the colour, which it leaves alone, from the computed style.
     it('draws a thin bar in the theme colours', () => {
-      const el = scroller();
-      expect(getComputedStyle(el).scrollbarWidth).toBe('thin');
-      expect(getComputedStyle(el).scrollbarColor).not.toBe('auto');
+      expect(pageRules().map((rule) => rule.style.getPropertyValue('scrollbar-width'))).toContain('thin');
+      expect(getComputedStyle(scroller()).scrollbarColor).not.toBe('auto');
     });
 
     it('leaves a .scrollbar-native element on the platform scrollbar', () => {
-      const el = scroller('scrollbar-native');
-      expect(getComputedStyle(el).scrollbarWidth).toBe('auto');
-      expect(getComputedStyle(el).scrollbarColor).toBe('auto');
+      expect(getComputedStyle(scroller('scrollbar-native')).scrollbarColor).toBe('auto');
     });
   });
 });
