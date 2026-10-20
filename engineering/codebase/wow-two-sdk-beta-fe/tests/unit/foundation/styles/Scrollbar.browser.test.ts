@@ -57,9 +57,9 @@ function alphaOf(color: string): number {
   return legacy ? parseFloat(legacy[1]!.split(',')[3] ?? '1') : 1;
 }
 
-/** The thumb colour of a Firefox `scrollbar-color` value — its first colour. */
+/** The thumb colour of a Firefox `scrollbar-color` value — its first colour, in whatever function the theme token uses. */
 const firefoxThumb = (el: HTMLElement): string =>
-  /color\([^)]*\)|rgba?\([^)]*\)/.exec(getComputedStyle(el).scrollbarColor)?.[0] ?? '';
+  /[a-z][a-z0-9-]*\([^)]*\)/.exec(getComputedStyle(el).scrollbarColor)?.[0] ?? '';
 
 /** The hover state is not reachable through `getComputedStyle`, so it is read from the rule that declares it. */
 function hoverFill(): string {
