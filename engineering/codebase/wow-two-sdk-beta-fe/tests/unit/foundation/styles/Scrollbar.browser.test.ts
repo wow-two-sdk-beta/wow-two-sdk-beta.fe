@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import '@src/index.css';
 
 // Firefox draws the standard properties; Chromium and WebKit draw the `::-webkit-scrollbar*` pseudo-elements.
-const hasWebkitScrollbar = CSS.supports('selector(::-webkit-scrollbar)');
+// Firefox also parses `::-webkit-scrollbar`, so the engine is told apart by a Firefox-only property.
+const isFirefox = CSS.supports('-moz-appearance: none') || CSS.supports('-moz-orient: vertical');
+const hasWebkitScrollbar = !isFirefox;
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 // Forced colours replace every fill with a system colour by design; the geometry still applies.
 const isForcedColors = matchMedia('(forced-colors: active)').matches;

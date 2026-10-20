@@ -290,10 +290,11 @@ body {
  * Scrollbars — a slim themed track and a pill-shaped thumb on every scroll container.
  *
  * Chromium and Safari take `::-webkit-scrollbar*`: the thumb is a fully rounded pill, inset from the track by a
- * transparent border so both ends read as round. Firefox has no pseudo-elements, so it takes the standard
- * properties — a thin bar in the same colours, with the system's own ends. The standard properties are
- * deliberately kept out of Chromium and Safari, which would stop drawing the `::-webkit-scrollbar*` styles on any
- * element that sets them.
+ * transparent border so both ends read as round. Firefox draws no scrollbar pseudo-elements, so it takes the
+ * standard properties — a thin bar in the same colours, with the system's own ends. Those are deliberately kept
+ * out of Chromium and Safari, which would stop drawing the `::-webkit-scrollbar*` styles on any element that sets
+ * them. Firefox also parses `::-webkit-scrollbar` (and never draws it), so the gate is a Firefox-only property
+ * rather than `selector(::-webkit-scrollbar)`.
  *
  * Scope and escape hatches:
  *   - Fine pointers only (`hover: hover` and `pointer: fine`): touch devices keep their overlay scrollbars.
@@ -330,7 +331,7 @@ body {
       background-color: var(--scrollbar-thumb-hover, var(--color-muted-foreground));
     }
 
-    @supports not selector(::-webkit-scrollbar) {
+    @supports ((-moz-appearance: none) or (-moz-orient: vertical)) {
       :where(*:not(.scrollbar-native)) {
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-thumb, var(--color-border-strong)) var(--scrollbar-track, transparent);
