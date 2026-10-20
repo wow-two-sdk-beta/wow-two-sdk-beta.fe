@@ -232,6 +232,12 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
+/* A read-only trigger stays focusable but neither opens its panel nor changes the value: `PopoverTrigger` skips a
+   click its caller prevented, and a keyboard activation arrives as a click. */
+function onTriggerClick(event: MouseEvent): void {
+  if (readOnly.value) event.preventDefault();
+}
+
 const triggerClass = computed(() =>
   cn(
     selectTriggerVariants({ size: props.size, state: invalid.value ? InputState.Invalid : InputState.Default }),
@@ -260,13 +266,15 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
   <Popover :key="formResetRevision" v-model:open="open" placement="bottom-start" :offset="6">
     <PopoverTrigger
       :id="props.id ?? field?.id"
-      :disabled="disabled || readOnly"
+      :disabled="disabled"
+      :aria-readonly="readOnly && !disabled ? true : undefined"
       :aria-invalid="invalid || undefined"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
       :aria-describedby="field?.describedBy"
       :class="triggerClass"
       v-bind="passthroughAttrs"
+      @click="onTriggerClick"
     >
       <span :class="labelClass">{{ displayText }}</span>
       <ChevronDown class="h-4 w-4 shrink-0 text-muted-foreground" />

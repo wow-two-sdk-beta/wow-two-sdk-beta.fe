@@ -156,7 +156,10 @@ const clearOffsetClass = computed(() => TriggerClearOffsetClasses[sizeKey.value]
 /* Names the trigger from the Field label when present; an explicit aria-label always wins. */
 const labelledBy = computed(() => (!ariaLabel.value ? ctx.labelId : undefined));
 
-const dataState = computed(() => triggerDataState(ctx.open, ctx.isLoading, ctx.isDisabled, ctx.isInvalid));
+/* A read-only trigger is not disabled: it keeps its focus and names its state through `aria-readonly`. */
+const isHardDisabled = computed(() => ctx.isDisabled && !ctx.isReadOnly);
+
+const dataState = computed(() => triggerDataState(ctx.open, ctx.isLoading, isHardDisabled.value, ctx.isInvalid));
 
 const chevronClass = computed(() =>
   cn(iconClass.value, 'text-muted-foreground transition-transform', ctx.open && 'rotate-180'),
@@ -218,7 +221,8 @@ defineExpose({ el: root });
         ref="root"
         type="button"
         :id="ctx.fieldId"
-        :disabled="ctx.isDisabled || ctx.isLoading"
+        :disabled="isHardDisabled || ctx.isLoading"
+        :aria-readonly="ctx.isReadOnly || undefined"
         :aria-busy="ctx.isLoading || undefined"
         aria-haspopup="listbox"
         :aria-controls="ctx.listboxId"

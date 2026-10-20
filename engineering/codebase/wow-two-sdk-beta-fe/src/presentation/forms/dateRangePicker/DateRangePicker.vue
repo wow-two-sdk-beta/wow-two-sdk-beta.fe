@@ -180,6 +180,12 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
+/* A read-only trigger stays focusable but neither opens its panel nor changes the value: `PopoverTrigger` skips a
+   click its caller prevented, and a keyboard activation arrives as a click. */
+function onTriggerClick(event: MouseEvent): void {
+  if (finalReadOnly.value) event.preventDefault();
+}
+
 const triggerClass = computed(() =>
   cn(selectTriggerVariants({ size: props.size, state: triggerState.value }), attrs.class as ClassValue),
 );
@@ -202,13 +208,15 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     <PopoverTrigger
       ref="trigger"
       :id="triggerId"
-      :disabled="finalDisabled || finalReadOnly"
+      :disabled="finalDisabled"
+      :aria-readonly="finalReadOnly && !finalDisabled ? true : undefined"
       :aria-invalid="ariaInvalid"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
       :aria-describedby="describedBy"
       :class="triggerClass"
       v-bind="passthroughAttrs"
+      @click="onTriggerClick"
     >
       <!-- `muted-foreground` (not `subtle-foreground`): the trigger surface is muted, where
            subtle is only 4.2:1 (see index.css). -->

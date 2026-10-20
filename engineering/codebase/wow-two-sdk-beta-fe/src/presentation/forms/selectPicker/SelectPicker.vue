@@ -347,6 +347,9 @@ const context: SelectPickerContextValue = {
   get isDisabled() {
     return finalDisabled.value || finalReadOnly.value;
   },
+  get isReadOnly() {
+    return finalReadOnly.value && !finalDisabled.value;
+  },
   get isLoading() {
     return props.isLoading;
   },

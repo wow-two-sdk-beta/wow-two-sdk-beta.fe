@@ -149,6 +149,9 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
+/* A read-only combobox is not disabled: its input keeps the focus and takes the native `readonly` attribute. */
+const isHardDisabled = computed(() => ctx.isDisabled && !ctx.isReadOnly);
+
 const inputClass = computed(() =>
   cn(inputBaseVariants({ size: props.size, state: inputState.value }), attrs.class as ClassValue),
 );
@@ -166,8 +169,9 @@ defineExpose({ el: ctx.inputEl });
     :aria-controls="ctx.listboxId"
     :aria-activedescendant="activeDescendant"
     aria-autocomplete="list"
-    :aria-disabled="ctx.isDisabled || undefined"
-    :disabled="ctx.isDisabled"
+    :aria-disabled="isHardDisabled || undefined"
+    :disabled="isHardDisabled"
+    :readonly="ctx.isReadOnly"
     :value="ctx.inputValue"
     :class="inputClass"
     v-bind="passthroughAttrs"

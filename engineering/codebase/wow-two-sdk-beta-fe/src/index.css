@@ -6,6 +6,11 @@
 /* Dark mode variant — apply by toggling `.dark` on <html> or <body>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* A read-only control: the native `readonly` attribute, or `aria-readonly` / `data-readonly` on a custom control or a
+   composite's frame. Unlike Tailwind's `read-only:`, it never matches a `<button>` or a disabled field — the
+   `:read-only` pseudo-class matches every element that is not editable. */
+@custom-variant readonly (&:is([readonly], [aria-readonly='true'], [data-readonly]));
+
 /* A `Table` part below its table's stack breakpoint. Every part of a stacking table carries `data-stack` with the
    breakpoint key, so one variant serves every breakpoint and follows the app's own `@theme` breakpoints. */
 @custom-variant table-stacked {

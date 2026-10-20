@@ -3,8 +3,15 @@
 
 import { tv, type VariantProps } from '../../foundation/styles';
 
+/*
+ * A read-only control takes the disabled look without the disabled semantics: the muted surface and text, a default
+ * cursor, no hover border and a 1px neutral focus ring in place of the brand ring — it stays focusable and its
+ * value stays selectable. The `readonly:` variant (index.css) reads the native `readonly` attribute, or
+ * `aria-readonly` / `data-readonly` on a trigger or a composite's frame. A disabled control keeps the muted
+ * surface it had under `:read-only`, which also matched every `<button>` trigger; triggers now rest on the field.
+ */
 export const inputBaseVariants = tv({
-  base: 'flex w-full rounded-md bg-field text-foreground placeholder:text-subtle-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 read-only:bg-muted',
+  base: 'flex w-full rounded-md bg-field text-foreground placeholder:text-subtle-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 readonly:cursor-default readonly:bg-muted readonly:text-muted-foreground readonly:focus-visible:ring-1',
   variants: {
     size: {
       xs: 'h-7 px-2 text-xs',
@@ -13,7 +20,8 @@ export const inputBaseVariants = tv({
       lg: 'h-12 px-4 text-base',
     },
     state: {
-      default: 'border-input hover:border-border-strong',
+      default:
+        'border-input hover:border-border-strong readonly:hover:border-input readonly:focus-visible:ring-muted-foreground',
       invalid: 'border-destructive-soft-foreground focus-visible:ring-destructive-soft-foreground',
     },
     /* Border weight — scale like `size`/`radius`; default `sm` (1px). */
@@ -33,6 +41,8 @@ export const inputBaseVariants = tv({
       lg: 'focus-visible:ring-4',
     },
   },
+  /* A caller that turned the focus ring off keeps it off while the control is read-only. */
+  compoundVariants: [{ ring: 'none', class: 'readonly:focus-visible:ring-0' }],
   defaultVariants: {
     size: 'md',
     state: 'default',

@@ -127,7 +127,7 @@ describe('CascaderPicker', () => {
     expect(wrapper.emitted('update:modelValue')).toEqual([[['europe', 'spain', 'madrid']]]);
   });
 
-  it('ships every path value and locks the trigger while read-only', () => {
+  it('ships every path value and keeps a read-only trigger focusable but inert', async () => {
     const named = mountPicker({ defaultValue: ['europe', 'france', 'lyon'], name: 'region' });
     expect(named.findAll('input[name=region]').map((input) => input.attributes('value'))).toEqual([
       'europe',
@@ -135,7 +135,14 @@ describe('CascaderPicker', () => {
       'lyon',
     ]);
     const locked = mountPicker({ isReadOnly: true });
-    expect(locked.get<HTMLButtonElement>('[aria-label="Region"]').element.disabled).toBe(true);
-    expect(locked.get('[aria-label="Region"]').text()).toBe('Pick an option');
+    const trigger = locked.get<HTMLButtonElement>('[aria-label="Region"]');
+    expect(trigger.element.disabled).toBe(false);
+    expect(trigger.attributes('aria-readonly')).toBe('true');
+    expect(trigger.text()).toBe('Pick an option');
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+    expect(mountPicker({ isDisabled: true }).get<HTMLButtonElement>('[aria-label="Region"]').element.disabled).toBe(
+      true,
+    );
   });
 });

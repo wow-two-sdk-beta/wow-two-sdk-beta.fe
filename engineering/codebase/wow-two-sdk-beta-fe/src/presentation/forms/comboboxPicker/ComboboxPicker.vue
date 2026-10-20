@@ -192,6 +192,9 @@ provide<ComboboxPickerContextValue>(comboboxContextKey, {
   get isDisabled() {
     return inactive.value;
   },
+  get isReadOnly() {
+    return finalReadOnly.value && !finalDisabled.value;
+  },
   get isInvalid() {
     return props.isInvalid ?? field?.isInvalid;
   },

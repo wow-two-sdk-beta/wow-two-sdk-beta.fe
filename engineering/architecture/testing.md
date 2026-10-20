@@ -188,7 +188,7 @@ Bugs FIXED from the wave-2 inventory (each with regression stories):
 Still open (deliberate): contrast design-tuning tail (~60: `Surface`/`Button.matrix` soft-variant combos, `success` soft-on-solid, `jsonEditor` tree colors) · `DateRangePicker` mid-selection `null` API shape · `DismissableLayer` same-commit nesting · dark-mode axe pass.
 
 New findings from this wave:
-- **`InputStyles.ts` `read-only:bg-muted` matches `<button>` triggers** (buttons are always CSS `:read-only`) — all picker triggers render on muted unintentionally; the placeholder swaps compensate, but the variant is the real fix (design pass).
+- **`InputStyles.ts` `read-only:bg-muted` matches `<button>` triggers** (buttons are always CSS `:read-only`) — all picker triggers rendered on muted unintentionally; the placeholder swaps compensated. Fixed in the Vue package: the attribute-based `readonly:` variant (`index.css`) replaces `read-only:`, so triggers rest on the field surface and only a read-only control is muted.
 - **`Presence` drops the child's own `ref` under React 19** — cloned ref replaces it (worked around via `panelRef` props in BottomSheet; latently affects `Drawer.Content` forwarded ref). Primitive fix = compose refs in `Presence`.
 - `dataGrid` cell-editor inputs lack labels (2) · `dateRangePicker` calendar dialog unnamed (`aria-dialog-name`) · `multiSelect` chip-remove is `nested-interactive` — small backlog items.
 

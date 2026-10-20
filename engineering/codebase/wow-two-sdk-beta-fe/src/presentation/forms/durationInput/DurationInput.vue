@@ -226,14 +226,14 @@ const groupClass = computed(() =>
     'items-center gap-1 focus-within:ring-2 focus-within:ring-ring',
     invalid.value && 'focus-within:ring-destructive-soft-foreground',
     disabled.value && 'cursor-not-allowed opacity-60',
-    readOnly.value && 'bg-muted',
+    readOnly.value && 'focus-within:ring-1 focus-within:ring-muted-foreground',
     attrs.class as ClassValue,
   ),
 );
 
 const SegmentClass =
   'min-w-[2ch] bg-transparent text-end tabular-nums outline-hidden placeholder:text-subtle-foreground ' +
-  'disabled:cursor-not-allowed';
+  'disabled:cursor-not-allowed readonly:cursor-default';
 
 const formResetAnchor = useTemplateRef<HTMLInputElement>('formResetAnchor');
 useNativeFormReset(formResetAnchor, () => {
@@ -249,6 +249,7 @@ useNativeFormReset(formResetAnchor, () => {
     :aria-labelledby="groupLabelledBy"
     :aria-describedby="field?.describedBy"
     :aria-disabled="disabled || undefined"
+    :data-readonly="readOnly || undefined"
     :class="groupClass"
     v-bind="passthroughAttrs"
   >

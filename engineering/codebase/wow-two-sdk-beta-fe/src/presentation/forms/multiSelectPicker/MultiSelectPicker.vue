@@ -120,13 +120,16 @@ function getOptionLabelFn(value: string): string | number | null {
   return props.getOptionLabel?.(value) ?? null;
 }
 
+/* A disabled or read-only picker only closes: a read-only trigger is focusable, so its click reaches the popover. */
+function onOpenChange(next: boolean): void {
+  if (!next || !inactive.value) openCtl.setValue(next);
+}
+
 provide<MultiSelectPickerContextValue>(multiSelectContextKey, {
   get open() {
     return openCtl.value.value;
   },
-  setOpen: (next) => {
-    if (!next || !inactive.value) openCtl.setValue(next);
-  },
+  setOpen: onOpenChange,
   get values() {
     return valuesCtl.value.value;
   },
@@ -141,6 +144,9 @@ provide<MultiSelectPickerContextValue>(multiSelectContextKey, {
   getOptionLabel: getOptionLabelFn,
   get isDisabled() {
     return inactive.value;
+  },
+  get isReadOnly() {
+    return finalReadOnly.value && !finalDisabled.value;
   },
   get name() {
     return props.name;
@@ -170,13 +176,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
 </script>
 
 <template>
-  <Popover
-    :key="formResetRevision"
-    :open="isOpenNow"
-    :placement="placement"
-    :offset="6"
-    @update:open="openCtl.setValue"
-  >
+  <Popover :key="formResetRevision" :open="isOpenNow" :placement="placement" :offset="6" @update:open="onOpenChange">
     <slot />
     <!-- Always-rendered — inside PopoverContent they would vanish from form submission when closed. -->
     <template v-if="name">

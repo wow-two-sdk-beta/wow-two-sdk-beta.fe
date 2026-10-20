@@ -59,7 +59,10 @@ export interface SelectPickerContextValue {
   getCachedLabel: (key: unknown) => string | number | undefined;
   readonly query: string;
   setQuery: (query: string) => void;
+  /** Reports a disabled, read-only or loading picker alike — the picker neither opens nor changes. */
   readonly isDisabled: boolean;
+  /** Reports a read-only picker that is not also disabled: it stays focusable and shows its value. */
+  readonly isReadOnly: boolean;
   readonly isLoading: boolean;
   readonly loadingLabel: string;
   readonly isClearable: boolean;

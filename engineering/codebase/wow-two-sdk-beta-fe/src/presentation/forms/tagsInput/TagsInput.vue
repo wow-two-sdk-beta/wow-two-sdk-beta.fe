@@ -292,7 +292,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       :aria-invalid="invalid || undefined"
       :aria-describedby="describedBy"
       :aria-required="requiredAttr"
-      class="min-w-[6rem] flex-1 border-0 bg-transparent p-0 text-sm outline-hidden placeholder:text-subtle-foreground disabled:cursor-not-allowed"
+      class="min-w-[6rem] flex-1 border-0 bg-transparent p-0 text-sm outline-hidden placeholder:text-subtle-foreground disabled:cursor-not-allowed readonly:cursor-default"
       v-bind="passthroughAttrs"
       @input="onInput"
       @compositionend="onInput"

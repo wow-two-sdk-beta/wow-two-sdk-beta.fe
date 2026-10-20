@@ -405,6 +405,31 @@ const stamp = ref<Temporal.PlainDateTime | null>(
         </div>
       </Demo>
 
+      <Demo name="Read-only state" note="normal · read-only (muted, default cursor, focusable, selectable) · disabled">
+        <div class="space-y-3">
+          <Field label="Normal"><TextInput default-value="prod-net" /></Field>
+          <Field label="Read-only" is-read-only helper="Set by the server kit">
+            <TextInput default-value="prod-net" />
+          </Field>
+          <Field label="Disabled" is-disabled><TextInput default-value="prod-net" /></Field>
+          <Field label="Read-only text area" is-read-only><TextAreaInput :rows="2" :default-value="'two\nlines'" /></Field>
+          <Field label="Read-only number" is-read-only><NumberInput :default-value="42" /></Field>
+          <Field label="Read-only tags" is-read-only><TagsInput :default-value="['vue', 'tailwind']" /></Field>
+          <Field label="Read-only select" is-read-only>
+            <SelectPicker default-value="b">
+              <SelectPickerTrigger><SelectPickerValue placeholder="Pick one" /></SelectPickerTrigger>
+              <SelectPickerContent>
+                <SelectPickerItem :item-key="'a'" label="Alpha" />
+                <SelectPickerItem :item-key="'b'" label="Beta" />
+              </SelectPickerContent>
+            </SelectPicker>
+          </Field>
+          <Field label="Read-only date" is-read-only>
+            <DatePicker :default-value="Temporal.PlainDate.from('2026-10-21')" />
+          </Field>
+        </div>
+      </Demo>
+
       <Demo name="CheckboxInput / RadioInput / SwitchInput" note="size axis + disabled + indeterminate">
         <div class="space-y-3">
           <div class="flex items-center gap-3">

@@ -84,11 +84,16 @@ describe('TreeSelectPicker', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   });
 
-  it('ships the leaf value and locks the trigger while read-only', () => {
+  it('ships the leaf value and keeps a read-only trigger focusable but inert', async () => {
     const named = mountPicker({ defaultValue: 'madrid', name: 'city' });
     expect(named.get<HTMLInputElement>('input[name=city]').element.value).toBe('madrid');
     expect(named.get('[aria-label="City"]').text()).toBe('Madrid');
     const locked = mountPicker({ isReadOnly: true });
-    expect(locked.get<HTMLButtonElement>('[aria-label="City"]').element.disabled).toBe(true);
+    const trigger = locked.get<HTMLButtonElement>('[aria-label="City"]');
+    expect(trigger.element.disabled).toBe(false);
+    expect(trigger.attributes('aria-readonly')).toBe('true');
+    await trigger.trigger('click');
+    expect(trigger.attributes('aria-expanded')).toBe('false');
+    expect(mountPicker({ isDisabled: true }).get<HTMLButtonElement>('[aria-label="City"]').element.disabled).toBe(true);
   });
 });

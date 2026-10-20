@@ -55,4 +55,4 @@ None declared.
 
 ## Editing guarantees
 
-`readonly` inherits Field context and blocks typing, native changes and picker actions. Disabled native mirrors are omitted from submission; read-only values remain included. `form` reaches the named mirror. Calendar/display labels follow LocaleProvider unless explicitly overridden; canonical typed and wire formats remain stable.
+`readonly` inherits Field context and blocks typing, native changes and picker actions; the trigger stays focusable (`aria-readonly="true"`, not `disabled`), shows the read-only look and never opens the calendar. Disabled native mirrors are omitted from submission; read-only values remain included. `form` reaches the named mirror. Calendar/display labels follow LocaleProvider unless explicitly overridden; canonical typed and wire formats remain stable.

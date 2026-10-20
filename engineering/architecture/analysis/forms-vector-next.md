@@ -119,7 +119,7 @@ Original backlog (all above resolved or explicitly deferred):
 - **`fieldErrors` is `instanceof ApiError`-gated** — silently no-ops for non-SDK errors; now documented in `forms.md`, but making the recognizer configurable would remove the footgun. (wheelhouse, secrets-vault)
 - **`'Unknown error'` fallback** (`SubmitErrors.ts`) — last SDK-authored English literal on the submit path; make overridable for i18n. (F-2c)
 - **`deepEqual` blind to `File`** (no enumerable keys → any two Files equal) — file-swap won't re-flip dirty. Cosmetic today. (F-2e)
-- **`InputStyles` `read-only:bg-muted` matches `<button>` triggers** — pickers sit on muted unintentionally; design-pass item, alters every input visually. (F-2b)
+- **`InputStyles` `read-only:bg-muted` matches `<button>` triggers** — pickers sat on muted unintentionally; fixed in the Vue package by the attribute-based `readonly:` variant, so triggers now rest on the field surface. (F-2b)
 
 ### F-2g strains (smart-qr `CreateCodeScreen` stress migration — 2026-07-10)
 

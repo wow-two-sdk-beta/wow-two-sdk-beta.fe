@@ -44,7 +44,10 @@ export interface ComboboxPickerContextValue {
   /** Holds the DOM node of the panel — the input's blur check tests containment against it. */
   contentEl: ShallowRef<HTMLElement | null>;
   readonly listboxId: string;
+  /** Reports a disabled or read-only combobox alike — it neither opens nor changes. */
   readonly isDisabled: boolean;
+  /** Reports a read-only combobox that is not also disabled: its input stays focusable and shows the value. */
+  readonly isReadOnly: boolean;
   readonly isInvalid?: boolean;
   selectItem: (entry: ComboboxPickerItemEntry, options?: { close?: boolean }) => void;
 }

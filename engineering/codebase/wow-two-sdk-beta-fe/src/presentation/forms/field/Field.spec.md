@@ -38,6 +38,10 @@ None declared.
 | `helper` | `helper?(): unknown;` | See the declared signature. |
 | `error` | `error?(): unknown;` | See the declared signature. |
 
+## Read-only look
+
+A read-only control (its own `isReadOnly`, or the Field's) takes the disabled look without the disabled semantics: the muted surface and text, a default cursor, no hover border, and a 1px neutral focus ring in place of the brand ring. The control stays focusable, its value stays selectable and copyable, and assistive tech reads it as read-only (the native `readonly` attribute on an input, `aria-readonly` on a trigger button) rather than disabled. The `readonly:` variant in `index.css` carries the styling: it matches `[readonly]`, `[aria-readonly='true']` and `[data-readonly]`, never a `<button>` or a disabled field as Tailwind's `read-only:` does. Pickers that open a panel (`SelectPicker`, `MultiSelectPicker`, `DatePicker`, `DateRangePicker`, `TimePicker`, `MonthPicker`, `YearPicker`, `CascaderPicker`, `TreeSelectPicker`) stay focusable but never open while read-only. Verified by [ReadOnlyState.browser.test.ts](../../../../tests/unit/presentation/forms/ReadOnlyState.browser.test.ts).
+
 ## Exposed handle
 
 `{ el: root }`. Read this through a component template ref after mount; the referenced DOM node may be absent while unmounted.

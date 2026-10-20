@@ -35,7 +35,10 @@ export interface MultiSelectPickerContextValue {
    */
   getOptionLabel: (value: string) => string | number | null;
 
+  /** Reports a disabled or read-only picker alike — the picker neither opens nor changes. */
   readonly isDisabled: boolean;
+  /** Reports a read-only picker that is not also disabled: it stays focusable and shows its values. */
+  readonly isReadOnly: boolean;
   readonly name?: string;
   readonly isInvalid?: boolean;
 

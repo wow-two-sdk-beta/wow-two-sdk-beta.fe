@@ -207,15 +207,24 @@ const rootClass = computed(() =>
     'inline-flex items-stretch overflow-hidden rounded-md border bg-background',
     invalid.value ? 'border-destructive' : 'border-input',
     disabled.value && 'opacity-60',
+    readOnly.value && 'bg-muted text-muted-foreground',
     attrs.class as ClassValue,
   ),
 );
 
-const selectClass = cn(
-  'h-10 cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+/* The country select is a native `<select>`, which has no `readonly`: a read-only phone input disables it, so it
+   takes the frame's muted surface and the default cursor rather than the pointer. */
+const selectClass = computed(() =>
+  cn(
+    'h-10 cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    readOnly.value && 'cursor-default bg-muted text-muted-foreground',
+  ),
 );
 
-const inputClass = cn(inputBaseVariants({ size: InputSize.Md }), 'rounded-none border-0 focus-visible:ring-0');
+const inputClass = cn(
+  inputBaseVariants({ size: InputSize.Md }),
+  'rounded-none border-0 focus-visible:ring-0 readonly:focus-visible:ring-0',
+);
 
 const formResetAnchor = useTemplateRef<HTMLInputElement>('formResetAnchor');
 const formResetRevision = useNativeFormReset(formResetAnchor, () => {
@@ -226,7 +235,7 @@ const locale = useLocale();
 </script>
 
 <template>
-  <div :key="formResetRevision" :class="rootClass" v-bind="passthroughAttrs">
+  <div :key="formResetRevision" :data-readonly="readOnly || undefined" :class="rootClass" v-bind="passthroughAttrs">
     <select
       :aria-label="locale.t('PhoneInput.country', undefined, 'Country')"
       :value="iso"
