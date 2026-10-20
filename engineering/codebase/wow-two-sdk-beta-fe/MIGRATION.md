@@ -6,17 +6,42 @@ Consumer-facing changes per published version, newest first. The package was `@w
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
 
-## 0.0.28 — build env for config
+## 0.0.28 — account menu, build env for config
 
 No import moves and no renamed props. The `foundation/config` row changes a signature; wire it as shown below.
 
 | Area | Change |
 |---|---|
 | `foundation/config` | `importMetaEnvSource(env)` takes the app's `import.meta.env`: a bundler inlines it only in the app's own modules, so the old no-argument call returned `{}` in every consumer build and in vitest. `defineConfig` options take `env`; `defaultSources(env?)` reads `window.__APP_CONFIG__` alone without it. Values copy as strings into a frozen snapshot. New type `ConfigEnv`. |
+| `presentation/nav` | `AccountMenu` + `AccountMenuLocale` · `AccountMenuOrganization` · `AccountMenuVersion`: the avatar menu that ends the top bar — identity, organization switcher, an `items` slot, `System` / `Light` / `Dark` on the nearest `ColorModeProvider`, language, read-only service versions, and sign out last when `@sign-out` is bound. [Spec](src/presentation/nav/accountMenu/AccountMenu.spec.md) |
 
 ```ts
 const config = defineConfig({ API_URL: url() }, { prefix: 'VITE_', env: import.meta.env });
 const sources = [windowConfigSource(), importMetaEnvSource(import.meta.env)];
+```
+
+New message keys: `AccountMenu.menuLabel` (`Account`), `.triggerLabel` (`Account menu for {name}`, with the `name`
+variable), `.anonymousTriggerLabel` (`Account menu`), `.appearanceLabel` (`Appearance`), `.systemModeLabel`
+(`System`), `.lightModeLabel` (`Light`), `.darkModeLabel` (`Dark`), `.languageLabel` (`Language`),
+`.organizationLabel` (`Organization`), `.versionsLabel` (`Versions`) and `.signOutLabel` (`Sign out`).
+
+Replace an app-local account menu with it: keep the app's session, organization navigation and locale switch in the
+handlers, and pass names, organizations, languages and versions already translated.
+
+```vue
+<AccountMenu
+  :name="user.displayName"
+  :description="user.email"
+  :organizations="memberships"
+  v-model:organization="organizationId"
+  :locales="languages"
+  v-model:locale="uiLocale"
+  :versions="[{ label: 'Desk', version: appVersion }, { label: 'API', version: api.version, commit: api.commit }]"
+  :is-busy="session.isBusy"
+  @sign-out="logout"
+>
+  <template #items><MenuItem @select="openSettings">Account settings</MenuItem></template>
+</AccountMenu>
 ```
 
 ## 0.0.23 — app switcher, toast landmark, password labels, session expiry

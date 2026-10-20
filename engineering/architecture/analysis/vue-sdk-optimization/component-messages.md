@@ -1,7 +1,7 @@
 # Vue component message catalogue
 
 *Source snapshot: 2026-09-25 full SDK sweep; gap-close keys added 2026-09-26 and 2026-09-28; app switcher and
-password toggle keys added 2026-10-18.*
+password toggle keys added 2026-10-18; account menu keys added 2026-10-20.*
 
 Static component keys and English fallbacks extracted from source. Supply overrides through
 `LocaleProvider.messages`. Placeholders retain their names; complete messages can reorder them.
@@ -10,6 +10,17 @@ in their capability specifications and are not inferred by this catalogue.
 
 | Key | English fallback | Source |
 |---|---|---|
+| `AccountMenu.anonymousTriggerLabel` | Account menu | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.appearanceLabel` | Appearance | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.darkModeLabel` | Dark | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.languageLabel` | Language | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.lightModeLabel` | Light | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.menuLabel` | Account | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.organizationLabel` | Organization | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.signOutLabel` | Sign out | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.systemModeLabel` | System | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.triggerLabel` | Account menu for {name} | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
+| `AccountMenu.versionsLabel` | Versions | [AccountMenu.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/accountMenu/AccountMenu.vue) |
 | `ActionSheetCancel.cancel` | Cancel | [ActionSheetCancel.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/overlays/actionSheet/ActionSheetCancel.vue) |
 | `AddressEditor.addressLine1` | Address line 1 | [AddressEditor.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/addressEditor/AddressEditor.vue) |
 | `AddressEditor.addressLine2` | Address line 2 | [AddressEditor.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/addressEditor/AddressEditor.vue) |

@@ -12,3 +12,4 @@ export * from './linkItem';
 export * from './bottomNavMenu';
 export * from './sidebarMenu';
 export * from './appSwitcherMenu';
+export * from './accountMenu';

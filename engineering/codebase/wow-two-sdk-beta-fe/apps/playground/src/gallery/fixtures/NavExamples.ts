@@ -40,6 +40,7 @@ import {
   SidebarMenuSection,
   AppSwitcherMenu,
   AppSwitcherKind,
+  AccountMenu,
 } from '../../../../../src/presentation/nav';
 import { h, type VNode } from 'vue';
 import { smokeCase, type SmokeCase } from './Example';
@@ -193,5 +194,26 @@ export const navExamples: readonly SmokeCase[] = [
       },
       { key: 'blog', label: 'Blog', href: 'https://blog.example.com/', kind: AppSwitcherKind.Site },
     ],
+  }),
+
+  smokeCase('AccountMenu', AccountMenu, {
+    name: 'Jane Doe',
+    description: 'jane.doe@example.com',
+    organizations: [
+      { id: 'northwind', label: 'Northwind', description: 'Owner' },
+      { id: 'contoso', label: 'Contoso', description: 'Editor' },
+    ],
+    organization: 'northwind',
+    locales: [
+      { value: 'uz', label: 'O‘zbekcha' },
+      { value: 'ru', label: 'Русский' },
+      { value: 'en', label: 'English' },
+    ],
+    locale: 'en',
+    versions: [
+      { label: 'Catalogue', version: '0.1.3' },
+      { label: 'API', version: '0.1.3', commit: '0123456789abcdef' },
+    ],
+    onSignOut: () => undefined,
   }),
 ];
