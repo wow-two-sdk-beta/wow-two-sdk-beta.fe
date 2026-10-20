@@ -23,6 +23,13 @@ export interface ScrollViewportProps extends /* @vue-ignore */ HTMLAttributes {
   readonly isAnimated?: boolean;
   /** @deprecated Use `isAnimated`; this alias is removed next release. */
   readonly animate?: boolean;
+
+  /**
+   * Fades the scrollbar thumb while the area is idle and brings it back on hover and while it scrolls. The track
+   * keeps its space, so the layout never shifts.
+   * @default false
+   */
+  readonly hasAutoHideScrollbar?: boolean;
 }
 </script>
 
@@ -30,6 +37,7 @@ export interface ScrollViewportProps extends /* @vue-ignore */ HTMLAttributes {
 import { computed, normalizeStyle, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../styles/Cn';
 import { useReducedMotion } from '../../device/hooks/UseReducedMotion';
+import { useScrollActivity } from '../../dom/hooks/UseScrollActivity';
 
 /**
  * Renders the slot inside a headless fixed-height scroll container. A drop-in for
@@ -54,8 +62,9 @@ const props = withDefaults(
     maxHeight?: number | string;
     isAnimated?: boolean;
     animate?: boolean;
+    hasAutoHideScrollbar?: boolean;
   }>(),
-  { isAnimated: undefined, animate: undefined },
+  { isAnimated: undefined, animate: undefined, hasAutoHideScrollbar: false },
 );
 
 defineSlots<{
@@ -66,6 +75,7 @@ defineSlots<{
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
 const reducedMotion = useReducedMotion();
+useScrollActivity(el, () => props.hasAutoHideScrollbar);
 
 const transitionsOn = computed(() => (props.isAnimated ?? props.animate ?? false) && !reducedMotion.value);
 
@@ -83,6 +93,7 @@ const sizeStyle = computed(() =>
 const classes = computed(() =>
   cn(
     'overflow-y-auto overflow-x-hidden',
+    props.hasAutoHideScrollbar && 'scrollbar-auto-hide',
     transitionsOn.value && 'transition-[height,opacity] duration-200 ease-out',
     attrs.class as string | undefined,
   ),

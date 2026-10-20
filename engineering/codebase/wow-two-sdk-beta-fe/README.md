@@ -40,12 +40,24 @@ It registers the package's own utility classes, which Tailwind otherwise exclude
 `themes.css` contains generated theme tokens and `themes.json` their manifest.
 Load the theme stylesheet when using a generated theme class.
 
-`styles.css` also themes every scrollbar on fine-pointer devices (mouse or trackpad; touch keeps its overlay bars).
-Chromium and Safari draw a slim bar with a rounded, inset thumb that follows the theme tokens (`--color-border-strong`,
-hover `--color-muted-foreground`) in light and dark; Firefox draws a thin bar in the same colours. Opt one element out
+`styles.css` also themes every scrollbar, on every device, and keeps it visible. Chromium and Safari draw a slim bar
+with a rounded, inset thumb that follows the theme tokens (`--color-border-strong`, hover `--color-muted-foreground`)
+in light and dark; Firefox draws a thin bar in the same colours. A styled bar is a classic one: its track takes its own
+width beside the content (`AppShellMain` and `ScrollViewport` also reserve it with `scrollbar-gutter: stable`), so
+content never sits under it, on phones as on desktops. A browser that keeps a system overlay scrollbar and ignores the
+styling keeps that overlay, which fades on its own and floats over the content; the SDK does not fake a bar there
+(iOS Safari and Firefox for Android are the two to confirm on a device). Opt one element out
 with `class="scrollbar-native"`, or tune a subtree with `--scrollbar-size`, `--scrollbar-inset`, `--scrollbar-track`,
 `--scrollbar-thumb` and `--scrollbar-thumb-hover`. The rules sit in `@layer base`, so an application's own scrollbar
 CSS wins. Setting `scrollbar-width` or `scrollbar-color` on an element makes Chromium ignore the rounded style there.
+
+Fading the thumb while idle is opt-in and off by default. `AppShellMain`, `ScrollArea`, `ScrollViewport` and
+`VirtualScrollArea` take `hasAutoHideScrollbar`; a plain element takes `class="scrollbar-auto-hide"`. The thumb
+fades out when nothing scrolls and returns while the pointer is over the element and while it carries `data-scrolling`.
+The components set that attribute while their content scrolls; on a plain element, call `useScrollActivity(target)`
+from `@wow-two-beta/fe/foundation/dom`, or set the attribute yourself, to bring the thumb back on touch devices, where
+no pointer hovers. The track keeps its space, so the layout never shifts. The fade needs the styled bar, so it applies
+wherever the bar does; `prefers-reduced-motion` makes it instant.
 
 `platform` is the validated theme every wow-two platform app shares (Wheelhouse's chalk and forest palette).
 A platform app imports `themes.css` after `styles.css` and sets `class="theme-platform"` on its root, plus `dark`

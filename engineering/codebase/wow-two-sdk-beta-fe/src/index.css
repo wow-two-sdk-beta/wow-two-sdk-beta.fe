@@ -287,59 +287,106 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Scrollbars — a slim themed track and a pill-shaped thumb on every scroll container.
+ * Scrollbars — a slim themed track and a pill-shaped thumb on every scroll container, always visible.
  *
  * Chromium and Safari take `::-webkit-scrollbar*`: the thumb is a fully rounded pill, inset from the track by a
- * transparent border so both ends read as round. Firefox draws no scrollbar pseudo-elements, so it takes the
- * standard properties — a thin bar in the same colours, with the system's own ends. Those are deliberately kept
- * out of Chromium and Safari, which would stop drawing the `::-webkit-scrollbar*` styles on any element that sets
- * them. Firefox also parses `::-webkit-scrollbar` (and never draws it), so the gate is a Firefox-only property
- * rather than `selector(::-webkit-scrollbar)`.
+ * transparent border so both ends read as round. A styled bar is a classic one: the track takes its own space
+ * beside the content, so nothing ever sits under it, on phones as on desktops. Firefox draws no scrollbar
+ * pseudo-elements, so it takes the standard properties — a thin bar in the same colours, with the system's own
+ * ends. Those are deliberately kept out of Chromium and Safari, which would stop drawing the
+ * `::-webkit-scrollbar*` styles on any element that sets them. Firefox also parses `::-webkit-scrollbar` (and
+ * never draws it), so the gate is a Firefox-only property rather than `selector(::-webkit-scrollbar)`.
+ *
+ * Every pointer type gets the same bar. A platform that draws its scrollbar as a system overlay and offers no
+ * styling hook (iOS Safari, Firefox for Android) keeps that overlay; CSS cannot change it.
  *
  * Scope and escape hatches:
- *   - Fine pointers only (`hover: hover` and `pointer: fine`): touch devices keep their overlay scrollbars.
  *   - `@layer base` plus `:where()` keep every rule below an app's own CSS and below utilities; a component's
  *     `scrollbar-width: none` or `[&::-webkit-scrollbar]:hidden` still hides its bar.
  *   - Opt out of one element with `class="scrollbar-native"` (it draws the platform's own scrollbar).
+ *   - Opt in to fading the thumb while idle with `class="scrollbar-auto-hide"`. The track keeps its space, so the
+ *     layout never shifts; the thumb returns while the pointer is over the element and while it carries
+ *     `data-scrolling` (the scroll-region components set it while their content scrolls). Off by default.
  *   - Tune any subtree by setting custom properties on it: `--scrollbar-size` (the bar's thickness, default
  *     0.625rem), `--scrollbar-inset` (the thumb's inset on each side, default 2px), `--scrollbar-track`,
  *     `--scrollbar-thumb` and `--scrollbar-thumb-hover`. The default colours follow the theme tokens, so they
  *     flip with `.dark` and any generated theme.
  * ------------------------------------------------------------------------- */
-@layer base {
-  @media (hover: hover) and (pointer: fine) {
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar {
-      width: var(--scrollbar-size, 0.625rem);
-      height: var(--scrollbar-size, 0.625rem);
-      background-color: var(--scrollbar-track, transparent);
-    }
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar-track,
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar-corner {
-      background-color: transparent;
-    }
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar-button {
-      display: none;
-    }
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb {
-      background-color: var(--scrollbar-thumb, var(--color-border-strong));
-      background-clip: padding-box;
-      border: var(--scrollbar-inset, 2px) solid transparent;
-      border-radius: 9999px;
-    }
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:hover,
-    :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:active {
-      background-color: var(--scrollbar-thumb-hover, var(--color-muted-foreground));
-    }
 
-    @supports ((-moz-appearance: none) or (-moz-orient: vertical)) {
-      :where(*:not(.scrollbar-native)) {
-        scrollbar-width: thin;
-        scrollbar-color: var(--scrollbar-thumb, var(--color-border-strong)) var(--scrollbar-track, transparent);
-      }
-      /* `scrollbar-color` inherits, so an opted-out element must reset it rather than only skip the rule above. */
-      .scrollbar-native {
-        scrollbar-color: auto;
-      }
+/* The thumb's opacity while an element opted in to auto-hide is idle. Registered so the fade animates. */
+@property --scrollbar-fade {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 100%;
+}
+
+@layer base {
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar {
+    width: var(--scrollbar-size, 0.625rem);
+    height: var(--scrollbar-size, 0.625rem);
+    background-color: var(--scrollbar-track, transparent);
+  }
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar-track,
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar-button {
+    display: none;
+  }
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb, var(--color-border-strong));
+    background-clip: padding-box;
+    border: var(--scrollbar-inset, 2px) solid transparent;
+    border-radius: 9999px;
+  }
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:hover,
+  :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:active {
+    background-color: var(--scrollbar-thumb-hover, var(--color-muted-foreground));
+  }
+
+  /* Auto-hide (opt-in). The fade is a registered property on the element: Chromium and Safari do not transition
+     the scrollbar pseudo-elements themselves, but they resolve the thumb's colour from this property each frame. */
+  :where(.scrollbar-auto-hide:not(.scrollbar-native)) {
+    --scrollbar-fade: 0%;
+    transition: --scrollbar-fade 200ms ease;
+  }
+  :where(.scrollbar-auto-hide:not(.scrollbar-native)[data-scrolling]) {
+    --scrollbar-fade: 100%;
+  }
+  @media (hover: hover) {
+    :where(.scrollbar-auto-hide:not(.scrollbar-native):hover) {
+      --scrollbar-fade: 100%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :where(.scrollbar-auto-hide:not(.scrollbar-native)) {
+      transition: none;
+    }
+  }
+  :where(.scrollbar-auto-hide:not(.scrollbar-native))::-webkit-scrollbar-thumb {
+    background-color: color-mix(
+      in srgb,
+      var(--scrollbar-thumb, var(--color-border-strong)) var(--scrollbar-fade),
+      transparent
+    );
+  }
+
+  @supports ((-moz-appearance: none) or (-moz-orient: vertical)) {
+    :where(*:not(.scrollbar-native)) {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb, var(--color-border-strong)) var(--scrollbar-track, transparent);
+    }
+    :where(.scrollbar-auto-hide:not(.scrollbar-native)) {
+      scrollbar-color: color-mix(
+          in srgb,
+          var(--scrollbar-thumb, var(--color-border-strong)) var(--scrollbar-fade),
+          transparent
+        )
+        var(--scrollbar-track, transparent);
+    }
+    /* `scrollbar-color` inherits, so an opted-out element must reset it rather than only skip the rule above. */
+    .scrollbar-native {
+      scrollbar-color: auto;
     }
   }
 }

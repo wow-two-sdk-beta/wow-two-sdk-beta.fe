@@ -11,12 +11,15 @@ Public import: `import { AppShellMain } from '@wow-two-beta/fe/presentation/layo
 - In a `region` shell the element is the one scroll container and carries `ScrollRegionAttribute`
   (`data-scroll-region`), so `createAppRouter` restores its offset on back/forward and resets it on a new
   navigation, as it does the window's.
+- `hasAutoHideScrollbar` opts the region in to the `scrollbar-auto-hide` styles and marks it with `data-scrolling` while it scrolls; by default the themed scrollbar stays visible.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
 
-No declared props.
+| Prop | Type | Required | Default | Meaning |
+|---|---|---|---|---|
+| `hasAutoHideScrollbar` | `boolean` | no | `false` | Fades the scrollbar thumb while the region is idle; it returns on hover and while the region scrolls. The track keeps its space. No effect in a `document` shell. |
 
 ## Emits
 

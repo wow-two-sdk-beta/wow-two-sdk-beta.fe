@@ -21,12 +21,20 @@ export interface VirtualScrollAreaProps<T> {
 
   /** How many items before the end the rendered window must reach to report `end-reached`. Default 5. */
   readonly endThreshold?: number;
+
+  /**
+   * Fades the scrollbar thumb while the area is idle and brings it back on hover and while it scrolls. The track
+   * keeps its space, so the layout never shifts.
+   * @default false
+   */
+  readonly hasAutoHideScrollbar?: boolean;
 }
 </script>
 
 <script setup lang="ts" generic="T">
 import { computed, onBeforeUnmount, onMounted, useAttrs, useTemplateRef, watch, type CSSProperties } from 'vue';
 import type { ClassValue } from 'clsx';
+import { useScrollActivity } from '../../../foundation/dom';
 import { cn } from '../../../foundation/styles';
 import { useVirtualList, type VirtualItem } from '../../../foundation/virtualization';
 
@@ -50,6 +58,7 @@ const props = withDefaults(defineProps<VirtualScrollAreaProps<T>>(), {
   isHorizontal: false,
   getKey: undefined,
   endThreshold: 5,
+  hasAutoHideScrollbar: false,
 });
 
 const emit = defineEmits<{
@@ -59,6 +68,7 @@ const emit = defineEmits<{
 
 const attrs = useAttrs();
 const viewport = useTemplateRef<HTMLDivElement>('viewport');
+useScrollActivity(viewport, () => props.hasAutoHideScrollbar);
 
 const list = useVirtualList({
   count: () => props.items.length,
@@ -92,7 +102,9 @@ const rest = computed(() => {
   return others;
 });
 
-const viewportClass = computed(() => cn('relative overflow-auto', attrs.class as ClassValue));
+const viewportClass = computed(() =>
+  cn('relative overflow-auto', props.hasAutoHideScrollbar && 'scrollbar-auto-hide', attrs.class as ClassValue),
+);
 
 /** Reports `end-reached` once per length when the rendered window nears the end. */
 watch(

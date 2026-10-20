@@ -3,15 +3,22 @@
  * The prop surface of `AppShellMain`.
  *
  * React declared `HTMLAttributes<HTMLElement>`; attributes reach the root
- * through `useAttrs` here and `children` is the default slot, which leaves no
- * declared prop.
+ * through `useAttrs` here and `children` is the default slot.
  */
-export type AppShellMainProps = Record<string, never>;
+export interface AppShellMainProps {
+  /**
+   * Fades the scrollbar thumb while the region is idle and brings it back on hover and while it scrolls. The
+   * track keeps its space, so the layout never shifts. Only a region shell's main scrolls, so it has no effect
+   * in a `document` shell.
+   * @default false
+   */
+  readonly hasAutoHideScrollbar?: boolean;
+}
 </script>
 
 <script setup lang="ts">
 import { computed, inject, useAttrs, useTemplateRef } from 'vue';
-import { ScrollRegionAttribute } from '../../../foundation/dom';
+import { ScrollRegionAttribute, useScrollActivity } from '../../../foundation/dom';
 import { cn } from '../../../foundation/styles';
 import { appShellContextKey, AppShellScroll } from './AppShell.vue';
 
@@ -26,6 +33,8 @@ defineOptions({ name: 'AppShellMain', inheritAttrs: false });
 /** The page content — React's `children`. */
 defineSlots<{ default?(): unknown }>();
 
+const props = withDefaults(defineProps<AppShellMainProps>(), { hasAutoHideScrollbar: false });
+
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLElement>('el');
 
@@ -33,6 +42,9 @@ const el = useTemplateRef<HTMLElement>('el');
 const context = inject(appShellContextKey, null);
 
 const isRegion = computed(() => context?.scroll.value === AppShellScroll.Region);
+
+const isAutoHiding = computed(() => isRegion.value && props.hasAutoHideScrollbar);
+useScrollActivity(el, isAutoHiding);
 
 /* The app router saves, restores and resets a marked region's scroll as it does the window's. */
 const regionAttrs = computed(() => (isRegion.value ? { [ScrollRegionAttribute]: '' } : {}));
@@ -43,6 +55,7 @@ const classes = computed(() =>
   cn(
     'flex flex-col [grid-area:main] focus:outline-hidden',
     isRegion.value && 'min-h-0 overflow-y-auto [scrollbar-gutter:stable]',
+    isAutoHiding.value && 'scrollbar-auto-hide',
     attrs.class as string | undefined,
   ),
 );

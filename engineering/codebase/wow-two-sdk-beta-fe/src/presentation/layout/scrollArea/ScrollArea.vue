@@ -17,11 +17,19 @@ export type ScrollAxis = (typeof ScrollAxis)[keyof typeof ScrollAxis];
 export interface ScrollAreaProps {
   /** The scroll axis. Default `vertical`. */
   readonly axis?: ScrollAxis;
+
+  /**
+   * Fades the scrollbar thumb while the area is idle and brings it back on hover and while it scrolls. The track
+   * keeps its space, so the layout never shifts.
+   * @default false
+   */
+  readonly hasAutoHideScrollbar?: boolean;
 }
 </script>
 
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
+import { useScrollActivity } from '../../../foundation/dom';
 import { cn } from '../../../foundation/styles';
 
 /**
@@ -31,7 +39,10 @@ import { cn } from '../../../foundation/styles';
  */
 defineOptions({ name: 'ScrollArea', inheritAttrs: false });
 
-const props = withDefaults(defineProps<ScrollAreaProps>(), { axis: ScrollAxis.Vertical });
+const props = withDefaults(defineProps<ScrollAreaProps>(), {
+  axis: ScrollAxis.Vertical,
+  hasAutoHideScrollbar: false,
+});
 
 defineSlots<{
   /** The scrollable content. */
@@ -40,6 +51,7 @@ defineSlots<{
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
+useScrollActivity(el, () => props.hasAutoHideScrollbar);
 
 const classes = computed(() =>
   cn(
@@ -47,6 +59,7 @@ const classes = computed(() =>
     props.axis === ScrollAxis.Vertical && 'overflow-y-auto overflow-x-hidden',
     props.axis === ScrollAxis.Horizontal && 'overflow-x-auto overflow-y-hidden',
     props.axis === ScrollAxis.Both && 'overflow-auto',
+    props.hasAutoHideScrollbar && 'scrollbar-auto-hide',
     attrs.class as string | undefined,
   ),
 );

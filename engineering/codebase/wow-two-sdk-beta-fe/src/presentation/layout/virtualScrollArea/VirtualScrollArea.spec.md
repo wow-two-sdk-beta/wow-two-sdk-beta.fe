@@ -16,6 +16,7 @@ Public import: `import { VirtualScrollArea } from '@wow-two-beta/fe/presentation
 - `end-reached` fires once per list length when the rendered window comes within `endThreshold` items of the end — the hook for loading the next page.
 - Server rendering and the first client frame render no rows until the viewport is measured.
 - Horizontal areas lay out left to right; right-to-left horizontal scrolling is not supported.
+- `hasAutoHideScrollbar` opts the viewport in to the `scrollbar-auto-hide` styles and marks it with `data-scrolling` while it scrolls; by default the themed scrollbar stays visible.
 - Attributes and `class` reach the scrolling element; a `role="list"` there pairs with `role="listitem"` and `aria-posinset` / `aria-setsize` in the slot.
 
 ## Props
@@ -29,6 +30,7 @@ Public import: `import { VirtualScrollArea } from '@wow-two-beta/fe/presentation
 | `isHorizontal` | `boolean` | no | `false` | Scrolls horizontally instead of vertically. |
 | `getKey` | `(item: T, index: number) => string \| number` | no | index | Stable identity per item. |
 | `endThreshold` | `number` | no | `5` | How close to the end the window must come to report `end-reached`. |
+| `hasAutoHideScrollbar` | `boolean` | no | `false` | Fades the scrollbar thumb while the area is idle; it returns on hover and while the area scrolls. The track keeps its space. |
 
 ## Emits
 
