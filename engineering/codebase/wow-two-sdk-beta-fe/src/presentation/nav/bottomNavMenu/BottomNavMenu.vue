@@ -1,8 +1,17 @@
 <script lang="ts">
+import type { NavbarVariant } from '../../layout/navbar/Navbar.variants';
+
 /** Defines props for the mobile bottom navigation bar. */
 export interface BottomNavMenuProps {
   /** Whether the bar pins to the bottom of the viewport. Default `true`; `false` keeps it in flow. */
   readonly isFixed?: boolean;
+
+  /**
+   * The surface: `solid` (the page background, default), `glass` (the theme's chrome glass with its edge on the top
+   * border and its shadow cast upward; opaque where blur or transparency is unavailable or reduced) or
+   * `transparent`.
+   */
+  readonly variant?: NavbarVariant;
 }
 </script>
 
@@ -12,6 +21,7 @@ import type { ClassValue } from 'clsx';
 import { AriaAttribute } from '../../../foundation/dom';
 import { useLocale } from '../../../foundation/i18n';
 import { cn } from '../../../foundation/styles';
+import { BottomNavSurfaceClass } from '../../layout/navbar/Navbar.variants';
 
 /**
  * Renders the mobile bottom navigation bar — three to five top-level destinations as equal-width tabs, padded
@@ -22,7 +32,7 @@ defineOptions({ name: 'BottomNavMenu', inheritAttrs: false });
 /** The `BottomNavMenuItem` destinations. */
 defineSlots<{ default(): unknown }>();
 
-const props = withDefaults(defineProps<BottomNavMenuProps>(), { isFixed: true });
+const props = withDefaults(defineProps<BottomNavMenuProps>(), { isFixed: true, variant: 'solid' });
 
 const attrs = useAttrs();
 const locale = useLocale();
@@ -39,7 +49,9 @@ const rest = computed(() => {
 
 const classes = computed(() =>
   cn(
-    'border-t border-border bg-background pb-[env(safe-area-inset-bottom)]',
+    'border-t',
+    BottomNavSurfaceClass[props.variant],
+    'pb-[env(safe-area-inset-bottom)]',
     props.isFixed && 'fixed inset-x-0 bottom-0 z-sticky',
     attrs.class as ClassValue,
   ),

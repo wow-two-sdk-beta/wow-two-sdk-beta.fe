@@ -269,7 +269,7 @@ describe('the ocharo theme', () => {
     });
   });
 
-  it('emits the approved frame glass in both modes, the highlight inside both shadows', () => {
+  it('emits the approved frame glass in both modes, the highlight inside every shadow', () => {
     const [light, dark] = themeToCss(theme).split('\n\n');
     for (const line of [
       '--glass-fill: rgb(255 255 255 / 0.84);',
@@ -280,6 +280,7 @@ describe('the ocharo theme', () => {
       '--glass-edge: rgb(24 27 37 / 0.08);',
       '--glass-highlight: rgb(255 255 255 / 0.9);',
       '--glass-shadow: 0 10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 var(--glass-highlight);',
+      '--glass-bottom-shadow: 0 -10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 var(--glass-highlight);',
       '--glass-menu-shadow: 0 18px 50px rgb(24 27 37 / 0.16), inset 0 1px 0 var(--glass-highlight);',
     ]) {
       expect(light).toContain(line);
@@ -293,6 +294,7 @@ describe('the ocharo theme', () => {
       '--glass-edge: rgb(255 255 255 / 0.07);',
       '--glass-highlight: rgb(255 255 255 / 0.06);',
       '--glass-shadow: 0 12px 32px rgb(0 0 0 / 0.25), inset 0 1px 0 var(--glass-highlight);',
+      '--glass-bottom-shadow: 0 -12px 32px rgb(0 0 0 / 0.25), inset 0 1px 0 var(--glass-highlight);',
       '--glass-menu-shadow: 0 20px 60px rgb(0 0 0 / 0.5), inset 0 1px 0 var(--glass-highlight);',
     ]) {
       expect(dark).toContain(line);

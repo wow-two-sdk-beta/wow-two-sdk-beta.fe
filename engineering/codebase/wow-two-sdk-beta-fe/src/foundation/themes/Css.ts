@@ -51,12 +51,16 @@ const GlassProperties: ReadonlyArray<readonly [keyof ThemeGlassTokens, string]> 
   ['edge', '--glass-edge'],
   ['highlight', '--glass-highlight'],
   ['shadow', '--glass-shadow'],
+  ['bottomShadow', '--glass-bottom-shadow'],
   ['menuShadow', '--glass-menu-shadow'],
 ];
 
+/** The tokens that are shadows; each ends in the highlight line. */
+const GlassShadowTokens: ReadonlySet<keyof ThemeGlassTokens> = new Set(['shadow', 'bottomShadow', 'menuShadow']);
+
 /**
- * Render one mode's glass strength as declaration lines (empty string when unset). With a highlight, both shadows
- * end in its 1px inset line, so a surface that takes the shadow takes the highlight too.
+ * Render one mode's glass strength as declaration lines (empty string when unset). With a highlight, every shadow
+ * ends in its 1px inset line along the top edge, so a surface that takes a shadow takes the highlight too.
  */
 function glassDeclarations(tokens: ThemeGlassTokens | undefined, indent = '  '): string {
   if (!tokens) return '';
@@ -64,9 +68,10 @@ function glassDeclarations(tokens: ThemeGlassTokens | undefined, indent = '  '):
   for (const [key, property] of GlassProperties) {
     const value = tokens[key];
     if (value === undefined) continue;
-    const isShadow = key === 'shadow' || key === 'menuShadow';
     const declared =
-      isShadow && tokens.highlight !== undefined ? `${value}, inset 0 1px 0 var(--glass-highlight)` : value;
+      GlassShadowTokens.has(key) && tokens.highlight !== undefined
+        ? `${value}, inset 0 1px 0 var(--glass-highlight)`
+        : value;
     lines.push(`\n${indent}${property}: ${declared};`);
   }
   return lines.join('');

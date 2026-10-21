@@ -411,7 +411,9 @@ const ocharoAmbient: ThemeAmbient = {
 };
 
 /* The approved frame glass, verbatim from Ocharo Desk's `oc-glass` materials: the chrome at 84% / 90%, the sidebar at
- * 60% / 70% over #212125, menus at 92% / 96%, a 24px blur, and a white top highlight inside both shadows. */
+ * 60% / 70% over #212125, menus at 92% / 96%, a 24px blur, and a white top highlight inside every shadow. The bottom
+ * bar's shadow is derived, not approved: the chrome shadow mirrored upward, so the phone bar lifts off the page as
+ * the top bar does (Desk's own phone bar had none). */
 const ocharoGlass: ThemeGlass = {
   light: {
     fill: 'rgb(255 255 255 / 0.84)',
@@ -422,6 +424,7 @@ const ocharoGlass: ThemeGlass = {
     edge: 'rgb(24 27 37 / 0.08)',
     highlight: 'rgb(255 255 255 / 0.9)',
     shadow: '0 10px 30px rgb(24 27 37 / 0.06)',
+    bottomShadow: '0 -10px 30px rgb(24 27 37 / 0.06)',
     menuShadow: '0 18px 50px rgb(24 27 37 / 0.16)',
   },
   dark: {
@@ -433,6 +436,7 @@ const ocharoGlass: ThemeGlass = {
     edge: 'rgb(255 255 255 / 0.07)',
     highlight: 'rgb(255 255 255 / 0.06)',
     shadow: '0 12px 32px rgb(0 0 0 / 0.25)',
+    bottomShadow: '0 -12px 32px rgb(0 0 0 / 0.25)',
     menuShadow: '0 20px 60px rgb(0 0 0 / 0.5)',
   },
 };

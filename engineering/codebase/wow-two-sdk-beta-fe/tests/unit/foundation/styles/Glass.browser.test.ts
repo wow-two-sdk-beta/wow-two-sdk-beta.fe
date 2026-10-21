@@ -7,6 +7,7 @@ import type {} from '@vitest/browser-playwright';
 import { surfaceVariants } from '@src/foundation/styles';
 import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppShell, AppShellHeader, AppShellMain, AppShellSidebar } from '@src/presentation/layout';
+import { BottomNavMenu, BottomNavMenuItem } from '@src/presentation/nav';
 import '@src/index.css';
 
 // Forced colours replace fills with system colours and drop shadows by design, so there is nothing to compare.
@@ -65,6 +66,19 @@ const referenceBackdrop = (value: string): string =>
   reference('backdrop-filter', `backdrop-filter: ${value}`) ||
   reference('-webkit-backdrop-filter', `-webkit-backdrop-filter: ${value}`);
 
+/** Mounts an in-flow glass phone bar beside a default one under the root; returns `[glass, solid]`. */
+function bottomBars(): [HTMLElement, HTMLElement] {
+  const bar = (variant: 'glass' | undefined) =>
+    h(BottomNavMenu, { variant, isFixed: false, 'data-bar': variant ?? 'solid' }, () =>
+      h(BottomNavMenuItem, { href: '#home' }, () => 'Home'),
+    );
+  wrapper = mount(() => h('div', [bar('glass'), bar(undefined)]), { attachTo: root });
+  return [
+    root.querySelector<HTMLElement>('[data-bar="glass"]')!,
+    root.querySelector<HTMLElement>('[data-bar="solid"]')!,
+  ];
+}
+
 describe.skipIf(isForcedColors)('glass strength without a theme that sets it', () => {
   it('keeps the SDK glass: the chrome at 75% card, 12px blur, no shadow', () => {
     const chrome = surface('surface-glass border border-glass-edge shadow-(--glass-shadow)');
@@ -83,6 +97,16 @@ describe.skipIf(isForcedColors)('glass strength without a theme that sets it', (
     );
     expect(backdrop(panel)).toBe(referenceBackdrop('blur(12px) saturate(100%)'));
     expect(read(panel, 'box-shadow')).not.toBe('none');
+  });
+
+  it('keeps the SDK glass on the phone bar: the chrome at 75% card, the border edge, no shadow', () => {
+    const [glass] = bottomBars();
+    expect(read(glass, 'background-color')).toBe(
+      reference('background-color', 'background-color: color-mix(in oklab, var(--color-card) 75%, transparent)'),
+    );
+    expect(backdrop(glass)).toBe(referenceBackdrop('blur(12px) saturate(100%)'));
+    expect(read(glass, 'border-top-color')).toBe(reference('color', 'color: var(--color-border)'));
+    expect(read(glass, 'box-shadow')).toBe(tailwindShadow('0 0 #0000'));
   });
 
   it('falls the side and menu strengths back to the SDK glass, the menu with a large shadow', () => {
@@ -125,6 +149,26 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
     expect(read(menu, 'border-top-color')).toBe(reference('color', `color: ${glass.edge}`));
     expect(read(chrome, 'box-shadow')).toBe(tailwindShadow(`${glass.shadow}, inset 0 1px 0 ${glass.highlight}`));
     expect(read(menu, 'box-shadow')).toBe(tailwindShadow(`${glass.menuShadow}, inset 0 1px 0 ${glass.highlight}`));
+  });
+
+  it.each(modes)('paints the %s phone bar in the chrome glass, its shadow cast upward', (mode, glass) => {
+    root.className = mode === 'dark' ? 'theme-ocharo dark' : 'theme-ocharo';
+    const [bar, solid] = bottomBars();
+
+    expect(read(bar, 'background-color')).toBe(reference('background-color', `background-color: ${glass.fill}`));
+    expect(backdrop(bar)).toBe(referenceBackdrop(`blur(${glass.blur}) saturate(${glass.saturate})`));
+    expect(read(bar, 'border-top-width')).toBe('1px');
+    expect(read(bar, 'border-top-color')).toBe(reference('color', `color: ${glass.edge}`));
+    expect(glass.bottomShadow).toMatch(/^0 -\d+px /u);
+    expect(read(bar, 'box-shadow')).toBe(tailwindShadow(`${glass.bottomShadow}, inset 0 1px 0 ${glass.highlight}`));
+
+    /* The default stays the opaque page background with the plain border, no blur and no shadow. */
+    expect(read(solid, 'background-color')).toBe(
+      reference('background-color', 'background-color: var(--color-background)'),
+    );
+    expect(read(solid, 'border-top-color')).toBe(reference('color', 'color: var(--color-border)'));
+    expect(backdrop(solid)).toBe('none');
+    expect(read(solid, 'box-shadow')).toBe('none');
   });
 
   it('reaches the frame components that opt in', async () => {
@@ -186,5 +230,12 @@ describe.skipIf(isForcedColors || server.browser !== 'chromium')('glass under re
       reference('background-color', 'background-color: var(--color-popover)'),
     );
     expect(backdrop(menu)).toBe('none');
+  });
+
+  it('returns the glass phone bar to the solid card without a blur', () => {
+    root.className = 'theme-ocharo';
+    const [bar] = bottomBars();
+    expect(read(bar, 'background-color')).toBe(reference('background-color', 'background-color: var(--color-card)'));
+    expect(backdrop(bar)).toBe('none');
   });
 });

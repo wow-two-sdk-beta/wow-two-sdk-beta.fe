@@ -38,7 +38,7 @@ export const NavbarVariant = {
   Solid: 'solid',
   /**
    * Refers to a translucent, blurred surface at the theme's glass strength; opaque where blur or transparency is
-   * unavailable or unwanted. A bar paints the chrome material, a sidebar the side one.
+   * unavailable or unwanted. A top or bottom bar paints the chrome material, a sidebar the side one.
    */
   Glass: 'glass',
   /** Refers to no surface; the page shows through. */
@@ -63,6 +63,17 @@ export const SidebarSurfaceClass: Record<NavbarVariant, string> = {
   solid: 'bg-card',
   glass: 'surface-glass-side border-glass-edge',
   transparent: 'bg-transparent',
+};
+
+/**
+ * The surface and top-border colour per `NavbarVariant` for the phone bottom bar (`BottomNavMenu`). `solid` is the
+ * page background; `glass` is the `surface-glass` chrome material with the `--glass-edge` hairline on its top border
+ * and `--glass-bottom-shadow`, the chrome shadow cast upward over the page (no shadow when the theme sets none).
+ */
+export const BottomNavSurfaceClass: Record<NavbarVariant, string> = {
+  solid: 'border-border bg-background',
+  glass: 'surface-glass border-glass-edge shadow-(--glass-bottom-shadow)',
+  transparent: 'border-border bg-transparent',
 };
 
 /** Provides the header-band chrome (height, sticky positioning) for `Navbar`. */

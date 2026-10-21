@@ -432,15 +432,16 @@ body {
  *
  * The strength is a set of custom properties. A theme sets them in its `.theme-{id}` blocks (`Theme.glass`); an
  * app may also set them on any subtree. Unset, every surface keeps the SDK's own glass:
- *   --glass-fill         chrome fill; unset, the card at 75% (`surface-glass`) or the popover at 70% (`glass`)
- *   --glass-side-fill    sidebar fill; unset, --glass-fill
- *   --glass-menu-fill    menu fill; unset, --glass-fill, else the popover at 70%
- *   --glass-blur         backdrop blur radius; default 12px
- *   --glass-saturate     backdrop saturation; default 100%
- *   --glass-edge         hairline between glass and content, as `border-glass-edge`; unset, --color-border
- *   --glass-highlight    inset top highlight a theme adds to both shadows; default transparent
- *   --glass-shadow       chrome shadow, as `shadow-(--glass-shadow)`; default none
- *   --glass-menu-shadow  menu shadow, as `shadow-(--glass-menu-shadow)`; default Tailwind's `shadow-lg`
+ *   --glass-fill           chrome fill; unset, the card at 75% (`surface-glass`) or the popover at 70% (`glass`)
+ *   --glass-side-fill      sidebar fill; unset, --glass-fill
+ *   --glass-menu-fill      menu fill; unset, --glass-fill, else the popover at 70%
+ *   --glass-blur           backdrop blur radius; default 12px
+ *   --glass-saturate       backdrop saturation; default 100%
+ *   --glass-edge           hairline between glass and content, as `border-glass-edge`; unset, --color-border
+ *   --glass-highlight      inset top highlight a theme adds to every shadow; default transparent
+ *   --glass-shadow         chrome shadow cast down from a top bar, as `shadow-(--glass-shadow)`; default none
+ *   --glass-bottom-shadow  bottom-bar shadow cast up over the page, as `shadow-(--glass-bottom-shadow)`; default none
+ *   --glass-menu-shadow    menu shadow, as `shadow-(--glass-menu-shadow)`; default Tailwind's `shadow-lg`
  * The `glass` and `glass-outline` surface variants read --glass-fill, --glass-blur and --glass-saturate; the
  * `glass-side` and `glass-menu` variants paint the two materials, the menu one with its edge and shadow.
  * ------------------------------------------------------------------------- */
@@ -462,6 +463,11 @@ body {
   initial-value: transparent;
 }
 @property --glass-shadow {
+  syntax: '*';
+  inherits: true;
+  initial-value: 0 0 #0000;
+}
+@property --glass-bottom-shadow {
   syntax: '*';
   inherits: true;
   initial-value: 0 0 #0000;

@@ -46,6 +46,36 @@ describe('BottomNavMenu', () => {
     expect(wrapper.get('nav').classes()).not.toContain('fixed');
   });
 
+  it('keeps the solid page-background bar by default', () => {
+    expect(mountBar().get('nav').classes().join(' ')).toBe(
+      'border-t border-border bg-background pb-[env(safe-area-inset-bottom)] fixed inset-x-0 bottom-0 z-sticky',
+    );
+  });
+
+  it('paints the chrome glass material, top edge and upward shadow as glass', () => {
+    const nav = mountBar({ variant: 'glass', isFixed: false }, { class: 'z-sticky md:hidden' }).get('nav');
+    expect(nav.classes()).toEqual(
+      expect.arrayContaining([
+        'surface-glass',
+        'border-t',
+        'border-glass-edge',
+        'shadow-(--glass-bottom-shadow)',
+        'pb-[env(safe-area-inset-bottom)]',
+        'z-sticky',
+        'md:hidden',
+      ]),
+    );
+    expect(nav.classes()).not.toContain('bg-background');
+    expect(nav.classes()).not.toContain('border-border');
+    expect(nav.get('ul').classes()).toEqual(expect.arrayContaining(['mx-auto', 'grid', 'max-w-lg']));
+  });
+
+  it('paints no surface when transparent and keeps the border', () => {
+    const nav = mountBar({ variant: 'transparent' }).get('nav');
+    expect(nav.classes()).toEqual(expect.arrayContaining(['bg-transparent', 'border-t', 'border-border']));
+    expect(nav.classes()).not.toContain('bg-background');
+  });
+
   it('localizes the default landmark name', () => {
     const wrapper = mount(
       defineComponent({

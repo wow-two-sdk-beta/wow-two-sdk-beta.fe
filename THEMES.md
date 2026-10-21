@@ -193,14 +193,19 @@ SDK's own glass, and an app may set any of them on a subtree.
 | `blur` | `--glass-blur` | every glass surface | `12px` |
 | `saturate` | `--glass-saturate` | every glass surface | `100%` |
 | `edge` | `--glass-edge` | `border-glass-edge`, `glass-menu` | `--color-border` |
-| `highlight` | `--glass-highlight` | added to both shadows as `inset 0 1px 0` | `transparent` |
+| `highlight` | `--glass-highlight` | added to every shadow as `inset 0 1px 0` | `transparent` |
 | `shadow` | `--glass-shadow` | `shadow-(--glass-shadow)`, glass `Navbar` / `AppShellHeader` | none |
+| `bottomShadow` | `--glass-bottom-shadow` | `shadow-(--glass-bottom-shadow)`, glass `BottomNavMenu` | none |
 | `menuShadow` | `--glass-menu-shadow` | `shadow-(--glass-menu-shadow)`, `glass-menu` | Tailwind `shadow-lg` |
 
 - `ocharo` carries the approved frame glass: light `fill` white 84%, `sideFill` 60%, `menuFill` 92%, `blur` 24px,
-  `saturate` 120%; dark `#29292d` at 90% / 96% and `#212125` at 70%, `saturate` 100%.
-- Frame surfaces: `AppShellHeader variant="glass"`, `AppShellSidebar variant="glass"`, and `variant="glass-menu"` on
-  `DropdownMenuContent`, `PopoverContent`, `ModalContent`, `AccountMenu` and `AppSwitcherMenu`.
+  `saturate` 120%; dark `#29292d` at 90% / 96% and `#212125` at 70%, `saturate` 100%. Its `bottomShadow` is derived,
+  not approved: the chrome `shadow` with its y offset negated.
+- `bottomShadow` points up — a negative y offset — because a bottom bar lifts off the page above it; the chrome
+  `shadow` falls downward, off a bottom bar's screen edge. The highlight still lines the bar's top edge.
+- Frame surfaces: `AppShellHeader variant="glass"`, `AppShellSidebar variant="glass"`, `BottomNavMenu variant="glass"`
+  and `variant="glass-menu"` on `DropdownMenuContent`, `PopoverContent`, `ModalContent`, `AccountMenu` and
+  `AppSwitcherMenu`.
 - Each material is the solid card (popover for menus) where `backdrop-filter` is unsupported and under
   `prefers-reduced-transparency`.
 

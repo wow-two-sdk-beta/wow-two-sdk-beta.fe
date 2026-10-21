@@ -85,11 +85,17 @@ export interface ThemeGlassTokens {
   /** The hairline colour between glass and content (`--glass-edge`). */
   readonly edge?: string;
 
-  /** The inset top highlight colour (`--glass-highlight`); the emitter adds it to both shadows as a 1px line. */
+  /** The inset top highlight colour (`--glass-highlight`); the emitter adds it to every shadow as a 1px line. */
   readonly highlight?: string;
 
-  /** The chrome's outer shadow (`--glass-shadow`). */
+  /** The chrome's outer shadow, cast down from a top bar (`--glass-shadow`). */
   readonly shadow?: string;
+
+  /**
+   * The bottom bar's outer shadow, cast up over the page (`--glass-bottom-shadow`) — a negative y offset, the
+   * mirror of `shadow`.
+   */
+  readonly bottomShadow?: string;
 
   /** The menus' outer shadow (`--glass-menu-shadow`). */
   readonly menuShadow?: string;
