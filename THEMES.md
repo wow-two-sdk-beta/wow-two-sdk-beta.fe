@@ -199,8 +199,8 @@ SDK's own glass, and an app may set any of them on a subtree.
 | `menuShadow` | `--glass-menu-shadow` | `shadow-(--glass-menu-shadow)`, `glass-menu` | Tailwind `shadow-lg` |
 
 - `ocharo` carries the approved frame glass: light `fill` white 84%, `sideFill` 60%, `menuFill` 92%, `blur` 24px,
-  `saturate` 120%; dark `#29292d` at 90% / 96% and `#212125` at 70%, `saturate` 100%. Its `bottomShadow` is derived,
-  not approved: the chrome `shadow` with its y offset negated.
+  `saturate` 120%; dark `#29292d` at 90% / 96% and `#212125` at 70%, `saturate` 100%. Its `bottomShadow` is the
+  chrome `shadow` with its y offset negated, approved by the Ocharo owner on 2026-10-21.
 - `bottomShadow` points up — a negative y offset — because a bottom bar lifts off the page above it; the chrome
   `shadow` falls downward, off a bottom bar's screen edge. The highlight still lines the bar's top edge.
 - Frame surfaces: `AppShellHeader variant="glass"`, `AppShellSidebar variant="glass"`, `BottomNavMenu variant="glass"`
