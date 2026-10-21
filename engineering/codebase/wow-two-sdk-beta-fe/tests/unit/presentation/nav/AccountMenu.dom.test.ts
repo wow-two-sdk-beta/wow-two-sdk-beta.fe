@@ -451,6 +451,21 @@ describe('AccountMenu versions and sign out', () => {
   });
 });
 
+describe('AccountMenu surface', () => {
+  it('paints the menu glass on the surface and keeps panelClass on the scrolling panel', async () => {
+    menu({ name: 'Jane Doe', variant: 'glass-menu', panelClass: 'gap-1' });
+    const surfaceNode = await open();
+    for (const name of ['surface-glass-menu', 'border-glass-edge', 'shadow-(--glass-menu-shadow)']) {
+      expect(surfaceNode.classList.contains(name), name).toBe(true);
+    }
+    expect(surfaceNode.classList.contains('bg-popover')).toBe(false);
+    const scroller = surfaceNode.firstElementChild!;
+    expect(scroller.classList.contains('gap-1')).toBe(true);
+    expect(scroller.classList.contains('overflow-y-auto')).toBe(true);
+    expect(scroller.classList.contains('surface-glass-menu')).toBe(false);
+  });
+});
+
 describe('AccountMenu labels', () => {
   const Uzbek = {
     'AccountMenu.menuLabel': 'Hisob',

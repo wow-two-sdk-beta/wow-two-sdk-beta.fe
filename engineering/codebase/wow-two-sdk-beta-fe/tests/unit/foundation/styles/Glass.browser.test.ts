@@ -7,11 +7,10 @@ import type {} from '@vitest/browser-playwright';
 import { surfaceVariants } from '@src/foundation/styles';
 import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppShell, AppShellHeader, AppShellMain, AppShellSidebar } from '@src/presentation/layout';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@src/presentation/nav/dropdownMenu';
-import { MenuItem } from '@src/presentation/nav/menu';
 import '@src/index.css';
 
 // Forced colours replace fills with system colours and drop shadows by design, so there is nothing to compare.
+// Nothing here takes focus: test files share the browser's focus, and a menu's focus trap would take it from them.
 const isForcedColors = matchMedia('(forced-colors: active)').matches;
 
 const ocharo = getTheme('ocharo')!;
@@ -158,29 +157,6 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
       expect(read(sidebar, 'border-right-color')).toBe(reference('color', 'color: rgb(24 27 37 / 0.08)'));
     } finally {
       await page.viewport(414, 896);
-    }
-  });
-
-  it('paints an open dropdown on the menu glass', async () => {
-    /* The menu portals to the body, outside the root, so the body carries the theme, before the surface's colour
-       transition could start from the default. */
-    document.body.classList.add('theme-ocharo');
-    wrapper = mount(
-      () =>
-        h(DropdownMenu, { defaultOpen: true }, () => [
-          h(DropdownMenuTrigger, null, () => 'Open'),
-          h(DropdownMenuContent, { variant: 'glass-menu' }, () => [h(MenuItem, null, () => 'Row')]),
-        ]),
-      { attachTo: root },
-    );
-    await expect.poll(() => document.querySelector('[role=menu]')).not.toBeNull();
-    try {
-      const menu = document.querySelector<HTMLElement>('[role=menu]')!;
-      expect(read(menu, 'background-color')).toBe(
-        reference('background-color', 'background-color: rgb(255 255 255 / 0.92)'),
-      );
-    } finally {
-      document.body.classList.remove('theme-ocharo');
     }
   });
 });
