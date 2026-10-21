@@ -93,7 +93,7 @@ function clearOpenTimer(): void {
 /** Focuses the first enabled row of the open submenu. */
 function focusFirstRow(): void {
   const content = el.value?.ownerDocument.getElementById(sub.contentId);
-  content?.querySelector<HTMLElement>('[role^="menuitem"]:not([disabled])')?.focus();
+  content?.querySelector<HTMLElement>('[role^="menuitem"]:not([disabled]):not([aria-disabled="true"])')?.focus();
 }
 
 /** Opens the submenu from the keyboard, or moves into it when it is already open. */

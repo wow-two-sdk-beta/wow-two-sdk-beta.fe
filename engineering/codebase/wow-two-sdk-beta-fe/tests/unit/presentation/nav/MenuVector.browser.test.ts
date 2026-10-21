@@ -95,3 +95,42 @@ it('keeps the menu open while an opted-out checkbox row toggles', async () => {
   expect(row('Pinned').getAttribute('aria-checked')).toBe('true');
   expect(open.value).toBe(true);
 });
+
+it('follows a link row once from a real Enter and Space, then closes the menu', async () => {
+  for (const press of ['{Enter}', ' ']) {
+    const open = ref(false);
+    const clicks: string[] = [];
+    /* Counts each activation and keeps the test page where it is. */
+    const record = (event: MouseEvent): void => {
+      const link = (event.target as Element).closest('a');
+      if (!link) return;
+      clicks.push(link.getAttribute('href') ?? '');
+      event.preventDefault();
+    };
+    document.addEventListener('click', record);
+    wrapper = mount(
+      defineComponent({
+        setup: () => () =>
+          h(DropdownMenu, { open: open.value, 'onUpdate:open': (next: boolean) => (open.value = next) }, () => [
+            h(DropdownMenuTrigger, null, () => 'Account'),
+            h(DropdownMenuContent, { class: 'w-48' }, () => [
+              h(MenuItem, { href: '#account-settings' }, () => 'Settings'),
+              h(MenuItem, { href: 'https://example.com/help', target: '_blank' }, () => 'Help'),
+            ]),
+          ]),
+      }),
+      { attachTo: document.body },
+    );
+    document.querySelector<HTMLElement>('[aria-haspopup=menu]')!.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect.poll(() => document.activeElement?.textContent?.trim()).toBe('Settings');
+    expect(document.activeElement?.tagName).toBe('A');
+    await userEvent.keyboard(press);
+    await expect.poll(() => open.value).toBe(false);
+    expect(clicks).toEqual(['#account-settings']);
+    document.removeEventListener('click', record);
+    wrapper.unmount();
+    wrapper = null;
+    document.body.innerHTML = '';
+  }
+});

@@ -1,7 +1,7 @@
 # Vue component message catalogue
 
 *Source snapshot: 2026-09-25 full SDK sweep; gap-close keys added 2026-09-26 and 2026-09-28; app switcher and
-password toggle keys added 2026-10-18; account menu keys added 2026-10-20.*
+password toggle keys added 2026-10-18; account menu keys added 2026-10-20; menu link key added 2026-10-21.*
 
 Static component keys and English fallbacks extracted from source. Supply overrides through
 `LocaleProvider.messages`. Placeholders retain their names; complete messages can reorder them.
@@ -156,6 +156,7 @@ in their capability specifications and are not inferred by this catalogue.
 | `MarqueeGroup.resumeLabel` | Resume animation | [MarqueeGroup.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/marqueeGroup/MarqueeGroup.vue) |
 | `MentionInput.label` | Suggestions | [MentionInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/mentionInput/MentionInput.vue) |
 | `MentionInput.suggestions` | {count} suggestions | [MentionInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/mentionInput/MentionInput.vue) |
+| `MenuItem.newTabLabel` | (opens in a new tab) | [MenuItem.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/nav/menu/MenuItem.vue) |
 | `MessageGroup.jumpToLatest` | Jump to latest | [MessageGroup.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/messageGroup/MessageGroup.vue) |
 | `MonthGrid.nextMonth` | Next month | [MonthGrid.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/MonthGrid.vue) |
 | `MonthGrid.previousMonth` | Previous month | [MonthGrid.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/MonthGrid.vue) |

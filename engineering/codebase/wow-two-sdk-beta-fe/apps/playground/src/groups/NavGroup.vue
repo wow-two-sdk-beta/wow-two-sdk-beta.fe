@@ -172,6 +172,8 @@ const menuAnchor = ref<HTMLElement | null>(null);
           <MenuGroup label="Workspace">
             <MenuItem>Profile</MenuItem>
             <MenuItem>Billing</MenuItem>
+            <MenuItem href="#account-settings">Settings (link)</MenuItem>
+            <MenuItem href="https://example.com/help" target="_blank">Help (new tab)</MenuItem>
           </MenuGroup>
           <MenuSeparator />
           <MenuItem state="destructive">Delete workspace</MenuItem>

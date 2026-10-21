@@ -76,7 +76,7 @@ watch(
 function focusLastEnabledItem(panel: HTMLElement): void {
   if (context.openFocus.current !== 'last') return;
   context.openFocus.current = 'first';
-  const items = panel.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled])');
+  const items = panel.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([disabled]):not([aria-disabled="true"])');
   items[items.length - 1]?.focus();
 }
 

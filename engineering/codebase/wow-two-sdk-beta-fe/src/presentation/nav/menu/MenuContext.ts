@@ -3,7 +3,7 @@ import { inject, type InjectionKey, type Ref, type ShallowRef } from 'vue';
 /** One registered `MenuItem` — the unit the arrow-key walk moves across. */
 export interface MenuItemEntry {
   id: string;
-  el: HTMLButtonElement | null;
+  el: HTMLElement | null;
   disabled: boolean;
 }
 
