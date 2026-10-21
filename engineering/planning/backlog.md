@@ -144,7 +144,6 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to show one panel as a popover on desktop and a bottom sheet on phones | feature | Wheelhouse filter pickers |
 | Ability to give infinite queries first-load and refreshing states for `DataRegion` | feature | Wheelhouse deployments list |
 | Ability to render `TabsGroupTab` as a router link | feature | Wheelhouse product tabs are buttons, so they can't open in a new tab |
-| Ability to use a link item in menus | feature | Wheelhouse's profile menu navigates with `router.push` on select |
 | Ability to size `BottomSheet` to its content | feature | Wheelhouse's profile sheet uses a fixed 540px |
 | Ability to give `NavItem` a chip variant | feature | Wheelhouse workspace chips use local classes |
 | Fix `StatCard`'s trend row splitting its figure and caption into columns on narrow tiles | fix | Wheelhouse phone stat tiles wrap the caption under the figure with a local class |

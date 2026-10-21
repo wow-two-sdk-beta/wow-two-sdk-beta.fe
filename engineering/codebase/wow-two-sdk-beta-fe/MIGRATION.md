@@ -1,10 +1,45 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-21*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## 0.0.31 — glass strength, menu link rows, account menu width
+
+No import moves and no renamed props. Default themes look unchanged; the `ocharo` theme gains its frame glass.
+
+| Area | Change |
+|---|---|
+| `foundation/themes` | `Theme.glass` (`ThemeGlass`, `ThemeGlassTokens`): a theme's glass strength per mode — `fill`, `sideFill`, `menuFill`, `blur`, `saturate`, `edge`, `highlight`, `shadow`, `menuShadow` — emitted into its blocks as `--glass-fill`, `--glass-side-fill`, `--glass-menu-fill`, `--glass-blur`, `--glass-saturate`, `--glass-edge`, `--glass-highlight`, `--glass-shadow` and `--glass-menu-shadow`; both shadows end in the highlight. `ocharo` sets the approved frame values. |
+| `styles.css` | The materials `surface-glass` (top bar, bottom bar, cards), `surface-glass-side` and `surface-glass-menu`: solid card (popover for menus), then the translucent fill and backdrop blur where the browser blurs, solid again under `prefers-reduced-transparency`. `border-glass-edge`, `shadow-(--glass-shadow)` and `shadow-(--glass-menu-shadow)` take the edge and shadows. Unset, every property keeps the SDK glass. [THEMES.md](../../../THEMES.md#glass-strength) |
+| `foundation/styles` | `SurfaceVariant` adds `glass-side` and `glass-menu` (the menu material with the edge and menu shadow). `glass` and `glass-outline` read `--glass-fill` (unset, the popover at 70%), `--glass-blur` and `--glass-saturate`. A switch over every `SurfaceVariant` needs the two new cases. |
+| `presentation/layout` | `AppShellSidebar` takes `variant` (`solid` · `glass` · `transparent`); a glass sidebar's phone drawer takes `glass-menu`. The `glass` variant of `Navbar` and `AppShellHeader` paints `surface-glass` with `border-glass-edge` and `shadow-(--glass-shadow)`. [Sidebar spec](src/presentation/layout/appShell/AppShellSidebar.spec.md) |
+| `presentation/nav` | `MenuItem` takes `href`, `target`, `rel`, `asChild` and `newTabLabel`: `href` renders an `<a role="menuitem">`, `rel` defaults to `noopener noreferrer` for an absolute URL or `_blank`, a `_blank` link adds a hidden new-tab label, and `asChild` makes a router `AppLink` the row. Enter and Space click a link row once; it emits `select` and closes the menu, a router-prevented click included. Its exposed `el` is now `HTMLElement`. [Spec](src/presentation/nav/menu/MenuItem.spec.md) |
+| `AccountMenu` | The panel no longer scrolls sideways: it spans the surface's inline padding, so a separator's bleed stays inside it. The menu keeps its width. Drop an app's `overflow-x-hidden` on `panelClass`. `variant="glass-menu"` paints the surface; `panelClass` reaches only the scrolling panel inside it. |
+
+New message key: `MenuItem.newTabLabel` (`(opens in a new tab)`).
+
+Replace an app's copied frame glass: delete the `--oc-glass*` and `--oc-menu-shadow` properties and the `oc-glass`,
+`oc-glass-side` and `oc-glass-menu` utilities, apply `theme-ocharo`, and move each use:
+
+| App copy | SDK |
+|---|---|
+| `AppShellHeader class="oc-glass border-b border-(--oc-glass-edge) shadow-(--oc-glass-shadow)"` | `AppShellHeader variant="glass"` |
+| `AppShellSidebar class="oc-glass-side border-e border-(--oc-glass-edge)"` | `AppShellSidebar variant="glass"` |
+| `panel-class="oc-glass-menu border-(--oc-glass-edge) shadow-(--oc-menu-shadow)"` | `variant="glass-menu"` |
+| `oc-glass` · `oc-glass-side` · `oc-glass-menu` on app markup | `surface-glass` · `surface-glass-side` · `surface-glass-menu` |
+| `border-(--oc-glass-edge)` · `shadow-(--oc-glass-shadow)` · `shadow-(--oc-menu-shadow)` | `border-glass-edge` · `shadow-(--glass-shadow)` · `shadow-(--glass-menu-shadow)` |
+
+```vue
+<AccountMenu variant="glass-menu" :name="user.displayName" @sign-out="logout">
+  <template #items>
+    <MenuItem as-child><AppLink to="/settings">Settings</AppLink></MenuItem>
+    <MenuItem :href="account.url" target="_blank">Ocharo account</MenuItem>
+  </template>
+</AccountMenu>
+```
 
 ## 0.0.28 — account menu, build env for config
 
@@ -43,6 +78,42 @@ handlers, and pass names, organizations, languages and versions already translat
   <template #items><MenuItem @select="openSettings">Account settings</MenuItem></template>
 </AccountMenu>
 ```
+
+## 0.0.27 — scrollbars on touch, opt-in auto-hide
+
+No import moves and no renamed props.
+
+| Area | Change |
+|---|---|
+| `styles.css` | The themed scrollbar draws on every device, touch included, and stays visible; a styled bar takes its own track width beside the content. Fading the thumb while idle is opt-in: `class="scrollbar-auto-hide"` shows it again on hover and while the element carries `data-scrolling`. |
+| `presentation/layout` | `AppShellMain`, `ScrollArea` and `VirtualScrollArea` take `hasAutoHideScrollbar` and set `data-scrolling` while their content scrolls; `AppShellMain` reserves the bar with `scrollbar-gutter: stable`. |
+| `foundation/primitives` | `ScrollViewport` takes `hasAutoHideScrollbar` and reserves the bar with `scrollbar-gutter: stable`. |
+| `foundation/dom` | `useScrollActivity(target)` sets `data-scrolling` on a plain element while it scrolls, so its auto-hidden thumb returns on touch. |
+
+## 0.0.26 — themed scrollbars
+
+No import moves and no renamed props.
+
+| Area | Change |
+|---|---|
+| `styles.css` | Every scroll container draws a slim themed scrollbar with a rounded, inset thumb (`--color-border-strong`, hover `--color-muted-foreground`), on fine pointers only in this release. Firefox draws a thin bar in the same colours. Opt one element out with `class="scrollbar-native"`; tune a subtree with `--scrollbar-size`, `--scrollbar-inset`, `--scrollbar-track`, `--scrollbar-thumb` and `--scrollbar-thumb-hover`. The rules sit in `@layer base`, so an app's own scrollbar CSS wins. |
+
+## 0.0.25 — copy fallback and failure state
+
+No import moves and no renamed props.
+
+| Area | Change |
+|---|---|
+| `CopyButton` | A copy the Clipboard API cannot complete retries through `document.execCommand('copy')`. A failure sets `data-error="true"`, shows the X icon, emits `error` and announces `failedAriaLabel`, then resets after `resetAfter`. |
+| `foundation/clipboard` | `useClipboard({ legacyFallback })` (default `true`) retries through the legacy path; `copy(text, anchor?)` keeps that path inside the anchor's dialog; `error` resets after `resetAfter` like `copied`. `ClipboardCopyOptions.anchor` does the same for `copyText`. |
+
+## 0.0.24 — tooltip layer
+
+No import moves and no renamed props.
+
+| Area | Change |
+|---|---|
+| `Tooltip` | The `z-tooltip` layer (100) moved onto the positioned floating root, so a tooltip shows above sticky bars, menus, popovers and modals; the body inside sets no z-index of its own. |
 
 ## 0.0.23 — app switcher, toast landmark, password labels, session expiry
 
