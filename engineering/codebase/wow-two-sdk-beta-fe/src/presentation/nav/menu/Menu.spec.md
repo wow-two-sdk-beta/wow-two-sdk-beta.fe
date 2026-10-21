@@ -9,6 +9,8 @@ Public import: `import { Menu } from '@wow-two-beta/fe/presentation/nav';`.
 ## Contract
 
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
+- `variant="glass-menu"` paints the theme's menu glass: `--glass-menu-fill`, `--glass-blur`, `--glass-saturate`, the
+  `--glass-edge` hairline and `--glass-menu-shadow`; opaque where blur is unavailable or reduced transparency is asked.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 

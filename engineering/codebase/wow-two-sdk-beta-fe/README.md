@@ -64,6 +64,17 @@ A platform app imports `themes.css` after `styles.css` and sets `class="theme-pl
 for dark mode and `surface-ambient` on the page for the backdrop; the `glass` variants of `Navbar`,
 `AppShellHeader` and `Card` take their translucent fill from its card and popover tokens.
 
+Glass strength is a theme setting. The glass surfaces read nine custom properties, which a theme sets in its
+`.theme-{id}` blocks (`Theme.glass`; the `ocharo` theme sets the approved frame values) and an app may set on any
+subtree: `--glass-fill` (top bar, bottom bar, cards), `--glass-side-fill`, `--glass-menu-fill`, `--glass-blur`,
+`--glass-saturate`, `--glass-edge`, `--glass-highlight`, `--glass-shadow` and `--glass-menu-shadow`. Unset, every
+surface keeps the SDK's own glass. Use them through the components — `AppShellHeader variant="glass"`,
+`AppShellSidebar variant="glass"`, and `variant="glass-menu"` on `DropdownMenuContent`, `PopoverContent`,
+`ModalContent`, `AccountMenu` and `AppSwitcherMenu` — or on an app's own markup through the utilities
+`surface-glass`, `surface-glass-side`, `surface-glass-menu`, `border-glass-edge`, `shadow-(--glass-shadow)` and
+`shadow-(--glass-menu-shadow)`. Each material is the solid card (popover for menus) where blur is unsupported and
+under `prefers-reduced-transparency`.
+
 The root exports presentation components and the `styles`, `dom`, `optionals`, `state`, `numbers`, `json`, `icons`, `primitives`, `themes`,
 `color` and `emoji` namespaces. Dedicated subpaths expose application adapters:
 

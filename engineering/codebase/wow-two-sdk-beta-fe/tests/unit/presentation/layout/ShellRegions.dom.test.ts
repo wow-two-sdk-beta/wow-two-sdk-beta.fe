@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { h, nextTick } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { AppShell, AppShellContent, AppShellHeader, AppShellMain } from '@src/presentation/layout';
+import { AppShell, AppShellContent, AppShellHeader, AppShellMain, AppShellSidebar } from '@src/presentation/layout';
 
 const wrappers: VueWrapper[] = [];
 afterEach(() => {
@@ -41,10 +41,47 @@ describe('app shell header', () => {
     expect(header().className).not.toMatch(/(^|\s)h-14(\s|$)/);
   });
 
-  it('paints a translucent, blurred card fill as glass', async () => {
+  it('paints the chrome glass material, edge and shadow as glass', async () => {
     await shell({ variant: 'glass' }, {});
-    expect(header().className).toContain('supports-[backdrop-filter]:bg-card/75');
-    expect(header().className).toContain('supports-[backdrop-filter]:backdrop-blur-md');
+    expect(header().classList).toContain('surface-glass');
+    expect(header().classList).toContain('border-glass-edge');
+    expect(header().classList).toContain('shadow-(--glass-shadow)');
+    expect(header().classList).not.toContain('border-border');
+    expect(header().classList).not.toContain('bg-card');
+  });
+});
+
+describe('app shell sidebar', () => {
+  async function sidebar(props: Record<string, unknown>): Promise<HTMLElement> {
+    wrappers.push(
+      mount(AppShell, {
+        props: { sidebarBreakpoint: 'sm' },
+        slots: {
+          default: () => [h(AppShellSidebar, props, () => 'Nav'), h(AppShellMain, null, () => h('p', 'Page'))],
+        },
+        attachTo: document.body,
+      }),
+    );
+    await nextTick();
+    return document.querySelector<HTMLElement>('aside')!;
+  }
+
+  it('keeps the solid card rail by default', async () => {
+    const rail = await sidebar({});
+    expect(rail.classList).toContain('bg-card');
+    expect(rail.classList).toContain('border-border');
+  });
+
+  it('paints the sidebar glass material and edge as glass', async () => {
+    const rail = await sidebar({ variant: 'glass' });
+    expect(rail.classList).toContain('surface-glass-side');
+    expect(rail.classList).toContain('border-glass-edge');
+    expect(rail.classList).not.toContain('bg-card');
+  });
+
+  it('paints no surface when transparent', async () => {
+    const rail = await sidebar({ variant: 'transparent' });
+    expect(rail.classList).toContain('bg-transparent');
   });
 });
 

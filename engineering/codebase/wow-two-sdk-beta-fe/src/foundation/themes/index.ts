@@ -32,7 +32,7 @@ export type { SemanticToken, TokenSet, RadiusScale, ToneFamilyName, ToneSlots } 
 export { SemanticTokens, SurfaceTokens, ToneFamilies, applyToneSlots } from './Tokens';
 
 // Theme + seed shapes
-export type { Theme, ThemeAmbient, ThemeMeta, ThemeSeed } from './Theme';
+export type { Theme, ThemeAmbient, ThemeGlass, ThemeGlassTokens, ThemeMeta, ThemeSeed } from './Theme';
 // Const-object enums + a type of the same name (value + type export).
 export { ThemeStatus, ThemeRadius, NeutralTemp, AccentMode, SurfaceStyle } from './Theme';
 

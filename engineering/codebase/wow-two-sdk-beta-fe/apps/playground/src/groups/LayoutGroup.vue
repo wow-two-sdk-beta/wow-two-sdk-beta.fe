@@ -82,6 +82,8 @@ const SURFACE_VARIANTS = [
   'outline',
   'glass',
   'glass-outline',
+  'glass-side',
+  'glass-menu',
   'elevated',
   'flat',
   'subtle',

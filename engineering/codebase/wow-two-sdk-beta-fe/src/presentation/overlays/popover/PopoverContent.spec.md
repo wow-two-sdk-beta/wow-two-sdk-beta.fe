@@ -18,7 +18,7 @@ Public import: `import { PopoverContent } from '@wow-two-beta/fe/presentation/ov
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
 | `isBare` | `boolean` | no | — | The bare toggle — skips the surface chrome (bg/border/shadow); keeps only z-index + animation. |
-| `variant` | `SurfaceVariant` | no | `raised` | The visual recipe — `raised` draws an opaque popover fill, a visible border and a large shadow. |
+| `variant` | `SurfaceVariant` | no | `raised` | The visual recipe — `raised` draws an opaque popover fill, a visible border and a large shadow; `glass-menu` the theme's menu glass (`--glass-menu-fill`, `--glass-edge`, `--glass-menu-shadow`). |
 | `tone` | `SurfaceTone` | no | — | The color tone the recipe is tinted with. |
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. |
 | `padding` | `SurfacePadding` | no | — | The inner spacing step. Defaults to `lg` with chrome on, `none` when bare. |

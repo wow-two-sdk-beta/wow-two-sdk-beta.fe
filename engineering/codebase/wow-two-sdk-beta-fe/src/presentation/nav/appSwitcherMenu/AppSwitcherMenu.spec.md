@@ -31,8 +31,10 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 - Strings resolve through the nearest `LocaleProvider` when their prop is omitted: `AppSwitcherMenu.title` (`Apps`),
   `.sitesLabel` (`Sites`), `.closeLabel` (`Close`), `.newTabLabel` (`(opens in a new tab)`) and `.triggerLabel`
   (`{app} — switch app`, with the `app` variable).
-- Styling uses theme tokens only. `variant` picks the panels' surface recipe — `glass` for the SDK's translucent
-  chrome — and `panelClass` adds an app's own material to both panels.
+- Styling uses theme tokens only. `variant` picks the panels' surface recipe: `glass-menu` paints the theme's menu
+  glass on the popover and the phone dialog (`--glass-menu-fill`, `--glass-blur`, `--glass-saturate`, the
+  `--glass-edge` hairline and `--glass-menu-shadow`, opaque under `prefers-reduced-transparency`). `panelClass` adds
+  classes to both panels.
 - Attributes and `class` land on the trigger button. Automatic attribute inheritance is disabled; the source
   explicitly forwards and merges supported fallthrough attributes.
 
@@ -52,7 +54,7 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 | `closeLabel` | `string` | no | locale `Close` | The dialog close button's name. |
 | `newTabLabel` | `string` | no | locale `(opens in a new tab)` | The screen-reader text after each site link. |
 | `triggerLabel` | `string` | no | locale `{app} — switch app` | The trigger's accessible name; `{app}` is the app name. |
-| `variant` | `SurfaceVariant` | no | overlay default | The surface recipe of both panels. |
+| `variant` | `SurfaceVariant` | no | overlay default | The surface recipe of both panels; `glass-menu` for the frame glass. |
 | `panelClass` | `HTMLAttributes['class']` | no | — | Extra classes on both panels. |
 
 `AppSwitcherItem`: `key` · `label` · `description?` · `href` · `icon?: IconAdapter` · `kind: AppSwitcherKind`

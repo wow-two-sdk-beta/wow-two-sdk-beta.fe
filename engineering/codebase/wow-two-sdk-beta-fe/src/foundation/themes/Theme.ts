@@ -62,6 +62,48 @@ export interface ThemeAmbient {
   dark: string;
 }
 
+/**
+ * One mode's glass strength: CSS values for the `--glass-*` custom properties the glass surfaces read (see
+ * `styles.css`). Every member is optional; an unset one keeps the SDK's own glass.
+ */
+export interface ThemeGlassTokens {
+  /** The chrome fill — top bar, bottom bar, cards (`--glass-fill`), e.g. `rgb(255 255 255 / 0.84)`. */
+  readonly fill?: string;
+
+  /** The sidebar fill (`--glass-side-fill`). */
+  readonly sideFill?: string;
+
+  /** The menu, popover and phone-sheet fill (`--glass-menu-fill`). */
+  readonly menuFill?: string;
+
+  /** The backdrop blur radius, a length (`--glass-blur`). */
+  readonly blur?: string;
+
+  /** The backdrop saturation, a percentage (`--glass-saturate`). */
+  readonly saturate?: string;
+
+  /** The hairline colour between glass and content (`--glass-edge`). */
+  readonly edge?: string;
+
+  /** The inset top highlight colour (`--glass-highlight`); the emitter adds it to both shadows as a 1px line. */
+  readonly highlight?: string;
+
+  /** The chrome's outer shadow (`--glass-shadow`). */
+  readonly shadow?: string;
+
+  /** The menus' outer shadow (`--glass-menu-shadow`). */
+  readonly menuShadow?: string;
+}
+
+/** A theme's glass strength per mode, emitted as the `--glass-*` custom properties. */
+export interface ThemeGlass {
+  /** Light-mode strength. */
+  readonly light: ThemeGlassTokens;
+
+  /** Dark-mode strength. */
+  readonly dark: ThemeGlassTokens;
+}
+
 /** A named, validated theme — the unit the registry stores and the emitter renders. */
 export interface Theme {
   /** Stable kebab-case id; drives the `.theme-{id}` class. */
@@ -87,6 +129,9 @@ export interface Theme {
 
   /** Page backdrop for glass themes (maps to `--theme-ambient`). Optional. */
   ambient?: ThemeAmbient;
+
+  /** Glass strength for the translucent surfaces (maps to the `--glass-*` properties). Optional. */
+  glass?: ThemeGlass;
 
   /** Lifecycle status — `validated` (real-app proven, locked) or `candidate` (engine-proven). */
   status: ThemeStatus;

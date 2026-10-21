@@ -132,7 +132,9 @@ describe('navbar orientations', () => {
     const glass = mount(Navbar, { props: { variant: 'glass' }, slots: { start: () => 'Brand' } });
     const bare = mount(Navbar, { props: { variant: 'transparent' }, slots: { start: () => 'Brand' } });
     wrappers.push(glass, bare);
-    expect(glass.get('header').classes().join(' ')).toContain('supports-[backdrop-filter]:backdrop-blur-md');
+    expect(glass.get('header').classes()).toEqual(
+      expect.arrayContaining(['surface-glass', 'border-glass-edge', 'shadow-(--glass-shadow)']),
+    );
     expect(bare.get('header').classes()).toContain('bg-transparent');
   });
 

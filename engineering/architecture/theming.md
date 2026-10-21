@@ -140,6 +140,17 @@ Toggle by setting `data-theme` on a wrapper element. CSS variable lookup is scop
 
 ---
 
+## Glass strength
+
+The translucent surfaces read a separate set of custom properties, not `--color-*` tokens: `--glass-fill`,
+`--glass-side-fill`, `--glass-menu-fill`, `--glass-blur`, `--glass-saturate`, `--glass-edge`, `--glass-highlight`,
+`--glass-shadow` and `--glass-menu-shadow`. Unset, every surface keeps the SDK's own glass; a theme sets them through
+`Theme.glass`, and an app may set them on any subtree. Defaults, readers and the `ocharo` values:
+[THEMES.md § Glass strength](../../THEMES.md#glass-strength). The materials and their fallbacks live in
+`src/index.css` (`surface-glass`, `surface-glass-side`, `surface-glass-menu`).
+
+---
+
 ## Tailwind v4 mechanics (the short version)
 
 - `@theme { --color-* … }` — declares both a CSS variable on `:root` AND a Tailwind theme value used to generate utilities.

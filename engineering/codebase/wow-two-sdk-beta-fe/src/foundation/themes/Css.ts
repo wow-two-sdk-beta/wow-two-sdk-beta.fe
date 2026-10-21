@@ -9,7 +9,7 @@
  * ancestor `.dark`).
  * ------------------------------------------------------------------------- */
 
-import type { Theme, ThemeStatus } from './Theme';
+import type { Theme, ThemeGlassTokens, ThemeStatus } from './Theme';
 import { SemanticTokens, type TokenSet } from './Tokens';
 
 /** Radius knob → concrete `--radius-*` triple (mirrors the lib's default scale shifts). */
@@ -41,6 +41,37 @@ function ambientDeclaration(layers: string | undefined, indent = '  '): string {
   return layers ? `\n${indent}--theme-ambient: ${layers};` : '';
 }
 
+/** The custom property each glass token writes, in emission order. */
+const GlassProperties: ReadonlyArray<readonly [keyof ThemeGlassTokens, string]> = [
+  ['fill', '--glass-fill'],
+  ['sideFill', '--glass-side-fill'],
+  ['menuFill', '--glass-menu-fill'],
+  ['blur', '--glass-blur'],
+  ['saturate', '--glass-saturate'],
+  ['edge', '--glass-edge'],
+  ['highlight', '--glass-highlight'],
+  ['shadow', '--glass-shadow'],
+  ['menuShadow', '--glass-menu-shadow'],
+];
+
+/**
+ * Render one mode's glass strength as declaration lines (empty string when unset). With a highlight, both shadows
+ * end in its 1px inset line, so a surface that takes the shadow takes the highlight too.
+ */
+function glassDeclarations(tokens: ThemeGlassTokens | undefined, indent = '  '): string {
+  if (!tokens) return '';
+  const lines: Array<string> = [];
+  for (const [key, property] of GlassProperties) {
+    const value = tokens[key];
+    if (value === undefined) continue;
+    const isShadow = key === 'shadow' || key === 'menuShadow';
+    const declared =
+      isShadow && tokens.highlight !== undefined ? `${value}, inset 0 1px 0 var(--glass-highlight)` : value;
+    lines.push(`\n${indent}${property}: ${declared};`);
+  }
+  return lines.join('');
+}
+
 /**
  * Emit the CSS for a single theme: a light `.theme-{id}` block + a
  * `.dark.theme-{id}` block. Returns a string (no trailing newline).
@@ -49,8 +80,12 @@ export function themeToCss(theme: Theme): string {
   const radius = radiusDeclarations(theme);
   const id = theme.id.replace(/[^a-zA-Z0-9_-]/gu, (character) => `\\${character.codePointAt(0)!.toString(16)} `);
   const selector = `.theme-${id}`;
-  const light = `${selector} {\n${declarations(theme.light)}${radius}${ambientDeclaration(theme.ambient?.light)}\n}`;
-  const dark = `.dark${selector}, .dark ${selector} {\n${declarations(theme.dark)}${ambientDeclaration(theme.ambient?.dark)}\n}`;
+  const light =
+    `${selector} {\n${declarations(theme.light)}${radius}${ambientDeclaration(theme.ambient?.light)}` +
+    `${glassDeclarations(theme.glass?.light)}\n}`;
+  const dark =
+    `.dark${selector}, .dark ${selector} {\n${declarations(theme.dark)}${ambientDeclaration(theme.ambient?.dark)}` +
+    `${glassDeclarations(theme.glass?.dark)}\n}`;
   return `${light}\n\n${dark}`;
 }
 

@@ -9,10 +9,10 @@
  * Smart QR: brand fills and neutral backgrounds preserve the original app colors; foreground tokens were corrected
  * for the SDK's declared text/placeholder/glass contrast pairs and await visual review in the app.
  * Ocharo: the owner-approved Ink and Raspberry (light) and Neutral graphite (dark) palette under a raspberry-and-blue
- * backdrop; the tones the approval left open are derived to match it.
+ * backdrop, with the approved frame glass; the tones the approval left open are derived to match it.
  * Smart QR and Ocharo stay candidates until a shipping app validates them through the registry. */
 
-import type { Theme, ThemeAmbient } from '../Theme';
+import type { Theme, ThemeAmbient, ThemeGlass } from '../Theme';
 import { ThemeRadius, ThemeStatus } from '../Theme';
 import type { TokenSet } from '../Tokens';
 import { ensureForegroundContrast } from '../ForegroundContrast';
@@ -306,7 +306,7 @@ const smartQr: Theme = {
  * lightness only, by the least that clears the declared pairs. The approval left muted, subtle, inverse, field,
  * accent and the status families open; they are derived here (muted and the status tones start from Catalogue's
  * shipped values). The approved header and menu materials (light: white at 84% and 92%; dark: #29292d at 90% and
- * 96%) set the popover colour; the SDK's glass recipes apply their own fixed 70% alpha to it.
+ * 96%) set the popover colour and, with the sidebar, blur, edge and shadows, the theme's glass strength.
  * ------------------------------------------------------------------------- */
 
 const ocharoLight: TokenSet = {
@@ -410,6 +410,33 @@ const ocharoAmbient: ThemeAmbient = {
   ].join(', '),
 };
 
+/* The approved frame glass, verbatim from Ocharo Desk's `oc-glass` materials: the chrome at 84% / 90%, the sidebar at
+ * 60% / 70% over #212125, menus at 92% / 96%, a 24px blur, and a white top highlight inside both shadows. */
+const ocharoGlass: ThemeGlass = {
+  light: {
+    fill: 'rgb(255 255 255 / 0.84)',
+    sideFill: 'rgb(255 255 255 / 0.6)',
+    menuFill: 'rgb(255 255 255 / 0.92)',
+    blur: '24px',
+    saturate: '120%',
+    edge: 'rgb(24 27 37 / 0.08)',
+    highlight: 'rgb(255 255 255 / 0.9)',
+    shadow: '0 10px 30px rgb(24 27 37 / 0.06)',
+    menuShadow: '0 18px 50px rgb(24 27 37 / 0.16)',
+  },
+  dark: {
+    fill: 'rgb(41 41 45 / 0.9)',
+    sideFill: 'rgb(33 33 37 / 0.7)',
+    menuFill: 'rgb(41 41 45 / 0.96)',
+    blur: '24px',
+    saturate: '100%',
+    edge: 'rgb(255 255 255 / 0.07)',
+    highlight: 'rgb(255 255 255 / 0.06)',
+    shadow: '0 12px 32px rgb(0 0 0 / 0.25)',
+    menuShadow: '0 20px 60px rgb(0 0 0 / 0.5)',
+  },
+};
+
 /** Ocharo — the shared look of the Ocharo apps; the product keeps its layout and typography. */
 const ocharo: Theme = {
   id: 'ocharo',
@@ -421,6 +448,7 @@ const ocharo: Theme = {
   dark: ocharoDark,
   radius: ThemeRadius.Lg,
   ambient: ocharoAmbient,
+  glass: ocharoGlass,
   status: ThemeStatus.Candidate,
   meta: validateTheme({ light: ocharoLight, dark: ocharoDark }),
 };

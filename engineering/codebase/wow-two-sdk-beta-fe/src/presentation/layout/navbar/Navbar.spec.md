@@ -11,6 +11,9 @@ Public import: `import { Navbar } from '@wow-two-beta/fe/presentation/layout';`.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Shares its orientation with the `NavItem`s inside: in a top bar each sizes to its label, in a rail each fills the row.
 - Renders a `<header>` banner on its own. Inside an `AppShellHeader`, which is already the banner, it renders a `<div>` that fills the bar's row and defaults to no border, a `transparent` surface and the host's height; explicit `as`, `hasBorder`, `variant`, `tone` and `height` still win.
+- `glass` paints the `surface-glass` material: the theme's `--glass-fill` (unset, the card at 75%), `--glass-blur`
+  (12px) and `--glass-saturate`, with the border in `--glass-edge` (unset, `--color-border`) and the
+  `--glass-shadow` (unset, none). It is the solid card where blur is unsupported or reduced transparency is asked.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props
@@ -28,7 +31,7 @@ Public import: `import { Navbar } from '@wow-two-beta/fe/presentation/layout';`.
 | `hasBorder` | `boolean` | no | `true`; `false` in an `AppShellHeader` | The bottom border under the bar (the end border for a rail). |
 | `bordered` | `boolean` | no | —      | Deprecated — use `hasBorder`; removed next release.                          |
 | `orientation` | `NavbarOrientation` | no | `horizontal` | A full-width top bar (`start` / `center` / `end` in a row) or a full-height rail (`start` at the top, `center` scrolling, `end` at the foot). |
-| `variant` | `NavbarVariant` | no | `solid`; `transparent` in an `AppShellHeader` | The surface: `solid`, `glass` (blurred, opaque where blur or transparency is unavailable or unwanted) or `transparent`. A `tone` overrides it. |
+| `variant` | `NavbarVariant` | no | `solid`; `transparent` in an `AppShellHeader` | The surface: `solid`, `glass` (the theme's chrome glass, opaque where blur or transparency is unavailable or unwanted) or `transparent`. A `tone` overrides it. |
 
 ## Emits
 

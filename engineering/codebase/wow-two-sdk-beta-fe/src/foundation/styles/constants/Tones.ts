@@ -25,6 +25,12 @@ export const ToneFamily = {
 
 export type ToneFamily = (typeof ToneFamily)[keyof typeof ToneFamily];
 
+/**
+ * The neutral glass fill: the theme's `--glass-fill` when it sets one, else the popover at 70% — the SDK's own glass.
+ * A literal class, so Tailwind finds it in the package source.
+ */
+const GlassFill = 'bg-[color:var(--glass-fill,color-mix(in_oklab,var(--color-popover)_70%,transparent))]';
+
 /** Contains the cross-engine palette: bg / text (+ border where applicable) per tone-family × tone. */
 export const Tones: Record<ToneFamily, Record<Tone, string>> = {
   /** Opaque tone bg + foreground. Used by `solid`, `elevated`, `flat`, button defaults. */
@@ -94,9 +100,10 @@ export const Tones: Record<ToneFamily, Record<Tone, string>> = {
   /**
    * Translucent fills use soft foregrounds, verified over background/card/popover/muted.
    * Custom colors and image backdrops require contrast verification by the caller.
+   * The neutral fill reads the theme's glass strength (`--glass-fill`); unset, it is the popover at 70%.
    */
   glass: {
-    neutral: 'bg-popover/70 text-popover-foreground',
+    neutral: `${GlassFill} text-popover-foreground`,
     primary: 'bg-primary/30 text-primary-soft-foreground',
     danger: 'bg-destructive/30 text-destructive-soft-foreground',
     success: 'bg-success/30 text-success-soft-foreground',
@@ -105,7 +112,7 @@ export const Tones: Record<ToneFamily, Record<Tone, string>> = {
   },
   /** Glass + tone-accent border at 50% alpha. Same foreground reasoning as `glass`. */
   glassOutline: {
-    neutral: 'border-border/50 bg-popover/70 text-popover-foreground',
+    neutral: `border-border/50 ${GlassFill} text-popover-foreground`,
     primary: 'border-primary/50 bg-primary/30 text-primary-soft-foreground',
     danger: 'border-destructive/50 bg-destructive/30 text-destructive-soft-foreground',
     success: 'border-success/50 bg-success/30 text-success-soft-foreground',

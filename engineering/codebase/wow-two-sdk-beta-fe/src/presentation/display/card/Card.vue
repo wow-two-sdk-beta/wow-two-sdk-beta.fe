@@ -18,7 +18,10 @@ import type {
 export interface CardProps {
   /** The optional ambient surface treatment. */
   readonly ambient?: SurfaceAmbient;
-  /** The visual recipe — solid · soft · surface · outline · glass · elevated · flat · subtle. */
+  /**
+   * The visual recipe — solid · soft · surface · outline · glass · glass-outline · glass-side · glass-menu ·
+   * elevated · flat · subtle.
+   */
   readonly variant?: SurfaceVariant;
   /** The color tone the recipe is tinted with. */
   readonly tone?: SurfaceTone;

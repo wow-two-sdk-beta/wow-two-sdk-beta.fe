@@ -268,6 +268,63 @@ describe('the ocharo theme', () => {
       contrastAA: true,
     });
   });
+
+  it('emits the approved frame glass in both modes, the highlight inside both shadows', () => {
+    const [light, dark] = themeToCss(theme).split('\n\n');
+    for (const line of [
+      '--glass-fill: rgb(255 255 255 / 0.84);',
+      '--glass-side-fill: rgb(255 255 255 / 0.6);',
+      '--glass-menu-fill: rgb(255 255 255 / 0.92);',
+      '--glass-blur: 24px;',
+      '--glass-saturate: 120%;',
+      '--glass-edge: rgb(24 27 37 / 0.08);',
+      '--glass-highlight: rgb(255 255 255 / 0.9);',
+      '--glass-shadow: 0 10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 var(--glass-highlight);',
+      '--glass-menu-shadow: 0 18px 50px rgb(24 27 37 / 0.16), inset 0 1px 0 var(--glass-highlight);',
+    ]) {
+      expect(light).toContain(line);
+    }
+    for (const line of [
+      '--glass-fill: rgb(41 41 45 / 0.9);',
+      '--glass-side-fill: rgb(33 33 37 / 0.7);',
+      '--glass-menu-fill: rgb(41 41 45 / 0.96);',
+      '--glass-blur: 24px;',
+      '--glass-saturate: 100%;',
+      '--glass-edge: rgb(255 255 255 / 0.07);',
+      '--glass-highlight: rgb(255 255 255 / 0.06);',
+      '--glass-shadow: 0 12px 32px rgb(0 0 0 / 0.25), inset 0 1px 0 var(--glass-highlight);',
+      '--glass-menu-shadow: 0 20px 60px rgb(0 0 0 / 0.5), inset 0 1px 0 var(--glass-highlight);',
+    ]) {
+      expect(dark).toContain(line);
+    }
+  });
+
+  it('keeps body text AA on every glass fill over the page', () => {
+    /** An `rgb(r g b / a)` fill composited over an opaque `#rrggbb` page, as `#rrggbb`. */
+    const over = (fill: string, page: string): string => {
+      const [r, g, b, a] = fill.match(/[\d.]+/gu)!.map(Number);
+      const base = page.match(/[0-9a-f]{2}/giu)!.map((part) => Number.parseInt(part, 16));
+      const mix = [r!, g!, b!].map((channel, index) => Math.round(channel * a! + base[index]! * (1 - a!)));
+      return `#${mix.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
+    };
+    for (const mode of ['light', 'dark'] as const) {
+      const glass = theme.glass![mode];
+      for (const fill of [glass.fill!, glass.sideFill!, glass.menuFill!]) {
+        const backdrop = over(fill, theme[mode].background);
+        for (const text of ['foreground', 'muted-foreground'] as const) {
+          const ratio = contrastRatio(parseColor(theme[mode][text])!, parseColor(backdrop)!);
+          expect(ratio, `${mode} ${text} on ${fill}`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    }
+  });
+});
+
+describe('a theme without glass strength', () => {
+  it('emits no glass properties, so the surfaces keep the SDK glass', () => {
+    for (const id of ['platform', 'frost', 'bento-deck'])
+      expect(themeToCss(getTheme(id)!), id).not.toContain('--glass-');
+  });
 });
 
 describe('readableForeground', () => {

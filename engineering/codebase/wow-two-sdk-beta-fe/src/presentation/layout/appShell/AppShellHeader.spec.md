@@ -10,8 +10,11 @@ Public import: `import { AppShellHeader } from '@wow-two-beta/fe/presentation/la
 
 - `height` sizes the bar (`sm` 3rem · `md` 3.5rem · `lg` 4rem); `auto` keeps the default as a minimum and lets
   wrapped content grow it.
-- `variant` picks the surface from the `Navbar` scale (`NavbarVariant`): `glass` uses the theme's card fill at 75%
-  with a backdrop blur, opaque where blur is unsupported or reduced transparency is requested.
+- `variant` picks the surface from the `Navbar` scale (`NavbarVariant`): `glass` paints the `surface-glass` chrome
+  material at the theme's glass strength — `--glass-fill` (unset, the card at 75%), `--glass-blur` (12px) and
+  `--glass-saturate` (100%) — opaque where blur is unsupported or reduced transparency is requested. Its bottom border
+  takes `--glass-edge` (unset, `--color-border`) and the bar takes `--glass-shadow` (unset, none). The `ocharo` theme
+  sets the approved frame values.
 - It is the page's banner landmark: a `Navbar` inside renders a plain row that fills the bar instead of a second
   `<header>`, and leaves the border and surface to this bar.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
@@ -22,7 +25,7 @@ Public import: `import { AppShellHeader } from '@wow-two-beta/fe/presentation/la
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
 | `height` | `AppShellHeaderHeight` | no | `md` | The bar height; `auto` grows with wrapped content. |
-| `variant` | `NavbarVariant` | no | `solid` | The surface: `solid`, `glass` or `transparent`. |
+| `variant` | `NavbarVariant` | no | `solid` | The surface: `solid`, `glass` (the theme's chrome glass) or `transparent`. |
 
 ## Emits
 
@@ -41,4 +44,5 @@ None declared.
 ## Verification
 
 - Public render fixture: [LayoutExamples.ts](../../../../apps/playground/src/gallery/fixtures/LayoutExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
+- Focused test references: [ShellRegions.dom.test.ts](../../../../tests/unit/presentation/layout/ShellRegions.dom.test.ts) · [Glass.browser.test.ts](../../../../tests/unit/foundation/styles/Glass.browser.test.ts).
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

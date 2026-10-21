@@ -4,7 +4,7 @@ How to **use a theme**, what a theme actually is, its **lifecycle** (validated v
 
 A theme is a complete set of semantic **color** tokens for **both** light and dark mode, scoped to a `.theme-{id}` class. Switching themes = swapping that class. No rebuild, no JS, no flash.
 
-> A theme is **colors only** — the 39 semantic tokens, plus two optional knobs: `radius` and a glass theme's `ambient` backdrop ([Glass themes](#glass-themes--the-ambient-backdrop)). App-specific extras (fonts like Geist, surface treatments, custom radii beyond the `radius` knob) are **layered separately** in the app, not baked into the theme. A theme makes any app *consistent*; it doesn't make every app *identical*.
+> A theme is **colors only** — the 39 semantic tokens, plus three optional knobs: `radius`, a glass theme's `ambient` backdrop and its `glass` strength ([Glass themes](#glass-themes--the-ambient-backdrop)). App-specific extras (fonts like Geist, surface treatments, custom radii beyond the `radius` knob) are **layered separately** in the app, not baked into the theme. A theme makes any app *consistent*; it doesn't make every app *identical*.
 
 ---
 
@@ -178,6 +178,31 @@ Glass needs something behind it to blur. A theme may carry an `ambient` backdrop
 - Put panels on the `glass` / `glass-outline` surface variant: translucent `popover` fill plus `backdrop-blur`.
 - The tokens stay opaque, so every contrast check still holds; the translucency comes from the surface variant.
 - Authoring one: `Theme.ambient = { light, dark }`, each a comma-separated layer list.
+
+### Glass strength
+
+A theme may also set how strong its glass is: `Theme.glass = { light, dark }`, each a `ThemeGlassTokens` of CSS
+values. The emitter writes them as custom properties into the theme's light and dark blocks; an unset one keeps the
+SDK's own glass, and an app may set any of them on a subtree.
+
+| Token | Property | Read by | Unset |
+|---|---|---|---|
+| `fill` | `--glass-fill` | `surface-glass` (top bar, bottom bar, cards), `glass`, `glass-outline` | card 75% · popover 70% |
+| `sideFill` | `--glass-side-fill` | `surface-glass-side`, `glass-side` | `--glass-fill` |
+| `menuFill` | `--glass-menu-fill` | `surface-glass-menu`, `glass-menu` | `--glass-fill`, else popover 70% |
+| `blur` | `--glass-blur` | every glass surface | `12px` |
+| `saturate` | `--glass-saturate` | every glass surface | `100%` |
+| `edge` | `--glass-edge` | `border-glass-edge`, `glass-menu` | `--color-border` |
+| `highlight` | `--glass-highlight` | added to both shadows as `inset 0 1px 0` | `transparent` |
+| `shadow` | `--glass-shadow` | `shadow-(--glass-shadow)`, glass `Navbar` / `AppShellHeader` | none |
+| `menuShadow` | `--glass-menu-shadow` | `shadow-(--glass-menu-shadow)`, `glass-menu` | Tailwind `shadow-lg` |
+
+- `ocharo` carries the approved frame glass: light `fill` white 84%, `sideFill` 60%, `menuFill` 92%, `blur` 24px,
+  `saturate` 120%; dark `#29292d` at 90% / 96% and `#212125` at 70%, `saturate` 100%.
+- Frame surfaces: `AppShellHeader variant="glass"`, `AppShellSidebar variant="glass"`, and `variant="glass-menu"` on
+  `DropdownMenuContent`, `PopoverContent`, `ModalContent`, `AccountMenu` and `AppSwitcherMenu`.
+- Each material is the solid card (popover for menus) where `backdrop-filter` is unsupported and under
+  `prefers-reduced-transparency`.
 
 ---
 

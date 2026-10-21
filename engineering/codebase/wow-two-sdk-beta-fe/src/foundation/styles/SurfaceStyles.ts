@@ -4,7 +4,11 @@ import { tv, type VariantProps } from './Tv';
 import { Tones } from './constants/Tones';
 import { Tone } from './enums/StyleTokens';
 
-/** Defines the visual-recipe axis of a surface (solid · soft · surface · outline · glass · etc.). */
+/**
+ * Defines the visual-recipe axis of a surface (solid · soft · surface · outline · glass · etc.).
+ *
+ * The four glass recipes read the theme's glass strength — the `--glass-*` custom properties in `styles.css`.
+ */
 export const SurfaceVariant = {
   /** Refers to an opaque fill, no border, light shadow. */
   Solid: 'solid',
@@ -16,10 +20,17 @@ export const SurfaceVariant = {
   Raised: 'raised',
   /** Refers to a transparent fill + visible border. */
   Outline: 'outline',
-  /** Refers to a translucent + blur fill, no border, medium shadow. */
+  /** Refers to a translucent + blur fill, no border, medium shadow — the theme's `--glass-fill` strength. */
   Glass: 'glass',
   /** Refers to a translucent + blur fill + subtle border. */
   GlassOutline: 'glass-outline',
+  /** Refers to the sidebar glass — `--glass-side-fill`, no border, no shadow; opaque where blur is unavailable. */
+  GlassSide: 'glass-side',
+  /**
+   * Refers to the menu glass — `--glass-menu-fill` + the `--glass-edge` hairline + `--glass-menu-shadow`; opaque
+   * where blur is unavailable. For menus, popovers and phone sheets.
+   */
+  GlassMenu: 'glass-menu',
   /** Refers to an opaque fill, no border, heavy shadow. */
   Elevated: 'elevated',
   /** Refers to an opaque fill, no border, no shadow. */
@@ -46,10 +57,14 @@ export const surfaceVariants = tv({
       raised: 'border shadow-lg',
       /* Transparent fill + visible border — static cards, embedded info blocks. */
       outline: 'border bg-transparent',
-      /* Translucent + blur, no border, medium shadow — image overlays. */
-      glass: 'backdrop-blur-md shadow-md',
+      /* Translucent + blur, no border, medium shadow — image overlays. The blur and saturation are the theme's. */
+      glass: 'backdrop-blur-(--glass-blur) backdrop-saturate-(--glass-saturate) shadow-md',
       /* Translucent + blur + subtle border — premium / hero overlays. */
-      'glass-outline': 'border backdrop-blur-md shadow-md',
+      'glass-outline': 'border backdrop-blur-(--glass-blur) backdrop-saturate-(--glass-saturate) shadow-md',
+      /* The sidebar material from `styles.css`: fill, blur and the solid fallback; no border, no shadow. */
+      'glass-side': 'surface-glass-side',
+      /* The menu material from `styles.css`, with the theme's hairline and menu shadow. */
+      'glass-menu': 'surface-glass-menu border border-glass-edge shadow-(--glass-menu-shadow)',
       /* Opaque fill, no border, heavy shadow — modals, drawers, command palette. */
       elevated: 'shadow-xl',
       /* Opaque fill, no border, no shadow — embedded sub-panels inside another surface. */
@@ -155,6 +170,15 @@ export const surfaceVariants = tv({
     { variant: 'glass-outline', tone: 'success', class: Tones.glassOutline.success },
     { variant: 'glass-outline', tone: 'warning', class: Tones.glassOutline.warning },
     { variant: 'glass-outline', tone: 'info', class: Tones.glassOutline.info },
+
+    /* glass-side / glass-menu — the material paints the neutral fill; a tone tints it like `glass`. */
+    { variant: 'glass-side', tone: 'neutral', class: 'text-card-foreground' },
+    { variant: 'glass-menu', tone: 'neutral', class: 'text-popover-foreground' },
+    { variant: ['glass-side', 'glass-menu'], tone: 'primary', class: Tones.glass.primary },
+    { variant: ['glass-side', 'glass-menu'], tone: 'danger', class: Tones.glass.danger },
+    { variant: ['glass-side', 'glass-menu'], tone: 'success', class: Tones.glass.success },
+    { variant: ['glass-side', 'glass-menu'], tone: 'warning', class: Tones.glass.warning },
+    { variant: ['glass-side', 'glass-menu'], tone: 'info', class: Tones.glass.info },
 
     /* subtle — low-alpha tinted fill + neutral border, no shadow. */
     { variant: 'subtle', tone: 'neutral', class: Tones.subtle.neutral },
