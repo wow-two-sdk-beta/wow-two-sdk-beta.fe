@@ -5,6 +5,9 @@ import { page, userEvent } from 'vitest/browser';
 import { ListDetailLayout } from '@src/presentation/layout';
 import '@src/index.css';
 
+/* A focus move after the view swap needs more than the default one-second poll on a loaded CI runner. */
+const PollOptions = { timeout: 5000 };
+
 const Items = Array.from({ length: 40 }, (_, index) => `Product ${index + 1}`);
 
 let wrapper: VueWrapper | null = null;
@@ -63,7 +66,7 @@ const visible = (selector: string): boolean => (document.querySelector(selector)
 
 async function scrollTo(element: HTMLElement, top: number): Promise<void> {
   element.scrollTop = top;
-  await expect.poll(() => Math.round(element.scrollTop)).toBe(top);
+  await expect.poll(() => Math.round(element.scrollTop), PollOptions).toBe(top);
 }
 
 describe('below the breakpoint', () => {
@@ -79,14 +82,14 @@ describe('below the breakpoint', () => {
     await scrollTo(region(), 100);
     await scrollTo(listScroller(), 400);
     await userEvent.click(item('Product 12'));
-    await expect.poll(() => visible('[data-list-detail-pane="detail"]')).toBe(true);
+    await expect.poll(() => visible('[data-list-detail-pane="detail"]'), PollOptions).toBe(true);
     expect(visible('[data-list-detail-pane="list"]')).toBe(false);
-    await expect.poll(() => document.activeElement?.textContent).toBe('Product 12');
+    await expect.poll(() => document.activeElement?.textContent, PollOptions).toBe('Product 12');
     expect(document.activeElement?.tagName).toBe('H2');
     expect(visible('[data-list-detail-back]')).toBe(true);
     await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
-    await expect.poll(() => visible('[data-list-detail-pane="list"]')).toBe(true);
-    await expect.poll(() => document.activeElement).toBe(item('Product 12'));
+    await expect.poll(() => visible('[data-list-detail-pane="list"]'), PollOptions).toBe(true);
+    await expect.poll(() => document.activeElement, PollOptions).toBe(item('Product 12'));
     expect(Math.round(listScroller().scrollTop)).toBe(400);
     expect(Math.round(region().scrollTop)).toBe(100);
   });
@@ -97,7 +100,7 @@ describe('below the breakpoint', () => {
     await scrollTo(region(), 200);
     item('Product 3').focus();
     await userEvent.keyboard('{Enter}');
-    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await expect.poll(() => document.activeElement?.tagName, PollOptions).toBe('H2');
     const layoutTop = document.querySelector('[data-view]')!.getBoundingClientRect().top;
     expect(Math.round(layoutTop)).toBe(Math.round(region().getBoundingClientRect().top));
   });
@@ -108,13 +111,13 @@ describe('below the breakpoint', () => {
     /* The first return focuses Product 3. A touch tap in iOS Safari clicks without moving focus, so focus stays
        there; `click()` models that tap in every engine. */
     await userEvent.click(item('Product 3'));
-    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await expect.poll(() => document.activeElement?.tagName, PollOptions).toBe('H2');
     await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
-    await expect.poll(() => document.activeElement).toBe(item('Product 3'));
+    await expect.poll(() => document.activeElement, PollOptions).toBe(item('Product 3'));
     item('Product 7').click();
-    await expect.poll(() => document.querySelector('h2')?.textContent).toBe('Product 7');
+    await expect.poll(() => document.querySelector('h2')?.textContent, PollOptions).toBe('Product 7');
     await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
-    await expect.poll(() => document.activeElement).toBe(item('Product 7'));
+    await expect.poll(() => document.activeElement, PollOptions).toBe(item('Product 7'));
   });
 
   it('returns focus to the item activated from the keyboard', async () => {
@@ -122,9 +125,9 @@ describe('below the breakpoint', () => {
     await nextTick();
     item('Product 4').focus();
     await userEvent.keyboard('{Enter}');
-    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await expect.poll(() => document.activeElement?.tagName, PollOptions).toBe('H2');
     await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
-    await expect.poll(() => document.activeElement).toBe(item('Product 4'));
+    await expect.poll(() => document.activeElement, PollOptions).toBe(item('Product 4'));
   });
 
   it('names a keyed option the activator over a click just before it', async () => {
@@ -163,9 +166,9 @@ describe('below the breakpoint', () => {
     const option = [...document.querySelectorAll<HTMLElement>('[role=option]')][2]!;
     option.focus();
     await userEvent.keyboard('{Enter}');
-    await expect.poll(() => document.activeElement?.tagName).toBe('H2');
+    await expect.poll(() => document.activeElement?.tagName, PollOptions).toBe('H2');
     await userEvent.click(document.querySelector<HTMLElement>('[data-list-detail-back]')!);
-    await expect.poll(() => document.activeElement).toBe(option);
+    await expect.poll(() => document.activeElement, PollOptions).toBe(option);
   });
 
   it('pads the back row through backClass', async () => {
@@ -215,7 +218,7 @@ describe('below the breakpoint', () => {
     );
     await nextTick();
     route.value = false;
-    await expect.poll(() => document.activeElement?.textContent).toBe('Product 6');
+    await expect.poll(() => document.activeElement?.textContent, PollOptions).toBe('Product 6');
     expect(document.activeElement?.getAttribute('aria-pressed')).toBe('true');
   });
 });
@@ -235,7 +238,7 @@ describe('from the breakpoint up', () => {
     expect(Math.round(list.width)).toBe(320);
     expect(Math.round(detail.left)).toBeGreaterThanOrEqual(Math.round(list.right));
     await userEvent.click(item('Product 2'));
-    await expect.poll(() => document.querySelector('h2')?.textContent).toBe('Product 2');
+    await expect.poll(() => document.querySelector('h2')?.textContent, PollOptions).toBe('Product 2');
     expect(document.activeElement?.tagName).not.toBe('H2');
     expect(visible('[data-list-detail-back]')).toBe(false);
     expect(visible('[data-list-detail-pane="list"]')).toBe(true);
