@@ -62,6 +62,9 @@ import { useControlled } from '../../../foundation/state';
 import { useEventListener } from '../../../foundation/dom';
 import { useFormControl } from '../../../foundation/primitives';
 import KbdText from '../../display/kbdText/KbdText.vue';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
+import { ReadOnlyLook } from '../InputStyles';
 
 /**
  * Renders a record button that captures the next key chord the reader presses.
@@ -105,6 +108,11 @@ const field = useFormControl();
 const finalDisabled = computed(() => props.isDisabled ?? props.disabled ?? field?.isDisabled);
 const finalReadOnly = computed(() => props.isReadOnly ?? props.readonly ?? field?.isReadOnly);
 const inactive = computed(() => finalDisabled.value || finalReadOnly.value);
+
+/* A read-only recorder stays focusable but never listens: a `button` has no `aria-readonly`, so the state is its
+   accessible description. */
+const readOnlyButton = computed(() => Boolean(finalReadOnly.value) && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyButton);
 
 const controlled = useControlled<ReadonlyArray<string>>({
   controlled: () => props.modelValue,
@@ -196,7 +204,7 @@ function modifierLabel(key: string): string {
 const buttonId = computed(() => props.id ?? field?.id);
 /* Names the trigger from the Field label when present; an explicit aria-label always wins. */
 const labelledBy = computed(() => ariaLabelledBy.value ?? (ariaLabel.value ? undefined : field?.labelledBy));
-const describedBy = computed(() => ariaDescribedBy.value ?? field?.describedBy);
+const describedBy = computed(() => readOnlyHint.describedBy(ariaDescribedBy.value ?? field?.describedBy));
 const hiddenValue = computed(() => keys.value.join('+'));
 
 const OwnedAttributes: ReadonlySet<string> = new Set(['class', AriaAttribute.LabelledBy, AriaAttribute.DescribedBy]);
@@ -207,6 +215,8 @@ const passthroughAttrs = computed(() =>
 const buttonClass = computed(() =>
   cn(
     'inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
+    ReadOnlyLook,
+    'readonly:hover:border-input',
     recording.value && 'border-primary bg-primary-soft text-primary-soft-foreground',
     attrs.class as ClassValue,
   ),
@@ -231,7 +241,8 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     :aria-invalid="field?.isInvalid || undefined"
     :aria-labelledby="labelledBy"
     :aria-describedby="describedBy"
-    :disabled="inactive"
+    :disabled="finalDisabled"
+    :data-readonly="readOnlyButton || undefined"
     :class="buttonClass"
     v-bind="passthroughAttrs"
     @click="startRecord"
@@ -256,6 +267,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       aria-hidden="true"
     />
   </button>
+  <ReadOnlyHint v-if="readOnlyButton" :id="readOnlyHint.hintId" />
   <input
     v-if="name"
     type="hidden"

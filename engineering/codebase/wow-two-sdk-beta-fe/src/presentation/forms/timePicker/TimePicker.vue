@@ -57,6 +57,8 @@ export interface TimePickerProps {
 <script setup lang="ts">
 import { useLocale, useLocaleDefaults } from '../../../foundation/i18n';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 import { computed, ref, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Clock } from 'lucide-vue-next';
@@ -142,12 +144,17 @@ const ariaLabel = computed(() => attrs[AriaAttribute.Label] as string | undefine
 const triggerId = computed(() => props.id ?? field?.id);
 /* Names the trigger from the Field label when present; an explicit aria-label always wins. */
 const labelledBy = computed(() => (ariaLabel.value ? undefined : field?.labelledBy));
-const describedBy = computed(() => field?.describedBy);
+/* A read-only trigger is a `button`, whose role has no `aria-readonly`: the state is its accessible description. */
+const readOnlyTrigger = computed(() => finalReadOnly.value && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyTrigger);
+const describedBy = computed(() =>
+  readOnlyHint.describedBy((attrs[AriaAttribute.DescribedBy] as string | undefined) ?? field?.describedBy),
+);
 const ariaInvalid = computed(() => triggerState.value === InputStateValue.Invalid || undefined);
 
 const hiddenValue = computed(() => time.value?.toString({ smallestUnit: 'minute' }) ?? '');
 
-const OwnedAttributes: ReadonlySet<string> = new Set(['class', AriaAttribute.Label]);
+const OwnedAttributes: ReadonlySet<string> = new Set(['class', AriaAttribute.Label, AriaAttribute.DescribedBy]);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
@@ -181,7 +188,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       ref="trigger"
       :id="triggerId"
       :disabled="finalDisabled"
-      :aria-readonly="finalReadOnly && !finalDisabled ? true : undefined"
+      :data-readonly="readOnlyTrigger || undefined"
       :aria-invalid="ariaInvalid"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
@@ -195,6 +202,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       <span :class="labelClass">{{ displayText }}</span>
       <Clock class="h-4 w-4 shrink-0 text-muted-foreground" />
     </PopoverTrigger>
+    <ReadOnlyHint v-if="readOnlyTrigger" :id="readOnlyHint.hintId" />
     <PopoverContent is-bare>
       <TimeColumns
         :is-disabled="finalDisabled || finalReadOnly"

@@ -53,6 +53,15 @@ export const inputBaseVariants = tv({
 
 export type InputBaseVariants = VariantProps<typeof inputBaseVariants>;
 
+/**
+ * The read-only look for a control that does not extend `inputBaseVariants` (a custom trigger, a drop zone): the muted
+ * surface and text, a default cursor, no hover fill and the 1px neutral focus ring. It reads the same `readonly:`
+ * variant, so the control carries `data-readonly` while read-only. The control adds `readonly:hover:border-*` for its
+ * own resting border, which the hover would otherwise replace.
+ */
+export const ReadOnlyLook =
+  'readonly:cursor-default readonly:bg-muted readonly:text-muted-foreground readonly:hover:bg-muted readonly:focus-visible:ring-1 readonly:focus-visible:ring-muted-foreground';
+
 /** Defines the size step of a form input control. */
 export const InputSize = {
   /** Refers to the extra-small step (h-7). */

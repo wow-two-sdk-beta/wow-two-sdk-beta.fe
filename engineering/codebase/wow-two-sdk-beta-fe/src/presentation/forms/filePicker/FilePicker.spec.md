@@ -21,6 +21,8 @@ Public import: `import { FilePicker } from '@wow-two-beta/fe/presentation/forms'
 | `id`       | `string`           | no       | —               | The control's id. Auto-filled from `FormControl` context when omitted.                           |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state. Falls back to the surrounding field's `isDisabled`. |
 | `disabled` | `boolean` | no | `undefined` | Deprecated alias of `isDisabled`; removed next release. |
+| `isReadOnly` | `boolean` | no | `undefined` | Blocks the system dialog without disabling the button. Falls back to the surrounding field's `isReadOnly`. |
+| `readonly` | `boolean` | no | `undefined` | Deprecated alias of `isReadOnly`; removed next release. |
 
 ## Emits
 
@@ -47,3 +49,5 @@ Public import: `import { FilePicker } from '@wow-two-beta/fe/presentation/forms'
 ## Editing guarantees
 
 Field disabled/read-only state is checked at mutation boundaries, including synthetic events. Read-only prevents edits without discarding the current value. Where a named hidden mirror is provided, it forwards `form`, omits disabled values and retains read-only values. Localizable default labels follow LocaleProvider while explicit caller text takes precedence.
+
+Read-only: the button stays focusable and described as "Read only" with the muted look, never opens the system dialog; the native file input stays disabled so a label click cannot open it either.

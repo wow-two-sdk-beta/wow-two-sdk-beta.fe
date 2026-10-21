@@ -36,6 +36,8 @@ export interface ColorSwatchPickerProps {
 
 <script setup lang="ts">
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { AriaAttribute } from '../../../foundation/dom';
@@ -74,6 +76,12 @@ const attrs = useAttrs();
  */
 const field = useFormControl();
 const finalDisabled = computed(() => props.isDisabled ?? field?.isDisabled ?? false);
+const finalReadOnly = computed(() => props.isReadOnly ?? field?.isReadOnly ?? false);
+
+/* A read-only palette keeps every swatch focusable and shows the selection; a `group` has no `aria-readonly`, so the
+   state is the group's accessible description. */
+const readOnlyGroup = computed(() => finalReadOnly.value && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyGroup);
 
 const controlled = useControlled<string | null>({
   /* `??` is wrong here — `null` is a MEANINGFUL selection ("nothing selected"), and `??`
@@ -88,7 +96,7 @@ const controlled = useControlled<string | null>({
 const selected = controlled.value;
 
 function onSelect(color: string): void {
-  if (finalDisabled.value || (props.isReadOnly ?? field?.isReadOnly)) return;
+  if (finalDisabled.value || finalReadOnly.value) return;
   controlled.setValue(color);
 }
 
@@ -99,7 +107,7 @@ const ariaLabel = computed(() => attrs[AriaAttribute.Label] as string | undefine
 const groupId = computed(() => props.id ?? field?.id);
 /* Names the group from the Field label when present; an explicit aria-label always wins. */
 const labelledBy = computed(() => (ariaLabel.value ? undefined : field?.labelledBy));
-const describedBy = computed(() => field?.describedBy);
+const describedBy = computed(() => readOnlyHint.describedBy(field?.describedBy));
 
 const OwnedAttributes: ReadonlySet<string> = new Set(['class']);
 const passthroughAttrs = computed(() =>
@@ -128,6 +136,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     :id="groupId"
     :aria-labelledby="labelledBy"
     :aria-describedby="describedBy"
+    :data-readonly="readOnlyGroup || undefined"
     :class="rootClass"
     v-bind="passthroughAttrs"
   >
@@ -136,11 +145,13 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       :key="c"
       :color="c"
       :is-selected="selected === c"
-      :is-disabled="finalDisabled || (props.isReadOnly ?? field?.isReadOnly ?? false)"
+      :is-disabled="finalDisabled"
+      :is-read-only="readOnlyGroup"
       :size="swatchSize"
       :shape="swatchShape"
       @select="onSelect"
     />
+    <ReadOnlyHint v-if="readOnlyGroup" :id="readOnlyHint.hintId" />
     <input
       ref="formResetAnchor"
       type="hidden"

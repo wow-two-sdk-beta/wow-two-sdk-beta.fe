@@ -24,6 +24,8 @@ Public import: `import { FileUploadPicker } from '@wow-two-beta/fe/presentation/
 | `hint`      | `string \| number` | no       | —                                       | The zone's sub-line. Fill the `hint` slot for richer content.                           |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state. Falls back to the surrounding field's `isDisabled`. |
 | `disabled` | `boolean` | no | `undefined` | Deprecated alias of `isDisabled`; removed next release. |
+| `isReadOnly` | `boolean` | no | `undefined` | Blocks drops and the system dialog without disabling the drop zone. Falls back to the surrounding field's `isReadOnly`. |
+| `readonly` | `boolean` | no | `undefined` | Deprecated alias of `isReadOnly`; removed next release. |
 | `name`      | `string`           | no       | —                                       | The native input name.                                                                  |
 | `id`        | `string`           | no       | —                                       | The control's id. Auto-filled from `FormControl` context when omitted.                  |
 
@@ -53,3 +55,5 @@ Public import: `import { FileUploadPicker } from '@wow-two-beta/fe/presentation/
 ## Editing guarantees
 
 Field disabled/read-only state is checked at mutation boundaries, including synthetic events. Read-only prevents edits without discarding the current value. Where a named hidden mirror is provided, it forwards `form`, omits disabled values and retains read-only values. Localizable default labels follow LocaleProvider while explicit caller text takes precedence.
+
+Read-only: the drop zone keeps its tab stop and the muted look, is described as "Read only" (a `button` has no `aria-readonly`), and ignores click, Enter, Space and drops; the native file input stays disabled.

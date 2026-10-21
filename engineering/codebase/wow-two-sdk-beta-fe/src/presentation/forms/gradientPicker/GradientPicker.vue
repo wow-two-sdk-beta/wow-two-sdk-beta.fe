@@ -62,6 +62,8 @@ export function gradientToCss(g: Gradient): string {
 <script setup lang="ts">
 import { useLocale } from '../../../foundation/i18n';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Plus, Trash } from 'lucide-vue-next';
@@ -105,6 +107,13 @@ const ctx = useFormControl();
 const isDisabled = computed(() => props.isDisabled ?? ctx?.isDisabled);
 const isReadOnly = computed(() => props.isReadOnly ?? ctx?.isReadOnly);
 const inactive = computed(() => isDisabled.value || isReadOnly.value);
+
+/* A read-only editor keeps every field focusable and readable: text and number fields take the native `readonly`,
+   the colour fields and kind buttons ignore activation, and the add and remove actions stay unavailable. A `group`
+   has no `aria-readonly`, so the state is the group's accessible description. */
+const readOnlyGroup = computed(() => Boolean(isReadOnly.value) && !isDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyGroup);
+const describedBy = computed(() => readOnlyHint.describedBy(ctx?.describedBy));
 
 const controlled = useControlled<Gradient>({
   controlled: () => props.modelValue,
@@ -172,7 +181,13 @@ function kindClass(kind: GradientKind): string {
   return cn(
     'inline-flex h-6 items-center rounded px-2 text-xs font-medium transition-colors',
     gradient.value.kind === kind ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+    readOnlyGroup.value && 'cursor-default',
   );
+}
+
+/** A colour field has no `readonly`: a read-only one stays focusable and never opens its system picker. */
+function keepColorClosed(event: Event): void {
+  if (isReadOnly.value) event.preventDefault();
 }
 
 const rootId = computed(() => props.id ?? ctx?.id);
@@ -186,6 +201,7 @@ const rootClass = computed(() =>
   cn(
     'flex flex-col gap-3 rounded-md border border-border bg-card p-3 text-card-foreground shadow-sm',
     isDisabled.value && 'opacity-60',
+    'readonly:bg-muted readonly:text-muted-foreground',
     attrs.class as ClassValue,
   ),
 );
@@ -215,8 +231,9 @@ const locale = useLocale();
     role="group"
     :id="rootId"
     :aria-labelledby="ctx?.labelledBy"
-    :aria-describedby="ctx?.describedBy"
+    :aria-describedby="describedBy"
     :aria-invalid="ctx?.isInvalid || undefined"
+    :data-readonly="readOnlyGroup || undefined"
     :class="rootClass"
     v-bind="passthroughAttrs"
   >
@@ -233,7 +250,7 @@ const locale = useLocale();
           type="button"
           role="radio"
           :aria-checked="gradient.kind === k"
-          :disabled="inactive"
+          :disabled="isDisabled"
           :class="kindClass(k)"
           @click="update({ kind: k })"
         >
@@ -247,7 +264,8 @@ const locale = useLocale();
           :min="0"
           :max="360"
           :value="gradient.angle"
-          :disabled="inactive"
+          :disabled="isDisabled"
+          :readonly="isReadOnly"
           :class="angleInputClass"
           @input="onAngleInput"
         />
@@ -266,15 +284,18 @@ const locale = useLocale();
           type="color"
           :aria-label="locale.t('GradientPicker.stopColor', undefined, 'Stop color')"
           :value="stop.color"
-          :disabled="inactive"
-          class="h-7 w-10 cursor-pointer rounded-sm border border-input bg-background"
+          :disabled="isDisabled"
+          class="h-7 w-10 cursor-pointer rounded-sm border border-input bg-background readonly:cursor-default"
+          :data-readonly="readOnlyGroup || undefined"
+          @click="keepColorClosed"
           @input="onStopColorInput(i, $event)"
         />
         <input
           type="text"
           :aria-label="locale.t('GradientPicker.stopColorHex', undefined, 'Stop color hex')"
           :value="stop.color"
-          :disabled="inactive"
+          :disabled="isDisabled"
+          :readonly="isReadOnly"
           :class="hexInputClass"
           @input="onStopColorInput(i, $event)"
         />
@@ -284,7 +305,8 @@ const locale = useLocale();
           :min="0"
           :max="100"
           :value="stop.position"
-          :disabled="inactive"
+          :disabled="isDisabled"
+          :readonly="isReadOnly"
           :class="positionInputClass"
           @input="onStopPositionInput(i, $event)"
         />
@@ -309,6 +331,8 @@ const locale = useLocale();
     >
       <Icon :icon="PlusIcon" :size="12" /> {{ locale.t('GradientPicker.addStop', undefined, 'Add stop') }}
     </button>
+
+    <ReadOnlyHint v-if="readOnlyGroup" :id="readOnlyHint.hintId" />
 
     <!-- CSS output -->
     <code class="block break-all rounded-md bg-muted/40 px-2 py-1.5 text-[10px] text-muted-foreground">

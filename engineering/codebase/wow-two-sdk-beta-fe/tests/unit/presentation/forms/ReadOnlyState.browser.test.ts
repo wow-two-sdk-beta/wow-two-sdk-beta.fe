@@ -1,9 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { nativeTab } from '../../../BrowserKeyboard';
-import { mount, type VueWrapper } from '@vue/test-utils';
-import { defineComponent, h, nextTick, type Component, type VNode } from 'vue';
 import { Temporal } from 'temporal-polyfill';
+import { h, type Component, type VNode } from 'vue';
 import {
   CascaderPicker,
   ComboboxPicker,
@@ -43,66 +41,34 @@ import {
   UrlInput,
   YearPicker,
 } from '@src/presentation/forms';
-import '@src/index.css';
+import {
+  ariaViolations,
+  bg,
+  cursorOf,
+  descriptionOf,
+  isForcedColors,
+  mountHost,
+  mountPair,
+  type PairVariant,
+  settle,
+  Theme,
+  textColor,
+  tabTo,
+  tokenColor,
+  unmountAfterEach,
+  unmountNow,
+} from '../../../support/ReadOnlyHarness';
 
 /*
  * A read-only control takes the disabled look without the disabled semantics: the muted surface and text, a default
- * cursor, no hover border, a 1px neutral focus ring, a native `readonly` attribute (or `aria-readonly` on a trigger),
- * focus, and a selectable value. Every case mounts a normal control beside a read-only one, so the read-only look is
- * read as a difference rather than a constant.
+ * cursor, no hover border, a 1px neutral focus ring, focus, and a selectable value. Its state reaches assistive
+ * technology through a role that allows it: the native `readonly` attribute on an input, `aria-readonly` on a
+ * `combobox` trigger, and the accessible description "Read only" on a `button` trigger, whose role has no
+ * `aria-readonly`. Every case mounts a normal control beside a read-only one, so the read-only look is read as a
+ * difference rather than a constant.
  */
 
-// Forced colours replace every fill and border with a system colour by design; structure, focus and cursor still apply.
-const isForcedColors = matchMedia('(forced-colors: active)').matches;
-
-let wrapper: VueWrapper | null = null;
-afterEach(() => {
-  wrapper?.unmount();
-  wrapper = null;
-  document.body.innerHTML = '';
-});
-
-/** Distinct resting and hover borders, so a hover emphasis is a visible difference in the default theme. */
-const Theme = '--color-input: rgb(0, 0, 255); --color-border-strong: rgb(255, 0, 0); width: 360px; padding: 16px;';
-
-/** Mounts a normal control and a read-only one, both through their surrounding `Field`, in one container. */
-async function mountPair(make: () => VNode, className = ''): Promise<HTMLElement> {
-  const host = defineComponent({
-    render: () =>
-      h('div', { class: className, style: Theme }, [
-        h(Field, { label: 'Normal' }, () => make()),
-        h(Field, { label: 'Read only', isReadOnly: true }, () => make()),
-      ]),
-  });
-  wrapper = mount(host, { attachTo: document.body });
-  await nextTick();
-  await nextTick();
-  return wrapper.element as HTMLElement;
-}
-
-/** Resolves a token to the colour the engine computes for it, in the container's theme. */
-function tokenColor(container: HTMLElement, property: string, token: string): string {
-  const probe = document.createElement('span');
-  probe.style.setProperty(property, `var(${token})`);
-  container.append(probe);
-  const value = getComputedStyle(probe).getPropertyValue(property);
-  probe.remove();
-  return value;
-}
-
-/** Presses Tab from the top of the page until the element is focused, so `:focus-visible` sees keyboard modality. */
-async function tabTo(element: HTMLElement): Promise<void> {
-  // A click leaves the sequential-focus starting point where it landed (and WebKit does not focus a clicked button).
-  document.body.tabIndex = -1;
-  document.body.focus();
-  document.body.removeAttribute('tabindex');
-  for (let press = 0; press < 12 && document.activeElement !== element; press++) await nativeTab();
-  expect(document.activeElement).toBe(element);
-}
-
-const bg = (element: Element): string => getComputedStyle(element).backgroundColor;
-const textColor = (element: Element): string => getComputedStyle(element).color;
-const cursorOf = (element: Element): string => getComputedStyle(element).cursor;
+unmountAfterEach();
 
 interface Case {
   readonly make: () => VNode;
@@ -208,8 +174,7 @@ describe.each(Object.entries(Inputs))('read-only %s', (_name, { make, control, f
       await tabTo(readOnly);
       const ring = tokenColor(root, 'color', '--color-muted-foreground');
       expect(getComputedStyle(readOnly).boxShadow).toContain(ring);
-      wrapper?.unmount();
-      document.body.innerHTML = '';
+      unmountNow();
     }
   });
 });
@@ -228,29 +193,18 @@ describe('read-only text inputs', () => {
   });
 
   it('takes its own flag, which wins over the surrounding Field', async () => {
-    wrapper = mount(
-      defineComponent({
-        render: () =>
-          h(Field, { label: 'Name', isReadOnly: true }, () => [
-            h(TextInput, { id: 'own', isReadOnly: false }),
-            h(TextInput, { id: 'inherited' }),
-          ]),
-      }),
-      { attachTo: document.body },
+    await mountHost(() =>
+      h(Field, { label: 'Name', isReadOnly: true }, () => [
+        h(TextInput, { id: 'own', isReadOnly: false }),
+        h(TextInput, { id: 'inherited' }),
+      ]),
     );
-    await nextTick();
     expect(document.querySelector('#own')!.hasAttribute('readonly')).toBe(false);
     expect(document.querySelector('#inherited')!.hasAttribute('readonly')).toBe(true);
   });
 
   it('keeps the invalid border while read-only', async () => {
-    wrapper = mount(
-      defineComponent({
-        render: () => h('div', { style: Theme }, [h(TextInput, { isReadOnly: true, state: 'invalid' })]),
-      }),
-      { attachTo: document.body },
-    );
-    await nextTick();
+    await mountHost(() => h('div', { style: Theme }, [h(TextInput, { isReadOnly: true, state: 'invalid' })]));
     const input = document.querySelector('input')!;
     await userEvent.hover(input);
     expect(input.getAttribute('readonly')).not.toBeNull();
@@ -261,92 +215,175 @@ describe('read-only text inputs', () => {
   });
 
   it.skipIf(isForcedColors)('leaves a disabled input on the muted surface it always had', async () => {
-    wrapper = mount(
-      defineComponent({ render: () => h('div', { style: Theme }, [h(TextInput, { isDisabled: true })]) }),
-      { attachTo: document.body },
-    );
-    await nextTick();
-    const root = wrapper.element as HTMLElement;
+    const root = await mountHost(() => h('div', { style: Theme }, [h(TextInput, { isDisabled: true })]));
     expect(bg(root.querySelector('input')!)).toBe(tokenColor(root, 'background-color', '--color-muted'));
     expect(cursorOf(root.querySelector('input')!)).toBe('not-allowed');
   });
 
   it.skipIf(isForcedColors)('keeps the focus ring off when the caller turned it off', async () => {
-    wrapper = mount(
-      defineComponent({ render: () => h('div', { style: Theme }, [h(TextInput, { isReadOnly: true, ring: 'none' })]) }),
-      { attachTo: document.body },
-    );
-    await nextTick();
+    await mountHost(() => h('div', { style: Theme }, [h(TextInput, { isReadOnly: true, ring: 'none' })]));
     const input = document.querySelector('input')!;
     await tabTo(input);
     expect(getComputedStyle(input).boxShadow).not.toMatch(/0px 0px 0px [1-9]/);
   });
 });
 
-const Triggers: Record<string, { make: () => VNode; opens: string }> = {
+interface TriggerCase {
+  /** Builds the picker; `onChange` reports every value change, tagged by the instance that made it. */
+  readonly make: (variant: PairVariant, onChange: (variant: PairVariant) => void) => VNode;
+  readonly opens: string;
+  /** `combobox` carries `aria-readonly`; a `button` has no such attribute and is described instead. */
+  readonly role: 'combobox' | 'button';
+  /** Keys that change the value of a normal closed trigger, to prove the read-only one ignores them. */
+  readonly mutatingKey?: string;
+}
+
+const Triggers: Record<string, TriggerCase> = {
   SelectPicker: {
-    make: () =>
-      h(SelectPicker as Component, { defaultValue: 'a' }, () => [
+    make: (variant, onChange) =>
+      h(SelectPicker as Component, { defaultValue: 'a', 'onUpdate:modelValue': () => onChange(variant) }, () => [
         h(SelectPickerTrigger, { 'aria-label': 'Kind' }, () => h(SelectPickerValue)),
-        h(SelectPickerContent, null, () => h(SelectPickerItem, { itemKey: 'a', value: 'a', label: 'All' })),
+        h(SelectPickerContent, null, () => [
+          h(SelectPickerItem, { itemKey: 'a', value: 'a', label: 'All' }),
+          h(SelectPickerItem, { itemKey: 'b', value: 'b', label: 'Beta' }),
+        ]),
       ]),
     opens: '[role=listbox]',
+    role: 'combobox',
+    mutatingKey: 'b',
   },
   MultiSelectPicker: {
-    make: () =>
-      h(MultiSelectPicker as Component, { defaultValue: ['a'] }, () => [
+    make: (variant, onChange) =>
+      h(MultiSelectPicker as Component, { defaultValue: ['a'], 'onUpdate:modelValue': () => onChange(variant) }, () => [
         h(MultiSelectPickerTrigger, { 'aria-label': 'Kinds' }),
         h(MultiSelectPickerContent, null, () => h(MultiSelectPickerItem, { value: 'a', label: 'All' })),
       ]),
     opens: '[role=listbox]',
+    role: 'combobox',
+    mutatingKey: 'Backspace',
   },
   DatePicker: {
-    make: () => h(DatePicker, { 'aria-label': 'Day', defaultValue: Temporal.PlainDate.from('2026-10-21') }),
+    make: (variant, onChange) =>
+      h(DatePicker, {
+        'aria-label': 'Day',
+        defaultValue: Temporal.PlainDate.from('2026-10-21'),
+        'onUpdate:modelValue': () => onChange(variant),
+      }),
     opens: '[role=dialog]',
+    role: 'button',
   },
-  DateRangePicker: { make: () => h(DateRangePicker, { 'aria-label': 'Days' }), opens: '[role=dialog]' },
-  TimePicker: { make: () => h(TimePicker, { 'aria-label': 'Time' }), opens: '[role=dialog]' },
-  MonthPicker: { make: () => h(MonthPicker, { 'aria-label': 'Month' }), opens: '[role=dialog]' },
-  YearPicker: { make: () => h(YearPicker, { 'aria-label': 'Year' }), opens: '[role=dialog]' },
-  CascaderPicker: { make: () => h(CascaderPicker, { 'aria-label': 'Path', options }), opens: '[role=dialog]' },
-  TreeSelectPicker: {
-    make: () => h(TreeSelectPicker, { 'aria-label': 'Node', nodes: treeNodes }),
+  DateRangePicker: {
+    make: (variant, onChange) =>
+      h(DateRangePicker, { 'aria-label': 'Days', 'onUpdate:modelValue': () => onChange(variant) }),
     opens: '[role=dialog]',
+    role: 'button',
+  },
+  TimePicker: {
+    make: (variant, onChange) =>
+      h(TimePicker, { 'aria-label': 'Time', 'onUpdate:modelValue': () => onChange(variant) }),
+    opens: '[role=dialog]',
+    role: 'button',
+  },
+  MonthPicker: {
+    make: (variant, onChange) =>
+      h(MonthPicker, { 'aria-label': 'Month', 'onUpdate:modelValue': () => onChange(variant) }),
+    opens: '[role=dialog]',
+    role: 'button',
+  },
+  YearPicker: {
+    make: (variant, onChange) =>
+      h(YearPicker, { 'aria-label': 'Year', 'onUpdate:modelValue': () => onChange(variant) }),
+    opens: '[role=dialog]',
+    role: 'button',
+  },
+  CascaderPicker: {
+    make: (variant, onChange) =>
+      h(CascaderPicker, { 'aria-label': 'Path', options, 'onUpdate:modelValue': () => onChange(variant) }),
+    opens: '[role=dialog]',
+    role: 'button',
+  },
+  TreeSelectPicker: {
+    make: (variant, onChange) =>
+      h(TreeSelectPicker, { 'aria-label': 'Node', nodes: treeNodes, 'onUpdate:modelValue': () => onChange(variant) }),
+    opens: '[role=dialog]',
+    role: 'button',
   },
 };
 
-describe.each(Object.entries(Triggers))('read-only %s trigger', (_name, { make, opens }) => {
+describe.each(Object.entries(Triggers))('read-only %s trigger', (_name, { make, opens, role, mutatingKey }) => {
+  const changes: PairVariant[] = [];
   const pick = async (): Promise<{ normal: HTMLButtonElement; readOnly: HTMLButtonElement; root: HTMLElement }> => {
-    const root = await mountPair(make);
+    changes.length = 0;
+    const root = await mountPair((variant) => make(variant, (changed) => changes.push(changed)));
     const [normal, readOnly] = Array.from(root.querySelectorAll<HTMLButtonElement>('button[aria-haspopup]'));
     return { normal: normal!, readOnly: readOnly!, root };
   };
   const panelOpen = (): boolean => document.querySelector(opens) !== null;
 
-  it('stays focusable and says read-only, not disabled', async () => {
+  it('stays focusable and exposes its read-only state through a role that allows it', async () => {
     const { normal, readOnly } = await pick();
     expect(readOnly.disabled).toBe(false);
-    expect(readOnly.getAttribute('aria-readonly')).toBe('true');
-    expect(normal.getAttribute('aria-readonly')).toBeNull();
+    expect(readOnly.hasAttribute('aria-disabled')).toBe(false);
+    if (role === 'combobox') {
+      // A combobox allows `aria-readonly`, which assistive technology announces as read only.
+      expect(readOnly.getAttribute('role')).toBe('combobox');
+      expect(normal.getAttribute('role')).toBe('combobox');
+      expect(readOnly.getAttribute('aria-readonly')).toBe('true');
+      expect(normal.getAttribute('aria-readonly')).toBeNull();
+    } else {
+      // A button has no `aria-readonly`: the state is its accessible description instead.
+      expect(readOnly.hasAttribute('aria-readonly')).toBe(false);
+      expect(normal.hasAttribute('aria-readonly')).toBe(false);
+      expect(descriptionOf(readOnly)).toBe('Read only');
+      expect(descriptionOf(normal)).toBe('');
+      expect(readOnly.hasAttribute('data-readonly')).toBe(true);
+      expect(normal.hasAttribute('data-readonly')).toBe(false);
+    }
     await tabTo(readOnly);
   });
 
-  it('opens when normal, and neither opens nor changes when read-only', async () => {
-    const { normal, readOnly } = await pick();
+  it('passes the ARIA validity rules, normal and read-only alike', async () => {
+    const { root } = await pick();
+    expect(await ariaViolations(root)).toEqual([]);
+  });
+
+  it('opens when normal', async () => {
+    const { normal } = await pick();
     await userEvent.click(normal);
     await expect.poll(panelOpen).toBe(true);
-    await userEvent.keyboard('{Escape}');
-    await expect.poll(panelOpen).toBe(false);
+  });
 
+  it('neither opens nor changes when read-only, on a click or a key', async () => {
+    const { readOnly } = await pick();
     await userEvent.click(readOnly);
-    await nextTick();
+    // One keyboard call keeps real input to a minimum: Enter and Space click a button, the arrows open a combobox.
+    readOnly.focus();
+    await userEvent.keyboard('{Enter} {ArrowDown}{ArrowUp}{Alt>}{ArrowDown}{/Alt}');
+    await settle();
     expect(panelOpen()).toBe(false);
     expect(readOnly.getAttribute('aria-expanded')).not.toBe('true');
-    await tabTo(readOnly);
-    await userEvent.keyboard('{Enter}');
-    await userEvent.keyboard(' ');
-    await nextTick();
-    expect(panelOpen()).toBe(false);
+    expect(document.activeElement).toBe(readOnly);
+    expect(changes).toEqual([]);
+  });
+
+  it.skipIf(role !== 'combobox')('opens a normal combobox on the arrow keys', async () => {
+    const { normal } = await pick();
+    normal.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect.poll(panelOpen).toBe(true);
+  });
+
+  // A synthetic key event: WebKit navigates back on a real Backspace that no handler consumed.
+  it.skipIf(mutatingKey === undefined)('ignores the keys that change a normal closed trigger', async () => {
+    const { normal, readOnly } = await pick();
+    const press = (target: HTMLElement): boolean =>
+      target.dispatchEvent(new KeyboardEvent('keydown', { key: mutatingKey!, bubbles: true, cancelable: true }));
+    press(normal);
+    await expect.poll(() => changes).toEqual(['normal']);
+    changes.length = 0;
+    press(readOnly);
+    await settle();
+    expect(changes).toEqual([]);
   });
 
   it('shows a default cursor', async () => {
@@ -372,6 +409,13 @@ describe.each(Object.entries(Triggers))('read-only %s trigger', (_name, { make, 
       return;
     }
     expect(style.boxShadow).toMatch(/0px 0px 0px 1px/);
+  });
+});
+
+describe('the ARIA validity check', () => {
+  it('rejects an aria-readonly on a button, the mistake the trigger tests guard against', async () => {
+    const root = await mountHost(() => h('div', [h('button', { type: 'button', 'aria-readonly': 'true' }, 'Day')]));
+    expect((await ariaViolations(root)).join('\n')).toContain('aria-allowed-attr');
   });
 });
 

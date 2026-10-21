@@ -24,6 +24,7 @@ Public import: `import { FontPicker } from '@wow-two-beta/fe/presentation/forms'
 | `placeholder` | `string` | no | `'Select font…'` | The trigger text shown when the value matches no known font. |
 | `previewText` | `string` | no | `'The quick brown fox'` | The sample string rendered in each row's own face, unless the option carries its own `sample`. |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state. Falls back to the surrounding form control's `isDisabled`. |
+| `isReadOnly` | `boolean` | no | `undefined` | Keeps the value but blocks changes. Falls back to the surrounding form control's `isReadOnly`. |
 | `name` | `string` | no | — | The hidden form input name; the hidden input emits the selected family. |
 | `id` | `string` | no | — | The control's id — it lands on the trigger button. Auto-filled from `FormControl` context. |
 
@@ -45,3 +46,7 @@ No explicit exposed handle.
 
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
+
+## Editing guarantees
+
+Read-only: the trigger stays focusable (not `disabled`), shows the muted read-only look (see Field), never opens its panel and never changes the value; a `button` has no `aria-readonly`, so it is described as "Read only" and carries `data-readonly`. The hidden native mirror retains the value.

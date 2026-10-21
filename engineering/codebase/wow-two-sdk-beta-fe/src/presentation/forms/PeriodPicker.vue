@@ -69,6 +69,8 @@ import { currentPeriodIndex, PeriodKind as PeriodKindValue, periodStartDate } fr
 import PeriodGrid from './PeriodGrid.vue';
 import { selectTriggerVariants } from './selectPicker/SelectPicker.variants';
 import { useNativeFormReset } from './UseNativeFormReset';
+import { useReadOnlyHint } from './UseReadOnlyHint';
+import ReadOnlyHint from './ReadOnlyHint.vue';
 
 /** Renders a trigger that opens a popover period grid and shows the picked month or year. */
 defineOptions({ name: 'PeriodPicker', inheritAttrs: false });
@@ -138,10 +140,15 @@ const ariaLabel = computed(() => attrs[AriaAttribute.Label] as string | undefine
 const triggerId = computed(() => props.id ?? field?.id);
 /* Names the trigger from the Field label when present; an explicit aria-label always wins. */
 const labelledBy = computed(() => (ariaLabel.value ? undefined : field?.labelledBy));
-const describedBy = computed(() => field?.describedBy);
+/* A read-only trigger is a `button`, whose role has no `aria-readonly`: the state is its accessible description. */
+const readOnlyTrigger = computed(() => readOnly.value && !disabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyTrigger);
+const describedBy = computed(() =>
+  readOnlyHint.describedBy((attrs[AriaAttribute.DescribedBy] as string | undefined) ?? field?.describedBy),
+);
 const formId = computed(() => (typeof attrs.form === 'string' ? attrs.form : undefined));
 
-const OwnedAttributes: ReadonlySet<string> = new Set(['class', 'form', AriaAttribute.Label]);
+const OwnedAttributes: ReadonlySet<string> = new Set(['class', 'form', AriaAttribute.Label, AriaAttribute.DescribedBy]);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
@@ -177,7 +184,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       ref="trigger"
       :id="triggerId"
       :disabled="disabled"
-      :aria-readonly="readOnly && !disabled ? true : undefined"
+      :data-readonly="readOnlyTrigger || undefined"
       :aria-invalid="invalid || undefined"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
@@ -189,6 +196,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       <span :class="labelClass">{{ displayText }}</span>
       <CalendarIcon class="h-4 w-4 shrink-0 text-muted-foreground" />
     </PopoverTrigger>
+    <ReadOnlyHint v-if="readOnlyTrigger" :id="readOnlyHint.hintId" />
     <PopoverContent is-bare>
       <PeriodGrid
         :kind="props.kind"

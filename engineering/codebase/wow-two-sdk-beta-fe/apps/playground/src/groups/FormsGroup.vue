@@ -106,6 +106,13 @@ const {
   CascaderPicker,
   ImageCropEditor,
   MentionInput,
+  ColorPicker,
+  FontPicker,
+  FilePicker,
+  FileUploadPicker,
+  KeyboardShortcutPicker,
+  IconPicker,
+  GradientPicker,
 } = forms;
 
 const covered = [
@@ -427,6 +434,26 @@ const stamp = ref<Temporal.PlainDateTime | null>(
           <Field label="Read-only date" is-read-only>
             <DatePicker :default-value="Temporal.PlainDate.from('2026-10-21')" />
           </Field>
+        </div>
+      </Demo>
+
+      <Demo
+        name="Read-only pickers"
+        note="focusable, never open or change · a button has no aria-readonly, so each is described as read only"
+      >
+        <div class="space-y-3">
+          <Field label="Color" is-read-only><ColorPicker default-value="#336699" /></Field>
+          <Field label="Font" is-read-only><FontPicker /></Field>
+          <Field label="File" is-read-only><FilePicker /></Field>
+          <Field label="Upload" is-read-only><FileUploadPicker /></Field>
+          <Field label="Shortcut" is-read-only><KeyboardShortcutPicker :default-value="['Control', 'K']" /></Field>
+          <Field label="Palette" is-read-only>
+            <ColorSwatchPicker :colors="['#ef4444', '#22c55e', '#3b82f6']" default-value="#22c55e" />
+          </Field>
+          <Field label="Icon" is-read-only><IconPicker default-value="star" :columns="6" /></Field>
+          <Field label="Gradient" is-read-only><GradientPicker /></Field>
+          <Field label="Choice" is-read-only><RadioInput name="read-only-choice" :default-value="true" /></Field>
+          <Field label="Signature" is-read-only><SignatureInput /></Field>
         </div>
       </Demo>
 

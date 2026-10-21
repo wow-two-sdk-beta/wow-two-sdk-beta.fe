@@ -40,7 +40,16 @@ None declared.
 
 ## Read-only look
 
-A read-only control (its own `isReadOnly`, or the Field's) takes the disabled look without the disabled semantics: the muted surface and text, a default cursor, no hover border, and a 1px neutral focus ring in place of the brand ring. The control stays focusable, its value stays selectable and copyable, and assistive tech reads it as read-only (the native `readonly` attribute on an input, `aria-readonly` on a trigger button) rather than disabled. The `readonly:` variant in `index.css` carries the styling: it matches `[readonly]`, `[aria-readonly='true']` and `[data-readonly]`, never a `<button>` or a disabled field as Tailwind's `read-only:` does. Pickers that open a panel (`SelectPicker`, `MultiSelectPicker`, `DatePicker`, `DateRangePicker`, `TimePicker`, `MonthPicker`, `YearPicker`, `CascaderPicker`, `TreeSelectPicker`) stay focusable but never open while read-only. Verified by [ReadOnlyState.browser.test.ts](../../../../tests/unit/presentation/forms/ReadOnlyState.browser.test.ts).
+A read-only control (its own `isReadOnly`, or the Field's) takes the disabled look without the disabled semantics: the muted surface and text, a default cursor, no hover border, and a 1px neutral focus ring in place of the brand ring. The control stays focusable, its value stays selectable and copyable, and it never opens a panel, starts a recording or changes. The `readonly:` variant in `index.css` carries the styling: it matches `[readonly]`, `[aria-readonly='true']` and `[data-readonly]`, never a `<button>` or a disabled field as Tailwind's `read-only:` does.
+
+The state reaches assistive technology through a role that allows it, never through an `aria-readonly` the role forbids:
+
+- An input or text area carries the native `readonly` attribute.
+- A `combobox` trigger (`SelectPicker`, `MultiSelectPicker`) carries `aria-readonly="true"`. `role="combobox"` on the trigger button, with `aria-haspopup="listbox"`, `aria-expanded` and `aria-controls`, is the APG select-only combobox; it opens on Enter, Space and the arrow keys, and ignores all of them while read-only.
+- A `button`, `group`, `img`, `radio` or drop-zone control has no `aria-readonly`, so it carries `data-readonly` for the styling and is described as "Read only" (`Field.readOnly` in the locale catalogue) through `aria-describedby`, beside any helper text. This covers the picker triggers that open a dialog (`DatePicker`, `DateRangePicker`, `TimePicker`, `MonthPicker`, `YearPicker`, `CascaderPicker`, `TreeSelectPicker`, `ColorPicker`, `FontPicker`, `EmojiPickerPopover`), `FilePicker`, `FileUploadPicker`, `KeyboardShortcutPicker`, `IconPicker`, `ColorSwatchPicker`, `GradientPicker`, `SignatureInput` and `RadioInput`.
+- A `slider`, `listbox`, `checkbox` and `switch` keep `aria-readonly`, which their roles allow.
+
+Internally, `useReadOnlyHint` and `ReadOnlyHint` supply the description; a control that needs one renders `ReadOnlyHint` beside itself. Verified by [ReadOnlyState.browser.test.ts](../../../../tests/unit/presentation/forms/ReadOnlyState.browser.test.ts) (inputs and the popover pickers), [ReadOnlyControls.browser.test.ts](../../../../tests/unit/presentation/forms/ReadOnlyControls.browser.test.ts) (the other controls) and [ReadOnlyAria.dom.test.ts](../../../../tests/unit/presentation/forms/ReadOnlyAria.dom.test.ts), which runs the ARIA validity rules over every public control that takes `isReadOnly`.
 
 ## Exposed handle
 

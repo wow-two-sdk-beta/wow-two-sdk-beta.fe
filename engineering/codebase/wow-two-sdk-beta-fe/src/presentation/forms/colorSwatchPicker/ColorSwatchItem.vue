@@ -15,6 +15,8 @@ export interface ColorSwatchItemProps {
   readonly isSelected: boolean;
   /** The disabled state. */
   readonly isDisabled: boolean;
+  /** The read-only state — the swatch stays focusable, shows a default cursor and takes no hover emphasis. */
+  readonly isReadOnly?: boolean;
   /** The swatch size step. */
   readonly size?: ColorSwatchPreviewSize;
   /** The swatch outline shape. */
@@ -61,6 +63,7 @@ function handleKeydown(event: KeyboardEvent): void {
     :shape="shape"
     :is-selected="isSelected"
     :is-disabled="isDisabled"
+    :class="isReadOnly && 'cursor-default hover:shadow-none'"
     :tabindex="roving.tabindex"
     :data-roving-focus-item="roving['data-roving-focus-item']"
     :aria-label="color"

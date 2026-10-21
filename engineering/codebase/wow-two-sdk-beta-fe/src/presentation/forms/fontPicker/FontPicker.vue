@@ -41,6 +41,9 @@ export interface FontPickerProps {
   /** The disabled state. Falls back to the surrounding form control's `isDisabled`. */
   readonly isDisabled?: boolean;
 
+  /** Keeps the value but blocks changes. Falls back to the surrounding form control's `isReadOnly`. */
+  readonly isReadOnly?: boolean;
+
   /** The hidden form input name; the hidden input emits the selected family. */
   readonly name?: string;
 
@@ -53,6 +56,9 @@ export interface FontPickerProps {
 import { useLocaleDefaults, useLocale } from '../../../foundation/i18n';
 import { useTemplateRef } from 'vue';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
+import { ReadOnlyLook } from '../InputStyles';
 import { computed, ref, useAttrs } from 'vue';
 import type { ClassValue } from 'clsx';
 import { ChevronDown } from 'lucide-vue-next';
@@ -74,6 +80,7 @@ const inputProps = withDefaults(defineProps<FontPickerProps>(), {
      absent `boolean` prop to `false` — which would shadow the form control context. */
   modelValue: undefined,
   isDisabled: undefined,
+  isReadOnly: undefined,
 });
 const props = useLocaleDefaults(inputProps, 'FontPicker', {
   placeholder: 'Select font…',
@@ -92,6 +99,12 @@ const attrs = useAttrs();
    The `id` lands on the trigger button (the control), not the wrapper div. */
 const field = useFormControl();
 const finalDisabled = computed(() => props.isDisabled ?? field?.isDisabled);
+const finalReadOnly = computed(() => props.isReadOnly ?? field?.isReadOnly ?? false);
+
+/* A read-only trigger is a `button`, whose role has no `aria-readonly`: the state is its accessible description. */
+const readOnlyTrigger = computed(() => finalReadOnly.value && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyTrigger);
+const describedBy = computed(() => readOnlyHint.describedBy(field?.describedBy));
 
 const controlled = useControlled<string>({
   controlled: () => props.modelValue,
@@ -115,8 +128,14 @@ const filtered = computed(() => {
 
 const current = computed(() => props.fonts.find((f) => f.family === family.value));
 
+/* A read-only picker only closes: its trigger is focusable, so a click or key activation reaches the popover. */
 function onOpenChange(next: boolean): void {
+  if (next && finalReadOnly.value) return;
   open.value = next;
+}
+
+function onTriggerClick(event: MouseEvent): void {
+  if (finalReadOnly.value) event.preventDefault();
 }
 
 function onQueryInput(event: Event): void {
@@ -124,6 +143,7 @@ function onQueryInput(event: Event): void {
 }
 
 function select(option: FontOption): void {
+  if (finalDisabled.value || finalReadOnly.value) return;
   controlled.setValue(option.family);
   open.value = false;
 }
@@ -178,6 +198,12 @@ const passthroughAttrs = computed(() =>
 
 const wrapperClass = computed(() => cn('inline-block', attrs.class as ClassValue));
 
+const triggerClass = cn(
+  'inline-flex h-10 min-w-[14rem] items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
+  ReadOnlyLook,
+  'readonly:hover:border-input',
+);
+
 const ChevronDownIcon = ChevronDown;
 
 const formResetAnchor = useTemplateRef<HTMLInputElement>('formResetAnchor');
@@ -198,17 +224,20 @@ const locale = useLocale();
           :disabled="finalDisabled"
           :aria-invalid="field?.isInvalid || undefined"
           :aria-labelledby="field?.labelledBy"
-          :aria-describedby="field?.describedBy"
+          :aria-describedby="describedBy"
+          :data-readonly="readOnlyTrigger || undefined"
           aria-haspopup="listbox"
           :aria-expanded="open"
-          class="inline-flex h-10 min-w-[14rem] items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+          :class="triggerClass"
+          @click="onTriggerClick"
         >
-          <span :style="{ fontFamily: family }" class="truncate text-foreground">
+          <span :style="{ fontFamily: family }" class="truncate">
             {{ current?.name ?? placeholder }}
           </span>
           <Icon :icon="ChevronDownIcon" :size="14" class="text-muted-foreground" />
         </button>
       </PopoverTrigger>
+      <ReadOnlyHint v-if="readOnlyTrigger" :id="readOnlyHint.hintId" />
       <!-- NOT `is-bare` (which the React original passed): bare strips the whole surface
            recipe — background, border, shadow — leaving a transparent panel with the page
            showing through the font list. The explicit `w-`/`p-` classes already override the

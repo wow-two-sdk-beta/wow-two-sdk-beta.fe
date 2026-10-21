@@ -42,6 +42,9 @@ export interface MultiSelectPickerContextValue {
   readonly name?: string;
   readonly isInvalid?: boolean;
 
+  /** Stable id of the panel's listbox — wired to the trigger's `aria-controls`. */
+  readonly listboxId: string;
+
   /** Form-control wiring inherited from a surrounding `<Field>` (undefined when standalone).
    *  `labelId`/`describedBy` carry only ids of chrome that is actually rendered. */
   readonly fieldId?: string;

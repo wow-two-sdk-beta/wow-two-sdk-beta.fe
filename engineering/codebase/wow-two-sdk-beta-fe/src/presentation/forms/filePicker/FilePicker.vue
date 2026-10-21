@@ -36,6 +36,9 @@ const SizeClass: Partial<Record<Size, string>> = {
 
 <script setup lang="ts">
 import { useLocaleDefaults } from '../../../foundation/i18n';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
+import { ReadOnlyLook } from '../InputStyles';
 import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Upload } from 'lucide-vue-next';
@@ -81,7 +84,13 @@ const finalDisabled = computed(() => props.isDisabled ?? props.disabled ?? ctx?.
 const finalReadOnly = computed(() => props.isReadOnly ?? props.readonly ?? ctx?.isReadOnly);
 const inactive = computed(() => finalDisabled.value || finalReadOnly.value);
 const inputId = computed(() => props.id ?? ctx?.id);
+
+/* A read-only picker keeps its button focusable; a `button` has no `aria-readonly`, so the state is its description.
+   The native file input stays disabled, so a label click cannot open the system dialog either. */
+const readOnlyButton = computed(() => Boolean(finalReadOnly.value) && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyButton);
 const describedBy = computed(() => ctx?.describedBy);
+const buttonDescribedBy = computed(() => readOnlyHint.describedBy(ctx?.describedBy));
 const isInvalid = computed(() => ctx?.isInvalid || undefined);
 /* aria- (not native) required — the change handler resets `value` after handing the files
    out, so a native `required` would block every submit. */
@@ -117,6 +126,8 @@ const wrapperClass = computed(() => cn('inline-flex items-center gap-3', attrs.c
 const buttonClass = computed(() =>
   cn(
     'inline-flex items-center gap-2 rounded-md border border-input bg-background font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+    ReadOnlyLook,
+    'readonly:hover:border-input',
     SizeClass[props.size] ?? SizeClass.md,
   ),
 );
@@ -129,10 +140,18 @@ defineExpose({ el: input });
 
 <template>
   <div :class="wrapperClass">
-    <button type="button" :disabled="inactive" :aria-describedby="describedBy" :class="buttonClass" @click="openPicker">
+    <button
+      type="button"
+      :disabled="finalDisabled"
+      :aria-describedby="buttonDescribedBy"
+      :data-readonly="readOnlyButton || undefined"
+      :class="buttonClass"
+      @click="openPicker"
+    >
       <Icon :icon="UploadIcon" :size="16" />
       <slot name="label">{{ props.label }}</slot>
     </button>
+    <ReadOnlyHint v-if="readOnlyButton" :id="readOnlyHint.hintId" />
     <input
       ref="input"
       type="file"

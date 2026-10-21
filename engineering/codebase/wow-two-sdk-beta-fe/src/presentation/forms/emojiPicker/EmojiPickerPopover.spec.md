@@ -30,6 +30,7 @@ Public import: `import { EmojiPickerPopover } from '@wow-two-beta/fe/presentatio
 | `placement` | `Placement` | no | `'bottom'` | The popover placement relative to the trigger. Default `bottom`. |
 | `open` | `boolean` | no | `undefined` | The open state, controlled. The `v-model:open` binding target. |
 | `defaultOpen` | `boolean` | no | `false` | The initial open state when uncontrolled. Default `false`. |
+| `isReadOnly` | `boolean` | no | `undefined` | Keeps the emoji but blocks changes: the trigger stays focusable and never opens the panel. Falls back to the surrounding field's `isReadOnly`. |
 
 ## Emits
 
@@ -52,3 +53,7 @@ No explicit exposed handle.
 
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
+
+## Editing guarantees
+
+Read-only: the trigger stays focusable with a default cursor and the "Read only" description, never opens the panel and never emits a change.

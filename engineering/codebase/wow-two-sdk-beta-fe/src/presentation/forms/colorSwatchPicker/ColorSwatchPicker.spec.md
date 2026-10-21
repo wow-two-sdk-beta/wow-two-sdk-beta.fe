@@ -24,6 +24,7 @@ Public import: `import { ColorSwatchPicker } from '@wow-two-beta/fe/presentation
 | `swatchSize`   | `ColorSwatchPreviewSize` | no       | `'md'`      | The size step every swatch renders at.                                         |
 | `swatchShape`  | `SwatchShape`            | no       | `'square'`  | The outline shape every swatch renders with.                                   |
 | `isDisabled`   | `boolean`                | no       | `undefined` | The disabled state. Falls back to the surrounding form control's `isDisabled`. |
+| `isReadOnly`   | `boolean`                | no       | `undefined` | Keeps the selection but blocks changes; the swatches stay focusable. Falls back to the surrounding form control's `isReadOnly`. |
 | `id`           | `string`                 | no       | —           | The group's id. Auto-filled from `FormControl` context when omitted.           |
 
 ## Emits
@@ -48,3 +49,5 @@ None declared.
 ## Editing guarantees
 
 Field disabled/read-only state is checked at mutation boundaries, including synthetic events. Read-only prevents edits without discarding the current value. Where a named hidden mirror is provided, it forwards `form`, omits disabled values and retains read-only values. Localizable default labels follow LocaleProvider while explicit caller text takes precedence.
+
+Read-only: every swatch stays focusable with a default cursor and ignores activation; the group is described as "Read only" (a `group` has no `aria-readonly`).

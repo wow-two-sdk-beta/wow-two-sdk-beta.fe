@@ -21,6 +21,7 @@ Public import: `import { GradientPicker } from '@wow-two-beta/fe/presentation/fo
 | `modelValue`   | `Gradient` | no       | `undefined` | The gradient, controlled. The `v-model` binding target.                        |
 | `defaultValue` | `Gradient` | no       | `undefined` | The initial gradient when uncontrolled.                                        |
 | `isDisabled`   | `boolean`  | no       | `undefined` | The disabled state. Falls back to the surrounding form control's `isDisabled`. |
+| `isReadOnly`   | `boolean`  | no       | `undefined` | Keeps the gradient but blocks changes; the fields stay focusable. Falls back to the surrounding form control's `isReadOnly`. |
 | `name`         | `string`   | no       | —           | The hidden input name; the hidden input emits the CSS string.                  |
 | `id`           | `string`   | no       | —           | The control's id. Auto-filled from `FormControl` context when omitted.         |
 
@@ -46,3 +47,5 @@ None declared.
 ## Editing guarantees
 
 Field disabled/read-only state is checked at mutation boundaries, including synthetic events. Read-only prevents edits without discarding the current value. Where a named hidden mirror is provided, it forwards `form`, omits disabled values and retains read-only values. Localizable default labels follow LocaleProvider while explicit caller text takes precedence.
+
+Read-only: text and number fields take the native `readonly`, the colour fields and kind buttons stay focusable but ignore activation, and the add and remove actions stay unavailable; the group is described as "Read only" and takes the muted surface.

@@ -45,6 +45,9 @@ const SizeClass: Partial<Record<Size, string>> = {
 
 <script setup lang="ts">
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
+import { AriaAttribute } from '../../../foundation/dom';
 import { computed, nextTick, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { cn, Size as SizeValue } from '../../../foundation/styles';
@@ -112,7 +115,12 @@ const finalReadOnly = computed(() => props.isReadOnly ?? props.readonly ?? ctx?.
 const finalRequired = computed(() => props.isRequired ?? props.required ?? ctx?.isRequired);
 const isInvalid = computed(() => ctx?.isInvalid || undefined);
 
-const OwnedAttributes: ReadonlySet<string> = new Set(['class', 'checked']);
+/* A radio's role has no `aria-readonly` (a `radiogroup` does), and a native radio has no `readonly`: the state is the
+   input's accessible description. */
+const readOnlyHint = useReadOnlyHint(finalReadOnly);
+const describedBy = computed(() => readOnlyHint.describedBy(attrs[AriaAttribute.DescribedBy] as string | undefined));
+
+const OwnedAttributes: ReadonlySet<string> = new Set(['class', 'checked', AriaAttribute.DescribedBy]);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
@@ -123,7 +131,7 @@ const wrapperClass = computed(() =>
 
 const VisualClass = cn(
   'pointer-events-none grid h-full w-full place-items-center rounded-full border border-input bg-background transition-colors',
-  'peer-checked:border-primary-soft-foreground',
+  'peer-checked:border-primary-soft-foreground peer-data-[readonly]:bg-muted',
   /* `peer-checked:` cannot reach descendants — the dot's opacity is gated by a child selector on this peer span. */
   '[&>span]:opacity-0 peer-checked:[&>span]:opacity-100',
   'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1',
@@ -163,14 +171,16 @@ defineExpose({ el: input });
       :required="finalRequired"
       :checked="isChecked"
       :aria-invalid="isInvalid"
-      class="peer absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+      :aria-describedby="describedBy"
+      :data-readonly="finalReadOnly || undefined"
+      class="peer absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed readonly:cursor-default"
       v-bind="passthroughAttrs"
       @change="onChange"
       @click="finalReadOnly && $event.preventDefault()"
-      :aria-readonly="finalReadOnly || undefined"
     />
     <span aria-hidden="true" :class="visualClass">
       <span class="h-2 w-2 rounded-full bg-primary-soft-foreground" />
     </span>
+    <ReadOnlyHint v-if="finalReadOnly" :id="readOnlyHint.hintId" />
   </span>
 </template>

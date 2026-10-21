@@ -57,6 +57,9 @@ const FallbackHsv: HSV = { h: 217, s: 0.91, v: 0.96, a: 1 };
 <script setup lang="ts">
 import { useLocale } from '../../../foundation/i18n';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
+import { ReadOnlyLook } from '../InputStyles';
 import { computed, shallowRef, useAttrs, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { AriaAttribute } from '../../../foundation/dom';
@@ -119,7 +122,12 @@ const ariaLabel = computed(() => attrs[AriaAttribute.Label] as string | undefine
    wins, and the default label only applies when nothing else names the trigger. */
 const labelledBy = computed(() => (ariaLabel.value ? undefined : field?.labelledBy));
 const finalAriaLabel = computed(() => ariaLabel.value ?? (labelledBy.value ? undefined : 'Pick a color'));
-const describedBy = computed(() => field?.describedBy);
+/* A read-only trigger is a `button`, whose role has no `aria-readonly`: the state is its accessible description. */
+const readOnlyTrigger = computed(() => finalReadOnly.value && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyTrigger);
+const describedBy = computed(() =>
+  readOnlyHint.describedBy((attrs[AriaAttribute.DescribedBy] as string | undefined) ?? field?.describedBy),
+);
 const isInvalid = computed(() => field?.isInvalid || undefined);
 
 const controlled = useControlled<string | null>({
@@ -192,19 +200,29 @@ const hiddenValue = computed(() => hex.value ?? '');
 const alphaValue = computed(() => hsv.value.a ?? 1);
 const hasPresets = computed(() => Boolean(props.presets && props.presets.length > 0));
 
-const OwnedAttributes: ReadonlySet<string> = new Set(['class', AriaAttribute.Label]);
+const OwnedAttributes: ReadonlySet<string> = new Set(['class', AriaAttribute.Label, AriaAttribute.DescribedBy]);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
+/* A read-only trigger stays focusable but neither opens its panel nor changes the value: `PopoverTrigger` skips a
+   click its caller prevented, and a keyboard activation arrives as a click. */
+function onTriggerClick(event: MouseEvent): void {
+  if (finalReadOnly.value) event.preventDefault();
+}
+
 const framedTriggerClass = computed(() =>
   cn(
     'inline-flex items-center gap-2 rounded-md border border-border bg-background px-2 py-1 text-sm transition-colors hover:border-border-strong focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
+    ReadOnlyLook,
+    'readonly:hover:border-border',
     attrs.class as ClassValue,
   ),
 );
 
-const swatchTriggerClass = computed(() => attrs.class as ClassValue);
+const swatchTriggerClass = computed(() =>
+  cn('readonly:cursor-default readonly:hover:shadow-none', attrs.class as ClassValue),
+);
 
 const trigger = useTemplateRef<{ el: HTMLElement | null }>('trigger');
 
@@ -222,7 +240,15 @@ const locale = useLocale();
 <template>
   <Popover :key="formResetRevision">
     <!-- Custom trigger: no id/aria wiring, per the React original's contract. -->
-    <PopoverTrigger v-if="hasCustomTrigger" ref="trigger" as-child :disabled="finalDisabled || finalReadOnly">
+    <PopoverTrigger
+      v-if="hasCustomTrigger"
+      ref="trigger"
+      as-child
+      :disabled="finalDisabled"
+      :data-readonly="readOnlyTrigger || undefined"
+      :aria-describedby="readOnlyHint.describedBy()"
+      @click="onTriggerClick"
+    >
       <slot name="trigger" />
     </PopoverTrigger>
 
@@ -237,12 +263,14 @@ const locale = useLocale();
       :aria-labelledby="labelledBy"
       :aria-describedby="describedBy"
       :aria-invalid="isInvalid"
+      :data-readonly="readOnlyTrigger || undefined"
       v-bind="passthroughAttrs"
+      @click="onTriggerClick"
     >
       <ColorSwatchPreview
         :color="swatchColor"
         :size="triggerSize"
-        :is-disabled="finalDisabled || finalReadOnly"
+        :is-disabled="finalDisabled"
         :class="swatchTriggerClass"
         @click="noop"
       />
@@ -256,13 +284,16 @@ const locale = useLocale();
       :aria-labelledby="labelledBy"
       :aria-describedby="describedBy"
       :aria-invalid="isInvalid"
-      :disabled="finalDisabled || finalReadOnly"
+      :disabled="finalDisabled"
+      :data-readonly="readOnlyTrigger || undefined"
       :class="framedTriggerClass"
       v-bind="passthroughAttrs"
+      @click="onTriggerClick"
     >
       <ColorSwatchPreview v-if="isFullTrigger" :color="swatchColor" :size="triggerSize" />
       <span class="font-mono uppercase">{{ hexText }}</span>
     </PopoverTrigger>
+    <ReadOnlyHint v-if="readOnlyTrigger" :id="readOnlyHint.hintId" />
 
     <PopoverContent
       :aria-label="locale.t('ColorPicker.colorPicker', undefined, 'Color picker')"

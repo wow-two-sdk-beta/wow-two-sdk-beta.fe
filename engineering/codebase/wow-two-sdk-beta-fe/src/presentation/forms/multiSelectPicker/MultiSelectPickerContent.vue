@@ -76,6 +76,7 @@ function onValueChange(next: unknown): void {
     :class="panelClass"
   >
     <ListboxPicker
+      :id="ctx.listboxId"
       :is-disabled="ctx.isDisabled"
       is-multiple
       :model-value="selected"

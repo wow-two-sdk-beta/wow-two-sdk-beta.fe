@@ -66,6 +66,8 @@ import { useFormControl } from '../../../foundation/primitives';
 import { useControlled } from '../../../foundation/state';
 import { cn } from '../../../foundation/styles';
 import { Button } from '../../actions';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 
 /**
  * Renders a pad the reader signs with a pointer — mouse, pen or finger — plus undo and clear, and reports the
@@ -99,6 +101,12 @@ const disabled = computed(() => props.isDisabled ?? field?.isDisabled ?? false);
 const readOnly = computed(() => props.isReadOnly ?? field?.isReadOnly ?? false);
 const invalid = computed(() => props.isInvalid ?? field?.isInvalid ?? false);
 const locked = computed(() => disabled.value || readOnly.value);
+
+/* The pad is an `img`, whose role has no `aria-readonly`: a read-only pad is described as read only, and keeps the
+   default cursor a disabled pad does not. */
+const readOnlyPad = computed(() => readOnly.value && !disabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyPad);
+const describedBy = computed(() => readOnlyHint.describedBy(field?.describedBy));
 
 const controlled = useControlled<string | null>({
   controlled: () => props.modelValue,
@@ -301,7 +309,10 @@ const padClass = computed(() =>
   ),
 );
 const canvasClass = computed(() =>
-  cn('absolute inset-0 size-full touch-none', locked.value ? 'cursor-not-allowed' : 'cursor-crosshair'),
+  cn(
+    'absolute inset-0 size-full touch-none',
+    disabled.value ? 'cursor-not-allowed' : readOnly.value ? 'cursor-default' : 'cursor-crosshair',
+  ),
 );
 </script>
 
@@ -327,7 +338,7 @@ const canvasClass = computed(() =>
         role="img"
         :aria-label="padName"
         :aria-labelledby="attrs[AriaAttribute.Label] ? undefined : field?.labelledBy"
-        :aria-describedby="field?.describedBy"
+        :aria-describedby="describedBy"
         :aria-invalid="invalid || undefined"
         :aria-disabled="disabled || undefined"
         :class="canvasClass"
@@ -337,6 +348,7 @@ const canvasClass = computed(() =>
         @pointercancel="onPointerEnd"
       />
     </div>
+    <ReadOnlyHint v-if="readOnlyPad" :id="readOnlyHint.hintId" />
     <div class="flex items-center gap-1">
       <span class="me-auto text-xs text-muted-foreground" aria-live="polite">{{ statusText }}</span>
       <Button size="sm" variant="ghost" :disabled="locked || strokeCount === 0" @click="undo">

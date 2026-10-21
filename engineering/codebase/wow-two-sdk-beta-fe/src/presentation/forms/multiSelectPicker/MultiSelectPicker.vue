@@ -43,6 +43,7 @@ import { useTemplateRef } from 'vue';
 import { useNativeFormReset } from '../UseNativeFormReset';
 import { computed, provide, ref } from 'vue';
 import { useControlled } from '../../../foundation/state';
+import { useId } from '../../../foundation/identifiers';
 import { useFormControl } from '../../../foundation/primitives';
 import { Popover } from '../../overlays';
 import { multiSelectContextKey, type MultiSelectPickerContextValue } from './MultiSelectPickerContext';
@@ -81,6 +82,8 @@ const finalDisabled = computed(() => props.isDisabled ?? field?.isDisabled ?? fa
 const finalReadOnly = computed(() => props.isReadOnly ?? field?.isReadOnly ?? false);
 const inactive = computed(() => finalDisabled.value || finalReadOnly.value);
 const finalInvalid = computed(() => props.isInvalid ?? field?.isInvalid);
+
+const listboxId = useId('multi-select-listbox');
 
 const openCtl = useControlled<boolean>({
   controlled: () => props.open,
@@ -153,6 +156,9 @@ provide<MultiSelectPickerContextValue>(multiSelectContextKey, {
   },
   get isInvalid() {
     return finalInvalid.value;
+  },
+  get listboxId() {
+    return listboxId;
   },
   get fieldId() {
     return field?.id;

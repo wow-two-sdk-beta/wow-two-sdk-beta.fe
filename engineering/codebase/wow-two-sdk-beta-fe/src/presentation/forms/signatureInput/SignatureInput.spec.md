@@ -50,3 +50,7 @@ No explicit exposed handle.
 
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts).
 - Focused tests: [SignatureInput.dom.test.ts](../../../../tests/unit/presentation/forms/SignatureInput.dom.test.ts) — SVG paths, dots, undo, clear, saved signatures, read-only and localization; [SignatureInput.browser.test.ts](../../../../tests/unit/presentation/forms/SignatureInput.browser.test.ts) — real canvas ink at the device pixel ratio and PNG export.
+
+## Editing guarantees
+
+Read-only: the pad takes the muted surface, a default cursor and the "Read only" description (an `img` has no `aria-readonly`); strokes, undo and clear are unavailable.

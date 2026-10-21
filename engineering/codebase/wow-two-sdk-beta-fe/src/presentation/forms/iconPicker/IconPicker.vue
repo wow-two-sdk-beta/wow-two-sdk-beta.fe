@@ -138,6 +138,12 @@ export interface IconPickerProps {
   /** The disabled state. Falls back to the surrounding form control's `isDisabled`. */
   readonly isDisabled?: boolean;
 
+  /**
+   * Keeps the picked icon but blocks changes; the grid stays focusable and searchable.
+   * Falls back to the surrounding form control's `isReadOnly`.
+   */
+  readonly isReadOnly?: boolean;
+
   /** The hidden input name; the hidden input emits the selected icon key. */
   readonly name?: string;
 
@@ -149,6 +155,8 @@ export interface IconPickerProps {
 <script setup lang="ts">
 import { useLocaleDefaults, useLocale } from '../../../foundation/i18n';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 import { computed, ref, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { cn } from '../../../foundation/styles';
@@ -172,6 +180,7 @@ const inputProps = withDefaults(defineProps<IconPickerProps>(), {
      absent `boolean` prop to `false` — which would shadow the form control context. */
   modelValue: undefined,
   isDisabled: undefined,
+  isReadOnly: undefined,
 });
 const props = useLocaleDefaults(inputProps, 'IconPicker', { placeholder: 'Search icons…' });
 
@@ -190,7 +199,14 @@ const el = useTemplateRef<HTMLDivElement>('el');
    error chrome. Disabled flows to the search input + icon buttons. */
 const field = useFormControl();
 const finalDisabled = computed(() => props.isDisabled ?? field?.isDisabled);
+const finalReadOnly = computed(() => props.isReadOnly ?? field?.isReadOnly ?? false);
 const labelledBy = computed(() => field?.labelledBy);
+
+/* A `group` has no `aria-readonly` either: a read-only grid keeps its buttons focusable, and the state is the group's
+   accessible description. Searching only filters the view, so the search field stays usable. */
+const readOnlyGrid = computed(() => finalReadOnly.value && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyGrid);
+const describedBy = computed(() => readOnlyHint.describedBy(field?.describedBy));
 
 const controlled = useControlled<string>({
   controlled: () => props.modelValue,
@@ -201,6 +217,11 @@ const controlled = useControlled<string>({
 });
 
 const selected = controlled.value;
+
+function pick(key: string): void {
+  if (finalDisabled.value || finalReadOnly.value) return;
+  controlled.setValue(key);
+}
 const query = ref('');
 
 const filtered = computed(() => {
@@ -220,6 +241,9 @@ function buttonClass(key: string): string {
     selected.value === key
       ? 'border-primary bg-primary text-primary-foreground hover:bg-primary'
       : 'border-transparent',
+    readOnlyGrid.value && 'cursor-default hover:bg-transparent hover:text-muted-foreground',
+    readOnlyGrid.value && selected.value === key && 'hover:bg-primary hover:text-primary-foreground',
+    readOnlyGrid.value && 'focus-visible:ring-1 focus-visible:ring-muted-foreground',
   );
 }
 
@@ -243,6 +267,7 @@ const passthroughAttrs = computed(() =>
 const panelClass = computed(() =>
   cn(
     'flex flex-col gap-2 rounded-md border border-border bg-card p-3 text-card-foreground shadow-sm',
+    'readonly:bg-muted readonly:text-muted-foreground',
     attrs.class as ClassValue,
   ),
 );
@@ -261,7 +286,13 @@ const locale = useLocale();
 </script>
 
 <template>
-  <div :key="formResetRevision" ref="el" :class="panelClass" v-bind="passthroughAttrs">
+  <div
+    :key="formResetRevision"
+    ref="el"
+    :data-readonly="readOnlyGrid || undefined"
+    :class="panelClass"
+    v-bind="passthroughAttrs"
+  >
     <input
       type="search"
       :value="query"
@@ -279,7 +310,7 @@ const locale = useLocale();
       :id="gridId"
       :aria-label="labelledBy ? undefined : locale.t('IconPicker.icons', undefined, 'Icons')"
       :aria-labelledby="labelledBy"
-      :aria-describedby="field?.describedBy"
+      :aria-describedby="describedBy"
       class="grid gap-1 overflow-y-auto"
       :style="gridStyle"
     >
@@ -291,7 +322,7 @@ const locale = useLocale();
           :disabled="finalDisabled"
           :style="buttonStyle"
           :class="buttonClass(key)"
-          @click="controlled.setValue(key)"
+          @click="pick(key)"
         >
           <Icon :icon="iconComp" :size="size" />
         </button>
@@ -300,6 +331,7 @@ const locale = useLocale();
         {{ locale.t('IconPicker.noIconsMatch', undefined, 'No icons match.') }}
       </div>
     </div>
+    <ReadOnlyHint v-if="readOnlyGrid" :id="readOnlyHint.hintId" />
     <input
       v-if="name"
       type="hidden"

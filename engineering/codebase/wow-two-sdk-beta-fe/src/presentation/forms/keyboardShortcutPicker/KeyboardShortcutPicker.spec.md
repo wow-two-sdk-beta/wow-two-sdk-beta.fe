@@ -26,6 +26,8 @@ Public import: `import { KeyboardShortcutPicker } from '@wow-two-beta/fe/present
 | `id`           | `string`                | no       | —                   | The control's id. Auto-filled from `FormControl` context when omitted.         |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state. Falls back to the surrounding field's `isDisabled`. |
 | `disabled` | `boolean` | no | `undefined` | Deprecated alias of `isDisabled`; removed next release. |
+| `isReadOnly` | `boolean` | no | `undefined` | Keeps the chord but never starts recording. Falls back to the surrounding field's `isReadOnly`. |
+| `readonly` | `boolean` | no | `undefined` | Deprecated alias of `isReadOnly`; removed next release. |
 
 ## Emits
 
@@ -56,3 +58,5 @@ Field disabled/read-only state is checked at mutation boundaries, including synt
 ## Editing guarantees
 
 Becoming disabled/read-only cancels an active recording session and releases its document listener. Composition events are ignored. The listener belongs to the control owner document.
+
+Read-only: the button stays focusable with the muted look and the "Read only" description, never starts recording and keeps the chord.

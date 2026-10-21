@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-10-17*
+*Last updated: 2026-10-21*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -81,6 +81,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Add focused tests to parts covered only by the render smoke | engineering | 223 SFCs lacked one at the 2026-09-28 scan; re-measure first |
 | Sweep the remaining small convention breaches | engineering | `Avatar`'s 68 raw palette classes, 4 inline `defineProps<{…}>`; re-measure the rest |
 | Ability to make the node editor read-only as a whole | feature | whole-control read-only API and Field adoption |
+| Give the remaining controls the read-only look and a role that allows their state | feature | `ImageEditor`, `ImageCropEditor`, `RecurrenceEditor` and `AddressEditor` lock their parts like a disabled control; `TransferPicker`, `OptionTilePicker`, `SegmentedPicker`, `ToggleGroup`, `ReactionPicker`, `ChatComposerInput` and `PointControl` take no `isReadOnly`; `CheckboxInput`, `SwitchInput`, `SliderInput`, `KnobInput` and the colour sliders block changes with `aria-readonly` but keep the editable look. The shared pieces are `ReadOnlyLook`, `useReadOnlyHint` and the `readonly:` variant |
 | Ability to set the calendar week start per locale | feature | — |
 | Ability to edit exact numbers in data grid cells | feature | `ExactNumberInput` is the only lossless editing surface today |
 | Ability to page or virtualize very large diffs | feature | the diff viewer is quadratic in time with eager DOM rendering |

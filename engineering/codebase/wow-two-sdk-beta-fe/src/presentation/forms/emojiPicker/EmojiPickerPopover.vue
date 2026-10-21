@@ -49,6 +49,12 @@ export interface EmojiPickerPopoverProps {
 
   /** The initial open state when uncontrolled. Default `false`. */
   readonly defaultOpen?: boolean;
+
+  /**
+   * Keeps the value but blocks changes: the trigger stays focusable and never opens the panel.
+   * Falls back to the surrounding field's `isReadOnly`.
+   */
+  readonly isReadOnly?: boolean;
 }
 </script>
 
@@ -56,6 +62,8 @@ export interface EmojiPickerPopoverProps {
 import { useLocale } from '../../../foundation/i18n';
 import { useTemplateRef } from 'vue';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 import { computed } from 'vue';
 import { ColorTone, SizePreset } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
@@ -78,6 +86,7 @@ const props = withDefaults(defineProps<EmojiPickerPopoverProps>(), {
   /* `useControlled` keys on `=== undefined`, and Vue casts an absent `boolean` prop to `false`:
      without these the popover would read as "controlled, and closed" and never open. */
   open: undefined,
+  isReadOnly: undefined,
 });
 
 const emit = defineEmits<{
@@ -107,12 +116,23 @@ const field = useFormControl();
 const fieldId = computed(() => field?.id);
 const fieldLabelledBy = computed(() => field?.labelledBy);
 const fieldDescribedBy = computed(() => field?.describedBy);
+
+/* A read-only trigger is a `button`, whose role has no `aria-readonly`: the state is its accessible description. */
+const finalReadOnly = computed(() => props.isReadOnly ?? field?.isReadOnly ?? false);
+const readOnlyTrigger = computed(() => finalReadOnly.value && !field?.isDisabled);
+const readOnlyHint = useReadOnlyHint(readOnlyTrigger);
+const describedBy = computed(() => readOnlyHint.describedBy(fieldDescribedBy.value));
+
+/* `PopoverTrigger` skips a click its caller prevented, and a keyboard activation arrives as a click. */
+function onTriggerClick(event: MouseEvent): void {
+  if (finalReadOnly.value) event.preventDefault();
+}
 const fieldInvalid = computed(() => field?.isInvalid || undefined);
 
 const triggerGlyph = computed(() => currentValue.value?.glyph ?? '🙂');
 
 function onPick(entry: EmojiCatalogEntry | null): void {
-  if (field?.isDisabled || field?.isReadOnly) return;
+  if (field?.isDisabled || finalReadOnly.value) return;
   emit('update:modelValue', entry);
   if (entry !== null) openCtl.setValue(false);
 }
@@ -128,7 +148,13 @@ const locale = useLocale();
 
 <template>
   <Popover :key="formResetRevision" :open="isOpenNow" :placement="placement" @update:open="openCtl.setValue($event)">
-    <PopoverTrigger as-child :disabled="field?.isDisabled || field?.isReadOnly">
+    <PopoverTrigger
+      as-child
+      :disabled="field?.isDisabled"
+      :data-readonly="readOnlyTrigger || undefined"
+      :aria-describedby="readOnlyHint.describedBy()"
+      @click="onTriggerClick"
+    >
       <slot name="trigger">
         <Button
           :variant="ButtonVariant.Ghost"
@@ -138,20 +164,22 @@ const locale = useLocale();
           :id="fieldId"
           :aria-label="locale.t('EmojiPickerPopover.chooseEmoji', undefined, 'Choose emoji')"
           :aria-labelledby="fieldLabelledBy"
-          :aria-describedby="fieldDescribedBy"
+          :aria-describedby="describedBy"
           :aria-invalid="fieldInvalid"
+          class="readonly:cursor-default readonly:text-muted-foreground readonly:hover:bg-transparent"
         >
           {{ triggerGlyph }}
         </Button>
       </slot>
     </PopoverTrigger>
+    <ReadOnlyHint v-if="readOnlyTrigger" :id="readOnlyHint.hintId" />
     <PopoverContent class="w-80" padding="sm">
       <!--
         The panel's SearchInput is a sub-control of the picker, not the field's control — a bare
         FormControlProvider keeps it from adopting the surrounding Field's id (which now names
         the trigger; adoption would duplicate it) or its chrome.
       -->
-      <FormControlProvider :is-disabled="field?.isDisabled" :is-read-only="field?.isReadOnly">
+      <FormControlProvider :is-disabled="field?.isDisabled" :is-read-only="finalReadOnly">
         <EmojiPicker
           :model-value="currentValue"
           :storage="storage"

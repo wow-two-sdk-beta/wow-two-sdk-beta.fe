@@ -137,7 +137,9 @@ describe('CascaderPicker', () => {
     const locked = mountPicker({ isReadOnly: true });
     const trigger = locked.get<HTMLButtonElement>('[aria-label="Region"]');
     expect(trigger.element.disabled).toBe(false);
-    expect(trigger.attributes('aria-readonly')).toBe('true');
+    // A button has no `aria-readonly`: the state is the trigger's accessible description.
+    expect(trigger.attributes('aria-readonly')).toBeUndefined();
+    expect(document.getElementById(trigger.attributes('aria-describedby') ?? '')?.textContent).toBe('Read only');
     expect(trigger.text()).toBe('Pick an option');
     await trigger.trigger('click');
     expect(trigger.attributes('aria-expanded')).toBe('false');

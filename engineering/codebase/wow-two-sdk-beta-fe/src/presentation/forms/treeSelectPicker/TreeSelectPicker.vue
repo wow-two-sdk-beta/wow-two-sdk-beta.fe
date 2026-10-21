@@ -91,6 +91,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../overlays';
 import { InputState } from '../InputStyles';
 import { selectTriggerVariants } from '../selectPicker/SelectPicker.variants';
 import { useNativeFormReset } from '../UseNativeFormReset';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
 import TreeSelectPickerNode from './TreeSelectPickerNode.vue';
 
 /** Renders a trigger that opens a tree of options and shows the picked leaf. */
@@ -150,10 +152,17 @@ const displayText = computed(() => {
 
 /* Never a declared prop — a declared `'aria-label'` would arrive as `props.ariaLabel`. */
 const ariaLabel = computed(() => attrs[AriaAttribute.Label] as string | undefined);
+
+/* A read-only trigger is a `button`, whose role has no `aria-readonly`: the state is its accessible description. */
+const readOnlyTrigger = computed(() => readOnly.value && !disabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyTrigger);
+const describedBy = computed(() =>
+  readOnlyHint.describedBy((attrs[AriaAttribute.DescribedBy] as string | undefined) ?? field?.describedBy),
+);
 const labelledBy = computed(() => (ariaLabel.value ? undefined : field?.labelledBy));
 const formId = computed(() => (typeof attrs.form === 'string' ? attrs.form : undefined));
 
-const OwnedAttributes: ReadonlySet<string> = new Set(['class', 'form', AriaAttribute.Label]);
+const OwnedAttributes: ReadonlySet<string> = new Set(['class', 'form', AriaAttribute.Label, AriaAttribute.DescribedBy]);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
@@ -183,11 +192,11 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     <PopoverTrigger
       :id="props.id ?? field?.id"
       :disabled="disabled"
-      :aria-readonly="readOnly && !disabled ? true : undefined"
+      :data-readonly="readOnlyTrigger || undefined"
       :aria-invalid="invalid || undefined"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
-      :aria-describedby="field?.describedBy"
+      :aria-describedby="describedBy"
       :class="triggerClass"
       v-bind="passthroughAttrs"
       @click="onTriggerClick"
@@ -195,6 +204,7 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
       <span :class="labelClass">{{ displayText }}</span>
       <ChevronDown class="h-4 w-4 shrink-0 text-muted-foreground" />
     </PopoverTrigger>
+    <ReadOnlyHint v-if="readOnlyTrigger" :id="readOnlyHint.hintId" />
     <PopoverContent class="max-h-80 min-w-56 overflow-y-auto p-1">
       <TreeViewer
         :model-value="value"

@@ -52,7 +52,13 @@ describe('native read-only controls', () => {
       );
       const control = wrapper.findComponent(component);
       const input = wrapper.get('input');
-      expect(input.attributes('aria-readonly')).toBe('true');
+      if (component === RadioInput) {
+        // A radio's role has no `aria-readonly`: the state is the input's accessible description.
+        expect(input.attributes('aria-readonly')).toBeUndefined();
+        expect(document.getElementById(input.attributes('aria-describedby') ?? '')?.textContent).toBe('Read only');
+      } else {
+        expect(input.attributes('aria-readonly')).toBe('true');
+      }
       expect(new FormData(wrapper.get('form').element as HTMLFormElement).get('choice')).toBe('yes');
       (input.element as HTMLInputElement).checked = false;
       await input.trigger('change');
@@ -167,7 +173,7 @@ describe('compound control inactive lifetimes', () => {
     expect(wrapper.findComponent(component).emitted('files-change')).toBeUndefined();
     expect(wrapper.get('input[type=file]').attributes('disabled')).toBeDefined();
   });
-  it('locks gradient controls while retaining the native CSS value', () => {
+  it('locks gradient controls while retaining the native CSS value', async () => {
     const wrapper = track(
       mount(
         {
@@ -177,7 +183,16 @@ describe('compound control inactive lifetimes', () => {
         { attachTo: document.body },
       ),
     );
-    expect(wrapper.findAll('button').every((button) => button.attributes('disabled') !== undefined)).toBe(true);
+    // The add and remove actions stay unavailable; the fields and the kind buttons stay focusable but inert.
+    const actions = wrapper.findAll('button:not([role=radio])');
+    expect(actions.length).toBeGreaterThan(0);
+    expect(actions.every((button) => button.attributes('disabled') !== undefined)).toBe(true);
+    for (const field of wrapper.findAll('input[type=text], input[type=number]')) {
+      expect(field.attributes('readonly')).toBeDefined();
+      expect(field.attributes('disabled')).toBeUndefined();
+    }
+    await wrapper.get('button[role=radio]:not([aria-checked=true])').trigger('click');
+    expect(wrapper.findComponent(GradientPicker).emitted('update:modelValue')).toBeUndefined();
     expect(new FormData(wrapper.get('form').element as HTMLFormElement).get('gradient')).toContain('linear-gradient');
   });
 });

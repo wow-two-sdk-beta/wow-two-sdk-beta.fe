@@ -55,3 +55,5 @@ No explicit exposed handle.
 ## Editing guarantees
 
 Field disabled/read-only state is checked at mutation boundaries, including synthetic events. Read-only prevents edits without discarding the current value. Where a named hidden mirror is provided, it forwards `form`, omits disabled values and retains read-only values. Localizable default labels follow LocaleProvider while explicit caller text takes precedence.
+
+The trigger is a `combobox` (`aria-haspopup="listbox"`, `aria-controls` the panel's listbox): a read-only picker carries `aria-readonly="true"`, stays focusable and ignores Enter, Space, the arrow keys and Backspace.

@@ -64,6 +64,12 @@ function onKeydown(event: KeyboardEvent): void {
   /* Runs after any caller-supplied `@keydown` (declared after `v-bind`), exactly as React's
      `onKeyDown?.(e)` ran before this body. */
   if (event.defaultPrevented) return;
+  /* A combobox opens on the arrow keys; `setOpen` ignores the request while the picker is read-only or disabled. */
+  if (!ctx.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+    event.preventDefault();
+    ctx.setOpen(true);
+    return;
+  }
   if (event.key === 'Backspace' && ctx.values.length > 0) {
     ctx.setValues(ctx.values.slice(0, -1));
   }
@@ -101,9 +107,12 @@ defineExpose({ el: root });
     <button
       ref="root"
       type="button"
+      role="combobox"
       :id="ctx.fieldId"
       :disabled="ctx.isDisabled && !ctx.isReadOnly"
       :aria-readonly="ctx.isReadOnly || undefined"
+      aria-haspopup="listbox"
+      :aria-controls="ctx.listboxId"
       :aria-invalid="triggerState === 'invalid' || undefined"
       :aria-labelledby="labelledBy"
       :aria-describedby="ctx.describedBy"

@@ -26,6 +26,7 @@ Public import: `import { IconPicker } from '@wow-two-beta/fe/presentation/forms'
 | `iconButtonSize` | `number` | no | `36` | The pixel size of each icon button. Default `36`. |
 | `placeholder` | `string` | no | `'Search icons…'` | The search-field placeholder. |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state. Falls back to the surrounding form control's `isDisabled`. |
+| `isReadOnly` | `boolean` | no | `undefined` | Keeps the picked icon but blocks changes; the grid stays focusable and searchable. Falls back to the surrounding form control's `isReadOnly`. |
 | `name` | `string` | no | — | The hidden input name; the hidden input emits the selected icon key. |
 | `id` | `string` | no | — | The control's id. Auto-filled from `FormControl` context when omitted. |
 
@@ -47,3 +48,7 @@ None declared.
 
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
+
+## Editing guarantees
+
+Read-only: the grid is described as "Read only" (a `group` has no `aria-readonly`) and takes the muted surface; every icon stays focusable with its `aria-pressed`, takes a default cursor, and picking one changes nothing. The search field stays usable, since it only filters the view. The hidden mirror retains the value.

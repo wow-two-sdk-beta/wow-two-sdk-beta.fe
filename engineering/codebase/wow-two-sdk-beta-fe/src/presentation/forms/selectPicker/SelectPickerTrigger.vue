@@ -136,6 +136,12 @@ function handleTriggerKeyDown(event: KeyboardEvent): void {
      off `attrs` and invoked by hand (and excluded from the passthrough so it cannot fire twice). */
   (attrs.onKeydown as ((e: KeyboardEvent) => void) | undefined)?.(event);
   if (event.defaultPrevented) return;
+  /* A combobox opens on the arrow keys; `setOpen` ignores the request while the picker is read-only or disabled. */
+  if (!ctx.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+    event.preventDefault();
+    ctx.setOpen(true);
+    return;
+  }
   /* Only intercept when closed — open delegates to the ListboxPicker. A consumed char (incl. Space
      while a buffer is active) must not also toggle the popover open via the button. */
   if (!ctx.open && triggerTypeahead.onKeyDown(event)) {
@@ -156,7 +162,8 @@ const clearOffsetClass = computed(() => TriggerClearOffsetClasses[sizeKey.value]
 /* Names the trigger from the Field label when present; an explicit aria-label always wins. */
 const labelledBy = computed(() => (!ariaLabel.value ? ctx.labelId : undefined));
 
-/* A read-only trigger is not disabled: it keeps its focus and names its state through `aria-readonly`. */
+/* A read-only trigger is not disabled: it keeps its focus, and `aria-readonly` — valid because the trigger is a
+   `combobox`, not a `button` — names its state. */
 const isHardDisabled = computed(() => ctx.isDisabled && !ctx.isReadOnly);
 
 const dataState = computed(() => triggerDataState(ctx.open, ctx.isLoading, isHardDisabled.value, ctx.isInvalid));
@@ -220,6 +227,7 @@ defineExpose({ el: root });
       <button
         ref="root"
         type="button"
+        role="combobox"
         :id="ctx.fieldId"
         :disabled="isHardDisabled || ctx.isLoading"
         :aria-readonly="ctx.isReadOnly || undefined"

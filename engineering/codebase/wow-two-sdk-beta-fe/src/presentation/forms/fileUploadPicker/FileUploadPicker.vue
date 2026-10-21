@@ -62,6 +62,9 @@ export interface FileUploadPickerProps {
 
 <script setup lang="ts">
 import { useLocaleDefaults } from '../../../foundation/i18n';
+import { useReadOnlyHint } from '../UseReadOnlyHint';
+import ReadOnlyHint from '../ReadOnlyHint.vue';
+import { ReadOnlyLook } from '../InputStyles';
 import { computed, ref, watch, useAttrs, useSlots, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { UploadCloud } from 'lucide-vue-next';
@@ -119,6 +122,12 @@ const ctx = useFormControl();
 const finalDisabled = computed(() => props.isDisabled ?? props.disabled ?? ctx?.isDisabled);
 const finalReadOnly = computed(() => props.isReadOnly ?? props.readonly ?? ctx?.isReadOnly);
 const inactive = computed(() => finalDisabled.value || finalReadOnly.value);
+
+/* A read-only zone keeps its tab stop and drops every drop, click and key: a `button`-role zone has no
+   `aria-readonly`, so the state is its accessible description. The native file input stays disabled. */
+const readOnlyZone = computed(() => Boolean(finalReadOnly.value) && !finalDisabled.value);
+const readOnlyHint = useReadOnlyHint(readOnlyZone);
+const zoneDescribedBy = computed(() => readOnlyHint.describedBy(ctx?.describedBy));
 watch(inactive, (value) => {
   if (value) {
     dragCounter.value = 0;
@@ -246,8 +255,12 @@ const zoneClass = computed(() =>
     dragState.value === 'over' && 'border-primary bg-primary-soft/30 text-foreground',
     showError.value && 'border-destructive bg-destructive-soft/30 text-destructive-soft-foreground',
     finalDisabled.value && 'cursor-not-allowed opacity-60 hover:border-input hover:bg-background',
+    ReadOnlyLook,
+    !showError.value && 'readonly:hover:border-input',
   ),
 );
+
+const labelClass = computed(() => cn('font-medium', readOnlyZone.value ? 'text-muted-foreground' : 'text-foreground'));
 
 const iconClass = computed(() =>
   cn(
@@ -267,9 +280,10 @@ defineExpose({ el: input });
   <div :class="wrapperClass">
     <div
       role="button"
-      :tabindex="inactive ? -1 : 0"
-      :aria-disabled="inactive || undefined"
-      :aria-describedby="ctx?.describedBy"
+      :tabindex="finalDisabled ? -1 : 0"
+      :aria-disabled="finalDisabled || undefined"
+      :aria-describedby="zoneDescribedBy"
+      :data-readonly="readOnlyZone || undefined"
       :data-drag-state="dragState"
       :data-invalid="showError || undefined"
       :class="zoneClass"
@@ -281,7 +295,7 @@ defineExpose({ el: input });
       @drop="onDrop"
     >
       <Icon :icon="UploadIcon" :size="28" :class="iconClass" />
-      <div class="font-medium text-foreground">
+      <div :class="labelClass">
         <slot name="label">{{ props.label }}</slot>
       </div>
       <div v-if="hasHint" class="text-xs">
@@ -303,6 +317,7 @@ defineExpose({ el: input });
         @change="onChange"
       />
     </div>
+    <ReadOnlyHint v-if="readOnlyZone" :id="readOnlyHint.hintId" />
     <slot />
   </div>
 </template>

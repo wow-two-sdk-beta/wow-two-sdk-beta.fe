@@ -76,7 +76,7 @@ export default defineConfig({
       {
         plugins: [vue(), tailwindcss()],
         resolve: { alias: srcAlias },
-        optimizeDeps: { include: ['lossless-json', 'bignumber.js'] },
+        optimizeDeps: { include: ['lossless-json', 'bignumber.js', 'axe-core'] },
         test: {
           name: 'browser',
           include: ['tests/unit/**/*.component.test.ts', 'tests/unit/**/*.browser.test.ts'],

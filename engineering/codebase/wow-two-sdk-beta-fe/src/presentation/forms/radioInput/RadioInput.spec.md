@@ -50,3 +50,5 @@ None declared.
 ## Editing guarantees
 
 Field disabled/read-only state is checked at mutation boundaries, including synthetic events. Read-only prevents edits without discarding the current value. Where a named hidden mirror is provided, it forwards `form`, omits disabled values and retains read-only values. Localizable default labels follow LocaleProvider while explicit caller text takes precedence.
+
+A radio's role has no `aria-readonly` and a native radio has no `readonly`: a read-only radio stays focusable, ignores clicks and keys, takes the muted circle and a default cursor, and is described as "Read only" (`data-readonly` carries the styling).

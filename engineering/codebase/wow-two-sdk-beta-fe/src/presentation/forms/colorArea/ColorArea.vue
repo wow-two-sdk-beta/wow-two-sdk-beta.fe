@@ -214,7 +214,6 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     :aria-invalid="isInvalid"
     :aria-describedby="describedBy"
     :aria-disabled="disabled || undefined"
-    :aria-readonly="readOnly || undefined"
     :data-disabled="disabled ? '' : undefined"
     :style="trackStyle"
     :class="rootClass"

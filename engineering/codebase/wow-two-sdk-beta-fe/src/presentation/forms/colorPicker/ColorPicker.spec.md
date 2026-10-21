@@ -25,6 +25,7 @@ Public import: `import { ColorPicker } from '@wow-two-beta/fe/presentation/forms
 | `triggerSize`    | `ColorSwatchPreviewSize`    | no       | `ColorSwatchSizeValue.Md`        | The size step the built-in trigger's swatch renders at.                                                                                                                                                                                                                                        |
 | `triggerVariant` | `ColorPickerTriggerVariant` | no       | `ColorPickerTriggerVariant.Full` | The built-in trigger to render (ignored when the `trigger` slot is filled): - `full` _(default)_ — swatch + hex-value text, framed button. - `swatch` — a bare interactive swatch, no text (compact toolbars, tiles). - `modelValue` — hex-value text only, no swatch (dense / code contexts). |
 | `isDisabled`     | `boolean`                   | no       | `undefined`                      | The disabled state. Falls back to the surrounding form control's `isDisabled`.                                                                                                                                                                                                                 |
+| `isReadOnly`     | `boolean`                   | no       | `undefined`                      | Keeps the committed color but blocks changes. Falls back to the surrounding form control's `isReadOnly`. |
 | `name`           | `string`                    | no       | —                                | The hidden input's name — renders a form-submittable mirror of the hex.                                                                                                                                                                                                                        |
 | `id`             | `string`                    | no       | —                                | The trigger id; falls back to a surrounding `<Field>`'s control id.                                                                                                                                                                                                                            |
 
@@ -52,3 +53,7 @@ Public import: `import { ColorPicker } from '@wow-two-beta/fe/presentation/forms
 ## Editing guarantees
 
 Controlled hex alpha replaces the previous alpha. Internal hue/saturation geometry remains stable when its encoded hex is unchanged. Read-only inherits Field context and prevents picker changes while its named native value remains successful.
+
+Applies to every built-in trigger and to a custom `trigger` slot (which receives `data-readonly` and the description).
+
+Read-only: the trigger stays focusable (not `disabled`), shows the muted read-only look (see Field), never opens its panel and never changes the value; a `button` has no `aria-readonly`, so it is described as "Read only" and carries `data-readonly`. The hidden native mirror retains the value.
