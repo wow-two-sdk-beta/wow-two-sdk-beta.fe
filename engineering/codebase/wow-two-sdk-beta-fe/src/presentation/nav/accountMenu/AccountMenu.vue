@@ -340,10 +340,13 @@ const triggerClasses = computed(() =>
 );
 
 /* The panel fits a phone: never wider than the viewport, never taller than the space under a top bar, and
-   scrolling inside itself when the sections outgrow it. */
+   scrolling inside itself when the sections outgrow it. As the scroll box it spans the surface's inline padding
+   (`-mx-1 px-1`): a separator bleeds that padding to meet the surface edges, and inside a narrower scroll box the
+   bleed overflowed it by 4px and drew a sideways scrollbar. The width adds the padding back, so the surface keeps
+   its size. */
 const panelClasses = computed(() =>
   cn(
-    'flex w-[min(18rem,calc(100vw-2rem))] max-h-[calc(100dvh-5rem)] flex-col gap-0.5',
+    '-mx-1 flex w-[min(18.5rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-5rem)] flex-col gap-0.5 px-1',
     'overflow-y-auto overscroll-contain',
     props.panelClass as ClassValue,
   ),

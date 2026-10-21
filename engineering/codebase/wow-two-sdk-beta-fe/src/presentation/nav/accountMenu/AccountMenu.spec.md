@@ -15,13 +15,15 @@ Public import: `import { AccountMenu } from '@wow-two-beta/fe/presentation/nav';
 - `isDisabled` and `isBusy` disable the trigger and close an open menu. `isBusy` also sets `aria-busy`, `data-busy`
   and pulses the avatar.
 - The menu is a `DropdownMenu` placed `bottom-end` by default, named by `menuLabel` and described by the identity
-  header. The panel is at most `18rem` wide and never wider than the viewport less `2rem`; it caps at the viewport
-  height less `5rem` and scrolls inside itself. It stays a dropdown on phones.
+  header. The menu is at most `18.5rem` wide and never wider than the viewport less `1.5rem`; it caps at the viewport
+  height less `5rem` and scrolls inside itself, vertically only. The scrolling panel spans the surface's inline
+  padding, so every separator meets the surface edges without overflowing it. It stays a dropdown on phones.
 - Sections render in this order, each only when present, with one separator between each pair:
   1. identity — `name`, then `description`; a sole organization adds its `label · description` line here;
   2. organizations — a radio group, only for two or more `organizations`. The rows scroll inside an `11rem` band, so
      a long membership list leaves the rest of the menu in reach;
-  3. the `items` slot — the account-level destinations, as `MenuItem` rows;
+  3. the `items` slot — the account-level destinations, as `MenuItem` rows; a destination is a link row
+     (`MenuItem` with `href`, or `as-child` around a router link), not a `window.open` from `@select`;
   4. appearance — `System`, `Light`, `Dark` radio rows bound to the nearest `ColorModeProvider`: `System` calls
      `followSystem()`, the others `setMode()`. Hidden by `showAppearance: false`, or with no provider;
   5. language — a radio group, only for two or more `locales`; each row carries `lang` set to its `value`;
@@ -39,8 +41,10 @@ Public import: `import { AccountMenu } from '@wow-two-beta/fe/presentation/nav';
   (`Account menu`), `.appearanceLabel` (`Appearance`), `.systemModeLabel` (`System`), `.lightModeLabel` (`Light`),
   `.darkModeLabel` (`Dark`), `.languageLabel` (`Language`), `.organizationLabel` (`Organization`), `.versionsLabel`
   (`Versions`) and `.signOutLabel` (`Sign out`). Names, organizations, languages and versions arrive translated.
-- Styling uses theme tokens only. `variant` picks the menu surface recipe — `glass` for translucent chrome — and
-  `panelClass` adds an app's own material to the panel.
+- Styling uses theme tokens only. `variant` picks the menu surface recipe: `glass-menu` paints the theme's menu glass
+  (`--glass-menu-fill`, `--glass-blur`, `--glass-saturate`, the `--glass-edge` hairline and `--glass-menu-shadow`,
+  opaque under `prefers-reduced-transparency`). `panelClass` lands on the scrolling panel inside the surface — the
+  place for layout, not for the material.
 - Attributes and `class` land on the trigger button. Automatic attribute inheritance is disabled; the source
   explicitly forwards and merges supported fallthrough attributes.
 
@@ -74,8 +78,8 @@ Public import: `import { AccountMenu } from '@wow-two-beta/fe/presentation/nav';
 | `organizationLabel` | `string` | no | locale `Organization` | The organization group heading. |
 | `versionsLabel` | `string` | no | locale `Versions` | The versions group heading. |
 | `signOutLabel` | `string` | no | locale `Sign out` | The sign-out row. |
-| `variant` | `SurfaceVariant` | no | menu default | The menu surface recipe. |
-| `panelClass` | `HTMLAttributes['class']` | no | — | Extra classes on the panel. |
+| `variant` | `SurfaceVariant` | no | menu default | The menu surface recipe; `glass-menu` for the frame glass. |
+| `panelClass` | `HTMLAttributes['class']` | no | — | Extra classes on the scrolling panel inside the surface. |
 
 - `AccountMenuLocale`: `value` (the locale tag, also the row's `lang`) · `label` (the language's own name).
 - `AccountMenuOrganization`: `id` · `label` · `description?` (the person's role there).

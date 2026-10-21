@@ -9,6 +9,14 @@ Public import: `import { DropdownMenuContent } from '@wow-two-beta/fe/presentati
 ## Contract
 
 - Mount within the owner supplying `useDropdownMenuContext`; a compound part is not an independent root.
+- `class` lands on the animated panel inside the surface; every other attribute reaches `Menu`, the surface, so
+  `aria-label` and the surface props (`variant`, `tone`, `radius`, `padding`, `elevation`) set it.
+- `variant="glass-menu"` paints the theme's menu glass: `--glass-menu-fill`, `--glass-blur`, `--glass-saturate`, the
+  `--glass-edge` hairline and `--glass-menu-shadow`, opaque where blur is unavailable or
+  `prefers-reduced-transparency` asks.
+- A panel that scrolls (`max-h-*` with `overflow-y-auto`) spans the surface's inline padding (`-mx-1 px-1`), so a
+  `MenuSeparator`'s bleed stays inside it; the ArrowUp open focuses the last row that is neither `disabled` nor
+  `aria-disabled`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

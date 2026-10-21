@@ -113,6 +113,29 @@ describe('AccountMenu on a phone', () => {
   });
 });
 
+describe('AccountMenu panel width', () => {
+  it.each([
+    ['phone', Phone],
+    ['desktop', Desktop],
+  ] as const)('never scrolls sideways on a %s, and its separators still meet the surface edges', async (_, size) => {
+    await render(size);
+    const element = await openWithKeyboard();
+    const panel = element.firstElementChild as HTMLElement;
+    expect(getComputedStyle(panel).overflowY).toBe('auto');
+    expect(panel.scrollWidth).toBeLessThanOrEqual(panel.clientWidth);
+
+    const surfaceBox = element.getBoundingClientRect();
+    const border = Number.parseFloat(getComputedStyle(element).borderLeftWidth);
+    const separators = [...panel.querySelectorAll<HTMLElement>(':scope > [role=separator]')];
+    expect(separators.length).toBeGreaterThan(0);
+    for (const separator of separators) {
+      const box = separator.getBoundingClientRect();
+      expect(Math.round(box.left)).toBe(Math.round(surfaceBox.left + border));
+      expect(Math.round(box.right)).toBeLessThanOrEqual(Math.round(surfaceBox.right - border));
+    }
+  });
+});
+
 describe('AccountMenu on a desktop', () => {
   it('drops under the trigger, aligned to its end edge', async () => {
     await render(Desktop);
