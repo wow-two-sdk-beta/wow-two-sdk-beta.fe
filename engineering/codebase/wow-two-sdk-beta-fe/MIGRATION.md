@@ -6,6 +6,23 @@ Consumer-facing changes per published version, newest first. The package was `@w
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
 
+## 0.0.32 — glass phone bar
+
+No import moves and no renamed props. `BottomNavMenu` keeps its look by default.
+
+| Area | Change |
+|---|---|
+| `BottomNavMenu` | Takes `variant` (`solid` · `glass` · `transparent`), the `NavbarVariant` scale of the other frame surfaces. `solid` (default) is the page background under a `--color-border` top border, as before. `glass` paints `surface-glass` at the theme's `--glass-fill`, its top border in `--glass-edge` and `shadow-(--glass-bottom-shadow)`; it is the solid card where blur is unsupported and under `prefers-reduced-transparency`. Every variant keeps the safe-area padding. A `surface-glass` class beside the solid default loses its fill to `bg-background`, so set `variant`. [Spec](src/presentation/nav/bottomNavMenu/BottomNavMenu.spec.md) |
+| `foundation/themes` | `ThemeGlassTokens.bottomShadow`, emitted as `--glass-bottom-shadow` and ending in the highlight like the other shadows: the bottom bar's shadow, cast upward (a negative y offset) because the page sits above it. Unset, none. `ocharo` sets its chrome shadow mirrored upward, `0 -10px 30px` light and `0 -12px 32px` dark. [THEMES.md](../../../THEMES.md#glass-strength) |
+| `styles.css` | Registers `--glass-bottom-shadow` (initial: no shadow), for `shadow-(--glass-bottom-shadow)` on an app's own bar. |
+
+Move an app's phone bar onto the variant. Drop `surface-glass!` or `surface-glass`, `border-t`, `border-glass-edge` and
+`pb-[env(safe-area-inset-bottom)]`: the bar carries them. Keep the app's placement classes.
+
+| App copy | SDK |
+|---|---|
+| `<BottomNavMenu class="surface-glass! z-sticky border-t border-glass-edge pb-[env(safe-area-inset-bottom)] md:hidden">` | `<BottomNavMenu variant="glass" class="z-sticky md:hidden">` |
+
 ## 0.0.31 — glass strength, menu link rows, account menu width
 
 No import moves and no renamed props. Default themes look unchanged; the `ocharo` theme gains its frame glass.
