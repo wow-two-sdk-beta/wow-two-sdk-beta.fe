@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-10-24*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -171,6 +171,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to inspect form state in devtools | feature | on recurring form-debugging pain or a consumer request |
 | Recognize duck-typed field errors by default | engineering | only when `foundation/http/FieldErrors.ts` opens for another reason |
 | Ability to open one in-app devtools panel | feature | when a consumer wants one; query, router, flags, locale and theme in one shell |
+| Ability to load a custom theme from a token CSS file | feature | hosted pages of a self-hosted service (Identity, File Storage) for an owner without an SDK theme — wow-two-ws `capability-forms.md` § Theming |
 
 ## Docs
 
