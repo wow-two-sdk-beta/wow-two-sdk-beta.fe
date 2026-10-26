@@ -1,10 +1,37 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-10-26*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## 0.0.33 — schema decoders, failure reasons, typed confirmation
+
+No import moves and no renamed props. Everything here is new; apps delete their copies when they adopt it.
+
+| Area | Change |
+|---|---|
+| `foundation/http` | `ApiDecoderExtensions.fromSchema(schema, { onIssues? })`: any Standard Schema (the SDK validators, zod, valibot) as an `ApiDecoder`; a rejected payload is a `protocol` failure, its issues reach `onIssues` only. An asynchronous schema throws. [Spec](src/foundation/http/ApiDecoderExtensions.spec.md) |
+| `foundation/http` | `ProblemDetailsExtensions.of(failure)` and `.text(problem, options)`: the first field message (`errors` array or map), else `detail`, else `title`, without control or bidi characters, trimmed, at most `maxLength` (300); `labels`, `strip` and `fields: false` tune it. `ApiFailureExtensions.reason(failure, { fallback })` adds the fallback and the failure's own message. [Spec](src/foundation/http/ProblemDetailsExtensions.spec.md) |
+| `presentation/forms` | `TypedConfirmField`: a required field whose label shows the expected ID as code; `v-model` is the typed text for the API's `confirm`; exact match only; the mismatch error waits for blur; no autocorrect or autocapitalize. `useTypedConfirmation(expected, { isNeeded })` holds `typed`, `isConfirmed` and `confirm`, and clears on a new target. [Spec](src/presentation/forms/typedConfirmField/TypedConfirmField.spec.md) |
+| `presentation/overlays` | `TypedConfirmModal`: an `AlertModal` (a sheet on phones) around `TypedConfirmField`; Confirm and Enter wait for the exact ID; `onConfirm(typed)` is awaited, a throw, rejection or failed `Result` keeps it open and emits `error`; `error` shows the refusal. [Spec](src/presentation/overlays/typedConfirmModal/TypedConfirmModal.spec.md) |
+
+New message keys: `TypedConfirmField.label` (`Type {expected} to confirm`), `TypedConfirmField.mismatchError`
+(`Type {expected} exactly as shown.`), `TypedConfirmField.matchedLabel` (`The text matches.`),
+`TypedConfirmModal.confirmLabel` (`Confirm`) and `TypedConfirmModal.cancelLabel` (`Cancel`).
+
+| App copy | SDK |
+|---|---|
+| `DecoderExtensions.from(schema)`, Wheelhouse `decoder(schema)` in `integration/common/client.ts` | `ApiDecoderExtensions.fromSchema(schema)` |
+| `FailureMessages.describe(failure, fallback)`, `problemText`, `fieldText`, `messageOf` | `ApiFailureExtensions.reason(failure, { fallback })` |
+| `FailureMessages.describe(failure, fallback, labels)` | `ApiFailureExtensions.reason(failure, { fallback, labels })` |
+| Wheelhouse `failureReason(error)` | `ApiFailureExtensions.reason(error, { strip: /^Deployment (?:rejected\|step failed): / })` |
+| `typed` ref, `typed === target` and `<Field label="Type X to confirm"><TextInput v-model="typed" /></Field>` | `useTypedConfirmation(() => target)` and `<TypedConfirmField v-model="typed" :expected="target" />` |
+| An `AlertModal` holding only that field, Cancel and the action | `<TypedConfirmModal :expected="target" @confirm="(confirm) => run({ target, confirm })" />` |
+
+Keep product copy in the app: a connection hint for `unavailable` or `timeout`, sign-in wording per status, and
+ListingShelf's per-status catalog wording sit around `reason`, not inside it.
 
 ## 0.0.32 — glass phone bar
 
