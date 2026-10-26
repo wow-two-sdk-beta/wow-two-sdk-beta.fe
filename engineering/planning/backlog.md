@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-10-24*
+*Last updated: 2026-10-26*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -80,6 +80,8 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 |---|---|---|
 | Add focused tests to parts covered only by the render smoke | engineering | 223 SFCs lacked one at the 2026-09-28 scan; re-measure first |
 | Sweep the remaining small convention breaches | engineering | `Avatar`'s 68 raw palette classes, 4 inline `defineProps<{…}>`; re-measure the rest |
+| Remove the one-release deprecated prop aliases | engineering | `isDisabled`/`isReadOnly`/`isRequired` (S1), the `is`/`has`/`can`/`show` boolean renames (S8), the toast `showProgress`/`progress`; 109 files still carry `@deprecated … removed next release`; keep `BooleanPropNames.test.ts` |
+| Ability to show severity glyphs on `Alert`, `Callout` and `Banner` | feature | reuse `SeverityIcons` + `SeverityIconClasses` from `foundation/icons`, as `Toast` and `NotificationItem` do |
 | Ability to make the node editor read-only as a whole | feature | whole-control read-only API and Field adoption |
 | Give the remaining controls the read-only look and a role that allows their state | feature | `ImageEditor`, `ImageCropEditor`, `RecurrenceEditor` and `AddressEditor` lock their parts like a disabled control; `TransferPicker`, `OptionTilePicker`, `SegmentedPicker`, `ToggleGroup`, `ReactionPicker`, `ChatComposerInput` and `PointControl` take no `isReadOnly`; `CheckboxInput`, `SwitchInput`, `SliderInput`, `KnobInput` and the colour sliders block changes with `aria-readonly` but keep the editable look. The shared pieces are `ReadOnlyLook`, `useReadOnlyHint` and the `readonly:` variant |
 | Ability to set the calendar week start per locale | feature | — |
@@ -162,6 +164,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Item | Type | Notes |
 |---|---|---|
 | Adopt the commands registry in both command palettes | engineering | each palette keeps its own item registry today |
+| Complete the reporting vector | feature | session id, operation context, help links by error code, an add-details note after send, a flags snapshot, an offline outbox, client dedupe per fingerprint — wow-two-ws `ideas/feedbacks-spec.md` § Client increment 2 |
 | Audit every module against swappable-modules, then retrofit | engineering | `conventions/development/swappable-modules.md`; per-module verdict first; covers the `QueryKey` alias, typed native escape hatch and router contract |
 | Decide Temporal or `Date` before date components adopt `foundation/datetime` | engineering | date components and inbound HTTP data are Temporal-based |
 | Agree exact decimal and int64 wire forms per endpoint with the backend SDK | engineering | no global SDK coercion policy |
