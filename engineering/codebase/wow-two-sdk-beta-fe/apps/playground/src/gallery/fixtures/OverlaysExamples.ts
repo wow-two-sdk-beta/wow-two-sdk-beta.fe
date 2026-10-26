@@ -3,6 +3,7 @@ import {
   TourPopover,
   CommandPaletteModal,
   ConfirmPopover,
+  TypedConfirmModal,
   LightboxModal,
   CommandPaletteModalContent,
   CommandPaletteModalInput,
@@ -191,6 +192,19 @@ export const overlaysExamples: readonly SmokeCase[] = [
   ),
 
   smokeCase('ConfirmPopover', ConfirmPopover, { title: 'Delete this code?', defaultOpen: true }, { slot: true }),
+
+  smokeCase(
+    'TypedConfirmModal',
+    TypedConfirmModal,
+    {
+      title: 'Reconcile prod-local?',
+      description: 'Marks the stopped rollout interrupted; containers and data stay unchanged.',
+      expected: 'prod-local',
+      confirmLabel: 'Reconcile',
+      defaultOpen: true,
+    },
+    { slot: true },
+  ),
 
   smokeCase(
     'LightboxModal',

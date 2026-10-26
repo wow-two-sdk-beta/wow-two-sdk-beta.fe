@@ -94,6 +94,7 @@ import {
   SliderInput,
   SwitchInput,
   SwitchField,
+  TypedConfirmField,
   TagsInput,
   TelInput,
   TextAreaInput,
@@ -264,6 +265,8 @@ export const formsExamples: readonly SmokeCase[] = [
   smokeCase('RadioField', RadioField, {}),
 
   smokeCase('SwitchField', SwitchField, {}),
+
+  smokeCase('TypedConfirmField', TypedConfirmField, { expected: 'prod-local', helper: 'Prod on the local server.' }),
 
   smokeCase('CheckboxGroup', CheckboxGroup, {}, { slot: true }),
 

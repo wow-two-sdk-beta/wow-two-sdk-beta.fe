@@ -11,3 +11,4 @@ export * from './tourPopover';
 export * from './tooltip';
 export * from './commandPaletteModal';
 export * from './lightboxModal';
+export * from './typedConfirmModal';

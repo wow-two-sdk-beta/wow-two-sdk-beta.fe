@@ -41,6 +41,7 @@ const {
   DrawerTitle,
   DrawerBody,
   LightboxModal,
+  TypedConfirmModal,
 } = overlays;
 
 /** Draws an inline SVG "photo", so the lightbox demo needs no network. */
@@ -84,6 +85,7 @@ const covered = [
   'ActionSheetAction',
   'ActionSheetCancel',
   'ConfirmPopover',
+  'TypedConfirmModal',
   'LightboxModal',
   'BottomSheet',
   'BackdropOverlay',
@@ -125,6 +127,25 @@ function slowDelete(): Promise<void> {
   confirmLog.value = 'deleting…';
   return new Promise((resolve) => setTimeout(resolve, 1200)).then(() => {
     confirmLog.value = 'deleted';
+  });
+}
+
+const typedOpen = ref(false);
+const typedRefusal = ref<string | undefined>(undefined);
+const typedLog = ref('idle');
+
+/** Refuses the first reconcile, then succeeds — the refusal shows in the dialog, the retry closes it. */
+function slowReconcile(confirm: string): Promise<{ ok: true } | { ok: false; failure: string }> {
+  typedLog.value = `reconciling with confirm=${confirm}…`;
+  return new Promise((resolve) => setTimeout(resolve, 900)).then(() => {
+    if (typedRefusal.value === undefined) {
+      typedRefusal.value = 'The target is locked by another rollout.';
+      typedLog.value = 'refused';
+      return { ok: false, failure: typedRefusal.value };
+    }
+    typedRefusal.value = undefined;
+    typedLog.value = 'reconciled';
+    return { ok: true };
   });
 }
 
@@ -248,6 +269,25 @@ function openDrawer(side: 'left' | 'right' | 'top' | 'bottom') {
           </ConfirmPopover>
           <span class="text-xs text-subtle-foreground">{{ confirmLog }}</span>
         </div>
+      </Demo>
+
+      <Demo name="TypedConfirmModal" note="type the target ID; the first confirm is refused, the retry closes">
+        <div class="flex flex-wrap items-center gap-2">
+          <Button variant="soft" tone="danger" size="sm" @click="typedOpen = true">Reconcile…</Button>
+          <span class="text-xs text-subtle-foreground">{{ typedLog }}</span>
+        </div>
+        <TypedConfirmModal
+          v-model:open="typedOpen"
+          title="Reconcile prod-local?"
+          description="Marks the stopped rollout interrupted and clears its rollback pointer. Containers and data stay unchanged."
+          expected="prod-local"
+          confirm-label="Reconcile"
+          :error="typedRefusal"
+          @confirm="slowReconcile"
+          @cancel="typedLog = 'cancelled'"
+        >
+          <p class="text-sm text-muted-foreground">Stopped rollout: v1.4.2 · health check timed out</p>
+        </TypedConfirmModal>
       </Demo>
 
       <Demo name="HoverCard" note="hover the trigger for ~700ms">
