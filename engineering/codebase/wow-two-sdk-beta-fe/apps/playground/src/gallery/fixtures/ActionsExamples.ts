@@ -8,6 +8,7 @@ import {
   DisclosureButton,
   FabButton,
   GoogleSignInButton,
+  RefreshButton,
   SpeedDialGroup,
   SpeedDialGroupAction,
   SpeedDialGroupTrigger,
@@ -35,6 +36,8 @@ export const actionsExamples: readonly SmokeCase[] = [
   smokeCase('CopyButton', CopyButton, { text: 'copied', 'aria-label': 'Copy' }, { slot: true }),
 
   smokeCase('DisclosureButton', DisclosureButton, {}, { slot: true }),
+
+  smokeCase('RefreshButton', RefreshButton, { isRefreshing: false }),
 
   smokeCase('BackToTopButton', BackToTopButton, {}),
 

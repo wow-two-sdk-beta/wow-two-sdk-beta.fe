@@ -2,6 +2,7 @@ export * from './button';
 export * from './buttonGroup';
 export * from './fabButton';
 export * from './copyButton';
+export * from './refreshButton';
 export * from './googleSignInButton';
 export * from './disclosureButton';
 export * from './toolbar';

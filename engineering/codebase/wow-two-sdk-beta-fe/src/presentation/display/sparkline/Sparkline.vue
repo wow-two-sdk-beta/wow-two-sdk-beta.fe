@@ -31,9 +31,42 @@ export const SparklineTone = {
 
 export type SparklineTone = (typeof SparklineTone)[keyof typeof SparklineTone];
 
+/** Defines one reading of a time-based series. */
+export interface SparklinePoint {
+  /** The reading's instant, in epoch milliseconds. */
+  readonly at: number;
+
+  /** The reading's value. */
+  readonly value: number;
+}
+
+/** Defines a horizontal reference line — a warning or danger level. */
+export interface SparklineThreshold {
+  /** The level, on the same scale as the series. */
+  readonly value: number;
+
+  /** The line's color tone. Default `muted`. */
+  readonly tone?: SparklineTone;
+}
+
 export interface SparklineProps {
-  /** The series to plot, in order. */
-  readonly data: ReadonlyArray<number>;
+  /** The series to plot, evenly spaced in order. Ignored when `points` is set. */
+  readonly data?: ReadonlyArray<number>;
+
+  /**
+   * The time-based series, oldest first — each reading placed by its instant inside `since`…`until`, so a short history
+   * sits at the right end instead of stretching across the chart.
+   */
+  readonly points?: ReadonlyArray<SparklinePoint>;
+
+  /** The time window's start, in epoch milliseconds. Defaults to the first point's instant. */
+  readonly since?: number;
+
+  /** The time window's end, in epoch milliseconds. Defaults to the last point's instant. */
+  readonly until?: number;
+
+  /** The reference lines drawn dashed across the chart — levels on the series' scale. */
+  readonly thresholds?: ReadonlyArray<SparklineThreshold>;
 
   /** The render style. Default `line`. */
   readonly variant?: SparklineVariant;
@@ -66,6 +99,7 @@ export interface SparklineProps {
 /** The derived plot geometry — React's `useMemo` payload. */
 interface SparklineGeometry {
   points: ReadonlyArray<readonly [number, number]>;
+  levels: ReadonlyArray<{ readonly y: number; readonly tone: SparklineTone }>;
   barWidth: number;
   barRenderWidth: number;
   lastX: number;
@@ -76,6 +110,7 @@ interface SparklineGeometry {
 
 const EmptyGeometry: SparklineGeometry = {
   points: [],
+  levels: [],
   barWidth: 0,
   barRenderWidth: 0,
   lastX: 0,
@@ -102,13 +137,19 @@ import { useId } from '../../../foundation/identifiers';
 import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 
 /**
- * Renders an inline trend chart — line, area, bar, or dot — as bare SVG with no scales or axes.
+ * Renders an inline trend chart — line, area, bar, or dot — as bare SVG with no scales or axes; evenly spaced from
+ * `data`, or placed by time from `points`, with optional dashed threshold lines.
  *
  * Colour comes from Tailwind `text-*` tokens; pair with `currentColor` for parent inheritance.
  */
 defineOptions({ name: 'Sparkline', inheritAttrs: false });
 
 const componentProps = withDefaults(defineProps<SparklineProps>(), {
+  data: () => [],
+  points: undefined,
+  since: undefined,
+  until: undefined,
+  thresholds: () => [],
   variant: 'line',
   width: 120,
   height: 32,
@@ -127,14 +168,31 @@ const attrs = useAttrs();
 const el = useTemplateRef<SVGSVGElement>('el');
 const titleId = useId();
 
+/** The values in order, with each one's x: evenly spaced for `data`, by instant inside the window for `points`. */
+const series = computed<ReadonlyArray<readonly [number, number]>>(() => {
+  const { width } = props;
+  const timed = props.points;
+  if (timed) {
+    if (timed.length === 0) return [];
+    const since = props.since ?? timed[0]!.at;
+    const until = props.until ?? timed[timed.length - 1]!.at;
+    const span = until - since;
+    return timed.map((point) => [span > 0 ? ((point.at - since) / span) * width : width, point.value] as const);
+  }
+  const data = props.data;
+  const stepX = data.length === 1 ? 0 : width / (data.length - 1);
+  return data.map((value, index) => [index * stepX, value] as const);
+});
+
 const geometry = computed<SparklineGeometry>(() => {
-  const { data, width, height } = props;
-  if (data.length === 0) return EmptyGeometry;
+  const { width, height } = props;
+  const values = series.value;
+  if (values.length === 0) return EmptyGeometry;
 
   let seriesMin = Number.POSITIVE_INFINITY;
   let seriesMax = Number.NEGATIVE_INFINITY;
   if (props.min === undefined || props.max === undefined) {
-    for (const value of data) {
+    for (const [, value] of values) {
       seriesMin = Math.min(seriesMin, value);
       seriesMax = Math.max(seriesMax, value);
     }
@@ -142,14 +200,11 @@ const geometry = computed<SparklineGeometry>(() => {
   const min = props.min ?? seriesMin;
   const max = props.max ?? seriesMax;
   const range = max - min || 1;
-  const stepX = data.length === 1 ? 0 : width / (data.length - 1);
   const pad = 1; // keep stroke inside the box
+  const toY = (value: number): number => height - ((value - min) / range) * (height - pad * 2) - pad;
 
-  const points = data.map((v, i) => {
-    const x = i * stepX;
-    const y = height - ((v - min) / range) * (height - pad * 2) - pad;
-    return [x, y] as const;
-  });
+  const points = values.map(([x, value]) => [x, toY(value)] as const);
+  const levels = props.thresholds.map((level) => ({ y: toY(level.value), tone: level.tone ?? 'muted' }));
 
   const first = points[0];
   const last = points[points.length - 1];
@@ -157,10 +212,11 @@ const geometry = computed<SparklineGeometry>(() => {
 
   const linePath = points.map(([x, y], i) => (i === 0 ? `M${x},${y}` : `L${x},${y}`)).join(' ');
   const areaPath = `${linePath} L${last[0]},${height} L${first[0]},${height} Z`;
-  const barWidth = width / data.length - 1;
+  const barWidth = width / values.length - 1;
 
   return {
     points,
+    levels,
     barWidth,
     barRenderWidth: Math.max(1, barWidth),
     lastX: last[0],
@@ -170,7 +226,7 @@ const geometry = computed<SparklineGeometry>(() => {
   };
 });
 
-const showLast = computed(() => Boolean(props.hasLast) && props.data.length > 0 && props.variant !== 'dot');
+const showLast = computed(() => Boolean(props.hasLast) && series.value.length > 0 && props.variant !== 'dot');
 
 const classes = computed(() =>
   cn(
@@ -216,8 +272,25 @@ defineExpose({ el });
           stroke-width="1.5"
           stroke-linecap="round"
           stroke-linejoin="round"
+          vector-effect="non-scaling-stroke"
         />
       </template>
+
+      <line
+        v-for="(level, i) in geometry.levels"
+        :key="`level-${i}`"
+        data-threshold
+        x1="0"
+        :x2="props.width"
+        :y1="level.y"
+        :y2="level.y"
+        :class="ToneClass[level.tone]"
+        stroke="currentColor"
+        stroke-dasharray="3 3"
+        stroke-width="0.75"
+        stroke-opacity="0.6"
+        vector-effect="non-scaling-stroke"
+      />
 
       <path
         v-if="props.variant === 'line'"
@@ -227,6 +300,7 @@ defineExpose({ el });
         stroke-width="1.5"
         stroke-linecap="round"
         stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
       />
 
       <g v-if="props.variant === 'bar'">

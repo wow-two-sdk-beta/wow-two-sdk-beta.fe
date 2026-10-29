@@ -64,6 +64,7 @@ export { useRouteNavigating } from './hooks/UseRouteNavigating';
 export { definePath } from '../../Paths';
 export type { PathBuilder, PathBuilderArgs, PathParamName, PathParams } from '../../Paths';
 export { useTypedSearchParams, type TypedSearchParams } from './hooks/UseTypedSearchParams';
+export { useListDetailRoute, type ListDetailRoute } from './hooks/UseListDetailRoute';
 
 // Guards + returnTo
 export {

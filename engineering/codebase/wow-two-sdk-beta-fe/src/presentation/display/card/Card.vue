@@ -54,6 +54,11 @@ defineSlots<{ default(): unknown }>();
 
 const props = withDefaults(defineProps<CardProps>(), { isSkeleton: undefined });
 
+/* A card holding a `CardLink` positions its stretched hit area and draws the link's focus ring around itself. */
+const CardLinkHostClass =
+  'has-[[data-card-link]]:relative has-[[data-card-link]:focus-visible]:outline-2 ' +
+  'has-[[data-card-link]:focus-visible]:outline-offset-2 has-[[data-card-link]:focus-visible]:outline-ring';
+
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
 
@@ -71,6 +76,7 @@ const classes = computed(() =>
       elevation: props.elevation ?? 1,
       ambient: props.ambient,
     }),
+    CardLinkHostClass,
     attrs.class as string | undefined,
   ),
 );

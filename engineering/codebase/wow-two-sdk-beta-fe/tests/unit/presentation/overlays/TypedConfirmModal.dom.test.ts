@@ -200,4 +200,49 @@ describe('TypedConfirmModal', () => {
     expect(button('Löschen')).toBeTruthy();
     expect(button('Abbrechen')).toBeTruthy();
   });
+
+  it('confirms without a typed field when no text is expected, and hands onConfirm an empty string', async () => {
+    const onConfirm = vi.fn();
+    const wrapper = render({ expected: undefined, onConfirm });
+    await settle();
+    expect(dialog()!.querySelector('input')).toBeNull();
+    expect(button('Confirm').disabled).toBe(false);
+    button('Confirm').click();
+    await settle();
+    expect(onConfirm).toHaveBeenCalledWith('');
+    await expect.poll(dialog).toBeNull();
+    expect(wrapper.emitted('update:open')).toEqual([[false]]);
+  });
+
+  it('keeps an untyped confirm open on failure', async () => {
+    const onConfirm = vi.fn().mockRejectedValueOnce(new Error('refused'));
+    const wrapper = render({ expected: undefined, onConfirm });
+    await settle();
+    button('Confirm').click();
+    await settle();
+    expect(dialog()).not.toBeNull();
+    expect(wrapper.emitted('error')).toEqual([[new Error('refused')]]);
+  });
+
+  it('holds Confirm while canConfirm is false, whatever was typed', async () => {
+    const onConfirm = vi.fn();
+    const wrapper = render({ canConfirm: false, onConfirm });
+    await settle();
+    await type('prod-local');
+    expect(button('Confirm').disabled).toBe(true);
+    await submit();
+    expect(onConfirm).not.toHaveBeenCalled();
+    await wrapper.setProps({ canConfirm: true });
+    await settle();
+    expect(button('Confirm').disabled).toBe(false);
+    await wrapper.setProps({ expected: undefined, canConfirm: false });
+    await settle();
+    expect(button('Confirm').disabled).toBe(true);
+  });
+
+  it('puts the confirm-icon slot before the confirm text', async () => {
+    render({ expected: undefined }, { 'confirm-icon': () => h('svg', { 'data-icon': 'stop' }) });
+    await settle();
+    expect(button('Confirm').querySelector('[data-icon=stop]')).not.toBeNull();
+  });
 });

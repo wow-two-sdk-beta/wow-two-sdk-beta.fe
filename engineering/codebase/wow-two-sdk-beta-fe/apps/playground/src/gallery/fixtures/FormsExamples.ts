@@ -95,6 +95,7 @@ import {
   SwitchInput,
   SwitchField,
   TypedConfirmField,
+  RowsField,
   TagsInput,
   TelInput,
   TextAreaInput,
@@ -267,6 +268,15 @@ export const formsExamples: readonly SmokeCase[] = [
   smokeCase('SwitchField', SwitchField, {}),
 
   smokeCase('TypedConfirmField', TypedConfirmField, { expected: 'prod-local', helper: 'Prod on the local server.' }),
+
+  smokeCase('RowsField', RowsField, {
+    label: 'Smoke checks',
+    columns: [
+      { key: 'service', label: 'Service' },
+      { key: 'path', label: 'Path' },
+    ],
+    rows: [{ key: 'r0', index: 0 }],
+  }),
 
   smokeCase('CheckboxGroup', CheckboxGroup, {}, { slot: true }),
 

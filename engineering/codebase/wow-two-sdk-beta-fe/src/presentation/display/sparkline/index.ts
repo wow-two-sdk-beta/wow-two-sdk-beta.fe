@@ -1,1 +1,8 @@
-export { default as Sparkline, SparklineTone, SparklineVariant, type SparklineProps } from './Sparkline.vue';
+export {
+  default as Sparkline,
+  SparklineTone,
+  SparklineVariant,
+  type SparklinePoint,
+  type SparklineProps,
+  type SparklineThreshold,
+} from './Sparkline.vue';

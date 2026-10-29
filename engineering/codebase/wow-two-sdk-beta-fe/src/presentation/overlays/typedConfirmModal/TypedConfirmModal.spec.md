@@ -1,7 +1,8 @@
 # TypedConfirmModal
 
 Renders a centred alert dialog — a bottom sheet on phones — that asks the reader to type a target's ID before a
-dangerous action runs; the confirm button stays disabled until the typed text matches exactly.
+dangerous action runs; the confirm button stays disabled until the typed text matches exactly. Without `expected` it
+is a plain confirm that still awaits the action.
 
 Source: [TypedConfirmModal.vue](TypedConfirmModal.vue).
 
@@ -16,6 +17,10 @@ Public import: `import { TypedConfirmModal } from '@wow-two-beta/fe/presentation
 - The open state uses the shared controlled-state helper: `open` / `update:open`, seeded by `defaultOpen`.
 - The typed text clears each time the dialog opens and whenever `expected` changes.
 - Confirm stays disabled until the typed text equals `expected`; Enter in the field confirms through the form.
+- Without `expected` the dialog renders no typed field, and `onConfirm` receives an empty string; one call site serves
+  a target that needs the typed ID and one that does not.
+- `canConfirm` gates Confirm beside the typed match — keep it `false` while a required default-slot input is empty.
+- The `confirm-icon` slot fills the confirm button's leading icon; the busy spinner replaces it while pending.
 - `onConfirm(typed)` receives the typed text for the API's `confirm`; `@confirm` binds it.
 - A returned promise keeps the dialog open until it settles: a busy confirm button, `aria-busy`, a read-only field
   that keeps focus, a disabled Cancel and no Escape dismissal.
@@ -35,7 +40,8 @@ Public import: `import { TypedConfirmModal } from '@wow-two-beta/fe/presentation
 | `defaultOpen`  | `boolean`                    | no       | `false`               | The initial open state when uncontrolled.                                 |
 | `title`        | `string`                     | yes      | —                     | The question the dialog asks; it names the dialog.                        |
 | `description`  | `string`                     | no       | `undefined`           | The consequence under the title; `description` slot is the rich override. |
-| `expected`     | `string`                     | yes      | —                     | The exact text the reader types to enable the action.                     |
+| `expected`     | `string`                     | no       | `undefined`           | The text the reader types to enable the action; omitted, no typed field.  |
+| `canConfirm`   | `boolean`                    | no       | `true`                | Whether the action may run, beside the typed match.                       |
 | `label`        | `string`                     | no       | `TypedConfirmField`'s | The field's label template; `{expected}` marks the expected text.         |
 | `helper`       | `string`                     | no       | —                     | The helper beneath the field.                                             |
 | `error`        | `string`                     | no       | —                     | The refusal shown under the field.                                        |
@@ -58,6 +64,7 @@ Public import: `import { TypedConfirmModal } from '@wow-two-beta/fe/presentation
 | ------------- | ------------------------- | ---------------------------------------------------------------- |
 | `default`     | `default?(): unknown`     | What the reader weighs before confirming, above the typed field. |
 | `description` | `description?(): unknown` | The rich override for `description`.                             |
+| `confirm-icon` | `'confirm-icon'?(): unknown` | The confirm button's leading icon.                            |
 
 ## Exposed handle
 

@@ -15,6 +15,8 @@ Public import: `import { Card } from '@wow-two-beta/fe/presentation/display';`.
 - The glass recipes read the theme's glass strength: `glass` and `glass-outline` take `--glass-fill` (unset, the
   popover at 70%), `--glass-blur` and `--glass-saturate`; `glass-side` and `glass-menu` paint the sidebar and menu
   materials, opaque where blur is unavailable or `prefers-reduced-transparency` asks.
+- A card holding a `CardLink` turns `relative` and draws the focus ring while that link has `:focus-visible`, so the
+  whole card opens its subject through one named link.
 
 ## Props
 

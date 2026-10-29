@@ -30,6 +30,7 @@ import {
   CardBody,
   CardDescription,
   CardFooter,
+  CardLink,
   CardHeader,
   CardTitle,
   Carousel,
@@ -222,6 +223,13 @@ export const displayExamples: readonly SmokeCase[] = [
   smokeCase('CardBody', CardBody, {}, { slot: true }),
 
   smokeCase('CardFooter', CardFooter, {}, { slot: true }),
+
+  smokeCase(
+    'CardLink',
+    CardLink,
+    { href: '/products/shop' },
+    { slot: true, wrap: (node) => h(Card, null, () => node) },
+  ),
 
   smokeCase('AvatarGroup', AvatarGroup, {}),
 

@@ -9,7 +9,8 @@ Public import: `import { ListDetailLayout } from '@wow-two-beta/fe/presentation/
 ## Contract
 
 - The consumer owns `isDetailOpen`. Derive it from the route (a selection query) so the browser's back button and a
-  deep link drive the same swap as the back control.
+  deep link drive the same swap as the back control — `useListDetailRoute` from `@wow-two-beta/fe/router` holds the
+  selection in query keys and answers `back`.
 - From `breakpoint` up the panes form a grid row — the list column `listWidth` wide, the detail the rest — and both stay
   visible whatever `isDetailOpen` says. Spacing between them comes from a caller `gap-*` class.
 - Below `breakpoint` exactly one pane shows: the list while `isDetailOpen` is `false`, the detail while it is `true`.

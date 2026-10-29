@@ -1,10 +1,42 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-26*
+*Last updated: 2026-10-29*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## 0.0.34 — status badges, rows field, refresh button, card link, selectable rows, time sparkline
+
+No import moves and no renamed props. `Sparkline`'s `data` turns optional; `TypedConfirmModal`'s `expected` turns
+optional. Everything else is new; apps delete their copies when they adopt it.
+
+| Area | Change |
+|---|---|
+| `Badge` | A `leading` icon slot, `detail` (prop and slot) after the label, `isOutlined` (the tint's border), `borderStyle` (`solid` · `dashed` · `dotted`), `isSpinning` (the icon turns, still under reduced motion), and the `surface` and `quiet` variants. A plain label renders as before. [Spec](src/presentation/display/badge/Badge.spec.md) |
+| `RefreshButton` | `presentation/actions`: a neutral `Button` preset with the refresh icon; `isRefreshing` (from `useRefresh`) swaps the icon for the spinner and swallows clicks; `isIconOnly` squares it and names it by `label`. [Spec](src/presentation/actions/refreshButton/RefreshButton.spec.md) |
+| `RowsField` | `presentation/forms`: a list of records as rows of cells — headings, a remove control per row, the list's refusals, an add control; stacked blocks below `sm`. Engine-free: a `cell` slot, `rows` from `useFieldArray`, `@add` / `@remove`. [Spec](src/presentation/forms/rowsField/RowsField.spec.md) |
+| `CardLink` | `presentation/display`: the card's one link stretched over its `Card`; `asChild` merges onto a `RouterLink`. The `Card` turns `relative` and draws the focus ring. [Spec](src/presentation/display/card/CardLink.spec.md) |
+| `ListGroupItem` | `description` (a second line), `isSelected` (`aria-current` and the soft brand fill) and `onSelect` / `@select`, which makes the row a full-width button. [Spec](src/presentation/display/listGroup/ListGroupItem.spec.md) |
+| `Sparkline` | `points` (`{ at, value }` placed by time inside `since` / `until`), `thresholds` (`{ value, tone? }` dashed lines) and non-scaling strokes, so `class="w-full"` keeps hairlines. [Spec](src/presentation/display/sparkline/Sparkline.spec.md) |
+| `TypedConfirmModal` | `expected` is optional — without it the dialog is a plain, awaited confirm; `canConfirm` gates Confirm (a required reason); a `confirm-icon` slot. [Spec](src/presentation/overlays/typedConfirmModal/TypedConfirmModal.spec.md) |
+| `router` | `useListDetailRoute(keys)`: a list-detail selection in query keys — `isDetailOpen`, `read`, `select` (push on open, replace on switch, `null` removes) and `back` (steps back when the list is the previous entry). [ListDetailLayout spec](src/presentation/layout/listDetailLayout/ListDetailLayout.spec.md) |
+| `foundation/device` | `useBreakpointUp(scale, key)` and `useBreakpointBelow(scale, key)`: one media query for "at least" or "narrower than" a breakpoint; below is `true` until mounted. |
+
+New message keys: `RefreshButton.label` (`Refresh`), `RowsField.addLabel` (`Add row`) and `RowsField.removeLabel`
+(`Remove row {row}`).
+
+| App copy | SDK |
+|---|---|
+| Wheelhouse `StatusPill` markup (icon, label, `[data-detail]`, tone classes) | `<Badge :variant is-outlined :detail :is-spinning><template #leading>…</template>{{ label }}</Badge>` |
+| Wheelhouse `RefreshButton` (`refreshing`, `iconOnly`, `@refresh`) | `RefreshButton` (`isRefreshing`, `isIconOnly`, `@click`) |
+| Wheelhouse `RowsField` | `RowsField` with a `cell` slot over `useFieldArray` |
+| Wheelhouse `useListDetailRoute` | `useListDetailRoute` from `@wow-two-beta/fe/router` |
+| `after:absolute after:inset-0` link + `has-[a[data-card-link]:focus-visible]:outline-*` on the card | `<Card><CardLink as-child><RouterLink …></CardLink></Card>` |
+| A `button` row with `aria-current` and a second `Text` line | `<ListGroupItem :is-selected :description @select>` |
+| A hand-drawn SVG polyline over a time window with dashed levels | `<Sparkline :points :since :until :thresholds class="w-full">` |
+| A `Modal` with Cancel and a busy action beside a `TypedConfirmModal` | One `TypedConfirmModal`, `expected` only where the target needs it |
+| `computed(() => breakpoint.value === null \|\| breakpoint.value === 'sm')` | `useBreakpointBelow(TailwindBreakpoints, 'md')` |
 
 ## 0.0.33 — schema decoders, failure reasons, typed confirmation
 
@@ -457,6 +489,10 @@ ColorArea retains independent HSV `saturation` and `value` axes. SelectPicker em
 through `update:modelValue`; its former option-object `value-change` event is removed.
 Named model axes include `inputValue`, `editing`, `view`, `mode`, `date`, `currentStep`, `sidebarOpen`,
 `page`, `zoom`, `index`, `sortBy`, `expanded`, `nodes` and `sizes`; consult each adjacent component spec.
+
+Porting a React app: a React `onChange` handler does not map to `@change`. Vue falls an undeclared `onChange`
+through as the native `change` event, which fires on blur, so a mechanical rename compiles clean and breaks every
+controlled field. Bind `v-model` or `@update:modelValue` instead.
 
 ## Completed operations
 

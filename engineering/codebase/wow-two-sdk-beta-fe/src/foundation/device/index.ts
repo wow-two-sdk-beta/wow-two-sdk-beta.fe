@@ -16,6 +16,7 @@ export {
   resolveBreakpoint,
 } from './Breakpoints';
 export { useBreakpoint } from './hooks/UseBreakpoint';
+export { useBreakpointUp, useBreakpointBelow } from './hooks/UseBreakpointRange';
 
 export { useMediaQuery } from './hooks/UseMediaQuery';
 export * from './hooks/UseReducedMotion';

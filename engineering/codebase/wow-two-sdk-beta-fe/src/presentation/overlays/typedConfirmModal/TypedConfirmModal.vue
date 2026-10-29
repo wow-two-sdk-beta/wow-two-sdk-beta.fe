@@ -1,7 +1,10 @@
 <script lang="ts">
 import type { ColorTone } from '../../../foundation/styles';
 
-/** Defines props for the blocking dialog that runs a dangerous action once the reader types its target's ID. */
+/**
+ * Defines props for the blocking dialog that runs a dangerous action once the reader confirms it — by typing its
+ * target's ID when `expected` is set, by pressing the action alone when it is not.
+ */
 export interface TypedConfirmModalProps {
   /** The open state, controlled. The `v-model:open` binding target. */
   readonly open?: boolean;
@@ -15,8 +18,17 @@ export interface TypedConfirmModalProps {
   /** The consequence spelled out under the title. The `description` slot is the rich override. */
   readonly description?: string;
 
-  /** The exact text the reader types to enable the action — the target's ID or name. */
-  readonly expected: string;
+  /**
+   * The exact text the reader types to enable the action — the target's ID or name. Omit it for a plain confirm with
+   * no typed field: the same dialog asks once, so one call site serves a guarded and an unguarded target.
+   */
+  readonly expected?: string;
+
+  /**
+   * Whether the action may run, beside the typed match — `false` while a required input in the default slot, such as
+   * a reason, is still empty. Default `true`.
+   */
+  readonly canConfirm?: boolean;
 
   /** The field's label template; `{expected}` marks the expected text. Default `TypedConfirmField`'s. */
   readonly label?: string;
@@ -37,7 +49,8 @@ export interface TypedConfirmModalProps {
   readonly tone?: ColorTone;
 
   /**
-   * Runs with the typed text once the reader confirms — send it as the API's `confirm`. Returning a promise keeps the
+   * Runs with the typed text once the reader confirms — send it as the API's `confirm`; the text is empty without
+   * `expected`. Returning a promise keeps the
    * dialog open with a busy confirm button until it settles. The dialog closes on success and stays open, emitting
    * `error`, when it throws, rejects or settles to a failed `Result`.
    *
@@ -80,7 +93,8 @@ import OverlayTitle from '../OverlayTitle.vue';
 
 /**
  * Renders a centred alert dialog — a bottom sheet on phones — that asks the reader to type a target's ID before a
- * dangerous action runs; the confirm button stays disabled until the typed text matches exactly.
+ * dangerous action runs; the confirm button stays disabled until the typed text matches exactly. Without `expected` it
+ * is a plain confirm that still awaits the action, shows its refusal and stays open on failure.
  */
 defineOptions({ name: 'TypedConfirmModal', inheritAttrs: false });
 
@@ -90,12 +104,17 @@ defineSlots<{
 
   /** The rich override for the `description` prop. */
   description?(): unknown;
+
+  /** The confirm button's leading icon. */
+  'confirm-icon'?(): unknown;
 }>();
 
 const componentProps = withDefaults(defineProps<TypedConfirmModalProps>(), {
   open: undefined,
   defaultOpen: false,
   description: undefined,
+  expected: undefined,
+  canConfirm: true,
   label: undefined,
   helper: undefined,
   error: undefined,
@@ -140,7 +159,12 @@ const isPending = shallowRef(false);
 /** @internal Bumped on every settle-relevant change, so a stale promise cannot close a newer request. */
 let attempt = 0;
 
-const isConfirmed = computed(() => props.expected.length > 0 && typed.value === props.expected);
+/** Whether the dialog asks for the typed text at all. */
+const isTyped = computed(() => props.expected !== undefined);
+
+const isConfirmed = computed(
+  () => props.canConfirm && (!isTyped.value || (props.expected!.length > 0 && typed.value === props.expected)),
+);
 
 const hasDescription = computed(() => Boolean(props.description) || Boolean(slots.description));
 
@@ -213,8 +237,9 @@ async function confirm(): Promise<void> {
         <OverlayBody class="flex flex-col gap-4">
           <slot />
           <TypedConfirmField
+            v-if="isTyped"
             v-model="typed"
-            :expected="props.expected"
+            :expected="props.expected ?? ''"
             :label="props.label"
             :helper="props.helper"
             :is-read-only="isPending"
@@ -238,6 +263,7 @@ async function confirm(): Promise<void> {
             :is-disabled="!isConfirmed"
             :is-loading="isPending"
           >
+            <template v-if="slots['confirm-icon']" #leading><slot name="confirm-icon" /></template>
             {{ props.confirmLabel }}
           </Button>
         </OverlayFooter>

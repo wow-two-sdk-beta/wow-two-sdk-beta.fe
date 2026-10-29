@@ -91,3 +91,4 @@ export * from './imageCropEditor';
 export * from './imageEditor';
 export * from './mentionInput';
 export * from './typedConfirmField';
+export * from './rowsField';
