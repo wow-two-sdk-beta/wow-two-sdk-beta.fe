@@ -1,10 +1,25 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## 0.0.35 — shared persistent refs
+
+No import moves and no renamed props.
+
+| Area | Change |
+|---|---|
+| `foundation/storage` | `createPersistentRef(key, initial, { decode?, broker?, syncTabs? })`: one module-scope ref over the broker, shared by every reader; `decode` rejects a stored shape to `initial`; a changed assignment writes through; tab sync over `localStorage`. [Spec](src/foundation/storage/PersistentRef.spec.md) |
+
+| App copy | SDK |
+|---|---|
+| A module `ref(read(localStorage.getItem(key)))` plus `watch(value, (next) => localStorage.setItem(key, write(next)))` | `createPersistentRef(key, initial, { decode })` |
+
+The broker stores JSON: a raw string written by hand-rolled code (`setItem(key, 'rows')`) reads as `initial`.
+Re-encode such keys once, before the refs are created.
 
 ## 0.0.34 — status badges, rows field, refresh button, card link, selectable rows, time sparkline
 
