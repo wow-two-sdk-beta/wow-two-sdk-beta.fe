@@ -75,6 +75,23 @@ try {
   }
   for (const target of Object.values(published.exports)) verifyTarget(target);
 
+  // The date and decimal engines stay with the modules that use them. Shared output chunks once merged light
+  // components with date and number modules, so a packed file imported an engine none of its own modules used.
+  const engines = ['temporal-polyfill', 'bignumber.js'];
+  let engineFiles = 0;
+  for (const { path } of packed.files.filter((file) => file.path.endsWith('.js'))) {
+    const code = readFileSync(join(packageRoot, path), 'utf8');
+    const used = engines.filter((engine) => code.includes(`"${engine}"`) || code.includes(`'${engine}'`));
+    if (used.length === 0) continue;
+    engineFiles++;
+    const { sources, sourcesContent } = JSON.parse(readFileSync(join(packageRoot, `${path}.map`), 'utf8'));
+    for (const engine of used) {
+      const strays = sources.filter((_, index) => !sourcesContent?.[index]?.includes(`'${engine}'`));
+      if (strays.length > 0) throw new Error(`${path} imports ${engine} for modules that never use it: ${strays}`);
+    }
+  }
+  console.log(`check-package: ${engineFiles} packed files import a date or decimal engine, each for its own module.`);
+
   const optional = published.peerDependenciesMeta ?? {};
   for (const name of Object.keys(published.dependencies ?? {})) linkDependency(name);
   for (const name of Object.keys(published.peerDependencies ?? {})) {
@@ -250,7 +267,7 @@ try {
     if (!pointCss.includes(token)) throw new Error(`PointControl CSS omits component styling: ${token}`);
   }
   if (pointCss.includes('.h-9')) throw new Error('PointControl CSS scanned unrelated SDK controls.');
-  console.log('check-package: PointControl public stylesheet scans only its compiled component chunk.');
+  console.log('check-package: PointControl public stylesheet scans only its compiled component modules.');
 
   // A component-only toast consumer gets the host, card and countdown styling without the package-wide surface.
   writeFileSync(
@@ -291,15 +308,16 @@ try {
     if (!toastCss.includes(token)) throw new Error(`ToastHost CSS omits component styling: ${token}`);
   }
   if (toastCss.includes('.h-9')) throw new Error('ToastHost CSS scanned unrelated SDK controls.');
-  console.log('check-package: ToastHost public stylesheet scans only its compiled toast chunks.');
+  console.log('check-package: ToastHost public stylesheet scans only its compiled toast modules.');
   // JS-only production consumers; Vue is external, all other dependencies are included.
   // UI ceilings retain headroom while rejecting the previous duplicate class-merge engine.
-  for (const [entry, symbol, maximumGzip] of [
+  // Each consumer also lists the date and decimal engines its symbol really needs.
+  for (const [entry, symbol, maximumGzip, needs = []] of [
     ['presentation/actions', 'Button', 24_000],
     ['presentation/display', 'Text', 18_000],
     ['presentation/display', 'Card', 19_500],
     ['foundation/http', 'createApiClient', 4_500],
-    ['foundation/numbers', 'ExactNumber', 12_500],
+    ['foundation/numbers', 'ExactNumber', 12_500, ['bignumber.js']],
   ]) {
     const file = join(scratch, `budget-${symbol}.mjs`);
     writeFileSync(file, `import { ${symbol} } from '${published.name}/${entry}'; globalThis.__sdkBudget = ${symbol};`);
@@ -313,11 +331,19 @@ try {
         rollupOptions: { input: file, external: ['vue'], output: { format: 'es' } },
       },
     });
-    const code = (Array.isArray(result) ? result : [result])
+    const chunks = (Array.isArray(result) ? result : [result])
       .flatMap((bundle) => bundle.output)
-      .filter((item) => item.type === 'chunk')
-      .map((item) => item.code)
-      .join('');
+      .filter((item) => item.type === 'chunk');
+    const bundled = new Set(chunks.flatMap((item) => Object.keys(item.modules)));
+    for (const engine of engines) {
+      const included = [...bundled].some((id) => id.includes(`/node_modules/${engine}/`));
+      if (included !== needs.includes(engine)) {
+        throw new Error(
+          `${symbol} consumer ${included ? 'bundles' : 'lost'} ${engine}; it needs: ${needs.join(', ') || 'none'}`,
+        );
+      }
+    }
+    const code = chunks.map((item) => item.code).join('');
     const size = gzipSync(code).length;
     if (size > maximumGzip) throw new Error(`${symbol} consumer exceeds gzip budget: ${size} > ${maximumGzip}`);
     console.log(`check-package: ${symbol} JS consumer ${size}/${maximumGzip} gzip bytes.`);

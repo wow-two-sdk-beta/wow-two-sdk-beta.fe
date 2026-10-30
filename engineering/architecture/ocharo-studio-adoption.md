@@ -27,7 +27,7 @@ Its browser suite covers history, focused edits, delayed saves, loading-time edi
 Vue composables expose live getters over immutable state snapshots; Three.js objects stay outside reactive proxies.
 
 PointControl exposes a public `presentation/forms/point-control/styles.css` entry that scans only its compiled
-component chunk. The consumer provides Tailwind and semantic theme tokens, restricts its own scan to application
+component modules. The consumer provides Tailwind and semantic theme tokens, restricts its own scan to application
 source, and avoids including unrelated SDK utilities. The packed-consumer check verifies required PointControl
 classes and rejects an unrelated control class. The studio loads the tour stylesheet only with its editor chunk. Tour styles use concrete, scoped selectors so
 consumers do not depend on Tailwind scanning a second CSS module.
@@ -77,8 +77,8 @@ Ocharo adopts this contract through `wow-two-beta-ui-vue-0.0.7-ocharo-modal.tgz`
 
 `ToastHost` takes `show-progress` to draw a countdown bar per toast; the bar pauses with the toast on hover or focus
 and takes the toast's severity colour. `presentation/feedback/toast-host` loads the host, the store and
-`useToastHost` without the feedback barrel, and its `styles.css` scans only the compiled host chunk. The card atom's
-surface classes live in a shared chunk, so the stylesheet lists them inline; a DOM test renders every severity and
+`useToastHost` without the feedback barrel, and its `styles.css` scans only the compiled host modules. The card atom's
+surface classes live in the shared tone tables, so the stylesheet lists them inline; a DOM test renders every severity and
 fails if a rendered class is missing from that list. The packed-consumer check covers the entry and its stylesheet.
 
 Ocharo maps `info`, `success`, `warning`, `destructive`, `popover` and `muted` to its own tokens, keys every message to

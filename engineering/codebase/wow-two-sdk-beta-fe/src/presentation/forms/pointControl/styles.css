@@ -1,2 +1,2 @@
-/* Scan only PointControl's compiled SFC chunk; consumers provide Tailwind and semantic theme tokens. */
-@source '../../../chunks/PointControl*.js';
+/* Scan only PointControl's compiled SFC modules; consumers provide Tailwind and semantic theme tokens. */
+@source './PointControl*.js';

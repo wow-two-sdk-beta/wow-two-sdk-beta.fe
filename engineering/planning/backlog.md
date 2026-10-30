@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-10-26*
+*Last updated: 2026-10-30*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -100,7 +100,6 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Fix `SliderInput` lacking `step` and emitting strings | fix | PbnStudio |
 | Fix `Tooltip`'s ref owner under interaction | fix | TNIS on `0.0.7`; re-check at HEAD |
 | Verify `Button` types `onClick` and fires `@press` | fix | Arcade, Hijinx on `0.0.7`; `onClick` typing landed in `0.0.8` |
-| Split the package build per module | engineering | ForeverPin, Haven: shared chunks (385 kB) outweigh product code |
 | Replace `lucide-vue-next` | engineering | Haven; the package depends on it too |
 | Ability to follow the system colour scheme | feature | ListingShelf, Hijinx (theme-mode helper) |
 | Ability to set page titles and map routes to typed props | feature | ListingShelf |
@@ -139,7 +138,6 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Fix `AppShellSidebar` nesting a `<nav>` around `SidebarMenu`'s own landmark | fix | Wheelhouse v0.5 sidebar has nested nav landmarks |
 | Ability to use styled `SortableGroupMoveButton` and `SortableGroupHandle` | feature | Wheelhouse `PinEditor` and `WorkspacesPanel` style them locally |
 | Ability to split `SidebarMenuGroup` into a link and a separate toggle | feature | Wheelhouse workspace rows open their page and fold with a chevron (`WorkspaceNavGroup.vue`) |
-| Fix dist chunks pulling unrelated components into a single import | fix | Wheelhouse boot: `Badge`/`Avatar` pull temporal-polyfill and Kanban, layout pulls Masonry, formatters pull bignumber; per-component chunks or side-effect-free output |
 | Ability to draw `HeatmapCalendarGrid` over any range with per-cell tone, mark and live state | feature | Wheelhouse deployments grid: today ring, running pulse, sticky labels, sideways scroll, arrow keys, selected cell (local `ActivityGrid`) |
 | Ability to multi-select branches and leaves in `TreeSelectPicker` with chips | feature | Wheelhouse deployments entity picker: workspace, product and service mixed, partial and implied states |
 | Ability to pick a date-time range with presets | feature | Wheelhouse uses a native `datetime-local`; `DateRangePicker` is date-only and `DateTimeInput` needs Temporal |

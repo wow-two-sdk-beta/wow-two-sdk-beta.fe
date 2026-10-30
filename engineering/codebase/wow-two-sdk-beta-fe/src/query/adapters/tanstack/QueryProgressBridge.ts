@@ -2,7 +2,7 @@ import { defineComponent, onScopeDispose, watch } from 'vue';
 import { useIsFetching, useIsMutating } from '@tanstack/vue-query';
 
 // Deep import (not the `../router` barrel): the barrel statically imports vue-router, and a barrel
-// import here would merge the whole router graph into the shared chunk `/query` loads — breaking
+// import here would pull the whole router graph into the modules `/query` loads — breaking
 // `/query`'s isolation from the OPTIONAL vue-router peer. `UseNavigationProgress` is plain Vue.
 import { useNavigationProgress } from '../../../router/hooks/UseNavigationProgress';
 

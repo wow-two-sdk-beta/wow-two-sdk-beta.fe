@@ -75,8 +75,12 @@ export default defineConfig({
     rollupOptions: {
       external: isExternal,
       output: {
+        // One output file per source module, mirroring `src/`: shared chunks merged unrelated modules, so a light
+        // component's chunk statically imported `temporal-polyfill` / `bignumber.js` for a sibling it never used.
+        // Per-module files keep every dependency with the module that uses it; consumers tree-shake by module.
+        preserveModules: true,
+        preserveModulesRoot: 'src',
         entryFileNames: '[name].js',
-        chunkFileNames: 'chunks/[name]-[hash].js',
         assetFileNames: 'assets/[name][extname]',
       },
     },

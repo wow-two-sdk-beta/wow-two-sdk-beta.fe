@@ -6,6 +6,19 @@ Consumer-facing changes per published version, newest first. The package was `@w
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
 
+## 0.0.36 — one file per module
+
+No import moves, no renamed props and no API change: every entry exports the same names, and the package and
+component stylesheets compile to the same CSS.
+
+| Area | Change |
+|---|---|
+| `dist/` | One JavaScript file per source module, mirroring `src/`, replaces the shared `dist/chunks/`. A light component no longer imports `temporal-polyfill` or `bignumber.js` because a sibling in its chunk used them; an app's bundler keeps each dependency with the modules that use it. |
+
+Wheelhouse's entry chunk dropped `temporal-polyfill` and fell from 521 kB to 365 kB, below Vite's 500 kB warning, with
+no config change. `bignumber.js` stays wherever a module really reaches `ExactNumber`, such as `foundation/http`'s
+field-error parsing through the validator messages.
+
 ## 0.0.35 — shared persistent refs
 
 No import moves and no renamed props.
