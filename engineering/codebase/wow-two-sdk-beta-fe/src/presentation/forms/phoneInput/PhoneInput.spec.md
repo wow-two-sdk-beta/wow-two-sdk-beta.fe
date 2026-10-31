@@ -19,21 +19,29 @@ Public import: `import { PhoneInput } from '@wow-two-beta/fe/presentation/forms'
 - The value is E.164: the selected dial code joined to the national digits (non-digits are dropped).
 - With no national digits the value is empty — a dial code alone never submits or satisfies `required`. The chosen
   country is kept, including a shared dial code (`+1` for the US or Canada).
-- A value's country is read from its longest matching dial code (`+420` before `+42…`).
+- A value's country is read from its longest matching dial code (`+420` before `+42…`). A shared code (`+1` for the US
+  and Canada, `+7` for Russia and Kazakhstan) reads as the earlier country in the list, unless the reader picked the other.
+- `countries` limits the select to the listed ISO codes, in the order given. Unknown and repeated codes are ignored; a
+  list with no known code reads as absent.
+- With one allowed country there is no select: its flag and dial code render as a fixed prefix.
+- A `defaultCountry` outside the list gives way to the first allowed country.
+- A value whose dial prefix matches no allowed country keeps all its digits under the fallback country; the select
+  never shows a disallowed country, and the value is not rewritten until the reader edits.
 - Regression: `tests/unit/presentation/forms/PhoneInput.dom.test.ts`.
 
 ## Props
 
-| Prop             | Type      | Required | Default            | Meaning                                                                                  |
-| ---------------- | --------- | -------- | ------------------ | ---------------------------------------------------------------------------------------- |
-| `modelValue`     | `string`  | no       | `undefined`        | The E.164 value, controlled. The `v-model` binding target.                               |
-| `defaultValue`   | `string`  | no       | —                  | The initial E.164 value when uncontrolled.                                               |
-| `defaultCountry` | `string`  | no       | `'US'`             | The ISO code selected before the value carries a recognisable dial prefix. Default `US`. |
-| `isDisabled`     | `boolean` | no       | `undefined`        | The disabled state. Falls back to the surrounding form control's `isDisabled`.           |
-| `isReadOnly`     | `boolean` | no       | `undefined`        | The read-only state. Falls back to the surrounding form control's `isReadOnly`.          |
-| `isInvalid`      | `boolean` | no       | `undefined`        | The invalid surface override. Falls back to the surrounding form control's `isInvalid`.  |
-| `placeholder`    | `string`  | no       | `'(555) 555-5555'` | The national-number placeholder.                                                         |
-| `name`           | `string`  | no       | —                  | The hidden input name; the hidden input emits the full E.164 value.                      |
+| Prop             | Type                    | Required | Default            | Meaning                                                                                                      |
+| ---------------- | ----------------------- | -------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `modelValue`     | `string`                | no       | `undefined`        | The E.164 value, controlled. The `v-model` binding target.                                                   |
+| `defaultValue`   | `string`                | no       | —                  | The initial E.164 value when uncontrolled.                                                                   |
+| `defaultCountry` | `string`                | no       | `'US'`             | The ISO code selected before the value carries a recognisable dial prefix. Default `US`.                     |
+| `countries`      | `ReadonlyArray<string>` | no       | —                  | The ISO codes the reader may pick, in display order; unknown codes are ignored. Default every known country. |
+| `isDisabled`     | `boolean`               | no       | `undefined`        | The disabled state. Falls back to the surrounding form control's `isDisabled`.                               |
+| `isReadOnly`     | `boolean`               | no       | `undefined`        | The read-only state. Falls back to the surrounding form control's `isReadOnly`.                              |
+| `isInvalid`      | `boolean`               | no       | `undefined`        | The invalid surface override. Falls back to the surrounding form control's `isInvalid`.                      |
+| `placeholder`    | `string`                | no       | `'(555) 555-5555'` | The national-number placeholder.                                                                             |
+| `name`           | `string`                | no       | —                  | The hidden input name; the hidden input emits the full E.164 value.                                          |
 
 ## Emits
 

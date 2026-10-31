@@ -33,6 +33,11 @@ export const PhoneCountries: ReadonlyArray<PhoneCountry> = [
   { iso: 'TR', name: 'Türkiye', dial: '+90', flag: '🇹🇷' },
   { iso: 'RU', name: 'Russia', dial: '+7', flag: '🇷🇺' },
   { iso: 'UA', name: 'Ukraine', dial: '+380', flag: '🇺🇦' },
+  { iso: 'UZ', name: 'Uzbekistan', dial: '+998', flag: '🇺🇿' },
+  { iso: 'KZ', name: 'Kazakhstan', dial: '+7', flag: '🇰🇿' },
+  { iso: 'KG', name: 'Kyrgyzstan', dial: '+996', flag: '🇰🇬' },
+  { iso: 'TJ', name: 'Tajikistan', dial: '+992', flag: '🇹🇯' },
+  { iso: 'TM', name: 'Turkmenistan', dial: '+993', flag: '🇹🇲' },
   { iso: 'IL', name: 'Israel', dial: '+972', flag: '🇮🇱' },
   { iso: 'AE', name: 'UAE', dial: '+971', flag: '🇦🇪' },
   { iso: 'SA', name: 'Saudi Arabia', dial: '+966', flag: '🇸🇦' },
@@ -72,6 +77,9 @@ export interface PhoneInputProps extends /* @vue-ignore */ NativeInputAttributes
   /** The ISO code selected before the value carries a recognisable dial prefix. Default `US`. */
   readonly defaultCountry?: string;
 
+  /** The ISO codes the reader may pick, in display order; unknown codes are ignored. Default every known country. */
+  readonly countries?: ReadonlyArray<string>;
+
   /** The disabled state. Falls back to the surrounding form control's `isDisabled`. */
   readonly isDisabled?: boolean;
 
@@ -88,10 +96,23 @@ export interface PhoneInputProps extends /* @vue-ignore */ NativeInputAttributes
   readonly name?: string;
 }
 
-function splitE164(value: string, defaultIso: string): { iso: string; national: string } {
+/* A list with no known code reads as absent: a select with no options could not hold a value. */
+function resolveCountries(isos: ReadonlyArray<string> | undefined): ReadonlyArray<PhoneCountry> {
+  if (!isos) return PhoneCountries;
+  const known = [...new Set(isos)]
+    .map((iso) => PhoneCountries.find((c) => c.iso === iso))
+    .filter((c): c is PhoneCountry => c !== undefined);
+  return known.length > 0 ? known : PhoneCountries;
+}
+
+function splitE164(
+  value: string,
+  countries: ReadonlyArray<PhoneCountry>,
+  defaultIso: string,
+): { iso: string; national: string } {
   if (!value) return { iso: defaultIso, national: '' };
-  // Match the longest dial code prefix.
-  const sorted = [...PhoneCountries].sort((a, b) => b.dial.length - a.dial.length);
+  // Match the longest dial code prefix; the stable sort leaves a shared code (+7) to the earlier country.
+  const sorted = [...countries].sort((a, b) => b.dial.length - a.dial.length);
   for (const c of sorted) {
     if (value.startsWith(c.dial)) {
       return { iso: c.iso, national: value.slice(c.dial.length).replace(/\D/g, '') };
@@ -157,24 +178,31 @@ const disabled = computed(() => props.isDisabled ?? ctx?.isDisabled);
 const readOnly = computed(() => props.isReadOnly ?? ctx?.isReadOnly);
 const invalid = computed(() => props.isInvalid ?? ctx?.isInvalid);
 
+const allowed = computed(() => resolveCountries(props.countries));
+/* The fallback must be selectable: a `defaultCountry` outside the list gives way to the first allowed country. */
+const fallbackIso = computed(
+  () => allowed.value.find((c) => c.iso === props.defaultCountry)?.iso ?? allowed.value[0]!.iso,
+);
+
 /* Selected ISO is state — shared dial codes (+1 US/CA) make it unrecoverable from the value
    alone. Re-derive only when the value's dial prefix becomes incompatible with the selection. */
-const selectedIso = ref(props.defaultCountry);
+const selectedIso = ref(fallbackIso.value);
 
+/* A value whose dial prefix is outside the list matches no allowed country: its digits stay, under the fallback. */
 const split = computed(() => {
-  const selected = PhoneCountries.find((c) => c.iso === selectedIso.value);
+  const selected = allowed.value.find((c) => c.iso === selectedIso.value);
   if (selected && (!e164.value || e164.value.startsWith(selected.dial))) {
     return {
       iso: selected.iso,
       national: e164.value.slice(selected.dial.length).replace(/\D/g, ''),
     };
   }
-  return splitE164(e164.value, props.defaultCountry);
+  return splitE164(e164.value, allowed.value, fallbackIso.value);
 });
 
 const iso = computed(() => split.value.iso);
 const national = computed(() => split.value.national);
-const country = computed(() => PhoneCountries.find((c) => c.iso === iso.value) ?? PhoneCountries[0]!);
+const country = computed(() => allowed.value.find((c) => c.iso === iso.value) ?? allowed.value[0]!);
 
 /* A dial code alone is not a phone number: with no national digits the value is empty, so a blank field submits
    nothing and fails `required` — the selected country survives in `selectedIso`. */
@@ -184,7 +212,7 @@ function e164For(dial: string, digits: string): string {
 
 function setCountry(event: Event): void {
   const nextIso = (event.target as HTMLSelectElement).value;
-  const next = PhoneCountries.find((c) => c.iso === nextIso) ?? country.value;
+  const next = allowed.value.find((c) => c.iso === nextIso) ?? country.value;
   selectedIso.value = next.iso;
   const nextValue = e164For(next.dial, national.value);
   if (nextValue !== e164.value) controlled.setValue(nextValue);
@@ -221,6 +249,14 @@ const selectClass = computed(() =>
   ),
 );
 
+/* One allowed country leaves nothing to pick: its flag and dial code sit in the select's place as plain text. */
+const prefixClass = computed(() =>
+  cn(
+    'flex h-10 items-center border-r border-input bg-card px-2 text-sm',
+    readOnly.value && 'bg-muted text-muted-foreground',
+  ),
+);
+
 const inputClass = cn(
   inputBaseVariants({ size: InputSize.Md }),
   'rounded-none border-0 focus-visible:ring-0 readonly:focus-visible:ring-0',
@@ -236,7 +272,9 @@ const locale = useLocale();
 
 <template>
   <div :key="formResetRevision" :data-readonly="readOnly || undefined" :class="rootClass" v-bind="passthroughAttrs">
+    <span v-if="allowed.length === 1" :class="prefixClass">{{ country.flag }} {{ country.dial }}</span>
     <select
+      v-else
       :aria-label="locale.t('PhoneInput.country', undefined, 'Country')"
       :value="iso"
       :disabled="disabled || readOnly"
@@ -244,7 +282,7 @@ const locale = useLocale();
       :style="{ minWidth: '90px' }"
       @change="setCountry"
     >
-      <option v-for="c in PhoneCountries" :key="c.iso" :value="c.iso">{{ c.flag }} {{ c.dial }}</option>
+      <option v-for="c in allowed" :key="c.iso" :value="c.iso">{{ c.flag }} {{ c.dial }}</option>
     </select>
     <input
       type="tel"

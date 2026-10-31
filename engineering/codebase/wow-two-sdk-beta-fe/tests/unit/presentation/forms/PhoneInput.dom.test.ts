@@ -72,6 +72,61 @@ describe('PhoneInput', () => {
     expect(mountPhone({ defaultValue: '+358401234567' }).get<HTMLSelectElement>('select').element.value).toBe('FI');
   });
 
+  it('reads the Central Asian dial codes, a shared +7 going to the earlier country', () => {
+    const isoOf = (value: string, props: Record<string, unknown> = {}): string =>
+      mountPhone({ defaultValue: value, ...props }).get<HTMLSelectElement>('select').element.value;
+    expect(isoOf('+998901234567')).toBe('UZ');
+    expect(isoOf('+996555123456')).toBe('KG');
+    expect(isoOf('+992901234567')).toBe('TJ');
+    expect(isoOf('+99365123456')).toBe('TM');
+    expect(isoOf('+77011234567')).toBe('RU');
+    expect(isoOf('+77011234567', { countries: ['KZ', 'RU'] })).toBe('KZ');
+  });
+
+  it('lists only the given countries, in the order given', () => {
+    const wrapper = mountPhone({ countries: ['KZ', 'UZ', 'XX', 'KZ'] });
+    const options = wrapper.findAll('option');
+    expect(options.map((o) => o.element.value)).toEqual(['KZ', 'UZ']);
+    expect(options.map((o) => o.text())).toEqual(['🇰🇿 +7', '🇺🇿 +998']);
+  });
+
+  it('lists every country for a list with no known code', () => {
+    expect(mountPhone({ countries: ['XX'] }).findAll('option').length).toBe(mountPhone().findAll('option').length);
+  });
+
+  it('renders one allowed country as a fixed prefix with no select', async () => {
+    const wrapper = mountPhone({ countries: ['UZ'] });
+    expect(wrapper.find('select').exists()).toBe(false);
+    expect(wrapper.text()).toBe('🇺🇿 +998');
+    await typeNumber(wrapper, '90 123-45-67');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['+998901234567']);
+    expect(hidden(wrapper)).toBe('+998901234567');
+  });
+
+  it('falls back to the first allowed country when the default is not in the list', async () => {
+    const wrapper = mountPhone({ countries: ['UZ', 'KZ'], defaultCountry: 'US' });
+    expect(wrapper.get<HTMLSelectElement>('select').element.value).toBe('UZ');
+    await typeNumber(wrapper, '901234567');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['+998901234567']);
+    expect(
+      mountPhone({ countries: ['UZ', 'KZ'], defaultCountry: 'KZ' }).get<HTMLSelectElement>('select').element.value,
+    ).toBe('KZ');
+    expect(mountPhone({ countries: ['UZ'] }).text()).toBe('🇺🇿 +998');
+  });
+
+  it('keeps the digits of a disallowed prefix under the fallback country', async () => {
+    const wrapper = mountPhone({ countries: ['UZ', 'KZ'], modelValue: '+447911123456' });
+    expect(wrapper.get<HTMLSelectElement>('select').element.value).toBe('UZ');
+    expect(wrapper.get<HTMLInputElement>('input[type=tel]').element.value).toBe('447911123456');
+    expect(hidden(wrapper)).toBe('+447911123456');
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+    const fixed = mountPhone({ countries: ['UZ'], modelValue: '+447911123456' });
+    expect(fixed.find('select').exists()).toBe(false);
+    expect(fixed.text()).toBe('🇺🇿 +998');
+    expect(fixed.get<HTMLInputElement>('input[type=tel]').element.value).toBe('447911123456');
+  });
+
   it('takes its id, description and locked state from a surrounding field', async () => {
     const wrapper = mount(
       { render: () => h(Field, { label: 'Phone', helper: 'Work number', isDisabled: true }, () => h(PhoneInput)) },
