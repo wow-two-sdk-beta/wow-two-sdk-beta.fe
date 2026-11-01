@@ -40,6 +40,11 @@ Public import: `import { PhoneInput } from '@wow-two-beta/fe/presentation/forms'
 - `countries` limits the select to the listed ISO codes, in the order given. Unknown and repeated codes are ignored; a
   list with no known code reads as absent.
 - With one allowed country there is no select: its flag and dial code render as a fixed prefix.
+- The frame is the medium input height (`h-10`, 40px with its border), the same as every other input; the select,
+  the prefix and the number field fill it.
+- `focus` fires when focus enters the control from outside it, `blur` when focus leaves the whole control (for the
+  body included). Moving between the country select and the number field fires neither, so a form engine bound to
+  `@blur` validates once, when the reader leaves the phone number.
 - A `defaultCountry` outside the list gives way to the first allowed country.
 - A value whose dial prefix matches no allowed country keeps all its digits, unmasked, under the fallback country; the
   select never shows a disallowed country, and the value is not rewritten until the reader edits.
@@ -66,6 +71,8 @@ Public import: `import { PhoneInput } from '@wow-two-beta/fe/presentation/forms'
 | Event               | Signature                              | Meaning                                                                          |
 | ------------------- | -------------------------------------- | -------------------------------------------------------------------------------- |
 | `update:modelValue` | `'update:modelValue': [e164: string];` | Fires when the reader edits the number or switches country — the `v-model` half. |
+| `focus`             | `focus: [event: FocusEvent];`          | Fires when focus enters the control from outside it.                             |
+| `blur`              | `blur: [event: FocusEvent];`           | Fires when focus leaves the whole control.                                       |
 
 ## Slots
 
@@ -80,4 +87,4 @@ No explicit exposed handle.
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
 
-Native input attributes and event listeners (including `name`, `form`, `autocomplete`, `onBlur`, `onInput` and keyboard/composition/clipboard events) are represented in the public props type. They remain fallthrough attrs at runtime. Canonical model value, visual size, fixed native type and declared Temporal bounds retain component ownership. Autocomplete accepts its native extensible token string.
+Native input attributes and event listeners (including `name`, `form`, `autocomplete`, `onInput` and keyboard/composition/clipboard events) are represented in the public props type. They remain fallthrough attrs at runtime, except `onFocus` and `onBlur`, which bind the `focus` and `blur` emits of the whole control. Canonical model value, visual size, fixed native type and declared Temporal bounds retain component ownership. Autocomplete accepts its native extensible token string.

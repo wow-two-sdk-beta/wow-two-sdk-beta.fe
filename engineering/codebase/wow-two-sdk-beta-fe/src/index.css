@@ -291,6 +291,16 @@ body {
   color: var(--color-foreground);
 }
 
+/* A programmatic focus target — what `focusTarget` (`foundation/dom`) marks with `data-focus-target`: a page's `main`
+   after a route change, a heading, a region holding focus while its content swaps. It is not a control, so it draws
+   no focus ring, and a screen reader still lands on it. `@layer base` plus `:where()` leave a utility the app sets on
+   the element in charge. */
+@layer base {
+  :where([data-focus-target]:focus) {
+    outline: none;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Scrollbars — a slim themed track and a pill-shaped thumb on every scroll container, always visible.
  *

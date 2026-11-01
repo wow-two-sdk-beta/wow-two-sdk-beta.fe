@@ -5,6 +5,7 @@ export * from './slot';
 export * from './portal';
 export * from './visuallyHidden';
 export * from './presence';
+export * from './swapTransition';
 export * from './directionProvider';
 export * from './accessibleIcon';
 export * from './focusScope';

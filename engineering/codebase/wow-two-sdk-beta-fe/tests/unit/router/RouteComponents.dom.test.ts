@@ -7,9 +7,12 @@ import { AppErrorBoundary, RouteAnnouncer, RoutePageHeader } from '@src/router';
 
 const Blank = { template: '<div />' };
 
-function testRouter() {
+function testRouter(initialPath?: string) {
+  const history = createMemoryHistory();
+  // The URL an app opens on: installing the router navigates to it, as `createWebHistory` does with the address bar.
+  if (initialPath !== undefined) history.replace(initialPath);
   return createRouter({
-    history: createMemoryHistory(),
+    history,
     routes: [
       { path: '/', component: Blank, meta: { title: 'Home' } },
       { path: '/codes', component: Blank, meta: { title: 'Codes' } },
@@ -83,6 +86,61 @@ describe('router root components', () => {
     expect(document.activeElement).toBe(current);
     expect(oldFocus).not.toHaveBeenCalled();
     expect(wrapper.findComponent(RouteAnnouncer).text()).toBe('Same title');
+    wrapper.unmount();
+  });
+
+  it('focuses main content as a programmatic focus target, never a Tab stop', async () => {
+    const router = testRouter();
+    await router.push('/');
+    await router.isReady();
+    const main = document.createElement('main');
+    document.body.append(main);
+    const wrapper = mount(RouteAnnouncer, { attachTo: document.body, global: { plugins: [router] } });
+    await router.push('/codes');
+    await flushPromises();
+
+    expect(document.activeElement).toBe(main);
+    expect(main.getAttribute('tabindex')).toBe('-1');
+    expect(main.hasAttribute('data-focus-target')).toBe(true);
+    wrapper.unmount();
+  });
+
+  it('treats a first navigation still resolving at mount as the initial page', async () => {
+    const router = testRouter('/codes');
+    const main = document.createElement('main');
+    document.body.append(main);
+    const focus = vi.spyOn(main, 'focus');
+    // Mounted on `START_LOCATION`: installing the router starts the first navigation, as in an app that skips
+    // `await router.isReady()` before `mount`.
+    const wrapper = mount(RouteAnnouncer, { attachTo: document.body, global: { plugins: [router] } });
+    await router.isReady();
+    await flushPromises();
+
+    expect(focus).not.toHaveBeenCalled();
+    expect(wrapper.text()).toBe('');
+
+    await router.push('/');
+    await flushPromises();
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toBe('Home');
+    wrapper.unmount();
+  });
+
+  it('announces a first navigation still resolving at mount once when the initial page is announced', async () => {
+    const router = testRouter('/codes');
+    const main = document.createElement('main');
+    document.body.append(main);
+    const focus = vi.spyOn(main, 'focus');
+    const wrapper = mount(RouteAnnouncer, {
+      attachTo: document.body,
+      props: { canAnnounceInitial: true },
+      global: { plugins: [router] },
+    });
+    await router.isReady();
+    await flushPromises();
+
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toBe('Codes');
     wrapper.unmount();
   });
 

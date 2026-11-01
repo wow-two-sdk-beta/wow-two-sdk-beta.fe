@@ -21,3 +21,4 @@ export * from './hooks/UseScrollActivity';
 export { DomOrderExtensions } from './DomOrderExtensions';
 export { resolveElement } from './ResolveElement';
 export { ScrollRegionAttribute, findScrollRegions } from './ScrollRegion';
+export { FocusTargetAttribute, focusTarget } from './FocusTarget';

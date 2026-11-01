@@ -7,6 +7,7 @@ import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
 import { layoutExamples } from '../gallery/fixtures/LayoutExamples';
+import SwapTransitionDemo from './SwapTransitionDemo.vue';
 
 const {
   BoxLayout,
@@ -340,6 +341,13 @@ const FLEX_CASES = [
           </VirtualScrollArea>
         </div>
         <p class="mt-1 text-[10px] text-subtle-foreground">end reached = {{ endReached }}</p>
+      </Demo>
+
+      <Demo
+        name="SwapTransition"
+        note="foundation/primitives — fade out, height to the next pane, fade in; follows the error line too"
+      >
+        <SwapTransitionDemo />
       </Demo>
 
       <Demo name="MasonryLayout" note="uneven cards flow down 3 balanced columns (fewer below 7rem each)">

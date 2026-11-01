@@ -66,6 +66,10 @@ const props = withDefaults(defineProps<PhoneInputProps>(), {
 const emit = defineEmits<{
   /** Fires when the reader edits the number or switches country — the `v-model` half. */
   'update:modelValue': [e164: string];
+  /** Fires when focus enters the control from outside it — the country select or the number field. */
+  focus: [event: FocusEvent];
+  /** Fires when focus leaves the whole control; moving between the country select and the number field stays inside. */
+  blur: [event: FocusEvent];
 }>();
 
 const attrs = useAttrs();
@@ -224,6 +228,22 @@ function placeCaret(field: HTMLInputElement, caret: number): void {
   if (field.ownerDocument.activeElement === field) field.setSelectionRange(caret, caret);
 }
 
+/* The composite's focus is one focus: the root div never takes focus itself, so `focus` and `blur` follow the
+   bubbling `focusin` / `focusout` of its parts and skip a move between them. A `null` related target (focus left
+   for the body, or the window lost focus) counts as outside. */
+function isInside(event: FocusEvent): boolean {
+  const root = event.currentTarget as HTMLElement;
+  return event.relatedTarget instanceof Node && root.contains(event.relatedTarget);
+}
+
+function onFocusin(event: FocusEvent): void {
+  if (!isInside(event)) emit('focus', event);
+}
+
+function onFocusout(event: FocusEvent): void {
+  if (!isInside(event)) emit('blur', event);
+}
+
 const OwnedAttributes: ReadonlySet<string> = new Set(['class']);
 const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
@@ -231,7 +251,7 @@ const passthroughAttrs = computed(() =>
 
 const rootClass = computed(() =>
   cn(
-    'inline-flex items-stretch overflow-hidden rounded-md border bg-background',
+    'inline-flex h-10 items-stretch overflow-hidden rounded-md border bg-background',
     invalid.value ? 'border-destructive' : 'border-input',
     disabled.value && 'opacity-60',
     readOnly.value && 'bg-muted text-muted-foreground',
@@ -239,11 +259,12 @@ const rootClass = computed(() =>
   ),
 );
 
-/* The country select is a native `<select>`, which has no `readonly`: a read-only phone input disables it, so it
-   takes the frame's muted surface and the default cursor rather than the pointer. */
+/* The frame is the medium input step (`h-10`, border included); its parts fill it rather than add their own height
+   to the border. The country select is a native `<select>`, which has no `readonly`: a read-only phone input
+   disables it, so it takes the frame's muted surface and the default cursor rather than the pointer. */
 const selectClass = computed(() =>
   cn(
-    'h-10 cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'h-full cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     readOnly.value && 'cursor-default bg-muted text-muted-foreground',
   ),
 );
@@ -251,14 +272,14 @@ const selectClass = computed(() =>
 /* One allowed country leaves nothing to pick: its flag and dial code sit in the select's place as plain text. */
 const prefixClass = computed(() =>
   cn(
-    'flex h-10 items-center border-r border-input bg-card px-2 text-sm',
+    'flex h-full items-center border-r border-input bg-card px-2 text-sm',
     readOnly.value && 'bg-muted text-muted-foreground',
   ),
 );
 
 const inputClass = cn(
   inputBaseVariants({ size: InputSize.Md }),
-  'rounded-none border-0 focus-visible:ring-0 readonly:focus-visible:ring-0',
+  'h-full rounded-none border-0 focus-visible:ring-0 readonly:focus-visible:ring-0',
 );
 
 const formResetAnchor = useTemplateRef<HTMLInputElement>('formResetAnchor');
@@ -270,7 +291,14 @@ const locale = useLocale();
 </script>
 
 <template>
-  <div :key="formResetRevision" :data-readonly="readOnly || undefined" :class="rootClass" v-bind="passthroughAttrs">
+  <div
+    :key="formResetRevision"
+    :data-readonly="readOnly || undefined"
+    :class="rootClass"
+    v-bind="passthroughAttrs"
+    @focusin="onFocusin"
+    @focusout="onFocusout"
+  >
     <span v-if="allowed.length === 1" :class="prefixClass">{{ country.flag }} {{ country.dial }}</span>
     <select
       v-else

@@ -262,6 +262,71 @@ describe('PhoneInput', () => {
     expect(nationalField(wrapper).value).toBe('447911123456');
   });
 
+  it('fires blur once, when focus leaves the whole control, and focus once on the way in', async () => {
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
+    const wrapper = mountPhone({ onBlur, onFocus });
+    const select = wrapper.get<HTMLSelectElement>('select').element;
+    const field = nationalField(wrapper);
+
+    select.focus();
+    field.focus();
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).not.toHaveBeenCalled();
+
+    outside.focus();
+    expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(onBlur.mock.calls[0]![0]).toBeInstanceOf(FocusEvent);
+
+    field.focus();
+    field.blur();
+    expect(onFocus).toHaveBeenCalledTimes(2);
+    expect(onBlur).toHaveBeenCalledTimes(2);
+  });
+
+  it('validates on blur through a form engine bound to the control', async () => {
+    let form!: AppForm<{ phone: string }>;
+    const Host = defineComponent({
+      setup() {
+        form = houseFormEngine.useAppForm<{ phone: string }>({
+          defaultValues: { phone: '' },
+          schema: object({ phone: phone({ countries: ['UZ'] }) }),
+          validateOn: 'blur',
+          onSubmit: async () => ({ ok: true as const, value: undefined }),
+        });
+        return () =>
+          h(
+            form.Field as unknown as Component,
+            { name: 'phone' },
+            {
+              default: (field: AppFieldApi<string>) =>
+                h(Field, { label: 'Phone' }, () =>
+                  h(PhoneInput, {
+                    modelValue: field.value,
+                    'onUpdate:modelValue': (next: string) => (field.value = next),
+                    onBlur: field.onBlur,
+                    countries: ['UZ'],
+                  }),
+                ),
+            },
+          );
+      },
+    });
+    const wrapper = mount(Host, { attachTo: document.body });
+    wrappers.push(wrapper);
+    const input = nationalField(wrapper);
+
+    await typeKeys(input, '234');
+    await flushPromises();
+    expect(wrapper.find('[role=alert]').exists()).toBe(false);
+
+    input.blur();
+    await flushPromises();
+    expect(wrapper.get('[role=alert]').text()).toBe('must have 9 digits after +998');
+  });
+
   it('blocks submit with the phone rule error under the field until the number is complete', async () => {
     const onSubmit = vi.fn(async () => ({ ok: true as const, value: undefined }));
     let form!: AppForm<{ phone: string }>;

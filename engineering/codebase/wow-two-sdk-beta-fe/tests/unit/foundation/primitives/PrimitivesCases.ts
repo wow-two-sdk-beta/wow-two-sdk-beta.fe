@@ -17,6 +17,7 @@ import {
   ScrollLockProvider,
   ScrollViewport,
   Slottable,
+  SwapTransition,
   VisuallyHidden,
 } from '@src/foundation/primitives';
 import { smokeCase, type SmokeCase } from '../../../support/Smoke';
@@ -37,6 +38,7 @@ export const primitivesCases: readonly SmokeCase[] = [
   smokeCase('Portal', Portal, {}, { slot: true }),
   smokeCase('VisuallyHidden', VisuallyHidden, {}, { slot: true }),
   smokeCase('Presence', Presence, { isPresent: true }, { slot: true }),
+  smokeCase('SwapTransition', SwapTransition, {}, { slot: true }),
   smokeCase('DirectionProvider', DirectionProvider, { dir: Direction.Ltr }, { slot: true }),
   smokeCase('AccessibleIcon', AccessibleIcon, { label: 'Save' }, { slot: true }),
   smokeCase('FocusScope', FocusScope, {}, { slot: true }),
