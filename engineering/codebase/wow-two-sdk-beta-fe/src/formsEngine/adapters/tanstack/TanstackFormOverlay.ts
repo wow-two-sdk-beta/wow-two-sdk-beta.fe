@@ -16,6 +16,8 @@ import type { SubmitFailureResolution } from '../../SubmitErrors';
  *     replaced wholesale by `setFieldErrors`, remapped through array ops.
  *   - `baseline` — the dirty baseline `reset(next)` re-seeds.
  *   - `touched` — blur marks; `submitCount > 0` touches everything.
+ *   - `changed` — paths a write reached; with `validateOn: 'change'` a changed field shows its
+ *     client error (see `AppForm.spec.md` § Error display).
  *   - `isSubmitting` / `submitError` — the contract submit pipeline flags: `isSubmitting`
  *     wraps only the app's `onSubmit` call (not TanStack's validation window), and
  *     `submitError` holds the failure remainder no field could represent.
@@ -39,6 +41,8 @@ export interface TanstackOverlayState<TValues extends object> {
   /** The server-error overlay, keyed by form path (`rules[0].destination`). */
   readonly serverErrors: ErrorMap;
   readonly touched: ReadonlySet<string>;
+  /** Paths a write reached (`setValue`, array operations) — never the blur mark `touched` holds. */
+  readonly changed: ReadonlySet<string>;
   readonly submitCount: number;
   readonly isSubmitting: boolean;
   readonly submitError: AppError | null;
@@ -53,6 +57,8 @@ export interface TanstackFormOverlay<TValues extends object> {
   readonly getState: () => TanstackOverlayState<TValues>;
   /** Marks a field touched (wired onto the control's blur). */
   readonly markBlurred: (path: string) => void;
+  /** Marks a path written (`setValue` / array operation) — drives error display under `validateOn: 'change'`. */
+  readonly markChanged: (path: string) => void;
   /** Server messages clear on the next change to the field (contract JSDoc). */
   readonly clearServerErrorsAt: (path: string) => void;
   /** Row-scoped server errors + touched marks follow their rows through array ops. */
@@ -96,6 +102,7 @@ export function createTanstackFormOverlay<TValues extends object>(
     isScopeValidating: false,
     serverErrors: EmptyMap,
     touched: new Set<string>(),
+    changed: new Set<string>(),
     submitCount: 0,
     isSubmitting: false,
     submitError: null,
@@ -119,6 +126,12 @@ export function createTanstackFormOverlay<TValues extends object>(
       touched.add(path);
       patch({ touched });
     },
+    markChanged: (path) => {
+      if (store.value.changed.has(path)) return;
+      const changed = new Set(store.value.changed);
+      changed.add(path);
+      patch({ changed });
+    },
     clearServerErrorsAt: (path) => {
       if (!Object.prototype.hasOwnProperty.call(store.value.serverErrors, path)) return;
       patch({
@@ -129,6 +142,7 @@ export function createTanstackFormOverlay<TValues extends object>(
       patch({
         serverErrors: remapPathMap(store.value.serverErrors, arrayPath, operation),
         touched: remapPathSet(store.value.touched, arrayPath, operation),
+        changed: remapPathSet(store.value.changed, arrayPath, operation),
       });
     },
     beginSubmitAttempt: () => {
@@ -171,6 +185,7 @@ export function createTanstackFormOverlay<TValues extends object>(
         isScopeValidating: false,
         serverErrors: EmptyMap,
         touched: new Set<string>(),
+        changed: new Set<string>(),
         submitCount: 0,
         isSubmitting: false,
         submitError: null,

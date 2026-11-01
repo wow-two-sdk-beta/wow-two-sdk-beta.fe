@@ -5,7 +5,7 @@ import { AppErrorFactory, type AppError } from '../../../foundation/results';
 
 import type { AppFormOptions, AppFormState, AppFormValidationOptions } from '../../AppForm';
 import { deepEqual } from '../../DeepEqual';
-import { includesValidationPath, untilFormAbort, validateFormScope } from '../../FormOperations';
+import { includesValidationPath, resolveFieldDisplay, untilFormAbort, validateFormScope } from '../../FormOperations';
 import { snapshotFormValues } from '../../FormSnapshot';
 import { getPath, hasPath, mutateRows, remapPathMap, remapPathSet, setPath, type ArrayOperation } from '../../Paths';
 import {
@@ -52,6 +52,8 @@ interface InternalState<TValues extends object> {
   /** Merged per-path messages, client first — rebuilt whenever either source changes. */
   readonly errors: ErrorMap;
   readonly touched: ReadonlySet<string>;
+  /** Paths a write reached — never the blur mark `touched` holds. */
+  readonly changed: ReadonlySet<string>;
   readonly submitCount: number;
   readonly isSubmitting: boolean;
   readonly isValidating: boolean;
@@ -128,6 +130,7 @@ export function createHouseFormEngine<TValues extends object, TOutput = TValues>
     serverErrors: EmptyMap,
     errors: EmptyMap,
     touched: new Set<string>(),
+    changed: new Set<string>(),
     submitCount: 0,
     isSubmitting: false,
     isValidating: false,
@@ -265,13 +268,15 @@ export function createHouseFormEngine<TValues extends object, TOutput = TValues>
     const cached = fieldCache.get(path);
     if (cached) return cached;
     const value = getPath(state.values, path);
+    const { isTouched, showsClientErrors } = resolveFieldDisplay(path, state, currentOptions().validateOn);
+    // Validation is form-wide; display follows the field's own marks. Server messages always display.
+    const client = showsClientErrors ? (state.clientErrors[path] ?? EmptyErrors) : EmptyErrors;
+    const server = state.serverErrors[path] ?? EmptyErrors;
     const computed: HouseFieldState = {
       value,
-      errors: state.errors[path] ?? EmptyErrors,
+      errors: server.length === 0 ? client : client.length === 0 ? server : [...client, ...server],
       isDirty: !deepEqual(value, getPath(state.baseline, path)),
-      // A submit attempt counts as touching everything — error-display gating works post-attempt.
-      isTouched:
-        [...state.touched].some((selected) => includesValidationPath(path, [selected])) || state.submitCount > 0,
+      isTouched,
     };
     const previous = previousFieldCache.get(path);
     const stable = previous && fieldStatesEqual(previous, computed) ? previous : computed;
@@ -285,7 +290,11 @@ export function createHouseFormEngine<TValues extends object, TOutput = TValues>
     const serverErrors = Object.prototype.hasOwnProperty.call(state.serverErrors, path)
       ? Object.fromEntries(Object.entries(state.serverErrors).filter(([key]) => key !== path))
       : state.serverErrors;
-    patch({ values: setPath(state.values, path, snapshotFormValues(value)), serverErrors });
+    patch({
+      values: setPath(state.values, path, snapshotFormValues(value)),
+      serverErrors,
+      changed: state.changed.has(path) ? state.changed : new Set(state.changed).add(path),
+    });
     if (shouldValidateOnChange()) void runValidation();
     scheduleAutoSubmit();
   }
@@ -318,6 +327,7 @@ export function createHouseFormEngine<TValues extends object, TOutput = TValues>
       clientErrors: remapPathMap(state.clientErrors, path, operation),
       serverErrors: remapPathMap(state.serverErrors, path, operation),
       touched: remapPathSet(state.touched, path, operation),
+      changed: remapPathSet(new Set(state.changed).add(path), path, operation),
     });
     if (shouldValidateOnChange()) void runValidation();
     scheduleAutoSubmit();
@@ -338,6 +348,7 @@ export function createHouseFormEngine<TValues extends object, TOutput = TValues>
       serverErrors: EmptyMap,
       errors: EmptyMap,
       touched: new Set<string>(),
+      changed: new Set<string>(),
       submitCount: 0,
       isSubmitting: false,
       isValidating: false,

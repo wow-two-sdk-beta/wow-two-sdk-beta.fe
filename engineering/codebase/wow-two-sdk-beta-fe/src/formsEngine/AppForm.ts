@@ -44,12 +44,17 @@ export interface AppFormOptions<TValues extends object, TOutput = TValues> {
   readonly schema?: StandardSchemaV1<TValues, TOutput>;
 
   // ── validation-config cluster ───────────────────────────────────────────────
-  /** When client validation runs. `'submit'` re-validates touched fields on change after the first attempt. */
+  /**
+   * When client validation runs. `'submit'` re-validates touched fields on change after the first attempt.
+   * Validation is form-wide, but a field DISPLAYS its client error only once it was blurred, after a submit
+   * attempt, or — under `'change'` — once it changed ({@link AppFieldApi.errors}).
+   */
   readonly validateOn?: 'change' | 'blur' | 'submit';
   /**
    * Validate once on mount — seeds `isValid` / field errors before any interaction (edit-screen
    * validity indicators, wizard step-entry gating). Fields stay untouched (`isTouched` false), so
-   * the initial pass populates state without asserting the user has interacted. Default `false`.
+   * the initial pass populates `state.isValid` without asserting the user has interacted: a field's
+   * error displays once that field is touched, changed (`'change'`) or a submit is attempted. Default `false`.
    */
   readonly validateOnMount?: boolean;
   /** Performs the submit with valid values — usually a `useAppMutation` / `useOptimisticMutation` `mutateAsync`. */
@@ -136,7 +141,11 @@ export interface AppFieldApi<TValue> {
   readonly setValue: (value: TValue) => void;
   /** Marks the field touched — the Field glue also wires it onto the control's blur. */
   readonly onBlur: () => void;
-  /** Client + server messages merged (client first); server messages clear on the next change to the field. */
+  /**
+   * The messages to display, client first. Server messages always display and clear on the next change to
+   * the field. A client message displays once the field is touched, after a submit attempt, or — under
+   * `validateOn: 'change'` — once it changed; until then it stays in `form.state.isValid` only.
+   */
   readonly errors: ReadonlyArray<string>;
   readonly isDirty: boolean;
   readonly isTouched: boolean;

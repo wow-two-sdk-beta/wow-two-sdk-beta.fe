@@ -25,7 +25,13 @@ import type {
   AppFormValidationOptions,
 } from '../../AppForm';
 import { deepEqual } from '../../DeepEqual';
-import { includesValidationPath, submitWithFocus, untilFormAbort, validateFormScope } from '../../FormOperations';
+import {
+  includesValidationPath,
+  resolveFieldDisplay,
+  submitWithFocus,
+  untilFormAbort,
+  validateFormScope,
+} from '../../FormOperations';
 import { snapshotFormValues } from '../../FormSnapshot';
 import { createFieldApi, createFieldComponent, createFormStateView, createUseFormState } from '../../FormGlue';
 import { getPath, hasPath } from '../../Paths';
@@ -220,6 +226,7 @@ interface CombinedReader<TValues extends object> {
 function createCombinedReader<TValues extends object>(
   snapshot: ShallowRef<EngineStateView>,
   overlay: TanstackFormOverlay<TValues>,
+  getValidateOn: () => AppFormOptions<TValues>['validateOn'],
 ): CombinedReader<TValues> {
   let generation: { tan: EngineStateView; ov: TanstackOverlayState<TValues> } | null = null;
   let formState: AppFormState<TValues> | null = null;
@@ -265,8 +272,11 @@ function createCombinedReader<TValues extends object>(
       const cached = fieldCache.get(path);
       if (cached) return cached;
       const value = getPath(tan.values, path);
-      const clientMessages =
-        ov.scopedErrors !== null && includesValidationPath(path, ov.scopedFields)
+      const { isTouched, showsClientErrors } = resolveFieldDisplay(path, ov, getValidateOn());
+      // Validation is form-wide; display follows the field's own marks. Server messages always display.
+      const clientMessages = !showsClientErrors
+        ? EmptyMessages
+        : ov.scopedErrors !== null && includesValidationPath(path, ov.scopedFields)
           ? (ov.scopedErrors[path] ?? EmptyMessages)
           : toMessages(tan.fieldMeta[path]?.errors);
       const serverMessages = ov.serverErrors[path] ?? EmptyMessages;
@@ -280,8 +290,7 @@ function createCombinedReader<TValues extends object>(
               ? serverMessages
               : [...clientMessages, ...serverMessages],
         isDirty: !deepEqual(value, getPath(ov.baseline, path)),
-        // A submit attempt counts as touching everything — error-display gating works post-attempt.
-        isTouched: [...ov.touched].some((selected) => includesValidationPath(path, [selected])) || ov.submitCount > 0,
+        isTouched,
       };
       const previous = previousFieldCache.get(path);
       const stable = previous && fieldStatesEqual(previous, computed) ? previous : computed;
@@ -411,7 +420,7 @@ function buildAppForm<TValues extends object, TOutput>(
   let disposed = false;
   let trailingSubmit = false;
   let submittingValues: TValues | null = null;
-  const reader = createCombinedReader(bridgeStore(engine), overlay);
+  const reader = createCombinedReader(bridgeStore(engine), overlay, () => getOptions().validateOn);
   const identity = createFormArrayIdentity(() => engine.store.state.values);
 
   // ── Submit path shared by `handleSubmit` + auto-submit (validate → onSubmit → map failure) ─────
@@ -582,6 +591,7 @@ function buildAppForm<TValues extends object, TOutput>(
     setValue: (path: string, value: unknown) => {
       // Server messages clear on the next change to the field (contract JSDoc).
       overlay.clearServerErrorsAt(path);
+      overlay.markChanged(path);
       // Triggers TanStack 'change'-cause validation, gated by `revalidateLogic`.
       engine.setFieldValue(path as DeepKeys<TValues>, snapshotFormValues(value) as never);
       identity.replace(path);
@@ -631,6 +641,7 @@ function buildAppForm<TValues extends object, TOutput>(
       // follow their rows. TanStack shifts its OWN field meta by its rules; where they
       // differ, the contract wins because errors/touched surface from the overlay and
       // client errors are recomputed by the op's change-revalidation.
+      overlay.markChanged(path);
       overlay.remapForArrayOperation(path, operation);
     });
     scheduleAutoSubmit();
@@ -675,6 +686,7 @@ function buildAppForm<TValues extends object, TOutput>(
       // Server messages clear on the next change to the field (contract JSDoc) — mirror the
       // in-field `setValue`; TanStack's 'change'-cause validation runs under `revalidateLogic`.
       overlay.clearServerErrorsAt(path);
+      overlay.markChanged(path);
       engine.setFieldValue(path as DeepKeys<TValues>, snapshotFormValues(value) as never);
       identity.replace(path);
       scheduleAutoSubmit();

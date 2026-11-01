@@ -18,6 +18,35 @@ export function includesValidationPath(path: string, fields?: ReadonlyArray<stri
   });
 }
 
+/** The per-form interaction marks that decide which field shows its client error. */
+export interface FieldMarks {
+  /** Blurred paths (and paths a scoped `validate({ fields })` touched). */
+  readonly touched: ReadonlySet<string>;
+  /** Paths a write reached — `setValue`, field assignment, array operations. */
+  readonly changed: ReadonlySet<string>;
+  readonly submitCount: number;
+}
+
+/**
+ * Per-field error display, shared by every adapter. Validation runs form-wide, so a client error can
+ * exist for a field the user has not reached; it displays only once that field was blurred, after a
+ * submit attempt, or — under `validateOn: 'change'`, where every write validates — once it changed.
+ * A path matches its own mark and its descendants' (a touched `rules` array touches its rows).
+ */
+export function resolveFieldDisplay(
+  path: string,
+  marks: FieldMarks,
+  validateOn: 'change' | 'blur' | 'submit' | undefined,
+): { readonly isTouched: boolean; readonly showsClientErrors: boolean } {
+  const isMarked = (set: ReadonlySet<string>): boolean => {
+    for (const mark of set) if (includesValidationPath(path, [mark])) return true;
+    return false;
+  };
+  // A submit attempt counts as touching everything.
+  const isTouched = marks.submitCount > 0 || isMarked(marks.touched);
+  return { isTouched, showsClientErrors: isTouched || (validateOn === 'change' && isMarked(marks.changed)) };
+}
+
 /** Runs a display-only gate and filters issues without bypassing whole-form submit parsing. */
 export async function validateFormScope<TValues extends object>(
   values: TValues,

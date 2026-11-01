@@ -18,13 +18,23 @@ A form inside a dialog starts each session with `useFormDialogSession(form, { op
 
 `handleSubmit(event)` captures the form event's current target before awaiting. A current failed manual attempt waits for Vue's DOM update, focuses the first enabled invalid control and otherwise focuses `[data-form-error-summary]` within that form. Give the summary `tabindex="-1"` and render the actual errors there. Imperative calls supply `focusRoot: () => formElement`; no document-wide lookup occurs. Disabled/hidden/inert controls are skipped. Reset, cancellation, invalidation and disposal suppress obsolete focus. Autosave and `validate` never move focus. The view owns one coordinated announcement surface (field descriptions plus a single summary live region); the engine does not create a competing announcer.
 
-Verification: `tests/unit/formsEngine/Submission.dom.test.ts` runs the same cases under both mounted Vue adapters; `FormsEngine.test.ts` covers path/mapping and basic state behavior.
+Verification: `tests/unit/formsEngine/Submission.dom.test.ts` and `ErrorDisplay.dom.test.ts` run the same cases under both mounted Vue adapters; `FormsEngine.test.ts` covers path/mapping and basic state behavior.
 
 Supported writes are `field.value`/`field.setValue`, `form.setValue`, array operations and `reset`. The `values` objects are read views; direct nested mutation is unsupported and does not notify the form. Plain objects, arrays and Date values detach at ingress and at each validation/submission boundary, so caller-held defaults or accidental direct writes cannot change a pending supported-value snapshot. Validation receives a separate copy from the saved-baseline snapshot. Editing trees must be acyclic.
 
 File/Blob, Temporal and custom class instances are opaque immutable leaves retained by identity. Replace them through a setter; mutable class internals require a plain editing model instead. The form neither JSON-serializes these leaves nor strips their prototypes. Dirty comparison uses identity for opaque leaves.
 
 Synchronous and asynchronous schema exceptions settle the form's boolean verdict as false with a safe validation fallback. Both validating/submitting state and the in-flight latch release, so retry can run. Expected schema issues and Standard Schema output retain their existing protocol.
+
+## Error display
+
+Validation is form-wide (cross-field rules keep working), but a field shows its client error only after it is touched, after a submit attempt, or — under `validateOn: 'change'` — after it changed. `field.errors` and the `Field` slot's `isInvalid` follow that per-field state, so blurring one field under `validateOn: 'blur'` never surfaces another field's pending error.
+
+- Touched: the field blurred (`field.onBlur`) or a scoped `validate({ fields })` selected it; a touched path covers its descendants. `isTouched` reports exactly this plus any submit attempt.
+- Changed: a write reached the path (`field.value`, `setValue`, array operations on its array). It displays only under `validateOn: 'change'`; `'blur'` and `'submit'` wait for blur or submit, so typing never shows an error mid-edit.
+- Submit attempts (`handleSubmit`, auto-submit, `validate()` without scope) show every error. `reset()` clears all marks.
+- Server errors (`setFieldErrors`, mapped submit failures) always display, whatever the marks, until the field changes.
+- `state.isValid` stays form-wide: hidden client errors still make it false. `validateOnMount` seeds `isValid` and surfaces no field error until interaction.
 
 ## Discriminated array rows
 
