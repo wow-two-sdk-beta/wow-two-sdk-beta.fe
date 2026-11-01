@@ -11,6 +11,10 @@ Public import: `import { ModalContent } from '@wow-two-beta/fe/presentation/over
 - `size` picks the max-width step (`ModalSize`, exported beside the component). The panel is centered and reaches
   that cap whatever its content length: `w-full` resolves against the window, never against the content.
 - The panel caps at the viewport (`100dvh - 2rem`) as a flex column: its `ModalBody` scrolls between a fixed header and footer, and a panel without a body scrolls whole.
+- `height` (`ModalHeight`, exported beside the component) is `auto` by default: the panel fits its content under that
+  cap. `fixed` holds the card at the height paired with `size` — `sm` 24rem · `md` 32rem · `lg` 40rem · `xl` 48rem ·
+  `full` the window, each capped at the window — so content that streams in or changes step scrolls the body and
+  never moves the frame. The panel carries `data-height`.
 - `phoneLayout` (`ModalPhoneLayout`, exported beside the component) applies below `sm`; from `sm` up every layout is the
   centred card.
   - `fullscreen` (default) fills the window with no corner radius. `ModalBody` takes the free height and scrolls, so the
@@ -39,6 +43,7 @@ Public import: `import { ModalContent } from '@wow-two-beta/fe/presentation/over
 | `hideBackdrop` | `boolean` | no | — | Deprecated — use `showBackdrop` (inverted); removed next release.   |
 | `isBlurred` | `boolean` | no | — | The backdrop-blur toggle. |
 | `size` | `ModalSize` | no | `md` | The max-width step: `sm` 24rem · `md` 32rem · `lg` 42rem · `xl` 56rem · `full` the window inside its gutter. A `max-w-*` class still overrides it. |
+| `height` | `ModalHeight` | no | `auto` | `auto` fits the content under the window cap; `fixed` holds the height paired with `size`: `sm` 24rem · `md` 32rem · `lg` 40rem · `xl` 48rem · `full` the window. |
 | `variant` | `SurfaceVariant` | no | — | The visual recipe. Default `elevated`. |
 | `tone` | `SurfaceTone` | no | — | The color tone the recipe is tinted with. |
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. Default `lg`. |
@@ -66,6 +71,8 @@ None declared.
 - Public render fixture: [OverlaysExamples.ts](../../../../apps/playground/src/gallery/fixtures/OverlaysExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Focused test references: [Overlays.contract.dom.test.ts](../../../../tests/unit/presentation/overlays/Overlays.contract.dom.test.ts),
   [ModalWidth.browser.test.ts](../../../../tests/unit/presentation/overlays/ModalWidth.browser.test.ts),
+  [ModalHeight.dom.test.ts](../../../../tests/unit/presentation/overlays/ModalHeight.dom.test.ts),
+  [ModalHeight.browser.test.ts](../../../../tests/unit/presentation/overlays/ModalHeight.browser.test.ts),
   [ModalPhoneLayout.dom.test.ts](../../../../tests/unit/presentation/overlays/ModalPhoneLayout.dom.test.ts),
   [ModalPhone.browser.test.ts](../../../../tests/unit/presentation/overlays/ModalPhone.browser.test.ts). Consult the named test assertions for the behavior actually covered.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

@@ -24,6 +24,19 @@ export const ModalSize = {
 
 export type ModalSize = (typeof ModalSize)[keyof typeof ModalSize];
 
+/** Defines how tall a `ModalContent` panel is; either way it never outgrows the window. */
+export const ModalHeight = {
+  /** Refers to a panel that fits its content — a confirm, an alert, a short prompt settled when it opens. */
+  Auto: 'auto',
+  /**
+   * Refers to a panel held at the height paired with its `size` step, whatever its content: a streamed progress, a
+   * list that loads, a multi-step flow. The body scrolls; the frame never moves.
+   */
+  Fixed: 'fixed',
+} as const;
+
+export type ModalHeight = (typeof ModalHeight)[keyof typeof ModalHeight];
+
 /** Defines how a `ModalContent` panel lays out below the `sm` breakpoint; from `sm` up it is the centred card. */
 export const ModalPhoneLayout = {
   /** Refers to a panel that fills the screen — header on top, a scrolling body, the footer pinned to the bottom. */
@@ -42,6 +55,15 @@ const ModalSizeClass: Record<ModalSize, string> = {
   lg: 'max-w-2xl',
   xl: 'max-w-4xl',
   full: 'max-w-none',
+};
+
+/* The fixed height paired with each width step, capped at the window like the panel itself. */
+const ModalFixedHeightClass: Record<ModalSize, string> = {
+  sm: 'h-[min(24rem,calc(100dvh-2rem))]',
+  md: 'h-[min(32rem,calc(100dvh-2rem))]',
+  lg: 'h-[min(40rem,calc(100dvh-2rem))]',
+  xl: 'h-[min(48rem,calc(100dvh-2rem))]',
+  full: 'h-[calc(100dvh-2rem)]',
 };
 
 /* The layer, frame and panel classes per phone layout. Each is prefixed `max-sm:`, so wider screens keep the card. */
@@ -112,6 +134,12 @@ export interface ModalContentProps {
   /** The panel's max-width step; a `max-w-*` class still overrides it. Default `md`. */
   readonly size?: ModalSize;
 
+  /**
+   * Whether the panel fits its content or holds the height paired with `size`: `sm` 24rem · `md` 32rem · `lg` 40rem ·
+   * `xl` 48rem · `full` the window. Either way it caps at the window and its body scrolls. Default `auto`.
+   */
+  readonly height?: ModalHeight;
+
   /** The visual recipe. Default `elevated`. */
   readonly variant?: SurfaceVariant;
 
@@ -154,6 +182,7 @@ defineSlots<{ default(): unknown }>();
 
 const props = withDefaults(defineProps<ModalContentProps>(), {
   size: 'md',
+  height: ModalHeight.Auto,
   showBackdrop: undefined,
   hideBackdrop: undefined,
   phoneLayout: ModalPhoneLayout.Fullscreen,
@@ -207,6 +236,8 @@ const classes = computed(() =>
     /* The panel never outgrows the window: it caps at the viewport and its body scrolls under a fixed header and
        footer. A panel without a body part scrolls whole. */
     'flex max-h-[calc(100dvh-2rem)] flex-col overflow-y-auto overscroll-contain',
+    /* A fixed panel keeps its height while its content streams in or changes step; the body takes the free height. */
+    props.height === ModalHeight.Fixed && ModalFixedHeightClass[props.size],
     PanelMotionClass[props.phoneLayout],
     surfaceVariants({
       variant: props.variant ?? 'elevated',
@@ -321,6 +352,7 @@ defineExpose({ el });
                 :aria-labelledby="context.titleId"
                 :aria-describedby="context.descriptionId"
                 :data-phone-layout="props.phoneLayout"
+                :data-height="props.height"
                 v-bind="rest"
                 :class="classes"
                 :style="dragStyle"
