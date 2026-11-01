@@ -86,7 +86,13 @@ export default defineConfig({
             provider: playwright(),
             instances: [
               { browser: 'chromium', name: 'chromium' },
-              { browser: 'firefox', name: 'firefox' },
+              /*
+               * One Firefox test file at a time. Playwright opens each parallel file in its own Firefox window, and
+               * the windows take OS focus from each other; a test whose window just lost it keeps
+               * `document.activeElement` but drops `:focus`, and Firefox skips a focused button's Enter activation
+               * (keydown and keypress still arrive, no click follows). Chromium and WebKit hold focus per page.
+               */
+              { browser: 'firefox', name: 'firefox', maxWorkers: 1 },
               { browser: 'webkit', name: 'webkit' },
               {
                 browser: 'chromium',

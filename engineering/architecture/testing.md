@@ -202,6 +202,7 @@ New findings from this wave:
 - vitest 4 quirk: bare `vi.fn()` not assignable to `Ref<T>` — use typed mocks.
 - **Enter animations start at `opacity:0`** — never assert `toBeVisible` right after `findByRole`; wrap in `waitFor`. Same for transform reads: assert computed `matrix()` inside `waitFor`.
 - **Native default actions don't fire from synthetic events** (range-slider arrows, number-input arrows, HTML5 drag) — cover the same code path via UI affordances or keyboard alternatives; report as gap otherwise.
+- **Firefox runs one browser test file at a time** (`maxWorkers: 1` on the `firefox` instance in `vitest.config.ts`). Playwright opens each parallel file in its own Firefox window, and the windows take OS focus from each other: a test whose window just lost it keeps `document.activeElement` but drops `:focus`, and a script-focused button gets keydown and keypress for Enter with no click. Parallel Firefox failed `ListDetailLayout`'s keyboard-open tests and the read-only focus-ring checks on CI (2026-10-21 to 2026-11-01); Chromium and WebKit hold focus per page.
 - **Storybook-instrumented `userEvent` refuses `pointer-events:none` targets** — assert `toBeDisabled` instead of clicking disabled controls.
 - In `.test.tsx` (browser project) import `userEvent` from `vitest/browser` (real CDP events; `@vitest/browser/context` is deprecated in 4.1). In stories, only `'storybook/test'`.
 

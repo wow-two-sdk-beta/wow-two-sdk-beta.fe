@@ -293,10 +293,11 @@ body {
 
 /* A programmatic focus target — what `focusTarget` (`foundation/dom`) marks with `data-focus-target`: a page's `main`
    after a route change, a heading, a region holding focus while its content swaps. It is not a control, so it draws
-   no focus ring, and a screen reader still lands on it. `@layer base` plus `:where()` leave a utility the app sets on
-   the element in charge. */
+   no focus ring, and a screen reader still lands on it. The selector outweighs preflight's Firefox ring in the same
+   layer, `:-moz-focusring:where(:not(iframe)) { outline: auto }`, which a zero-specificity `:where()` lost to;
+   `@layer base` still leaves a utility the app sets on the element in charge. */
 @layer base {
-  :where([data-focus-target]:focus) {
+  [data-focus-target]:focus {
     outline: none;
   }
 }
