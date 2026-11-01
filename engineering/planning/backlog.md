@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-11-01*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -94,6 +94,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 
 | Item | Type | Notes |
 |---|---|---|
+| Fix `useAppQuery` refetching a shared key with another view's argument | fix | Wheelhouse 2026-11-01: a getter-reading `queryFn` runs with the options of the observer that set them last, so a refetch read `targets//state` (404) once the deploy dialog's argument went null. Wheelhouse's `useEndpointQuery` (`bootstrap/query.ts`) binds the fetcher per key; move that into `useAppQuery` and drop the helper. `useServiceLogs`, `useProductBranches`, `useProductCommits`, `useDeploymentOutcome` and `useDeploySettings` share the shape |
 | Split bignumber.js off the `foundation/http` error path | engineering | Wheelhouse 2026-10-30: 89 kB stays in the console's first load because http error parsing reaches `ExactNumber` through the validator messages; a source change, since `0.0.36` already emits one file per module |
 | Fix `useDrag` and `usePinch` capturing on press | fix | ListingShelf: taps on controls inside never click |
 | Fix `@vue-ignore` props breaking `strictTemplates` | fix | ListingShelf, Haven (strict-template-friendly components) |
