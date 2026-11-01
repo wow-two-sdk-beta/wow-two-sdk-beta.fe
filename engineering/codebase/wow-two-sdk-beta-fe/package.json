@@ -258,6 +258,11 @@
       "import": "./dist/foundation/datetime/index.js",
       "default": "./dist/foundation/datetime/index.js"
     },
+    "./foundation/phone": {
+      "types": "./dist/foundation/phone/index.d.ts",
+      "import": "./dist/foundation/phone/index.js",
+      "default": "./dist/foundation/phone/index.js"
+    },
     "./foundation/validators": {
       "types": "./dist/foundation/validators/index.d.ts",
       "import": "./dist/foundation/validators/index.js",

@@ -105,7 +105,10 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
-const rootClass = computed(() => cn('flex flex-col gap-1.5', attrs.class as ClassValue));
+/* Spacing is the chrome's own margin, never a flex `gap`: a password manager (NordPass and others) inserts its icon
+   element beside a focused `<input>`, and a gap would open around that element and push the block — and a page
+   centred on it — by the gap's height. A zero-size or absolutely positioned insert now moves nothing. */
+const rootClass = computed(() => cn('flex flex-col', attrs.class as ClassValue));
 
 const root = useTemplateRef<HTMLDivElement>('root');
 
@@ -129,20 +132,20 @@ defineExpose({ el: root });
       :class="rootClass"
       v-bind="passthroughAttrs"
     >
-      <LabelText v-if="hasLabel">
+      <LabelText v-if="hasLabel" class="mb-1.5">
         <slot name="label">{{ label }}</slot>
       </LabelText>
 
       <slot />
 
-      <FieldErrorCallout v-if="showError" :message="hasOwnError ? error : undefined">
+      <FieldErrorCallout v-if="showError" class="mt-1.5" :message="hasOwnError ? error : undefined">
         <!-- Passed only when this Field owns the error: an always-present default slot
              would read as an override and suppress the context's own `errors`. -->
         <template v-if="hasOwnError && $slots.error" #default>
           <slot name="error" />
         </template>
       </FieldErrorCallout>
-      <FieldHelperText v-else-if="hasHelper">
+      <FieldHelperText v-else-if="hasHelper" class="mt-1.5">
         <slot name="helper">{{ helper }}</slot>
       </FieldHelperText>
     </div>

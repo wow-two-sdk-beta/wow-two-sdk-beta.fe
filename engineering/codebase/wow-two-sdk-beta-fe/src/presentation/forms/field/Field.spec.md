@@ -12,6 +12,10 @@ Public import: `import { Field } from '@wow-two-beta/fe/presentation/forms';`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - Skeleton mode keeps the label line, the control's height and radius and the helper lines; one flag here switches
   every part inside.
+- The label, error and helper carry their own 6px margins; the block has no flex `gap`. An element a password manager
+  inserts beside the focused input (an in-flow icon root of no size, or an absolutely positioned icon) therefore moves
+  nothing; one with an in-flow size of its own still would. Several nodes in the default slot space themselves.
+  Regression: `tests/unit/presentation/forms/FocusStability.browser.test.ts`.
 
 ## Props
 

@@ -69,6 +69,7 @@ export const ValidationCodes = [
   'uuid',
   'isoDate',
   'creditCard',
+  'phone',
   // escape hatches
   'custom',
   'transform',
@@ -260,6 +261,15 @@ export const defaultValidationMessages: ValidationMessageCatalogue = Object.free
   uuid: () => 'must be a valid UUID',
   isoDate: () => 'must be a valid ISO date (YYYY-MM-DD)',
   creditCard: () => 'must be a valid card number',
+  phone: (context) => {
+    const dial = operand(context.params, 'dial');
+    const length = operand(context.params, 'length');
+    if (dial !== null && length !== null) return `must have ${length} digits after ${dial}`;
+    const min = operand(context.params, 'min');
+    const max = operand(context.params, 'max');
+    if (dial !== null && min !== null && max !== null) return `must have ${min} to ${max} digits after ${dial}`;
+    return 'must be a valid phone number';
+  },
 
   custom: (context) => context.message,
   transform: (context) => context.message,

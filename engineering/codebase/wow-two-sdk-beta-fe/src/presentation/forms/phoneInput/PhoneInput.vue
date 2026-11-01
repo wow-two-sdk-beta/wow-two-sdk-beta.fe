@@ -1,71 +1,5 @@
 <script lang="ts">
 import type { NativeInputAttributes } from '../NativeControlAttributes';
-/** Represents one selectable dialling country. */
-export interface PhoneCountry {
-  iso: string;
-  name: string;
-  dial: string; // includes leading +
-  flag: string; // emoji
-}
-
-export const PhoneCountries: ReadonlyArray<PhoneCountry> = [
-  { iso: 'US', name: 'United States', dial: '+1', flag: '🇺🇸' },
-  { iso: 'CA', name: 'Canada', dial: '+1', flag: '🇨🇦' },
-  { iso: 'GB', name: 'United Kingdom', dial: '+44', flag: '🇬🇧' },
-  { iso: 'AU', name: 'Australia', dial: '+61', flag: '🇦🇺' },
-  { iso: 'DE', name: 'Germany', dial: '+49', flag: '🇩🇪' },
-  { iso: 'FR', name: 'France', dial: '+33', flag: '🇫🇷' },
-  { iso: 'ES', name: 'Spain', dial: '+34', flag: '🇪🇸' },
-  { iso: 'IT', name: 'Italy', dial: '+39', flag: '🇮🇹' },
-  { iso: 'NL', name: 'Netherlands', dial: '+31', flag: '🇳🇱' },
-  { iso: 'BE', name: 'Belgium', dial: '+32', flag: '🇧🇪' },
-  { iso: 'CH', name: 'Switzerland', dial: '+41', flag: '🇨🇭' },
-  { iso: 'AT', name: 'Austria', dial: '+43', flag: '🇦🇹' },
-  { iso: 'SE', name: 'Sweden', dial: '+46', flag: '🇸🇪' },
-  { iso: 'NO', name: 'Norway', dial: '+47', flag: '🇳🇴' },
-  { iso: 'DK', name: 'Denmark', dial: '+45', flag: '🇩🇰' },
-  { iso: 'FI', name: 'Finland', dial: '+358', flag: '🇫🇮' },
-  { iso: 'IE', name: 'Ireland', dial: '+353', flag: '🇮🇪' },
-  { iso: 'PT', name: 'Portugal', dial: '+351', flag: '🇵🇹' },
-  { iso: 'PL', name: 'Poland', dial: '+48', flag: '🇵🇱' },
-  { iso: 'CZ', name: 'Czechia', dial: '+420', flag: '🇨🇿' },
-  { iso: 'GR', name: 'Greece', dial: '+30', flag: '🇬🇷' },
-  { iso: 'TR', name: 'Türkiye', dial: '+90', flag: '🇹🇷' },
-  { iso: 'RU', name: 'Russia', dial: '+7', flag: '🇷🇺' },
-  { iso: 'UA', name: 'Ukraine', dial: '+380', flag: '🇺🇦' },
-  { iso: 'UZ', name: 'Uzbekistan', dial: '+998', flag: '🇺🇿' },
-  { iso: 'KZ', name: 'Kazakhstan', dial: '+7', flag: '🇰🇿' },
-  { iso: 'KG', name: 'Kyrgyzstan', dial: '+996', flag: '🇰🇬' },
-  { iso: 'TJ', name: 'Tajikistan', dial: '+992', flag: '🇹🇯' },
-  { iso: 'TM', name: 'Turkmenistan', dial: '+993', flag: '🇹🇲' },
-  { iso: 'IL', name: 'Israel', dial: '+972', flag: '🇮🇱' },
-  { iso: 'AE', name: 'UAE', dial: '+971', flag: '🇦🇪' },
-  { iso: 'SA', name: 'Saudi Arabia', dial: '+966', flag: '🇸🇦' },
-  { iso: 'EG', name: 'Egypt', dial: '+20', flag: '🇪🇬' },
-  { iso: 'ZA', name: 'South Africa', dial: '+27', flag: '🇿🇦' },
-  { iso: 'NG', name: 'Nigeria', dial: '+234', flag: '🇳🇬' },
-  { iso: 'KE', name: 'Kenya', dial: '+254', flag: '🇰🇪' },
-  { iso: 'IN', name: 'India', dial: '+91', flag: '🇮🇳' },
-  { iso: 'PK', name: 'Pakistan', dial: '+92', flag: '🇵🇰' },
-  { iso: 'BD', name: 'Bangladesh', dial: '+880', flag: '🇧🇩' },
-  { iso: 'SG', name: 'Singapore', dial: '+65', flag: '🇸🇬' },
-  { iso: 'MY', name: 'Malaysia', dial: '+60', flag: '🇲🇾' },
-  { iso: 'TH', name: 'Thailand', dial: '+66', flag: '🇹🇭' },
-  { iso: 'VN', name: 'Vietnam', dial: '+84', flag: '🇻🇳' },
-  { iso: 'PH', name: 'Philippines', dial: '+63', flag: '🇵🇭' },
-  { iso: 'ID', name: 'Indonesia', dial: '+62', flag: '🇮🇩' },
-  { iso: 'JP', name: 'Japan', dial: '+81', flag: '🇯🇵' },
-  { iso: 'KR', name: 'South Korea', dial: '+82', flag: '🇰🇷' },
-  { iso: 'CN', name: 'China', dial: '+86', flag: '🇨🇳' },
-  { iso: 'HK', name: 'Hong Kong', dial: '+852', flag: '🇭🇰' },
-  { iso: 'TW', name: 'Taiwan', dial: '+886', flag: '🇹🇼' },
-  { iso: 'NZ', name: 'New Zealand', dial: '+64', flag: '🇳🇿' },
-  { iso: 'BR', name: 'Brazil', dial: '+55', flag: '🇧🇷' },
-  { iso: 'AR', name: 'Argentina', dial: '+54', flag: '🇦🇷' },
-  { iso: 'CL', name: 'Chile', dial: '+56', flag: '🇨🇱' },
-  { iso: 'CO', name: 'Colombia', dial: '+57', flag: '🇨🇴' },
-  { iso: 'MX', name: 'Mexico', dial: '+52', flag: '🇲🇽' },
-];
 
 export interface PhoneInputProps extends /* @vue-ignore */ NativeInputAttributes {
   /** The E.164 value, controlled. The `v-model` binding target. */
@@ -89,54 +23,30 @@ export interface PhoneInputProps extends /* @vue-ignore */ NativeInputAttributes
   /** The invalid surface override. Falls back to the surrounding form control's `isInvalid`. */
   readonly isInvalid?: boolean;
 
-  /** The national-number placeholder. */
+  /** The national-number placeholder. Default the country's mask with zeros (`00-000-00-00`), none without a mask. */
   readonly placeholder?: string;
 
   /** The hidden input name; the hidden input emits the full E.164 value. */
   readonly name?: string;
 }
-
-/* A list with no known code reads as absent: a select with no options could not hold a value. */
-function resolveCountries(isos: ReadonlyArray<string> | undefined): ReadonlyArray<PhoneCountry> {
-  if (!isos) return PhoneCountries;
-  const known = [...new Set(isos)]
-    .map((iso) => PhoneCountries.find((c) => c.iso === iso))
-    .filter((c): c is PhoneCountry => c !== undefined);
-  return known.length > 0 ? known : PhoneCountries;
-}
-
-function splitE164(
-  value: string,
-  countries: ReadonlyArray<PhoneCountry>,
-  defaultIso: string,
-): { iso: string; national: string } {
-  if (!value) return { iso: defaultIso, national: '' };
-  // Match the longest dial code prefix; the stable sort leaves a shared code (+7) to the earlier country.
-  const sorted = [...countries].sort((a, b) => b.dial.length - a.dial.length);
-  for (const c of sorted) {
-    if (value.startsWith(c.dial)) {
-      return { iso: c.iso, national: value.slice(c.dial.length).replace(/\D/g, '') };
-    }
-  }
-  return { iso: defaultIso, national: value.replace(/\D/g, '') };
-}
 </script>
 
 <script setup lang="ts">
-import { useLocale } from '../../../foundation/i18n';
-import { useTemplateRef } from 'vue';
-import { useNativeFormReset } from '../UseNativeFormReset';
-import { computed, ref, useAttrs } from 'vue';
+import { computed, ref, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
-import { cn } from '../../../foundation/styles';
-import { useControlled } from '../../../foundation/state';
+import { useLocale } from '../../../foundation/i18n';
+import { PhoneFormats, PhoneNumberExtensions } from '../../../foundation/phone';
 import { useFormControl } from '../../../foundation/primitives';
+import { useControlled } from '../../../foundation/state';
+import { cn } from '../../../foundation/styles';
 import { inputBaseVariants, InputSize } from '../InputStyles';
+import { useNativeFormReset } from '../UseNativeFormReset';
 
 /**
  * Renders a country dial-code select beside a national-number field, emitting one E.164 string.
  *
- * First-generation country list; full `libphonenumber` validation and formatting stays deferred.
+ * The field takes digits only and shows them through the country's mask (`foundation/phone` `PhoneFormats`); the
+ * value never carries a mask character. Pair it with the `phone()` validator for the per-country digit count.
  */
 /* `inheritAttrs: false` so `class` folds into the root's own `cn()` call — plain fallthrough
    appends outside it and loses tailwind-merge conflict resolution. */
@@ -144,7 +54,7 @@ defineOptions({ name: 'PhoneInput', inheritAttrs: false });
 
 const props = withDefaults(defineProps<PhoneInputProps>(), {
   defaultCountry: 'US',
-  placeholder: '(555) 555-5555',
+  placeholder: undefined,
   /* Explicit `undefined` defaults: `useControlled` keys on `=== undefined`, and Vue casts an
      absent `boolean` prop to `false` — which would shadow the form control context. */
   modelValue: undefined,
@@ -178,7 +88,7 @@ const disabled = computed(() => props.isDisabled ?? ctx?.isDisabled);
 const readOnly = computed(() => props.isReadOnly ?? ctx?.isReadOnly);
 const invalid = computed(() => props.isInvalid ?? ctx?.isInvalid);
 
-const allowed = computed(() => resolveCountries(props.countries));
+const allowed = computed(() => PhoneNumberExtensions.resolveCountries(props.countries));
 /* The fallback must be selectable: a `defaultCountry` outside the list gives way to the first allowed country. */
 const fallbackIso = computed(
   () => allowed.value.find((c) => c.iso === props.defaultCountry)?.iso ?? allowed.value[0]!.iso,
@@ -194,15 +104,27 @@ const split = computed(() => {
   if (selected && (!e164.value || e164.value.startsWith(selected.dial))) {
     return {
       iso: selected.iso,
-      national: e164.value.slice(selected.dial.length).replace(/\D/g, ''),
+      national: PhoneNumberExtensions.digitsOf(e164.value.slice(selected.dial.length)),
     };
   }
-  return splitE164(e164.value, allowed.value, fallbackIso.value);
+  return PhoneNumberExtensions.split(e164.value, allowed.value, fallbackIso.value);
 });
 
 const iso = computed(() => split.value.iso);
 const national = computed(() => split.value.national);
 const country = computed(() => allowed.value.find((c) => c.iso === iso.value) ?? allowed.value[0]!);
+const format = computed(() => PhoneNumberExtensions.formatOf(country.value));
+/* A value under a dial code the field does not show (outside `countries`) displays its bare digits: the country's
+   mask would read them as a national number they are not. */
+const isForeign = computed(() => e164.value !== '' && !e164.value.startsWith(country.value.dial));
+const displayed = computed(() =>
+  isForeign.value ? national.value : PhoneNumberExtensions.formatNational(national.value, format.value),
+);
+const placeholderText = computed(() => {
+  if (props.placeholder !== undefined) return props.placeholder;
+  const mask = PhoneFormats[country.value.iso]?.mask;
+  return mask ? mask.replace(/X/g, '0') : undefined;
+});
 
 /* A dial code alone is not a phone number: with no national digits the value is empty, so a blank field submits
    nothing and fails `required` — the selected country survives in `selectedIso`. */
@@ -218,11 +140,88 @@ function setCountry(event: Event): void {
   if (nextValue !== e164.value) controlled.setValue(nextValue);
 }
 
-function setNational(event: Event): void {
-  const digits = (event.target as HTMLInputElement).value.replace(/\D/g, '');
+function setDigits(digits: string): void {
   /* Deriving the country before the write keeps a shared dial code (+1 US / CA) on the reader's pick. */
   selectedIso.value = country.value.iso;
-  controlled.setValue(e164For(country.value.dial, digits));
+  const nextValue = e164For(country.value.dial, digits);
+  if (nextValue !== e164.value) controlled.setValue(nextValue);
+}
+
+/* An international number replaces the whole field: an allowed dial prefix picks its country, any other keeps every
+   digit as a foreign value, where the `phone()` rule reports it. Returns the text the field shows for it — computed
+   here, since a controlled value reaches `displayed` only after the parent re-renders. */
+function setInternational(text: string): string {
+  const parsed = PhoneNumberExtensions.parseInternational(text, allowed.value, country.value.iso);
+  if (parsed.country) {
+    const max = PhoneNumberExtensions.lengthOf(parsed.country).max;
+    const digits = parsed.e164.slice(parsed.country.dial.length, parsed.country.dial.length + max);
+    selectedIso.value = parsed.country.iso;
+    const nextValue = e164For(parsed.country.dial, digits);
+    if (nextValue !== e164.value) controlled.setValue(nextValue);
+    return PhoneNumberExtensions.formatNational(digits, PhoneNumberExtensions.formatOf(parsed.country));
+  }
+
+  const nextValue = parsed.e164.length > 1 ? parsed.e164 : '';
+  if (nextValue !== e164.value) controlled.setValue(nextValue);
+  return nextValue.slice(1);
+}
+
+/* Replacement text (autofill, drop, an untyped `input`) may carry a full `+…` number; typed text never does. */
+const ReplacementInputTypes: ReadonlySet<string | undefined> = new Set([
+  undefined,
+  'insertReplacementText',
+  'insertFromDrop',
+  'insertFromPaste',
+]);
+
+/* The text is rewritten in place on every input: a rejected character changes no state, so Vue would leave it on
+   screen. The caret goes back after the digit it followed. */
+function setNational(event: Event): void {
+  const field = event.target as HTMLInputElement;
+  const inputEvent = event as InputEvent;
+  if (inputEvent.isComposing) return;
+
+  if (ReplacementInputTypes.has(inputEvent.inputType) && field.value.trimStart().startsWith('+')) {
+    field.value = setInternational(field.value);
+    placeCaret(field, field.value.length);
+    return;
+  }
+
+  const edit = PhoneNumberExtensions.editNational({
+    text: field.value,
+    caret: field.selectionStart ?? field.value.length,
+    previousDigits: national.value,
+    inputType: inputEvent.inputType,
+    format: format.value,
+  });
+  field.value = edit.text;
+  placeCaret(field, edit.caret);
+  setDigits(edit.digits);
+}
+
+/* A pasted `+…` number is international; digits that spell the selected country's dial code and a full national
+   number (`998996632582`) lose the dial code; any other paste inserts at the caret as digits. */
+function pasteNational(event: ClipboardEvent): void {
+  const text = event.clipboardData?.getData('text') ?? '';
+  const field = event.target as HTMLInputElement;
+  if (text.trimStart().startsWith('+')) {
+    event.preventDefault();
+    field.value = setInternational(text);
+    placeCaret(field, field.value.length);
+    return;
+  }
+
+  const digits = PhoneNumberExtensions.digitsOf(text);
+  const stripped = PhoneNumberExtensions.withoutDialCode(digits, country.value);
+  if (stripped === digits) return;
+  event.preventDefault();
+  setDigits(stripped);
+  field.value = PhoneNumberExtensions.formatNational(stripped, format.value);
+  placeCaret(field, field.value.length);
+}
+
+function placeCaret(field: HTMLInputElement, caret: number): void {
+  if (field.ownerDocument.activeElement === field) field.setSelectionRange(caret, caret);
 }
 
 const OwnedAttributes: ReadonlySet<string> = new Set(['class']);
@@ -289,8 +288,8 @@ const locale = useLocale();
       inputmode="tel"
       autocomplete="tel-national"
       :id="ctx?.id"
-      :value="national"
-      :placeholder="placeholder"
+      :value="displayed"
+      :placeholder="placeholderText"
       :disabled="disabled"
       :readonly="readOnly"
       :aria-invalid="invalid || undefined"
@@ -298,6 +297,7 @@ const locale = useLocale();
       :aria-required="ctx?.isRequired || undefined"
       :class="inputClass"
       @input="setNational"
+      @paste="pasteNational"
     />
     <input
       v-if="name"

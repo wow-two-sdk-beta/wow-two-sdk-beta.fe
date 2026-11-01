@@ -24,6 +24,16 @@ Composable Result-returning validation with independent Standard Schema input an
 - `.min(exact)`, `.max(exact)`, and `.integer()` retain the exact validator chain.
 - Comparisons and message operands never convert through native number.
 
+## Phone
+
+- `phone({ countries, isOptional, message })` accepts an E.164 string whose national digits match its country's
+  numbering plan in `foundation/phone`: the exact `PhoneFormats` length (`+998` takes 9), else 4 to 15 digits less
+  the dial code.
+- A wrong length fails with code `phone` and params `{ country, dial, length }` or `{ country, dial, min, max }`; the
+  default catalogue renders `must have 9 digits after +998`.
+- A value that is not `+` and digits, or whose dial code names none of `countries`, fails with code `phone` alone.
+- An empty string fails as `required` unless `isOptional`; the phone control emits `''` for a cleared field.
+
 ## Messages
 
 - Code aliases, parameter aliases, catalogues and labels use own-key lookups.
@@ -36,3 +46,4 @@ Composable Result-returning validation with independent Standard Schema input an
 `tests/unit/foundation/validators/BoundarySafety.test.ts` verifies prototype-named data,
 independent default results, callback counts, transformed input/output types and lossless HTTP diagnostics.
 `tests/unit/foundation/validators/ExactNumber.test.ts` verifies exact integer boundaries and decimal rejection.
+`tests/unit/foundation/validators/Phone.test.ts` verifies the phone lengths, codes, params and catalogue rendering.

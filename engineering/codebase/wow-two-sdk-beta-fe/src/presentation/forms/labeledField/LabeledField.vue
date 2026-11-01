@@ -51,7 +51,8 @@ const passthroughAttrs = computed(() =>
   Object.fromEntries(Object.entries(attrs).filter(([key]) => !OwnedAttributes.has(key))),
 );
 
-const rootClass = computed(() => cn('flex flex-col gap-1.5', attrs.class as ClassValue));
+/* Margin, not a flex `gap`, as in `Field`: an element a password manager inserts beside the input opens no gap. */
+const rootClass = computed(() => cn('flex flex-col', attrs.class as ClassValue));
 
 const root = useTemplateRef<HTMLDivElement>('root');
 
@@ -61,7 +62,7 @@ defineExpose({ el: root });
 
 <template>
   <div ref="root" :class="rootClass" v-bind="passthroughAttrs">
-    <div class="flex items-center justify-between">
+    <div class="mb-1.5 flex items-center justify-between">
       <LabelText :for="generatedId">
         <slot name="label">{{ label }}</slot>
       </LabelText>

@@ -18,8 +18,13 @@
 // - `isoDate()` accepts a calendar date (`YYYY-MM-DD`) ONLY, not a full ISO 8601 timestamp, and confirms
 //   the date exists by round-tripping it — `2025-02-30` matches the pattern but is not a day. Years are
 //   compared after the round trip, including the four-digit years below 0100.
+// - `phone()` checks an E.164 value (`+998996632582`) against its country's national digit count from
+//   `foundation/phone`: the exact length for a fixed-length plan, else the E.164 bound (4 to 15 digits less the dial
+//   code). It is a length check by numbering plan, not `libphonenumber`: it cannot tell an unassigned number.
 
-import { string, type StringValidator } from './Primitives';
+import { PhoneNumberExtensions } from '../phone';
+import { invalid } from './ValidationOutcome';
+import { string, StringValidator } from './Primitives';
 
 /** One `@`, no whitespace, and a dotted domain. See the header — pragmatic, not RFC 5322. */
 const EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -77,4 +82,61 @@ export function isoDate(message = 'must be a valid ISO date (YYYY-MM-DD)'): Stri
       message,
       'isoDate',
     );
+}
+
+/** Configures the {@link phone} rule. */
+export interface PhoneRuleOptions {
+  /** The ISO codes a number may come from — the phone control's `countries`. Every known country when omitted. */
+  readonly countries?: ReadonlyArray<string>;
+  /** Accepts the empty string a cleared phone control emits. Default `false`: an empty value fails as `required`. */
+  readonly isOptional?: boolean;
+  /** Replaces the message of a `phone` failure; the form's catalogue still renders the code first. */
+  readonly message?: string;
+}
+
+/**
+ * Accepts an E.164 phone value whose national number has its country's digit count — `+998` takes 9 digits. Fails
+ * with code `phone` and params `{ country, dial, length }` (a fixed-length plan) or `{ country, dial, min, max }`;
+ * a value that is not `+` and digits, or whose dial code names none of `countries`, fails with `phone` alone.
+ */
+export function phone(options: PhoneRuleOptions = {}): StringValidator {
+  const countries = PhoneNumberExtensions.resolveCountries(options.countries);
+  const text = string();
+
+  return new StringValidator('phone', (value, path) => {
+    const parsed = text.parseAt(value, path);
+    if (!parsed.ok) return parsed;
+
+    const number = parsed.value;
+    if (number === '') {
+      return options.isOptional ? parsed : invalid([{ path, message: 'is required', code: 'required' }]);
+    }
+
+    const country = PhoneNumberExtensions.E164Pattern.test(number)
+      ? PhoneNumberExtensions.countryOf(number, countries)
+      : null;
+    if (!country) {
+      return invalid([{ path, message: options.message ?? 'must be a valid phone number', code: 'phone' }]);
+    }
+
+    const digits = number.length - country.dial.length;
+    const { min, max } = PhoneNumberExtensions.lengthOf(country);
+    if (digits >= min && digits <= max) return parsed;
+
+    const fixed = min === max;
+    return invalid([
+      {
+        path,
+        message:
+          options.message ??
+          (fixed
+            ? `must have ${min} digits after ${country.dial}`
+            : `must have ${min} to ${max} digits after ${country.dial}`),
+        code: 'phone',
+        params: fixed
+          ? { country: country.iso, dial: country.dial, length: min }
+          : { country: country.iso, dial: country.dial, min, max },
+      },
+    ]);
+  });
 }

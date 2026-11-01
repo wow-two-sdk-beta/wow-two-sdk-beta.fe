@@ -1,6 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { mount, type VueWrapper } from '@vue/test-utils';
-import { h, nextTick } from 'vue';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { defineComponent, h, nextTick, type Component } from 'vue';
+import type { AppFieldApi, AppForm } from '@src/formsEngine';
+import { houseFormEngine } from '@src/formsEngine/adapters/house';
+import { object, phone } from '@src/foundation/validators';
 import { Field, PhoneInput } from '@src/presentation/forms';
 
 const wrappers: VueWrapper[] = [];
@@ -31,6 +34,42 @@ async function pickCountry(wrapper: VueWrapper, iso: string): Promise<void> {
 
 function hidden(wrapper: VueWrapper): string {
   return wrapper.get<HTMLInputElement>('input[type=hidden][name=phone]').element.value;
+}
+
+function nationalField(wrapper: VueWrapper): HTMLInputElement {
+  return wrapper.get<HTMLInputElement>('input[type=tel]').element;
+}
+
+/** Types at the caret one character at a time, as a keyboard does: the browser inserts, then fires `input`. */
+async function typeKeys(input: HTMLInputElement, text: string): Promise<void> {
+  input.focus();
+  for (const character of text) {
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? start;
+    input.value = input.value.slice(0, start) + character + input.value.slice(end);
+    input.setSelectionRange(start + 1, start + 1);
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: character }));
+    await nextTick();
+  }
+}
+
+/** Presses Backspace with a collapsed caret: the browser removes the character before it, then fires `input`. */
+async function backspace(input: HTMLInputElement): Promise<void> {
+  const caret = input.selectionStart!;
+  input.value = input.value.slice(0, caret - 1) + input.value.slice(caret);
+  input.setSelectionRange(caret - 1, caret - 1);
+  input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'deleteContentBackward' }));
+  await nextTick();
+}
+
+/** Fires `paste` with clipboard text; resolves whether the browser's own insertion may go ahead. */
+async function paste(input: HTMLInputElement, text: string): Promise<boolean> {
+  input.focus();
+  const event = new Event('paste', { bubbles: true, cancelable: true });
+  Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } });
+  const proceeds = input.dispatchEvent(event);
+  await nextTick();
+  return proceeds;
 }
 
 describe('PhoneInput', () => {
@@ -143,5 +182,127 @@ describe('PhoneInput', () => {
     );
     expect(input.disabled).toBe(true);
     expect(wrapper.get<HTMLSelectElement>('select').element.disabled).toBe(true);
+  });
+
+  it('takes digits only and stops at the national length', async () => {
+    const wrapper = mountPhone({ countries: ['UZ', 'KZ'] });
+    const input = nationalField(wrapper);
+    await typeKeys(input, '99663258234234sdfsdfsdf');
+    expect(input.value).toBe('99-663-25-82');
+    expect(hidden(wrapper)).toBe('+998996632582');
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['+998996632582']);
+  });
+
+  it('shows the national number through the country mask while the value stays E.164', async () => {
+    const wrapper = mountPhone({ defaultValue: '+998996632582' });
+    expect(nationalField(wrapper).value).toBe('99-663-25-82');
+    expect(nationalField(wrapper).placeholder).toBe('00-000-00-00');
+    expect(hidden(wrapper)).toBe('+998996632582');
+    await pickCountry(wrapper, 'US');
+    expect(nationalField(wrapper).placeholder).toBe('(000) 000-0000');
+    expect(nationalField(wrapper).value).toBe('(996) 632-582');
+    expect(hidden(wrapper)).toBe('+1996632582');
+    expect(mountPhone({ defaultCountry: 'DE' }).get<HTMLInputElement>('input[type=tel]').element.placeholder).toBe('');
+    expect(mountPhone({ placeholder: 'Number' }).get<HTMLInputElement>('input[type=tel]').element.placeholder).toBe(
+      'Number',
+    );
+  });
+
+  it('keeps the caret after its digit and steps Backspace over a separator', async () => {
+    const wrapper = mountPhone({ countries: ['UZ'] });
+    const input = nationalField(wrapper);
+    await typeKeys(input, '99663');
+    expect(input.value).toBe('99-663');
+    expect(input.selectionStart).toBe(6);
+
+    input.setSelectionRange(3, 3);
+    await backspace(input);
+    expect(input.value).toBe('96-63');
+    expect(input.selectionStart).toBe(1);
+    expect(hidden(wrapper)).toBe('+9989663');
+
+    await typeKeys(input, '9');
+    expect(input.value).toBe('99-663');
+    expect(input.selectionStart).toBe(2);
+  });
+
+  it('reads a pasted international number into its country', async () => {
+    const wrapper = mountPhone({ countries: ['KZ', 'UZ'] });
+    const input = nationalField(wrapper);
+    expect(await paste(input, ' +998 (99) 663-25-82')).toBe(false);
+    expect(wrapper.get<HTMLSelectElement>('select').element.value).toBe('UZ');
+    expect(input.value).toBe('99-663-25-82');
+    expect(hidden(wrapper)).toBe('+998996632582');
+  });
+
+  it('drops the dial code from the digits of a full number pasted without a plus', async () => {
+    const wrapper = mountPhone({ countries: ['UZ'] });
+    expect(await paste(nationalField(wrapper), '998 99 663 25 82')).toBe(false);
+    expect(nationalField(wrapper).value).toBe('99-663-25-82');
+    expect(hidden(wrapper)).toBe('+998996632582');
+  });
+
+  it('inserts any other paste at the caret as digits', async () => {
+    const wrapper = mountPhone({ countries: ['UZ'] });
+    const input = nationalField(wrapper);
+    expect(await paste(input, 'tel: 99 663')).toBe(true);
+    // The browser's own insertion, then its `input` event.
+    input.value = 'tel: 99 663';
+    input.setSelectionRange(11, 11);
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste' }));
+    await nextTick();
+    expect(input.value).toBe('99-663');
+    expect(hidden(wrapper)).toBe('+99899663');
+  });
+
+  it('keeps a pasted number from a country outside the list as its bare digits', async () => {
+    const wrapper = mountPhone({ countries: ['UZ'] });
+    expect(await paste(nationalField(wrapper), '+44 7911 123456')).toBe(false);
+    expect(hidden(wrapper)).toBe('+447911123456');
+    expect(nationalField(wrapper).value).toBe('447911123456');
+  });
+
+  it('blocks submit with the phone rule error under the field until the number is complete', async () => {
+    const onSubmit = vi.fn(async () => ({ ok: true as const, value: undefined }));
+    let form!: AppForm<{ phone: string }>;
+    const Host = defineComponent({
+      setup() {
+        form = houseFormEngine.useAppForm<{ phone: string }>({
+          defaultValues: { phone: '' },
+          schema: object({ phone: phone({ countries: ['UZ'] }) }),
+          onSubmit,
+        });
+        return () =>
+          h(
+            form.Field as unknown as Component,
+            { name: 'phone' },
+            {
+              default: (field: AppFieldApi<string>) =>
+                h(Field, { label: 'Phone' }, () =>
+                  h(PhoneInput, {
+                    modelValue: field.value,
+                    'onUpdate:modelValue': (next: string) => (field.value = next),
+                    countries: ['UZ'],
+                  }),
+                ),
+            },
+          );
+      },
+    });
+    const wrapper = mount(Host, { attachTo: document.body });
+    wrappers.push(wrapper);
+    const input = nationalField(wrapper);
+
+    await typeKeys(input, '234234');
+    expect(await form.handleSubmit()).toBe(false);
+    await flushPromises();
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(wrapper.get('[role=alert]').text()).toBe('must have 9 digits after +998');
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+
+    await typeKeys(input, '258');
+    expect(input.value).toBe('23-423-42-58');
+    expect(await form.handleSubmit()).toBe(true);
+    expect(onSubmit).toHaveBeenCalledWith({ phone: '+998234234258' }, expect.anything());
   });
 });

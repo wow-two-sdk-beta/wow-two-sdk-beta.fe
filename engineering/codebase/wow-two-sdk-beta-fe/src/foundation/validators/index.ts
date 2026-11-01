@@ -69,7 +69,7 @@ export {
   tuple,
 } from './Composites';
 
-export { email, url, uuid, isoDate } from './Formats';
+export { type PhoneRuleOptions, email, url, uuid, isoDate, phone } from './Formats';
 
 export { ValidationError, assertValid } from './ValidationError';
 
