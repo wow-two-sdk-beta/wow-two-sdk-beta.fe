@@ -10,6 +10,11 @@ export interface ApiAntiforgeryOptions {
   /** The request header the token is echoed in. Default `X-XSRF-TOKEN`. */
   readonly headerName?: string;
   /**
+   * Supplies the token directly instead of reading `cookieName` — for a backend that hands it out in a payload
+   * (a BFF session's `csrfToken`) rather than a readable cookie. Read per unsafe request; `null` sends no header.
+   */
+  readonly getToken?: () => string | null;
+  /**
    * A safe path whose response reissues the token. A write rejected for a stale token — one issued before a
    * sign-in or sign-out — reads it once, then retries with the fresh token. Omitted, a rejection is returned.
    */

@@ -25,6 +25,9 @@ invalidates `scope` — aborting in-flight requests and clearing a scoped query 
 location. The 401 that ended the session resolves cancelled. A 401 while signed out is swallowed; a 401 during
 an unsettled first resolve settles anonymous without an expiry. `feedbackQueryErrors` never toasts a 401.
 
+A strategy's background re-read (`AuthStrategyHost.revalidate`, see [BffStrategy.spec.md](BffStrategy.spec.md))
+that finds the server session gone expires a signed-in session through the same path, so the listeners run once.
+
 ```ts
 bridge.subscribeExpired(feedbackSessionExpiry()); // one neutral notice
 bridge.subscribeExpired(signInRedirect(router)); // /login?returnTo=…, restored by useReturnTo()

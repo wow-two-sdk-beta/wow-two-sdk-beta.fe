@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { AuthBridge, AuthBridgeOwner } from '../AuthBridge';
-import { AuthStatus, type AuthSession, type AuthStrategy } from '../AuthSession';
+import { AuthStatus, type AuthSession, type AuthStrategy, type AuthStrategyHost } from '../AuthSession';
 
 const AnonymousSession = { status: AuthStatus.Anonymous, user: null } as const;
 
@@ -72,6 +72,10 @@ let generation = 0;
 let controller: AbortController | null = null;
 let inflight: Promise<Result<TUser | null, AppError>> | null = null;
 let disposed = false;
+let mounted = false;
+// Sign-ins and sign-outs in flight: a background revalidation yields to them instead of cancelling them.
+let actions = 0;
+const hostListeners = new Set<(session: AuthSession<TUser>) => void>();
 
 function invalidate(): number {
   generation += 1;
@@ -119,19 +123,61 @@ watch(
   (current) => {
     bridgeOwner?.publishSession(current);
     props.onSessionChange?.(current);
+    // A strategy's observer must not break the session it watches.
+    for (const listener of [...hostListeners]) {
+      try {
+        listener(current);
+      } catch {
+        /* The strategy owns its listener's failures. */
+      }
+    }
   },
   { immediate: true, flush: 'sync' },
 );
 
-function runResolve(): Promise<Result<TUser | null, AppError>> {
+/** Ends a signed-in session the server no longer holds — one expiry through the bridge, else a plain flip. */
+function endSession(): void {
+  const bridge = props.bridge;
+  if (bridge) {
+    bridge.expire(AppErrorFactory.unauthorized());
+    return;
+  }
+  invalidate();
+  try {
+    props.strategy.onUnauthorized?.();
+  } finally {
+    session.value = AnonymousSession;
+  }
+}
+
+function runResolve(silent = false): Promise<Result<TUser | null, AppError>> {
   if (inflight) return inflight;
+  if (silent && actions > 0) return Promise.resolve(cancelled());
   const { current, signal } = begin();
   const strategy = props.strategy;
-  session.value = { status: AuthStatus.Resolving, user: null };
+  const before = session.value;
+  // A settled session stays as it is while a background check runs; only a first or explicit resolve shows `resolving`.
+  const quiet = silent && (before.status === AuthStatus.Authenticated || before.status === AuthStatus.Anonymous);
+  if (!quiet) session.value = { status: AuthStatus.Resolving, user: null };
   const promise = (async (): Promise<Result<TUser | null, AppError>> => {
     try {
       const outcome = await awaitRequest(() => strategy.resolveUser({ signal }), signal);
       if (!owns(current)) return cancelled();
+      if (quiet) {
+        if (outcome.ok && outcome.value !== null) {
+          session.value = { status: AuthStatus.Authenticated, user: outcome.value };
+        } else if (outcome.ok && before.status === AuthStatus.Authenticated) {
+          try {
+            endSession();
+          } catch (error) {
+            props.onResolveError?.(error);
+          }
+        } else if (!outcome.ok && outcome.failure.type !== 'cancelled') {
+          // A failed check is not proof the session ended: keep it and report.
+          props.onResolveError?.(outcome.failure);
+        }
+        return outcome;
+      }
       session.value =
         outcome.ok && outcome.value !== null
           ? { status: AuthStatus.Authenticated, user: outcome.value }
@@ -140,7 +186,8 @@ function runResolve(): Promise<Result<TUser | null, AppError>> {
       return outcome;
     } catch (error) {
       if (signal.aborted) return cancelled();
-      if (owns(current)) session.value = AnonymousSession;
+      // A background check that throws is a bug to surface, not proof the session ended.
+      if (owns(current) && !quiet) session.value = AnonymousSession;
       throw error;
     }
   })().finally(() => {
@@ -152,7 +199,28 @@ function runResolve(): Promise<Result<TUser | null, AppError>> {
 async function resolveInitialSession(): Promise<void> {
   if (props.canResolveOnMount ?? props.resolveOnMount ?? true) await runResolve();
 }
-onMounted(resolveInitialSession);
+const host: AuthStrategyHost<TUser> = {
+  getSession: () => session.value,
+  subscribe: (listener) => {
+    hostListeners.add(listener);
+    return () => {
+      hostListeners.delete(listener);
+    };
+  },
+  revalidate: () => runResolve(true),
+};
+let disconnect: (() => void) | undefined;
+function connectStrategy(): void {
+  const previous = disconnect;
+  disconnect = undefined;
+  previous?.();
+  if (mounted && !disposed) disconnect = props.strategy.connect?.(host);
+}
+onMounted(() => {
+  mounted = true;
+  connectStrategy();
+  return resolveInitialSession();
+});
 watch(
   () => props.canResolveOnMount ?? props.resolveOnMount ?? true,
   (enabled) => {
@@ -164,6 +232,7 @@ watch(
   () => {
     invalidate();
     session.value = { status: AuthStatus.Unknown, user: null };
+    connectStrategy();
     return resolveInitialSession();
   },
   { flush: 'sync' },
@@ -171,6 +240,9 @@ watch(
 onScopeDispose(() => {
   disposed = true;
   invalidate();
+  disconnect?.();
+  disconnect = undefined;
+  hostListeners.clear();
 });
 
 async function signIn(input?: TSignInInput): Promise<Result<TUser | null, AppError>> {
@@ -179,11 +251,14 @@ async function signIn(input?: TSignInInput): Promise<Result<TUser | null, AppErr
   const { current, signal } = begin();
   if (session.value.status === AuthStatus.Resolving) session.value = AnonymousSession;
   let outcome: Result<TUser | null | void, AppError>;
+  actions += 1;
   try {
     outcome = await awaitRequest(() => strategy.signIn!(input as TSignInInput, { signal }), signal);
   } catch (error) {
     if (signal.aborted) return cancelled();
     throw error;
+  } finally {
+    actions -= 1;
   }
   if (!owns(current)) return cancelled();
   if (!outcome.ok) return outcome;
@@ -194,6 +269,7 @@ async function signIn(input?: TSignInInput): Promise<Result<TUser | null, AppErr
 async function signOut(): Promise<Result<void, AppError>> {
   const strategy = props.strategy;
   const { current, signal } = begin();
+  actions += 1;
   session.value = AnonymousSession;
   try {
     return (await awaitRequest(() => strategy.signOut?.({ signal }), signal)) ?? ResultExtensions.ok(undefined);
@@ -201,6 +277,7 @@ async function signOut(): Promise<Result<void, AppError>> {
     if (signal.aborted) return cancelled();
     throw error;
   } finally {
+    actions -= 1;
     if (owns(current)) session.value = AnonymousSession;
   }
 }
@@ -228,7 +305,7 @@ const api: AuthApi<TUser, TSignInInput> = {
   },
   signIn,
   signOut,
-  refresh: runResolve,
+  refresh: () => runResolve(),
   setUser,
 };
 

@@ -25,6 +25,23 @@ describe('antiforgery echo', () => {
     expect(header(fetch, 1, 'X-XSRF-TOKEN')).toBeNull();
   });
 
+  it('echoes a supplied token under its own header instead of reading the cookie', async () => {
+    vi.stubGlobal('document', { cookie: 'XSRF-TOKEN=from-cookie' });
+    let token: string | null = 'from-session';
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => json({ data: 1 }));
+    const client = createApiClient({ fetch, antiforgery: { headerName: 'X-Csrf-Token', getToken: () => token } });
+
+    await client.post('/api/codes', { body: {} });
+    await client.get('/api/codes');
+    token = null;
+    await client.delete('/api/codes/1');
+
+    expect(header(fetch, 0, 'X-Csrf-Token')).toBe('from-session');
+    expect(header(fetch, 0, 'X-XSRF-TOKEN')).toBeNull();
+    expect(header(fetch, 1, 'X-Csrf-Token')).toBeNull();
+    expect(header(fetch, 2, 'X-Csrf-Token')).toBeNull();
+  });
+
   it('refreshes a stale token once through the refresh path and retries the write', async () => {
     const document = { cookie: 'XSRF-TOKEN=before-sign-in' };
     vi.stubGlobal('document', document);

@@ -6,9 +6,11 @@
 // `bridge.isAuthenticated` to the router's `requireAuth(...)` guard so protected routes await the
 // resolve before redirecting. A signed-in session's first 401 (or `bridge.expire()`) expires it once:
 // anonymous, scope invalidated, then `bridge.subscribeExpired` listeners route to sign-in.
-// Strategies cover the three evidenced product shapes: cookie
+// Strategies cover the four evidenced product shapes: cookie
 // me-resolve (wheelhouse, smart-qr incl. guest/`isAnonymous`), in-memory bearer (secrets-vault —
-// `getAuthToken` feeds `createApiClient`), and external OAuth redirect (wheelhouse sign-in). This
+// `getAuthToken` feeds `createApiClient`), external OAuth redirect (wheelhouse sign-in), and a BFF session
+// (`createBffStrategy`: session read, CSRF through `createApiClient({ antiforgery })`, sign-in/out through the
+// BFF routes, cross-tab sync and a refresh before `expiresAt`; see `BffStrategy.spec.md`). This
 // subpath carries NO peer dependency (plain Vue + `foundation/http` types) and NO UI — gates,
 // splash screens, and login pages stay app-side.
 //
@@ -21,7 +23,13 @@
 //     `/router` in v0.2. The bridge itself is framework-free and wired today.
 
 // Session model + provider
-export { AuthStatus, type AuthSession, type AuthResolveContext, type AuthStrategy } from './AuthSession';
+export {
+  AuthStatus,
+  type AuthSession,
+  type AuthResolveContext,
+  type AuthStrategy,
+  type AuthStrategyHost,
+} from './AuthSession';
 export { default as AuthProvider, type AuthProviderProps } from './providers/AuthProvider.vue';
 export { useAuth, type AuthApi } from './providers/AuthContext';
 
@@ -57,3 +65,16 @@ export {
 } from './BearerStrategy';
 export { createRedirectStrategy, type CreateRedirectStrategyOptions } from './RedirectStrategy';
 export { createMemoryTokenStorage, type TokenStorage } from './TokenStorage';
+export { createBffStrategy, type BffStrategy, type CreateBffStrategyOptions } from './BffStrategy';
+export {
+  BffSessionExtensions,
+  decodeBffSession,
+  decodeBffLogout,
+  type BffUser,
+  type BffPerson,
+  type BffOrganization,
+  type BffSessionSnapshot,
+  type BffLogout,
+} from './BffSession';
+export { BffSyncKind, type BffSyncMessage, type BffSyncOptions, type BffRefreshOptions } from './BffSessionSync';
+export { useBffAuth, type BffAuthApi } from './UseBffAuth';

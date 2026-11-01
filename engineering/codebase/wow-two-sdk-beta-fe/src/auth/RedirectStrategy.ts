@@ -1,6 +1,7 @@
 import { AppErrorFactory, ResultExtensions, type AppError, type Result } from '../foundation/results';
 import type { AuthStrategy } from './AuthSession';
 import { createCookieStrategy, type CreateCookieStrategyOptions } from './CookieStrategy';
+import { ReturnUrlExtensions } from './ReturnUrlExtensions';
 
 /** Defines the options for {@link createRedirectStrategy}. */
 export interface CreateRedirectStrategyOptions<TUser> extends Omit<
@@ -18,18 +19,6 @@ export interface CreateRedirectStrategyOptions<TUser> extends Omit<
 
   /** Navigates. Default `window.location.assign` — inject to drive the strategy without a DOM in tests. */
   readonly navigate?: (url: string) => void;
-}
-
-/**
- * Reads the current location as the default return path.
- *
- * SSR-safe: `createRedirectStrategy` is built at module scope in an app, so this module is imported
- * on the server. There is no location there, so a bare `/` stands in rather than letting
- * `window.location` throw a bare `ReferenceError`.
- */
-function currentPath(): string {
-  if (typeof window === 'undefined') return '/';
-  return window.location.pathname + window.location.search;
 }
 
 /**
@@ -77,13 +66,8 @@ export function createRedirectStrategy<TUser>(
 
     // Returns void on purpose: the session state stays as-is while the browser navigates away.
     signIn(returnUrl?: string): Result<void, AppError> {
-      const target = returnUrl ?? currentPath();
-      if (
-        !buildSignInUrl &&
-        (!target.startsWith('/') ||
-          target.startsWith('//') ||
-          [...target].some((character) => character === '\\' || character.charCodeAt(0) < 32))
-      ) {
+      const target = returnUrl ?? ReturnUrlExtensions.current();
+      if (!buildSignInUrl && !ReturnUrlExtensions.isLocal(target)) {
         return ResultExtensions.fail(AppErrorFactory.validation());
       }
       if (!navigate && typeof window === 'undefined') return ResultExtensions.fail(AppErrorFactory.unavailable());

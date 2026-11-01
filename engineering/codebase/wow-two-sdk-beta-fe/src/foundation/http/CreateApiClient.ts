@@ -176,7 +176,9 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
     if (defaultHeaders) new Headers(defaultHeaders).forEach((value, key) => headers.set(key, value));
     if (token != null) headers.set('Authorization', `Bearer ${token}`);
     if (antiforgery && AntiforgeryExtensions.isUnsafe(init.method)) {
-      const xsrf = AntiforgeryExtensions.readToken(antiforgery.cookieName ?? AntiforgeryDefaults.cookieName);
+      const xsrf = antiforgery.getToken
+        ? antiforgery.getToken()
+        : AntiforgeryExtensions.readToken(antiforgery.cookieName ?? AntiforgeryDefaults.cookieName);
       if (xsrf != null) headers.set(antiforgery.headerName ?? AntiforgeryDefaults.headerName, xsrf);
     }
     if (init.headers) new Headers(init.headers).forEach((value, key) => headers.set(key, value));
