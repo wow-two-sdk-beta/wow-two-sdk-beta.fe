@@ -4,7 +4,7 @@ Source: [BffStrategy.ts](BffStrategy.ts), [BffSession.ts](BffSession.ts), [BffSe
 [UseBffAuth.ts](UseBffAuth.ts).
 
 For an SPA served on the same origin as its BFF. The BFF owns the session cookie; the SPA never holds a token.
-Routes (default prefix `/auth`, option `prefix`): `GET /session`, `GET /login?returnUrl=`, `POST /logout`.
+Routes (default prefix `/api/identity`, option `prefix`): `GET /session`, `GET /sign-in?returnUrl=`, `POST /sign-out`.
 
 ## Wiring
 
@@ -16,15 +16,15 @@ const http = createApiClient({
   onUnauthorized: bridge.onUnauthorized,
   antiforgery: bff.antiforgery, // X-Csrf-Token on POST/PUT/PATCH/DELETE
 });
-bridge.subscribeExpired(bff.redirectToLogin); // a 401 → /auth/login?returnUrl=<page>
+bridge.subscribeExpired(bff.redirectToSignIn); // a 401 → /api/identity/sign-in?returnUrl=<page>
 bridge.subscribeExpired(feedbackSessionExpiry(bus)); // optional neutral notice
 
 // <AuthProvider :strategy="bff" :bridge="bridge"> … </AuthProvider>
 const auth = useBffAuth(); // person · organization · role · permissions · hasPermission(p) · signIn · signOut
 ```
 
-`auth.signIn(returnUrl?)` navigates to `/auth/login?returnUrl=…`; a path that is not local (`//host`, `\`, absolute
-URL, control character) fails as `validation`. `redirectToLogin` falls back to `/` for the same input.
+`auth.signIn(returnUrl?)` navigates to `/api/identity/sign-in?returnUrl=…`; a path that is not local (`//host`, `\`, absolute
+URL, control character) fails as `validation`. `redirectToSignIn` falls back to `/` for the same input.
 
 ## Session
 
@@ -38,12 +38,12 @@ session keeps the caches, an organization or person switch drops them.
 
 `bff.antiforgery` is `{ headerName: 'X-Csrf-Token', getToken }`: `ApiAntiforgeryOptions.getToken` supplies the token
 in place of the cookie read. It is read per unsafe request, so a rotated token applies at once and a signed-out client
-sends no header. The strategy's own client (for `/auth/*`) uses the same option and carries no request scope, so a
-sign-out cannot cancel its own `POST /logout`.
+sends no header. The strategy's own client (for `/api/identity/*`) uses the same option and carries no request scope, so a
+sign-out cannot cancel its own `POST /sign-out`.
 
 ## Sign-out
 
-`POST /logout` with the token, then `navigate(endSessionUrl)`. The URL must be a local path or an absolute `http(s)`
+`POST /sign-out` with the token, then `navigate(endSessionUrl)`. The URL must be a local path or an absolute `http(s)`
 URL; anything else is a `protocol` failure and no navigation. The provider has already flipped to anonymous. A 401
 counts as already signed out. A server failure is returned and the token is dropped.
 
@@ -54,7 +54,7 @@ counts as already signed out. A server failure is returned and the token is drop
 tab that hears one re-reads `GET /session` silently.
 
 - Sign-in: any change to a signed-in identity announces `signed-in`, a fresh load that lands signed in included.
-- Sign-out: announced after `POST /logout` answered, and on a bridged 401 — never before, or a peer could read the
+- Sign-out: announced after `POST /sign-out` answered, and on a bridged 401 — never before, or a peer could read the
   session before it ended.
 - A tab applying a hint never announces, so tabs cannot echo. A hint during this tab's own sign-in or sign-out is
   dropped.

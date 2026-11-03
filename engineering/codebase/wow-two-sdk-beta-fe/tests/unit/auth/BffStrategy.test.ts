@@ -4,7 +4,7 @@ import {
   BffSessionExtensions,
   createAuthBridge,
   createBffStrategy,
-  decodeBffLogout,
+  decodeBffSignOut,
   decodeBffSession,
   type BffUser,
 } from '@src/auth';
@@ -49,7 +49,7 @@ describe('BFF session read', () => {
     expect(BffSessionExtensions.hasPermission(signedIn, 'reports.read')).toBe(true);
     expect(BffSessionExtensions.hasPermission(signedIn, 'reports.write')).toBe(false);
     expect(BffSessionExtensions.hasPermission(null, 'reports.read')).toBe(false);
-    expect(server.calls).toEqual([{ method: 'GET', path: '/auth/session', csrf: null }]);
+    expect(server.calls).toEqual([{ method: 'GET', path: '/api/identity/session', csrf: null }]);
   });
 
   it('resolves a signed-out answer to no user and no token', async () => {
@@ -161,7 +161,7 @@ describe('CSRF through the HTTP layer', () => {
     await http.put('/api/reports/1', { body: {} });
     await http.delete('/api/reports/1');
 
-    const api = server.calls.filter((call) => call.path.startsWith('/api'));
+    const api = server.calls.filter((call) => call.path.startsWith('/api/') && !call.path.startsWith('/api/identity/'));
     expect(api.map((call) => [call.method, call.csrf])).toEqual([
       ['POST', 'csrf-1'],
       ['GET', null],
@@ -201,7 +201,7 @@ describe('401 sends the person to sign-in', () => {
       getIdentity: BffSessionExtensions.identity,
       getReturnUrl: () => '/servers?env=prod',
     });
-    bridge.subscribeExpired(bff.redirectToLogin);
+    bridge.subscribeExpired(bff.redirectToSignIn);
     bridge.subscribeUnauthorized(() => bff.onUnauthorized?.());
     const http = createApiClient({
       fetch: server.fetch,
@@ -212,7 +212,7 @@ describe('401 sends the person to sign-in', () => {
     return { server, bff, bridge, http, navigate };
   }
 
-  it('navigates once to /auth/login with the page as returnUrl across parallel 401s', async () => {
+  it('navigates once to /api/identity/sign-in with the page as returnUrl across parallel 401s', async () => {
     const { server, bff, bridge, http, navigate } = signedInApp();
     server.signIn();
     bridge.publishSession({ status: AuthStatus.Authenticated, user: await user(bff) });
@@ -222,7 +222,7 @@ describe('401 sends the person to sign-in', () => {
 
     expect(outcomes.every((outcome) => !outcome.ok && outcome.failure.code === 'cancelled')).toBe(true);
     expect(navigate).toHaveBeenCalledOnce();
-    expect(navigate).toHaveBeenCalledWith('/auth/login?returnUrl=%2Fservers%3Fenv%3Dprod');
+    expect(navigate).toHaveBeenCalledWith('/api/identity/sign-in?returnUrl=%2Fservers%3Fenv%3Dprod');
     expect(bridge.getSession().status).toBe(AuthStatus.Anonymous);
     expect(bff.getCsrfToken()).toBeNull();
   });
@@ -237,14 +237,14 @@ describe('401 sends the person to sign-in', () => {
   it('falls back to / for a return path that is not local', () => {
     const { bff, navigate } = setup();
     for (const returnUrl of ['https://evil.test', '//evil.test', '/\\evil.test', '/a\nb']) {
-      bff.redirectToLogin({ returnUrl });
+      bff.redirectToSignIn({ returnUrl });
     }
-    expect(navigate.mock.calls.map(([url]) => url)).toEqual(Array(4).fill('/auth/login?returnUrl=%2F'));
+    expect(navigate.mock.calls.map(([url]) => url)).toEqual(Array(4).fill('/api/identity/sign-in?returnUrl=%2F'));
   });
 
   it('honours a prefix and a base URL', () => {
     const { bff } = setup({ prefix: '/identity/', baseUrl: 'https://bff.test' });
-    expect(bff.loginUrl('/a?b=1')).toBe('https://bff.test/identity/login?returnUrl=%2Fa%3Fb%3D1');
+    expect(bff.signInUrl('/a?b=1')).toBe('https://bff.test/identity/sign-in?returnUrl=%2Fa%3Fb%3D1');
   });
 });
 
@@ -252,13 +252,13 @@ describe('sign-in', () => {
   it('navigates to the BFF login with the given local path', async () => {
     const { bff, navigate } = setup();
     expect(await bff.signIn!('/account?x=1', {})).toEqual(R.ok(undefined));
-    expect(navigate).toHaveBeenCalledWith('/auth/login?returnUrl=%2Faccount%3Fx%3D1');
+    expect(navigate).toHaveBeenCalledWith('/api/identity/sign-in?returnUrl=%2Faccount%3Fx%3D1');
   });
 
   it('reads / as the current page without a browser and rejects remote or malformed paths', async () => {
     const { bff, navigate } = setup();
     expect(await bff.signIn!(undefined, {})).toEqual(R.ok(undefined));
-    expect(navigate).toHaveBeenCalledWith('/auth/login?returnUrl=%2F');
+    expect(navigate).toHaveBeenCalledWith('/api/identity/sign-in?returnUrl=%2F');
     navigate.mockClear();
 
     for (const target of ['https://other.test', '//other.test', '/\\other.test', '/a\n']) {
@@ -281,7 +281,7 @@ describe('sign-out', () => {
 
     expect(await bff.signOut!({})).toEqual(R.ok(undefined));
 
-    expect(server.calls.at(-1)).toEqual({ method: 'POST', path: '/auth/logout', csrf: 'csrf-1' });
+    expect(server.calls.at(-1)).toEqual({ method: 'POST', path: '/api/identity/sign-out', csrf: 'csrf-1' });
     expect(server.current()).toBeNull();
     expect(navigate).toHaveBeenCalledOnce();
     expect(navigate).toHaveBeenCalledWith(EndSessionUrl);
@@ -312,7 +312,7 @@ describe('sign-out', () => {
     const { server, bff, navigate } = setup();
     server.signIn();
     await bff.resolveUser({});
-    server.failWith((path) => (path === '/auth/logout' ? new Response(null, { status: 500 }) : null));
+    server.failWith((path) => (path === '/api/identity/sign-out' ? new Response(null, { status: 500 }) : null));
 
     expect(await bff.signOut!({})).toMatchObject({ ok: false, failure: { status: 500 } });
     expect(navigate).not.toHaveBeenCalled();
@@ -331,17 +331,17 @@ describe('sign-out', () => {
 
   it('refuses an end-session URL the page may not navigate to', async () => {
     for (const endSessionUrl of ['javascript:alert(1)', 'data:text/html,x', '//evil.test', '', 7, undefined]) {
-      expect(decodeBffLogout({ endSessionUrl })).toMatchObject({ ok: false, failure: { code: 'protocol' } });
+      expect(decodeBffSignOut({ endSessionUrl })).toMatchObject({ ok: false, failure: { code: 'protocol' } });
     }
     for (const endSessionUrl of ['https://idp.test/end?x=1', 'http://localhost:5000/end', '/signed-out']) {
-      expect(decodeBffLogout({ endSessionUrl })).toEqual(R.ok({ endSessionUrl }));
+      expect(decodeBffSignOut({ endSessionUrl })).toEqual(R.ok({ endSessionUrl }));
     }
 
     const { server, bff, navigate } = setup();
     server.signIn();
     await bff.resolveUser({});
     server.failWith((path) =>
-      path === '/auth/logout' ? Response.json({ data: { endSessionUrl: 'javascript:x' } }) : null,
+      path === '/api/identity/sign-out' ? Response.json({ data: { endSessionUrl: 'javascript:x' } }) : null,
     );
     expect(await bff.signOut!({})).toMatchObject({ ok: false, failure: { code: 'protocol' } });
     expect(navigate).not.toHaveBeenCalled();

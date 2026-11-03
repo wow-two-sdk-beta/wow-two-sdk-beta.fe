@@ -26,7 +26,7 @@ import { createFakeBff, EndSessionUrl, type FakeBff } from '../../support/FakeBf
 
 const Minute = 60_000;
 const ReturnUrl = '/servers?env=prod';
-const LoginUrl = '/auth/login?returnUrl=%2Fservers%3Fenv%3Dprod';
+const SignInUrl = '/api/identity/sign-in?returnUrl=%2Fservers%3Fenv%3Dprod';
 
 interface Tab {
   readonly api: BffAuthApi;
@@ -64,7 +64,7 @@ async function openTab(
     getIdentity: BffSessionExtensions.identity,
     getReturnUrl: () => ReturnUrl,
   });
-  bridge.subscribeExpired(bff.redirectToLogin);
+  bridge.subscribeExpired(bff.redirectToSignIn);
   const invalidated = vi.fn();
   bridge.scope.subscribe(invalidated);
   const http = createApiClient({
@@ -148,7 +148,7 @@ describe('BFF app session', () => {
 
     expect(outcomes.every((outcome) => !outcome.ok && outcome.failure.code === 'cancelled')).toBe(true);
     expect(tab.navigate).toHaveBeenCalledOnce();
-    expect(tab.navigate).toHaveBeenCalledWith(LoginUrl);
+    expect(tab.navigate).toHaveBeenCalledWith(SignInUrl);
     expect(tab.api.status).toBe(AuthStatus.Anonymous);
     expect(tab.bff.getCsrfToken()).toBeNull();
   });
@@ -160,7 +160,7 @@ describe('BFF app session', () => {
 
     expect(await tab.api.signOut()).toEqual(R.ok(undefined));
 
-    expect(server.calls.at(-1)).toEqual({ method: 'POST', path: '/auth/logout', csrf: 'csrf-1' });
+    expect(server.calls.at(-1)).toEqual({ method: 'POST', path: '/api/identity/sign-out', csrf: 'csrf-1' });
     expect(tab.navigate).toHaveBeenCalledOnce();
     expect(tab.navigate).toHaveBeenCalledWith(EndSessionUrl);
     expect(tab.api.status).toBe(AuthStatus.Anonymous);
@@ -169,7 +169,7 @@ describe('BFF app session', () => {
   it('signs in by navigating to the BFF login with the given path', async () => {
     const tab = await openTab(createFakeBff());
     await tab.api.signIn('/reports');
-    expect(tab.navigate).toHaveBeenCalledWith('/auth/login?returnUrl=%2Freports');
+    expect(tab.navigate).toHaveBeenCalledWith('/api/identity/sign-in?returnUrl=%2Freports');
     expect(tab.api.status).toBe(AuthStatus.Anonymous);
   });
 });
@@ -185,7 +185,7 @@ describe('background refresh', () => {
 
     await vi.advanceTimersByTimeAsync(9 * Minute);
 
-    expect(server.count('GET', '/auth/session')).toBe(2);
+    expect(server.count('GET', '/api/identity/session')).toBe(2);
     expect(tab.statuses).toEqual([
       AuthStatus.Unknown,
       AuthStatus.Resolving,
@@ -205,7 +205,7 @@ describe('background refresh', () => {
     await vi.advanceTimersByTimeAsync(5 * 24 * 60 * Minute);
 
     // The read on mount, the pre-expiry refresh and the check at expiry.
-    expect(server.count('GET', '/auth/session')).toBe(3);
+    expect(server.count('GET', '/api/identity/session')).toBe(3);
   });
 
   it('refreshes a stale session on focus without a resolving flash', async () => {
@@ -235,7 +235,7 @@ describe('background refresh', () => {
 
     expect(tab.api.status).toBe(AuthStatus.Anonymous);
     expect(tab.navigate).toHaveBeenCalledOnce();
-    expect(tab.navigate).toHaveBeenCalledWith(LoginUrl);
+    expect(tab.navigate).toHaveBeenCalledWith(SignInUrl);
     expect(tab.invalidated).toHaveBeenCalledOnce();
     expect(tab.statuses.filter((status) => status === AuthStatus.Resolving)).toHaveLength(1);
 
@@ -315,12 +315,12 @@ describe('tabs', () => {
 
     expect(b.api.status).toBe(AuthStatus.Anonymous);
     expect(b.navigate).toHaveBeenCalledOnce();
-    expect(b.navigate).toHaveBeenCalledWith(LoginUrl);
+    expect(b.navigate).toHaveBeenCalledWith(SignInUrl);
     expect(a.navigate).toHaveBeenCalledOnce();
     expect(a.navigate).toHaveBeenCalledWith(EndSessionUrl);
     expect(server.calls.slice(before).map((call) => `${call.method} ${call.path}`)).toEqual([
-      'POST /auth/logout',
-      'GET /auth/session',
+      'POST /api/identity/sign-out',
+      'GET /api/identity/session',
     ]);
   });
 
@@ -340,9 +340,9 @@ describe('tabs', () => {
     expect(b.api.isAuthenticated).toBe(true);
     expect(a.invalidated).toHaveBeenCalledOnce();
     // Three reads on mount, then one hint-driven read in each of the other two tabs — nothing echoes back.
-    expect(server.count('GET', '/auth/session')).toBe(5);
+    expect(server.count('GET', '/api/identity/session')).toBe(5);
     await vi.advanceTimersByTimeAsync(5 * Minute);
-    expect(server.count('GET', '/auth/session')).toBe(5);
+    expect(server.count('GET', '/api/identity/session')).toBe(5);
   });
 
   it('tells the other tabs when one tab discovers the session ended', async () => {
@@ -376,10 +376,10 @@ describe('lifetime', () => {
 
     expect(hub.openCount).toBe(0);
     expect(vi.getTimerCount()).toBe(0);
-    const reads = server.count('GET', '/auth/session');
+    const reads = server.count('GET', '/api/identity/session');
     focus();
     await vi.advanceTimersByTimeAsync(60 * Minute);
-    expect(server.count('GET', '/auth/session')).toBe(reads);
+    expect(server.count('GET', '/api/identity/session')).toBe(reads);
   });
 
   it('moves to a replacement strategy: the old one disconnects, the new one connects', async () => {

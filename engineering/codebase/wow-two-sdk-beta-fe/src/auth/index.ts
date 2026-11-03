@@ -69,12 +69,12 @@ export { createBffStrategy, type BffStrategy, type CreateBffStrategyOptions } fr
 export {
   BffSessionExtensions,
   decodeBffSession,
-  decodeBffLogout,
+  decodeBffSignOut,
   type BffUser,
   type BffPerson,
   type BffOrganization,
   type BffSessionSnapshot,
-  type BffLogout,
+  type BffSignOut,
 } from './BffSession';
 export { BffSyncKind, type BffSyncMessage, type BffSyncOptions, type BffRefreshOptions } from './BffSessionSync';
 export { useBffAuth, type BffAuthApi } from './UseBffAuth';

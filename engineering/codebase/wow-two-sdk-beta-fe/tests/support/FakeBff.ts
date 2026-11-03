@@ -20,10 +20,10 @@ export interface FakeBffSession {
 export const EndSessionUrl = 'https://idp.test/connect/endsession';
 
 /**
- * A BFF behind a mocked `fetch`: one server-side session, the `/auth/*` routes of the Identity `Client` package,
- * and `/api/*` answering 401 when signed out and 403 for an unsafe request without the session's CSRF token.
+ * A mocked BFF with one server-side session and the Identity `Client` package's `/api/identity/*` routes.
+ * Other `/api/*` calls answer 401 when signed out and 403 for an unsafe request without the session's CSRF token.
  */
-export function createFakeBff(prefix = '/auth') {
+export function createFakeBff(prefix = '/api/identity') {
   let issued = 0;
   let session: FakeBffSession | null = null;
   let fail: ((path: string) => Response | null) | null = null;
@@ -67,7 +67,7 @@ export function createFakeBff(prefix = '/auth') {
     }
     if (session === null) return new Response(null, { status: 401 });
     if (request.method !== 'GET' && csrf !== session.csrfToken) return json({ title: 'Forbidden' }, 403);
-    if (url.pathname === `${prefix}/logout`) {
+    if (url.pathname === `${prefix}/sign-out`) {
       session = null;
       return json({ data: { endSessionUrl: EndSessionUrl } });
     }

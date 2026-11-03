@@ -75,8 +75,8 @@ const isHint = (message: unknown): message is BffSyncMessage =>
  * Connects a BFF strategy to its provider for the life of a mounted app:
  *
  * - Tab sync: a sign-in here tells the other tabs, a sign-out or expiry here tells them, and a tab that hears a hint
- *   re-reads `GET /auth/session`. The hint carries no identity, and a tab applying one never announces, so two tabs
- *   cannot ping-pong.
+ *   re-reads `GET /api/identity/session`. The hint carries no identity; a tab applying one never announces,
+ *   so two tabs cannot ping-pong.
  * - Refresh: one timer per `expiresAt` fires at most twice (`lead`, then `expiry`) and never again for the same
  *   value, so a server that does not extend its session cannot make it loop; a new `expiresAt` earns a new pair, and
  *   `minIntervalMs` floors the pace. A failed refresh retries with doubling delay and stops after `maxRetries`.

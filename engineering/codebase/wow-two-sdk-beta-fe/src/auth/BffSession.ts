@@ -37,8 +37,8 @@ export interface BffSessionSnapshot {
   readonly csrfToken: string | null;
 }
 
-/** Defines one decoded `POST {prefix}/logout` response. */
-export interface BffLogout {
+/** Defines one decoded `POST {prefix}/sign-out` response. */
+export interface BffSignOut {
   /** Where the page navigates to end the identity provider's session. */
   readonly endSessionUrl: string;
 }
@@ -97,7 +97,7 @@ function isNavigable(url: string): boolean {
 }
 
 /** Decodes the logout response; an end-session URL the page may not navigate to is a `protocol` failure. */
-export function decodeBffLogout(value: unknown): Result<BffLogout, ApiFailure> {
+export function decodeBffSignOut(value: unknown): Result<BffSignOut, ApiFailure> {
   if (!isRecord(value) || !isText(value['endSessionUrl']) || !isNavigable(value['endSessionUrl'])) {
     return ResultExtensions.fail(protocol());
   }
