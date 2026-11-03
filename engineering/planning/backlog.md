@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-03*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -113,6 +113,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Ability to render backend `AppError` codes and field errors | feature | backend SDK: parse `code` and `errors[]`, map per field, error boundary, label map |
 | Ability to compose date and time inputs and constrained inputs | feature | ForeverPin: colour input over a pattern |
 | Ability to display enum values with shared helpers | feature | ForeverPin |
+| Ability to group the app switcher's apps by category, with recents and icon-first tiles | feature | Ocharo 2026-11-03: `AppSwitcherMenu` draws one flat list of wide tiles with descriptions. Wanted, launcher-style: a recents block on top (the last ~3 apps opened, kept per browser), then the apps under category headings so later apps land in that structure; each tile an icon above its name, no description; public sites stay below. `AppSwitcherItem` gains a category, and Ocharo's `OcharoApps:*` config names each app's |
 | Ability to split the emoji catalog and virtualize its grid | feature | ForeverPin |
 | Ability to pin-enter digits quickly | feature | Haven |
 | Ability to connect a realtime hub client | feature | Haven |
