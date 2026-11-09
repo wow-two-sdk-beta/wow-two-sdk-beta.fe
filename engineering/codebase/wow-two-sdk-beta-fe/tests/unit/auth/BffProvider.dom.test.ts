@@ -118,7 +118,12 @@ describe('BFF app session', () => {
 
     expect(tab.statuses).toEqual([AuthStatus.Unknown, AuthStatus.Resolving, AuthStatus.Authenticated]);
     expect(tab.api.isAuthenticated).toBe(true);
-    expect(tab.api.person).toMatchObject({ sub: 'alice', name: 'Alice', email: 'alice@app.test' });
+    expect(tab.api.person).toMatchObject({
+      sub: 'alice',
+      name: 'Alice',
+      picture: 'https://cdn.app.test/alice.png',
+      email: 'alice@app.test',
+    });
     expect(tab.api.organization).toEqual({ id: 'org-1', role: 'owner' });
     expect(tab.api.role).toBe('owner');
     expect(tab.api.permissions).toEqual(['reports.read']);

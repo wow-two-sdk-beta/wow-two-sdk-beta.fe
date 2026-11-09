@@ -28,11 +28,14 @@ URL, control character) fails as `validation`. `redirectToSignIn` falls back to 
 
 ## Session
 
-`GET /session` decodes to `BffUser { person, organization | null, permissions, expiresAt | null }`. The CSRF token is
-not part of the user: the strategy keeps it and clears it on sign-out, expiry and a signed-out read. A payload that
-breaks the contract (no `person.sub`, no `csrfToken`, a non-text permission) is a `protocol` failure, which settles
-anonymous and reaches `onResolveError`. `getIdentity` keys the session by person and organization: a refreshed
-session keeps the caches, an organization or person switch drops them.
+`GET /session` decodes to `BffUser { person, organization | null, permissions, expiresAt | null }`, with `person { sub,
+name, picture, email, phoneNumber }`; each but `sub` is `null` when absent. `picture` is the ID token's link, trimmed;
+blank or non-text reads as `null` rather than failing the session. Bind it to `AccountMenu`'s `avatarSrc` as is: the
+avatar shows initials while it is `null` or fails to load. The CSRF token is not part of the user: the strategy keeps it
+and clears it on sign-out, expiry and a signed-out read. A payload that breaks the contract (no `person.sub`, no
+`csrfToken`, a non-text permission) is a `protocol` failure, which settles anonymous and reaches `onResolveError`.
+`getIdentity` keys the session by person and organization: a refreshed session keeps the caches, an organization or
+person switch drops them.
 
 ## CSRF
 

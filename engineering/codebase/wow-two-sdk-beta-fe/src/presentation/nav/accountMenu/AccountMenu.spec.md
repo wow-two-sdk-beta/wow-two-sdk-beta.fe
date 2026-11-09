@@ -9,9 +9,11 @@ Public import: `import { AccountMenu } from '@wow-two-beta/fe/presentation/nav';
 
 ## Contract
 
-- The trigger is one button: an `Avatar` with the name's initials (or `avatarSrc`), else a person glyph, and a chevron
-  that turns while the menu is open. Both are decorative; the button's name is `triggerLabel` (`{name}` filled), else
-  `anonymousTriggerLabel` when `name` is empty. It carries `aria-haspopup="menu"`, `aria-expanded` and `data-state`.
+- The trigger is one button: an `Avatar` and a chevron that turns while the menu is open. The avatar shows
+  `avatarSrc` when it is set, else the name's initials, else a person glyph; a picture that fails to load falls back
+  the same way. `avatarSrc` takes `null` as no picture, so a BFF session's `person.picture` binds as is. Both are
+  decorative; the button's name is `triggerLabel` (`{name}` filled), else `anonymousTriggerLabel` when `name` is
+  empty. It carries `aria-haspopup="menu"`, `aria-expanded` and `data-state`.
 - `isDisabled` and `isBusy` disable the trigger and close an open menu. `isBusy` also sets `aria-busy`, `data-busy`
   and pulses the avatar.
 - The menu is a `DropdownMenu` placed `bottom-end` by default, named by `menuLabel` and described by the identity
@@ -54,7 +56,7 @@ Public import: `import { AccountMenu } from '@wow-two-beta/fe/presentation/nav';
 |---|---|---|---|---|
 | `name` | `string` | no | — | The signed-in person's display name. |
 | `description` | `string` | no | — | The header's second line — the email or the role. |
-| `avatarSrc` | `string` | no | — | The avatar image; initials show without it. |
+| `avatarSrc` | `string \| null` | no | — | The avatar image; initials, else the glyph, show without it. |
 | `open` | `boolean` | no | — | The open state, controlled. The `v-model:open` binding target. |
 | `defaultOpen` | `boolean` | no | `false` | The initial open state when uncontrolled. |
 | `placement` | `Placement` | no | `bottom-end` | The Floating UI placement. |

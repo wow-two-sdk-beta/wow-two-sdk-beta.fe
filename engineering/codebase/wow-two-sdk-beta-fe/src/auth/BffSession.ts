@@ -6,6 +6,11 @@ export interface BffPerson {
   /** The stable subject id — the identity key, never the display name. */
   readonly sub: string;
   readonly name: string | null;
+  /**
+   * The link to the person's picture (the ID token's `picture`); `null` without one or without the `profile` scope.
+   * Bind it to `AccountMenu`'s `avatarSrc` as is — the avatar shows initials while it is `null` or fails to load.
+   */
+  readonly picture: string | null;
   readonly email: string | null;
   readonly phoneNumber: string | null;
 }
@@ -48,6 +53,9 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isText = (value: unknown): value is string => typeof value === 'string' && value !== '';
 /** Reads an optional text field; anything but text reads as absent. */
 const optionalText = (value: unknown): string | null => (typeof value === 'string' ? value : null);
+/** Reads an optional link; anything but non-blank text reads as absent, since an empty link names no resource. */
+const optionalLink = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
 const protocol = (): ApiFailure => ApiFailureFactory.create('protocol');
 
 /** Decodes the session response; a payload that breaks the contract is a `protocol` failure. */
@@ -73,6 +81,7 @@ export function decodeBffSession(value: unknown): Result<BffSessionSnapshot, Api
       person: {
         sub: person['sub'],
         name: optionalText(person['name']),
+        picture: optionalLink(person['picture']),
         email: optionalText(person['email']),
         phoneNumber: optionalText(person['phoneNumber']),
       },

@@ -44,8 +44,11 @@ export interface AccountMenuProps {
   /** The header's second line — the email or the role. */
   readonly description?: string;
 
-  /** The avatar image. Without it, or when it fails, the avatar shows the name's initials. */
-  readonly avatarSrc?: string;
+  /**
+   * The avatar image — a BFF session's `person.picture` binds as is. Without it (`null` included), or when it fails,
+   * the avatar shows the name's initials, or the person glyph without a name.
+   */
+  readonly avatarSrc?: string | null;
 
   /** The open state, controlled. The `v-model:open` binding target. */
   readonly open?: boolean;
@@ -252,6 +255,12 @@ watch(isBlocked, (blocked) => {
 
 const hasName = computed(() => (props.name ?? '').trim() !== '');
 
+/** The picture to show, or `undefined` for none — the avatar then falls back to initials or the glyph. */
+const pictureSrc = computed(() => {
+  const src = (props.avatarSrc ?? '').trim();
+  return src === '' ? undefined : src;
+});
+
 const triggerName = computed(() => {
   if (!hasName.value) return props.anonymousTriggerLabel;
   const name = (props.name ?? '').trim();
@@ -377,14 +386,17 @@ defineExpose({ el });
         :class="triggerClasses"
       >
         <Avatar
-          v-if="hasName"
-          :name="props.name"
-          :src="props.avatarSrc"
+          v-if="hasName || pictureSrc"
+          :name="hasName ? props.name : undefined"
+          :src="pictureSrc"
           alt=""
           size="sm"
           :is-loading="props.isBusy"
           data-account-menu-avatar
-        />
+        >
+          <!-- A picture without a name that fails to load falls back to the glyph, not to empty initials. -->
+          <template v-if="!hasName" #fallback><Icon :icon="UserRound" :size="18" /></template>
+        </Avatar>
         <span
           v-else
           aria-hidden="true"

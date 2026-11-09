@@ -145,6 +145,68 @@ describe('AccountMenu trigger', () => {
     expect(avatar.querySelector('svg')).not.toBeNull();
   });
 
+  it('shows the session picture, and the initials once it fails or turns null', async () => {
+    const picture = ref<string | null>('https://cdn.app.test/jane.png');
+    track(
+      mount(
+        defineComponent({
+          render: () =>
+            h(ColorModeProvider, { storageKey: null }, () =>
+              h(AccountMenu, { name: 'Jane Doe', avatarSrc: picture.value }),
+            ),
+        }),
+        { attachTo: document.body },
+      ),
+    );
+    await settle();
+    const avatar = (): HTMLElement => trigger().querySelector<HTMLElement>('[data-account-menu-avatar]')!;
+    expect(avatar().querySelector('img')?.getAttribute('src')).toBe('https://cdn.app.test/jane.png');
+    expect(avatar().getAttribute('aria-hidden')).toBe('true');
+
+    avatar().querySelector('img')!.dispatchEvent(new Event('error'));
+    await settle();
+    expect(avatar().querySelector('img')).toBeNull();
+    expect(avatar().textContent?.trim()).toBe('JD');
+
+    // A new picture earns a fresh load; a signed-in person who removes theirs reads as `null`.
+    picture.value = 'https://cdn.app.test/jane-2.png';
+    await settle();
+    expect(avatar().querySelector('img')?.getAttribute('src')).toBe('https://cdn.app.test/jane-2.png');
+
+    picture.value = null;
+    await settle();
+    expect(avatar().querySelector('img')).toBeNull();
+    expect(avatar().textContent?.trim()).toBe('JD');
+  });
+
+  it('shows a picture without a name, and the person glyph once it fails', async () => {
+    menu({ avatarSrc: 'https://cdn.app.test/jane.png' });
+    await settle();
+    const avatar = (): HTMLElement => trigger().querySelector<HTMLElement>('[data-account-menu-avatar]')!;
+    expect(trigger().getAttribute('aria-label')).toBe('Account menu');
+    expect(avatar().querySelector('img')?.getAttribute('src')).toBe('https://cdn.app.test/jane.png');
+
+    avatar().querySelector('img')!.dispatchEvent(new Event('error'));
+    await settle();
+    expect(avatar().querySelector('img')).toBeNull();
+    expect(avatar().querySelector('svg')).not.toBeNull();
+    expect(avatar().getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('reads a null or blank picture as none', async () => {
+    const named = menu({ name: 'Jane Doe', avatarSrc: null });
+    await settle();
+    expect(trigger().querySelector('img')).toBeNull();
+    expect(trigger().querySelector('[data-account-menu-avatar]')?.textContent?.trim()).toBe('JD');
+
+    named.unmount();
+    wrappers.splice(wrappers.indexOf(named), 1);
+    menu({ avatarSrc: '  ' });
+    await settle();
+    expect(trigger().querySelector('img')).toBeNull();
+    expect(trigger().querySelector('[data-account-menu-avatar] svg')).not.toBeNull();
+  });
+
   it('lands caller attributes and classes on the trigger', async () => {
     menu({ name: 'Jane Doe', class: 'ms-2', 'data-testid': 'account' });
     await settle();

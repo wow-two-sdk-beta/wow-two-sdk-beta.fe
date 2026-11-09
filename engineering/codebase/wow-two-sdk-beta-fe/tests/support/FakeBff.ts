@@ -10,6 +10,8 @@ export interface FakeBffCall {
 
 export interface FakeBffSession {
   readonly sub: string;
+  /** The person's picture link, or `null` for a person without one. */
+  readonly picture: string | null;
   readonly organizationId: string | null;
   readonly role: string;
   readonly permissions: readonly string[];
@@ -35,6 +37,7 @@ export function createFakeBff(prefix = '/api/identity') {
     issued += 1;
     return {
       sub: 'alice',
+      picture: 'https://cdn.app.test/alice.png',
       organizationId: 'org-1',
       role: 'admin',
       permissions: ['reports.read', 'reports.write'],
@@ -57,7 +60,13 @@ export function createFakeBff(prefix = '/api/identity') {
       return json({
         data: {
           isAuthenticated: true,
-          person: { sub: session.sub, name: 'Alice', email: 'alice@app.test', phoneNumber: '+998901234567' },
+          person: {
+            sub: session.sub,
+            name: 'Alice',
+            picture: session.picture,
+            email: 'alice@app.test',
+            phoneNumber: '+998901234567',
+          },
           organization: session.organizationId === null ? null : { id: session.organizationId, role: session.role },
           permissions: session.permissions,
           csrfToken: session.csrfToken,

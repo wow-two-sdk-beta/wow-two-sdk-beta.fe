@@ -40,6 +40,7 @@ describe('BFF session read', () => {
     expect(signedIn.person).toEqual({
       sub: 'alice',
       name: 'Alice',
+      picture: 'https://cdn.app.test/alice.png',
       email: 'alice@app.test',
       phoneNumber: '+998901234567',
     });
@@ -62,6 +63,26 @@ describe('BFF session read', () => {
 
     expect(await bff.resolveUser({})).toEqual(R.ok(null));
     expect(bff.getCsrfToken()).toBeNull();
+  });
+
+  it('carries the person picture, and reads a person without one as null', async () => {
+    const { server, bff } = setup();
+    server.signIn({ picture: null });
+    expect((await user(bff)).person.picture).toBeNull();
+
+    server.signIn({ picture: 'https://cdn.app.test/alice-2.png' });
+    expect((await user(bff)).person.picture).toBe('https://cdn.app.test/alice-2.png');
+  });
+
+  it('reads an absent, blank or non-text picture as none instead of failing the session', () => {
+    const session = { isAuthenticated: true, csrfToken: 'token' };
+    for (const picture of [undefined, null, '', '   ', 42, { url: 'x' }]) {
+      const decoded = decodeBffSession({ ...session, person: { sub: 'alice', picture } });
+      expect(decoded).toMatchObject({ ok: true, value: { user: { person: { picture: null } } } });
+    }
+    expect(
+      decodeBffSession({ ...session, person: { sub: 'alice', picture: ' https://cdn.app.test/a.png ' } }),
+    ).toMatchObject({ ok: true, value: { user: { person: { picture: 'https://cdn.app.test/a.png' } } } });
   });
 
   it('reads a person acting in no organization', async () => {
@@ -111,7 +132,7 @@ describe('BFF session read', () => {
     });
     expect(decoded).toMatchObject({
       ok: true,
-      value: { user: { permissions: [], expiresAt: null, person: { name: null, email: null } } },
+      value: { user: { permissions: [], expiresAt: null, person: { name: null, picture: null, email: null } } },
     });
     expect(decoded.ok && Object.isFrozen(decoded.value.user?.permissions)).toBe(true);
   });
