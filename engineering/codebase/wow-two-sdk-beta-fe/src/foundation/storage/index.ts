@@ -1,12 +1,18 @@
 // storage — foundation seam. The generic, domain-agnostic client-side persistence contract
-// (`StorageBroker`) plus its two implementations: `localStorageStorageBroker` (production, SSR-safe) and
-// `memoryStorageBroker` (isolated in-memory double). The persistence hooks in this capability
+// (`StorageBroker`) plus its three implementations: `localStorageStorageBroker` (production, SSR-safe),
+// `sessionStorageStorageBroker` (the same over the tab-scoped `sessionStorage`) and `memoryStorageBroker` (isolated
+// in-memory double). The persistence hooks in this capability
 // (`usePersistentState`, `useRecentItems`) read and write through this seam. v2 adds two composables over any
 // broker: `namespacedBroker` (key prefixing / isolation) and `createVersionedStore` (schema-versioned values
 // with an on-read migration chain). `createPersistentRef` is the app-wide counterpart of `usePersistentState`: one
 // decoded ref, created at module scope and shared by every reader.
 
-export { type StorageBroker, localStorageStorageBroker, memoryStorageBroker } from './StorageBroker';
+export {
+  type StorageBroker,
+  localStorageStorageBroker,
+  memoryStorageBroker,
+  sessionStorageStorageBroker,
+} from './StorageBroker';
 
 export { namespacedBroker } from './NamespacedBroker';
 

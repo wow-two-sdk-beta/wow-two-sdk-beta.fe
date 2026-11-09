@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   createVersionedStore,
   localStorageStorageBroker,
   memoryStorageBroker,
   namespacedBroker,
+  sessionStorageStorageBroker,
 } from '@src/foundation/storage';
 
 /*
@@ -54,6 +55,90 @@ describe('localStorageStorageBroker', () => {
     expect(localStorageStorageBroker.write('k', 1)).toBe(false);
     expect(localStorageStorageBroker.read('k')).toBeNull();
     expect(localStorageStorageBroker.remove('k')).toBe(false);
+  });
+});
+
+/** A `Storage` over a `Map`; `failWrites` makes `setItem` throw the way a full quota does. */
+function fakeStorage(options: { failWrites?: boolean } = {}): Storage {
+  const values = new Map<string, string>();
+  return {
+    get length() {
+      return values.size;
+    },
+    clear: () => values.clear(),
+    key: (index) => [...values.keys()][index] ?? null,
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => {
+      if (options.failWrites) throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
+      values.set(key, String(value));
+    },
+    removeItem: (key) => {
+      values.delete(key);
+    },
+  };
+}
+
+describe('sessionStorageStorageBroker', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  /* The SSR guard, as for the local broker. */
+  it('degrades to a no-op when no ambient Storage exists', () => {
+    expect(sessionStorageStorageBroker.write('k', 1)).toBe(false);
+    expect(sessionStorageStorageBroker.read('k')).toBeNull();
+    expect(sessionStorageStorageBroker.remove('k')).toBe(false);
+  });
+
+  it("round-trips JSON through the tab's sessionStorage and never touches localStorage", () => {
+    const session = fakeStorage();
+    const local = fakeStorage();
+    vi.stubGlobal('window', { sessionStorage: session, localStorage: local });
+
+    expect(sessionStorageStorageBroker.write('draft', { step: 2, tags: ['a'] })).toBe(true);
+    expect(session.getItem('draft')).toBe('{"step":2,"tags":["a"]}');
+    expect(local.length).toBe(0);
+    expect(localStorageStorageBroker.read('draft')).toBeNull();
+    expect(sessionStorageStorageBroker.read<{ step: number }>('draft')).toEqual({ step: 2, tags: ['a'] });
+
+    expect(sessionStorageStorageBroker.remove('draft')).toBe(true);
+    expect(sessionStorageStorageBroker.read('draft')).toBeNull();
+  });
+
+  it('reads a malformed value as a miss and refuses a value JSON cannot carry', () => {
+    const session = fakeStorage();
+    vi.stubGlobal('window', { sessionStorage: session });
+    session.setItem('raw', 'not json');
+    const circular: { self?: unknown } = {};
+    circular.self = circular;
+
+    expect(sessionStorageStorageBroker.read('raw')).toBeNull();
+    expect(sessionStorageStorageBroker.write('fn', () => 1)).toBe(false);
+    expect(sessionStorageStorageBroker.write('circular', circular)).toBe(false);
+  });
+
+  it('swallows a full quota instead of throwing', () => {
+    vi.stubGlobal('window', { sessionStorage: fakeStorage({ failWrites: true }) });
+    expect(sessionStorageStorageBroker.write('k', 'big')).toBe(false);
+  });
+
+  /* Safari private mode, a sandboxed iframe and blocked site data throw from the getter itself. */
+  it('treats a storage getter that throws as no storage', () => {
+    vi.stubGlobal('window', {
+      get sessionStorage(): Storage {
+        throw new DOMException('Access is denied for this document.', 'SecurityError');
+      },
+    });
+    expect(sessionStorageStorageBroker.read('k')).toBeNull();
+    expect(sessionStorageStorageBroker.write('k', 1)).toBe(false);
+    expect(sessionStorageStorageBroker.remove('k')).toBe(false);
+  });
+
+  it('resolves the store per call, so storage granted later is used', () => {
+    expect(sessionStorageStorageBroker.write('k', 1)).toBe(false);
+    vi.stubGlobal('window', { sessionStorage: fakeStorage() });
+    expect(sessionStorageStorageBroker.write('k', 1)).toBe(true);
+    expect(sessionStorageStorageBroker.read('k')).toBe(1);
   });
 });
 

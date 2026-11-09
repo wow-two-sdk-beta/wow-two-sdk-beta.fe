@@ -1,10 +1,26 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-11-09*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## 0.0.42 — session picture, tab-scoped storage
+
+No import moves and no renamed props. `BffPerson` gains a required `picture`, so code that builds one by hand (test
+fixtures) adds `picture: null`; `AccountMenu`'s `avatarSrc` widens to `string | null`.
+
+| Area | Change |
+|---|---|
+| `auth` | `BffPerson.picture`: the BFF session's `person.picture` link, or `null`; blank or non-text reads as `null`. `useBffAuth().person?.picture` reads it. [Spec](src/auth/BffStrategy.spec.md) |
+| `AccountMenu` | `avatarSrc` takes `null` as no picture, and shows a picture without a `name` too; a failed picture falls back to the initials, else the person glyph. [Spec](src/presentation/nav/accountMenu/AccountMenu.spec.md) |
+| `foundation/storage` | `sessionStorageStorageBroker`: the `localStorageStorageBroker` contract over the tab's `sessionStorage` — JSON, SSR-safe, every failure a miss, nothing synced across tabs. |
+
+| App copy | SDK |
+|---|---|
+| `...(picture ? { avatarSrc: picture } : {})` over an app-read session picture | `:avatar-src="bff.person?.picture"` |
+| An app `sessionStorageBroker` mirroring `localStorageStorageBroker` | `sessionStorageStorageBroker` from `@wow-two-beta/fe/foundation/storage` |
 
 ## 0.0.36 — one file per module
 

@@ -17,7 +17,7 @@ Public import: `import { createPersistentRef } from '@wow-two-beta/fe/foundation
 - The ref is shallow: replace an array or object to persist it.
 - Over `localStorageStorageBroker` with `syncTabs` on (the default), a write under `key` in another tab is decoded and
   adopted, and removal or `localStorage.clear()` returns it to `initial`; session storage and other keys are ignored.
-  Adoption never writes back.
+  Adoption never writes back. Over `sessionStorageStorageBroker` nothing syncs: each tab holds its own value.
 - Created inside an effect scope, its `storage` listener detaches when the scope stops; at module scope it lives with
   the page.
 - The broker's JSON contract applies: a raw string an app stored before the move is not JSON and reads as `initial`.
