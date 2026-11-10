@@ -13,6 +13,10 @@ export interface FakeBffSession {
   /** The person's picture link, or `null` for a person without one. */
   readonly picture: string | null;
   readonly organizationId: string | null;
+  /** The organization's display name, or `null` for a token that names none. */
+  readonly organizationName: string | null;
+  /** The organization's handle, or `null` for a token that names none. */
+  readonly organizationSlug: string | null;
   readonly role: string;
   readonly permissions: readonly string[];
   readonly csrfToken: string;
@@ -39,6 +43,8 @@ export function createFakeBff(prefix = '/api/identity') {
       sub: 'alice',
       picture: 'https://cdn.app.test/alice.png',
       organizationId: 'org-1',
+      organizationName: 'Acme Travel',
+      organizationSlug: 'acme-travel',
       role: 'admin',
       permissions: ['reports.read', 'reports.write'],
       csrfToken: `csrf-${issued}`,
@@ -67,7 +73,15 @@ export function createFakeBff(prefix = '/api/identity') {
             email: 'alice@app.test',
             phoneNumber: '+998901234567',
           },
-          organization: session.organizationId === null ? null : { id: session.organizationId, role: session.role },
+          organization:
+            session.organizationId === null
+              ? null
+              : {
+                  id: session.organizationId,
+                  name: session.organizationName,
+                  slug: session.organizationSlug,
+                  role: session.role,
+                },
           permissions: session.permissions,
           csrfToken: session.csrfToken,
           expiresAt: session.expiresAt,

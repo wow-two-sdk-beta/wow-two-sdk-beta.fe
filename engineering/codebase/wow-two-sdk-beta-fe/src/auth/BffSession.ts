@@ -18,6 +18,10 @@ export interface BffPerson {
 /** Defines the organization the session acts in, and the person's role there. */
 export interface BffOrganization {
   readonly id: string;
+  /** The organization's display name (the token's `org_name`); `null` when the token names none. */
+  readonly name: string | null;
+  /** The organization's handle (the token's `org_slug`), as it appears in a link; `null` when the token names none. */
+  readonly slug: string | null;
   readonly role: string;
 }
 
@@ -53,8 +57,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isText = (value: unknown): value is string => typeof value === 'string' && value !== '';
 /** Reads an optional text field; anything but text reads as absent. */
 const optionalText = (value: unknown): string | null => (typeof value === 'string' ? value : null);
-/** Reads an optional link; anything but non-blank text reads as absent, since an empty link names no resource. */
-const optionalLink = (value: unknown): string | null =>
+/**
+ * Reads an optional link, name or handle, trimmed; anything but non-blank text reads as absent, since an empty one
+ * names nothing.
+ */
+const optionalLabel = (value: unknown): string | null =>
   typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
 const protocol = (): ApiFailure => ApiFailureFactory.create('protocol');
 
@@ -81,12 +88,17 @@ export function decodeBffSession(value: unknown): Result<BffSessionSnapshot, Api
       person: {
         sub: person['sub'],
         name: optionalText(person['name']),
-        picture: optionalLink(person['picture']),
+        picture: optionalLabel(person['picture']),
         email: optionalText(person['email']),
         phoneNumber: optionalText(person['phoneNumber']),
       },
       organization: isRecord(organization)
-        ? { id: organization['id'] as string, role: optionalText(organization['role']) ?? '' }
+        ? {
+            id: organization['id'] as string,
+            name: optionalLabel(organization['name']),
+            slug: optionalLabel(organization['slug']),
+            role: optionalText(organization['role']) ?? '',
+          }
         : null,
       permissions: Object.freeze([...(permissions as string[])]),
       expiresAt: typeof expiresAt === 'string' && Number.isFinite(Date.parse(expiresAt)) ? expiresAt : null,

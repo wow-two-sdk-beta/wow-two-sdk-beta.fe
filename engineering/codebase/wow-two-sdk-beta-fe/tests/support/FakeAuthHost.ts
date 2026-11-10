@@ -8,7 +8,7 @@ export const Anonymous: AuthSession<BffUser> = { status: AuthStatus.Anonymous, u
 export function user(expiresInMs: number | null, sub = 'alice'): BffUser {
   return {
     person: { sub, name: null, picture: null, email: null, phoneNumber: null },
-    organization: { id: 'org-1', role: 'admin' },
+    organization: { id: 'org-1', name: 'Acme Travel', slug: 'acme-travel', role: 'admin' },
     permissions: [],
     expiresAt: expiresInMs === null ? null : new Date(Date.now() + expiresInMs).toISOString(),
   };

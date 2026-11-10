@@ -124,7 +124,7 @@ describe('BFF app session', () => {
       picture: 'https://cdn.app.test/alice.png',
       email: 'alice@app.test',
     });
-    expect(tab.api.organization).toEqual({ id: 'org-1', role: 'owner' });
+    expect(tab.api.organization).toEqual({ id: 'org-1', name: 'Acme Travel', slug: 'acme-travel', role: 'owner' });
     expect(tab.api.role).toBe('owner');
     expect(tab.api.permissions).toEqual(['reports.read']);
     expect(tab.api.hasPermission('reports.read')).toBe(true);

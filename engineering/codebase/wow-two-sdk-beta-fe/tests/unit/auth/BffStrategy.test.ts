@@ -44,7 +44,7 @@ describe('BFF session read', () => {
       email: 'alice@app.test',
       phoneNumber: '+998901234567',
     });
-    expect(signedIn.organization).toEqual({ id: 'org-1', role: 'owner' });
+    expect(signedIn.organization).toEqual({ id: 'org-1', name: 'Acme Travel', slug: 'acme-travel', role: 'owner' });
     expect(signedIn.permissions).toEqual(['reports.read']);
     expect(Number.isFinite(Date.parse(signedIn.expiresAt ?? ''))).toBe(true);
     expect(BffSessionExtensions.hasPermission(signedIn, 'reports.read')).toBe(true);
@@ -121,6 +121,43 @@ describe('BFF session read', () => {
       expect(decodeBffSession(broken)).toMatchObject({ ok: false, failure: { code: 'protocol' } });
     }
     expect(decodeBffSession(valid)).toMatchObject({ ok: true });
+  });
+
+  it('reads the organization name and handle, and null where the token names none', () => {
+    const session = (organization: unknown): unknown => ({
+      isAuthenticated: true,
+      person: { sub: 'alice' },
+      organization,
+      permissions: [],
+      csrfToken: 'csrf-1',
+      expiresAt: '2030-01-01T00:00:00Z',
+    });
+    const read = (organization: unknown): unknown => {
+      const outcome = decodeBffSession(session(organization));
+      return outcome.ok ? outcome.value.user?.organization : outcome.failure;
+    };
+
+    expect(read({ id: 'org-1', name: ' Acme Travel ', slug: 'acme-travel', role: 'owner' })).toEqual({
+      id: 'org-1',
+      name: 'Acme Travel',
+      slug: 'acme-travel',
+      role: 'owner',
+    });
+    // Identity sends `null` for a claim the token lacks; an older BFF sends neither field.
+    expect(read({ id: 'org-1', name: null, slug: null, role: null })).toEqual({
+      id: 'org-1',
+      name: null,
+      slug: null,
+      role: '',
+    });
+    expect(read({ id: 'org-1', role: 'owner' })).toEqual({ id: 'org-1', name: null, slug: null, role: 'owner' });
+    expect(read({ id: 'org-1', name: '  ', slug: 7, role: 'owner' })).toEqual({
+      id: 'org-1',
+      name: null,
+      slug: null,
+      role: 'owner',
+    });
+    expect(read(null)).toBeNull();
   });
 
   it('defaults an absent permission list and drops an expiry that does not parse', () => {
