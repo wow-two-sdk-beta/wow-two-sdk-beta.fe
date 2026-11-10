@@ -19,6 +19,7 @@ export * from './listDetailLayout';
 export * from './resizablePanelsLayout';
 export * from './pullToRefreshLayout';
 export * from './appShell';
+export * from './appFrame';
 export * from './pageHeader';
 export * from './anchorLayout';
 export * from './surfaceLayout';

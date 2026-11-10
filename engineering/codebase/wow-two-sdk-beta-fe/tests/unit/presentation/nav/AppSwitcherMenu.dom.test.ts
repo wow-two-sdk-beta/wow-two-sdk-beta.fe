@@ -363,3 +363,17 @@ describe('AppSwitcherMenu labels', () => {
     expect(link('Blog').querySelector('.sr-only')?.textContent).toBe(' (в новой вкладке)');
   });
 });
+
+describe('AppSwitcherMenu compact', () => {
+  it('shows the mark alone and keeps its accessible name', async () => {
+    viewport(true);
+    menu({ isCompact: true });
+    await settle();
+    const button = trigger();
+    expect(button.hasAttribute('data-compact')).toBe(true);
+    expect(button.textContent?.trim()).toBe('');
+    expect(button.querySelector('[data-app-switcher-chevron]')).toBeNull();
+    expect(button.querySelector('[data-app-switcher-mark]')).not.toBeNull();
+    expect(button.getAttribute('aria-label')).toBe('Desk — switch app');
+  });
+});

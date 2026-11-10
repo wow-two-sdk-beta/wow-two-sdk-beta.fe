@@ -124,6 +124,7 @@ import {
   KanbanBoard,
   KanbanColumn,
   KanbanCard,
+  VersionBadge,
 } from '../../../../../src/presentation/display';
 import { h, type VNode } from 'vue';
 
@@ -180,6 +181,8 @@ const inCarouselViewport = (node: VNode): VNode => inCarousel(h(CarouselViewport
  * here before a consumer finds it.
  */
 export const displayExamples: readonly SmokeCase[] = [
+  smokeCase('VersionBadge', VersionBadge, { version: '0.4.2' }),
+
   smokeCase('Heading', Heading, {}, { slot: true }),
 
   smokeCase('Text', Text, {}, { slot: true }),

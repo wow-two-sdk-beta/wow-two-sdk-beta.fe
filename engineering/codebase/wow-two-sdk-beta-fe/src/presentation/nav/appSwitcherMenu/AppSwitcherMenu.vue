@@ -49,6 +49,9 @@ export interface AppSwitcherMenuProps<T extends AppSwitcherItem = AppSwitcherIte
   /** A second line on the trigger — the organisation or workspace. Hidden below `breakpoint`. */
   readonly subtitle?: string;
 
+  /** The compact state — the trigger shows the mark alone, as above an icon rail; its accessible name stays. */
+  readonly isCompact?: boolean;
+
   /** The open state, controlled. The `v-model:open` binding target. */
   readonly open?: boolean;
 
@@ -124,6 +127,7 @@ defineSlots<{
 const componentProps = withDefaults(defineProps<AppSwitcherMenuProps<T>>(), {
   label: undefined,
   subtitle: undefined,
+  isCompact: false,
   open: undefined,
   defaultOpen: false,
   breakpoint: 'md',
@@ -213,7 +217,8 @@ function select(item: AppSwitcherItem, event: MouseEvent): void {
 const triggerClasses = computed(() =>
   cn(
     'group/app-switcher inline-flex min-h-11 min-w-0 max-w-full shrink-0 items-center gap-2.5 rounded-xl border',
-    'border-transparent py-1 ps-1 pe-2 text-start text-foreground transition-colors motion-reduce:transition-none',
+    'border-transparent text-start text-foreground transition-colors motion-reduce:transition-none',
+    props.isCompact ? 'p-1' : 'py-1 ps-1 pe-2',
     'hover:border-primary/15 hover:bg-primary-soft data-[state=open]:border-primary/15 data-[state=open]:bg-primary-soft',
     'outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as ClassValue,
@@ -247,6 +252,7 @@ defineExpose({ el });
         :aria-expanded="isOpen"
         :aria-label="triggerName"
         :data-state="isOpen ? 'open' : 'closed'"
+        :data-compact="props.isCompact ? '' : undefined"
         v-bind="rest"
         :class="triggerClasses"
       >
@@ -257,11 +263,12 @@ defineExpose({ el });
             </span>
           </slot>
         </span>
-        <span class="min-w-0">
+        <span v-if="!props.isCompact" class="min-w-0">
           <span class="block truncate text-sm font-semibold leading-tight">{{ appName }}</span>
           <span v-if="props.subtitle" :class="subtitleClasses" data-app-switcher-subtitle>{{ props.subtitle }}</span>
         </span>
         <Icon
+          v-if="!props.isCompact"
           :icon="ChevronDown"
           :size="16"
           class="shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]/app-switcher:rotate-180 motion-reduce:transition-none"

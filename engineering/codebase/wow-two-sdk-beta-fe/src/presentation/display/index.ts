@@ -78,3 +78,4 @@ export * from './truncatedText';
 export * from './countdownText';
 export * from './overflowGroup';
 export * from './kanbanBoard';
+export * from './versionBadge';

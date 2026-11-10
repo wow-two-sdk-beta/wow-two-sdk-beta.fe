@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-11-03*
+*Last updated: 2026-11-10*
 
 Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
 
@@ -24,6 +24,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Feature flags | shipped v0.1 | — |
 | Theming | shipped v0.1 | [theming.md](../architecture/theming.md) |
 | Shell presets (Vue) | shipped v0.1 | — |
+| App frame (Vue) | shipped v0.1; Ocharo adoption pending | [app-frame-completeness.md](../architecture/analysis/app-frame-completeness.md) · [migration](../architecture/app-frame-migration.md) |
 | Localization | shipped v0.1 | — |
 | Formatters | shipped v0.1 | — |
 | Exact numbers and lossless JSON (Vue) | shipped v0.1 | — |
@@ -177,6 +178,14 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Recognize duck-typed field errors by default | engineering | only when `foundation/http/FieldErrors.ts` opens for another reason |
 | Ability to open one in-app devtools panel | feature | when a consumer wants one; query, router, flags, locale and theme in one shell |
 | Ability to load a custom theme from a token CSS file | feature | hosted pages of a self-hosted service (Identity, File Storage) for an owner without an SDK theme — wow-two-ws `capability-forms.md` § Theming |
+| Prove the app frame in a product | engineering | the Ocharo adoption, then each console's UI round — [migration](../architecture/app-frame-migration.md); verdicts for every row below in [app-frame-completeness.md](../architecture/analysis/app-frame-completeness.md) |
+| Ability to show a page's empty, loading and error states in one frame look | feature | app frame vector; the Ocharo adoption, where five apps carry a local error fallback |
+| Ability to pass navigation as data and get the sidebar and a phone bottom bar | feature | app frame vector; after three consumers adopt the `nav` slot unchanged |
+| Ability to bind the frame to `vue-router` (`RouteAppFrame`) | feature | app frame vector; crumbs from route metadata and `router.push`, on the second consumer that repeats the wiring |
+| Ability to read the frame's state below it (`useAppFrame`) | feature | app frame vector; a nav or page that needs `isRail` without the slot prop |
+| Ability to place a page's actions in the bar, wrapping on a phone | feature | app frame vector; Wheelhouse's UI round |
+| Ability to open the account menu as a sheet on a phone | feature | app frame vector; Wheelhouse's UI round (`ProfileSheet`) |
+| Ability to emit `version.json` and the pre-paint script from one Vite plugin | feature | app frame vector; the first app with no status call to read its running version from |
 
 ## Docs
 

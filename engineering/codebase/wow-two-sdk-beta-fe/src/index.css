@@ -425,6 +425,22 @@ body {
     0 2px 6px -3px color-mix(in srgb, var(--color-foreground) 14%, transparent);
 }
 
+/* ---------- App frame dimensions ----------
+ * One frame for every app, whatever its theme: `AppFrame` lays itself out by these, and an app offsets its own
+ * chrome by them (`top-(--frame-bar-height)`). A theme keeps its fonts and colours and leaves these alone, so
+ * moving between two apps never moves the bar or the sidebar.
+ *   --frame-bar-height     the top bar, its hairline included; 56px
+ *   --frame-sidebar-width  the open sidebar and the brand cell above it; 248px
+ *   --frame-rail-width     the sidebar as an icon rail; 64px
+ *   --frame-content-max    the cap on the page column; 1536px
+ */
+:root {
+  --frame-bar-height: 3.5rem;
+  --frame-sidebar-width: 15.5rem;
+  --frame-rail-width: 4rem;
+  --frame-content-max: 96rem;
+}
+
 /* A glass theme's page backdrop — the coloured light its translucent surfaces blur. Themes without an
    ambient leave `--theme-ambient` unset, so the class is a no-op there. */
 .surface-ambient {

@@ -62,11 +62,12 @@ wherever the bar does; `prefers-reduced-motion` makes it instant.
 `platform` is the validated theme every wow-two platform app shares (Wheelhouse's chalk and forest palette).
 A platform app imports `themes.css` after `styles.css` and sets `class="theme-platform"` on its root, plus `dark`
 for dark mode and `surface-ambient` on the page for the backdrop; the `glass` variants of `Navbar`,
-`AppShellHeader` and `Card` take their translucent fill from its card and popover tokens.
+`AppShellHeader`, `AppFrame` and `Card` take Wheelhouse's frame glass from it: an 86% chrome fill, a 16px blur, a
+forest-tinted hairline and a top highlight.
 
 Glass strength is a theme setting. The glass surfaces read ten custom properties, which a theme sets in its
-`.theme-{id}` blocks (`Theme.glass`; the `ocharo` theme sets the approved frame values) and an app may set on any
-subtree: `--glass-fill` (top bar, bottom bar, cards), `--glass-side-fill`, `--glass-menu-fill`, `--glass-blur`,
+`.theme-{id}` blocks (`Theme.glass`; the `platform` and `ocharo` themes set their frame values) and an app may set
+on any subtree: `--glass-fill` (top bar, bottom bar, cards), `--glass-side-fill`, `--glass-menu-fill`, `--glass-blur`,
 `--glass-saturate`, `--glass-edge`, `--glass-highlight`, `--glass-shadow`, `--glass-bottom-shadow` (the bottom bar's,
 cast upward) and `--glass-menu-shadow`. Unset, every surface keeps the SDK's own glass. Use them through the
 components — `AppShellHeader variant="glass"`, `AppShellSidebar variant="glass"`, `BottomNavMenu variant="glass"`,
@@ -75,6 +76,23 @@ and `variant="glass-menu"` on `DropdownMenuContent`, `PopoverContent`, `ModalCon
 `surface-glass-menu`, `border-glass-edge`, `shadow-(--glass-shadow)`, `shadow-(--glass-bottom-shadow)` and
 `shadow-(--glass-menu-shadow)`. Each material is the solid card (popover for menus) where blur is unsupported and
 under `prefers-reduced-transparency`.
+
+`AppFrame` (`@wow-two-beta/fe/presentation/layout`) is the frame every app shares: a 56px bar with the brand or app
+switcher and a `VersionBadge` above the sidebar, the sidebar toggle, the trail, the app's own bar controls and the
+`AccountMenu`; a sidebar that collapses to an icon rail and is remembered; and the page column. Its dimensions are
+four custom properties in `styles.css`, the same in every theme, so moving between two apps never moves the bar:
+`--frame-bar-height` (56px), `--frame-sidebar-width` (248px), `--frame-rail-width` (64px) and `--frame-content-max`
+(1536px). An app passes its brand, navigation, app list and slots; `useRunningVersion`
+(`@wow-two-beta/fe/foundation/net`) feeds the badge the release the host serves, so a tab left open offers a reload
+after a deployment.
+
+```vue
+<AppFrame :version="appVersion" :running-version="runningVersion" :crumbs="crumbs" :account="account">
+  <template #brand="{ isRail }"><RouterLink to="/">…</RouterLink></template>
+  <template #nav="{ isRail }"><SidebarMenu :is-collapsed="isRail">…</SidebarMenu></template>
+  <RouterView />
+</AppFrame>
+```
 
 The root exports presentation components and the `styles`, `dom`, `optionals`, `state`, `numbers`, `json`, `icons`, `primitives`, `themes`,
 `color` and `emoji` namespaces. Dedicated subpaths expose application adapters:

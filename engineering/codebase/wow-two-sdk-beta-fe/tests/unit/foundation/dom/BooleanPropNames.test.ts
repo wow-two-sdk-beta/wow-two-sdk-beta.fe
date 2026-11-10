@@ -15,7 +15,7 @@ const Prefixed = /^(?:is|has|can|show|default)[A-Z]|^asChild$/u;
 const BooleanMember = /^\s*(?:readonly\s+)?([a-zA-Z]\w*)\??\s*:\s*boolean\s*;/u;
 
 /** Controlled state roots — the bare name is the `v-model` target, per the controlled-state rule. */
-const ModelRoots = new Set(['open', 'modelValue', 'editing', 'sidebarOpen']);
+const ModelRoots = new Set(['open', 'modelValue', 'editing', 'sidebarOpen', 'accountOpen']);
 
 /** Forwarded under the spelling of the element or library that receives them. */
 const Forwarded: Readonly<Record<string, ReadonlyArray<string>>> = {

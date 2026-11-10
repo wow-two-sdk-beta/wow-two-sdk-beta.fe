@@ -122,6 +122,30 @@ const platformAmbient: ThemeAmbient = {
   ].join(', '),
 };
 
+/* The frame glass, verbatim from Wheelhouse's local `--wh-glass-*` materials: the chrome at 86% / 90%, a 16px blur,
+ * a forest-tinted hairline and a top highlight inside every shadow. The sidebar stays clear over the backdrop, as
+ * Wheelhouse draws it. The bottom bar's shadow is the chrome shadow mirrored upward. */
+const platformGlass: ThemeGlass = {
+  light: {
+    fill: '#ffffffdb',
+    sideFill: 'transparent',
+    blur: '16px',
+    edge: '#24433224',
+    highlight: '#ffffffd9',
+    shadow: '0 10px 30px #203b2910',
+    bottomShadow: '0 -10px 30px #203b2910',
+  },
+  dark: {
+    fill: '#1b2420e6',
+    sideFill: 'transparent',
+    blur: '16px',
+    edge: '#c1dfcb26',
+    highlight: '#d5ead91a',
+    shadow: '0 12px 32px #00000024',
+    bottomShadow: '0 -12px 32px #00000024',
+  },
+};
+
 /** Platform — the shared look of the wow-two platform apps, proven in Wheelhouse. */
 const platform: Theme = {
   id: 'platform',
@@ -132,6 +156,7 @@ const platform: Theme = {
   light: platformLight,
   dark: platformDark,
   ambient: platformAmbient,
+  glass: platformGlass,
   status: ThemeStatus.Validated,
   meta: validateTheme({ light: platformLight, dark: platformDark }),
 };

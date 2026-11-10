@@ -70,7 +70,8 @@ describe('atlas pages', () => {
   it('opens every section from the home page', async () => {
     await go('#/');
     const wrapper = render(HomePage);
-    for (const section of Sections.slice(1)) {
+    // `shell` is a bare showcase page the top bar links to; the home cards do not.
+    for (const section of Sections.slice(1).filter((entry) => entry.key !== 'shell')) {
       expect(wrapper.find(`a[href="#/${section.key}"]`).exists(), section.key).toBe(true);
     }
   });

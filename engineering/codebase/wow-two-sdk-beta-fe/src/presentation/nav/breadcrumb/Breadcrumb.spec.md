@@ -16,6 +16,7 @@ Public import: `import { Breadcrumb } from '@wow-two-beta/fe/presentation/nav';`
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
 | `items` | `ReadonlyArray<BreadcrumbItem>` | yes | — | Declared by the source contract. |
+| `isSingleLine` | `boolean` | no | `false` | Keeps the trail on one line: items shorten with an ellipsis, the current page is emphasised, and below `md` only the last two items show. |
 
 ## Emits
 

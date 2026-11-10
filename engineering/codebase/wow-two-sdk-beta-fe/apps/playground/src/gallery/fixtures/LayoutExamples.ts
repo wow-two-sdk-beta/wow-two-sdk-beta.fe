@@ -1,4 +1,5 @@
 import {
+  AppFrame,
   FieldsetLayout,
   InputAddonLayout,
   InputGroup,
@@ -103,6 +104,17 @@ export const layoutExamples: readonly SmokeCase[] = [
   smokeCase('ResizableSeparator', ResizableSeparator, {}, { wrap: inResizablePanels }),
 
   smokeCase('PullToRefreshLayout', PullToRefreshLayout, { onRefresh: () => undefined }, { slot: true }),
+
+  smokeCase(
+    'AppFrame',
+    AppFrame,
+    {
+      version: '0.4.2',
+      crumbs: [{ label: 'Operations', href: '/operations' }, { label: 'Release 42' }],
+      account: { name: 'Dana Operator', showAppearance: false },
+    },
+    { slot: true },
+  ),
 
   smokeCase('AppShell', AppShell, {}, { slot: true }),
 

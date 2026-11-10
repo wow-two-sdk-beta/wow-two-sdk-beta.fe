@@ -9,6 +9,12 @@ export interface BreadcrumbItem {
 
 export interface BreadcrumbProps {
   readonly items: ReadonlyArray<BreadcrumbItem>;
+
+  /**
+   * Keeps the trail on one line, as in an app bar: items shorten with an ellipsis instead of wrapping, the current
+   * page takes the emphasis, and below `md` only the last two items show.
+   */
+  readonly isSingleLine?: boolean;
 }
 </script>
 
@@ -37,12 +43,33 @@ defineSlots<{
   separator?(): unknown;
 }>();
 
-const props = defineProps<BreadcrumbProps>();
+const props = withDefaults(defineProps<BreadcrumbProps>(), { isSingleLine: false });
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLElement>('el');
 
-const classes = computed(() => cn('text-sm', attrs.class as string | undefined));
+const classes = computed(() => cn('text-sm', props.isSingleLine && 'min-w-0', attrs.class as string | undefined));
+
+const listClasses = computed(() =>
+  props.isSingleLine ? 'flex min-w-0 flex-nowrap items-center gap-1.5' : 'flex flex-wrap items-center gap-1.5',
+);
+
+/** An item's place from the end of the trail, separators included: the last item is 1, its separator 2. */
+function itemClasses(index: number): string | undefined {
+  if (!props.isSingleLine) return undefined;
+  const isLast = index === lastIndex.value;
+  // Below `md` the trail keeps its last two items; the earlier ones return from `md` up.
+  const isEarly = index < lastIndex.value - 1;
+  return cn('min-w-0 truncate', isLast && 'font-semibold', isEarly && 'max-md:hidden');
+}
+
+function separatorClasses(index: number): string {
+  return cn(
+    'text-subtle-foreground',
+    props.isSingleLine && 'shrink-0',
+    props.isSingleLine && index < lastIndex.value - 1 && 'max-md:hidden',
+  );
+}
 
 /** Everything but `class`, which is re-applied through `cn` above. */
 const rest = computed(() => {
@@ -59,9 +86,9 @@ defineExpose({ el });
   <!-- `aria-label` sits before `v-bind="rest"` so a consumer-supplied one wins,
        the precedence React got from spreading `{...props}` after it. -->
   <nav ref="el" :aria-label="locale.t('Breadcrumb.breadcrumb', undefined, 'Breadcrumb')" v-bind="rest" :class="classes">
-    <ol class="flex flex-wrap items-center gap-1.5">
+    <ol :class="listClasses">
       <template v-for="(item, i) in props.items" :key="item.href ?? item.label">
-        <li>
+        <li :class="itemClasses(i)">
           <a
             v-if="item.href && i !== lastIndex"
             :href="UrlExtensions.safeNavigation(item.href)"
@@ -73,7 +100,7 @@ defineExpose({ el });
             <slot name="label" :item="item" :index="i">{{ item.label }}</slot>
           </span>
         </li>
-        <li v-if="i !== lastIndex" aria-hidden="true" class="text-subtle-foreground">
+        <li v-if="i !== lastIndex" aria-hidden="true" :class="separatorClasses(i)">
           <slot name="separator"><Icon :icon="ChevronRight" :size="14" /></slot>
         </li>
       </template>

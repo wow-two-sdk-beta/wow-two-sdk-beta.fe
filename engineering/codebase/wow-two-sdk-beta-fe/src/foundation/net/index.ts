@@ -69,4 +69,11 @@ export { PollerState, createPoller, type PollFn, type Poller, type PollerOptions
 
 export { usePolling, type PollingHandle } from './hooks/UsePolling';
 
+export {
+  useRunningVersion,
+  type RunningVersionHandle,
+  type RunningVersionOptions,
+  type RunningVersionSource,
+} from './hooks/UseRunningVersion';
+
 export { readOnlineStatus, subscribeOnline, waitForOnline, type WaitForOnlineOptions } from './Liveness';

@@ -322,10 +322,39 @@ describe('the ocharo theme', () => {
   });
 });
 
+describe('the platform frame glass', () => {
+  it("emits Wheelhouse's chrome material per mode and leaves the sidebar clear", () => {
+    const [light, dark] = themeToCss(getTheme('platform')!).split('\n\n');
+    for (const line of [
+      '--glass-fill: #ffffffdb;',
+      '--glass-side-fill: transparent;',
+      '--glass-blur: 16px;',
+      '--glass-edge: #24433224;',
+      '--glass-highlight: #ffffffd9;',
+      '--glass-shadow: 0 10px 30px #203b2910, inset 0 1px 0 var(--glass-highlight);',
+      '--glass-bottom-shadow: 0 -10px 30px #203b2910, inset 0 1px 0 var(--glass-highlight);',
+    ]) {
+      expect(light).toContain(line);
+    }
+    for (const line of [
+      '--glass-fill: #1b2420e6;',
+      '--glass-side-fill: transparent;',
+      '--glass-blur: 16px;',
+      '--glass-edge: #c1dfcb26;',
+      '--glass-highlight: #d5ead91a;',
+      '--glass-shadow: 0 12px 32px #00000024, inset 0 1px 0 var(--glass-highlight);',
+      '--glass-bottom-shadow: 0 -12px 32px #00000024, inset 0 1px 0 var(--glass-highlight);',
+    ]) {
+      expect(dark).toContain(line);
+    }
+    /* Menus keep the chrome fill and the SDK's own shadow: Wheelhouse draws them opaque. */
+    expect(light).not.toContain('--glass-menu-');
+  });
+});
+
 describe('a theme without glass strength', () => {
   it('emits no glass properties, so the surfaces keep the SDK glass', () => {
-    for (const id of ['platform', 'frost', 'bento-deck'])
-      expect(themeToCss(getTheme(id)!), id).not.toContain('--glass-');
+    for (const id of ['frost', 'bento-deck']) expect(themeToCss(getTheme(id)!), id).not.toContain('--glass-');
   });
 });
 

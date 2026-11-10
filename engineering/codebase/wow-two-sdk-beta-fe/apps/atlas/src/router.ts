@@ -11,6 +11,7 @@ export const Sections = [
   { key: 'components', label: 'Components' },
   { key: 'themes', label: 'Themes' },
   { key: 'studio', label: 'Studio' },
+  { key: 'shell', label: 'App frame' },
 ] as const;
 
 /* `frame` renders one screen bare, for the device preview's iframe; it has no place in the top bar. */

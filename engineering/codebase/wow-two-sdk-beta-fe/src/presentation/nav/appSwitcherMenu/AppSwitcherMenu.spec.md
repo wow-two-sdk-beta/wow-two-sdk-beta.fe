@@ -11,7 +11,8 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 
 - The trigger is one button: the `mark` slot, the app name (`label`, else the current item's label, else `title`),
   `subtitle` from `breakpoint` up, and a chevron that turns while the menu is open. It carries `aria-haspopup="dialog"`,
-  `aria-expanded`, `data-state` (`open` · `closed`) and the `triggerLabel` name.
+  `aria-expanded`, `data-state` (`open` · `closed`) and the `triggerLabel` name. `isCompact` leaves the mark alone
+  on the trigger, marked `data-compact`; the accessible name still names the app.
 - From `breakpoint` up the menu is a `Popover` under the trigger (`bottom-start`), labelled by its heading. Below it the
   menu is a `Modal` with the full-screen phone layout below `sm` and the centred card from `sm`, headed by its title and
   a close button.
@@ -46,6 +47,7 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 | `current` | `string` | yes | — | The key of the open app or site. |
 | `label` | `string` | no | current item's label | The app name on the trigger. |
 | `subtitle` | `string` | no | — | The trigger's second line — the organisation or workspace. |
+| `isCompact` | `boolean` | no | `false` | The trigger shows the mark alone, as above an icon rail. |
 | `open` | `boolean` | no | — | The open state, controlled. The `v-model:open` binding target. |
 | `defaultOpen` | `boolean` | no | `false` | The initial open state when uncontrolled. |
 | `breakpoint` | `Breakpoint` | no | `md` | The popover shows from this breakpoint; the dialog below it. |
