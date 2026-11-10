@@ -19,7 +19,7 @@ Decided in the fe sdk lane, taken from Wheelhouse's frame where the consumers di
 | Brand | a divided cell above the sidebar | inline in the bar (Ocharo) |
 | Tablet | forced rail, drawer for the full navigation | rail by choice (SCFD) |
 | Phone | bottom bar when the app passes one, else the drawer | one of the two for everyone |
-| Page width | one cap, 1536px, plus `full` | a width per app (1400 to 1800px) |
+| Page width | a 1536px default, an app's own `contentMaxWidth`, plus `full` | one width for everyone |
 | Frame dimensions | `--frame-*` custom properties, the same in every theme | a `Theme.frame` knob per theme |
 | Account menu | the SDK `AccountMenu`, replaceable by slot | a second menu component |
 | Router | none in the frame; `onNavigate` and link-click closing | a `vue-router` dependency in `presentation` |
@@ -41,6 +41,11 @@ Decided in the fe sdk lane, taken from Wheelhouse's frame where the consumers di
 | Single-line trail | ship-now | `crumbs`; `Breadcrumb` `isSingleLine` |
 | Account menu with models and extra rows | ship-now | `account`, `account-items` |
 | Full-bleed page | ship-now | `contentWidth="full"` |
+| A page width per app | ship-now | `contentMaxWidth` |
+| A class on every region | ship-now | `barClass`, `sidebarClass`, `mainClass`, `contentClass` |
+| Sidebar footer | ship-now | `nav-footer` slot |
+| Every string as a prop | ship-now | the label props; `trailLabel`, `versionLabel`, `versionUpdateLabel`, `skipToContentLabel` |
+| Scroll the main region to its top | ship-now | `mainEl`, `scrollToTop()` |
 | Print layout | ship-now | `AppFrame` |
 | Skip link, single `main`, landmarks | ship-now | inherited from `AppShell` |
 | Frame state for descendants (`useAppFrame`) | defer | a nav or page that needs `isRail` without the slot prop |

@@ -1,7 +1,10 @@
 <script lang="ts">
 import type { AccountMenuProps } from '../../nav/accountMenu/AccountMenu.vue';
 import type { AppSwitcherItem, AppSwitcherMenuProps } from '../../nav/appSwitcherMenu/AppSwitcherMenu.vue';
+import type { HTMLAttributes } from 'vue';
+import type { SizeValue } from '../../../foundation/styles';
 import type { BreadcrumbItem } from '../../nav/breadcrumb/Breadcrumb.vue';
+import type { ContainerLayoutSize } from '../containerLayout/ContainerLayout.variants';
 
 /** Defines how wide an `AppFrame` lets its page run. */
 export const AppFrameContentWidth = {
@@ -52,7 +55,10 @@ export interface AppFrameProps {
   readonly onReload?: () => unknown;
 
   /** The trail to the current place, the last item the place itself. Empty or omitted, the bar shows none. */
-  readonly crumbs?: ReadonlyArray<BreadcrumbItem>;
+  readonly crumbs?: ReadonlyArray<BreadcrumbItem | string>;
+
+  /** The trail landmark's accessible name. Default `"Breadcrumb"`, localized. */
+  readonly trailLabel?: string;
 
   /**
    * Opens a trail link through the app's router: a plain left click on a link whose `href` starts with `/` calls
@@ -107,6 +113,24 @@ export interface AppFrameProps {
   /** How wide the page runs. Default `default`. */
   readonly contentWidth?: AppFrameContentWidth;
 
+  /**
+   * The cap on the page column under `contentWidth="default"`: a `ContainerLayoutSize` step or any CSS length
+   * (number = px). Default `--frame-content-max`, 1536px — the width every app shares unless its pages need another.
+   */
+  readonly contentMaxWidth?: ContainerLayoutSize | SizeValue;
+
+  /** Extra classes on the bar. */
+  readonly barClass?: HTMLAttributes['class'];
+
+  /** Extra classes on the sidebar. */
+  readonly sidebarClass?: HTMLAttributes['class'];
+
+  /** Extra classes on the scrolling main region. */
+  readonly mainClass?: HTMLAttributes['class'];
+
+  /** Extra classes on the page column; unused under `contentWidth="full"`, which renders none. */
+  readonly contentClass?: HTMLAttributes['class'];
+
   /** The chrome's surface. Default `glass`. */
   readonly variant?: AppFrameVariant;
 
@@ -121,6 +145,15 @@ export interface AppFrameProps {
 
   /** The navigation drawer's accessible title. Default `"Navigation"`, localized. */
   readonly navigationLabel?: string;
+
+  /** The version badge's tooltip; `{version}` is the shown version. Default `"Version {version}"`, localized. */
+  readonly versionLabel?: string;
+
+  /** The stale version badge's name; `{version}` is the loaded release, `{running}` the served one. Localized. */
+  readonly versionUpdateLabel?: string;
+
+  /** The skip link's text. Default `"Skip to content"`, localized. */
+  readonly skipToContentLabel?: string;
 }
 
 /** What the `brand` slot receives. */
@@ -190,6 +223,9 @@ const slots = defineSlots<{
   /** The sidebar's navigation — a `SidebarMenu` bound to `isRail`. Omitted, the frame has no sidebar. */
   nav?(props: AppFrameNavSlotProps): unknown;
 
+  /** What stands at the sidebar's foot, under a hairline — a home link, a help link. */
+  'nav-footer'?(props: Pick<AppFrameNavSlotProps, 'isRail'>): unknown;
+
   /** Controls between the toggle and the trail. */
   'bar-start'?(): unknown;
 
@@ -231,6 +267,15 @@ const componentProps = withDefaults(defineProps<AppFrameProps>(), {
   collapseStorageKey: DefaultCollapseStorageKey,
   isCollapsedByDefault: false,
   contentWidth: AppFrameContentWidth.Default,
+  contentMaxWidth: undefined,
+  barClass: undefined,
+  sidebarClass: undefined,
+  mainClass: undefined,
+  contentClass: undefined,
+  trailLabel: undefined,
+  versionLabel: undefined,
+  versionUpdateLabel: undefined,
+  skipToContentLabel: undefined,
   variant: AppFrameVariant.Glass,
 });
 
@@ -381,10 +426,23 @@ const rest = computed(() => {
 /** The frame's root element. */
 const el = computed(() => shell.value?.el ?? null);
 
-/** The scrolling main region — the element a caller scrolls back to its top. */
+/** The scrolling main region. */
 const mainEl = computed(() => main.value?.el ?? null);
 
-defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation });
+/** Returns the main region to its top — for an app whose router does not reset a region's scroll. */
+function scrollToTop(): void {
+  mainEl.value?.scrollTo?.({ top: 0 });
+}
+
+/** Plain labels become trail items, so an app without links passes its translated strings as they are. */
+const trail = computed<BreadcrumbItem[]>(() =>
+  props.crumbs.map((crumb) => (typeof crumb === 'string' ? { label: crumb } : crumb)),
+);
+
+/* Bound only when given: an `aria-label` of `undefined` would strip the breadcrumb's own localized name. */
+const trailAttrs = computed(() => (props.trailLabel === undefined ? {} : { 'aria-label': props.trailLabel }));
+
+defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, scrollToTop });
 </script>
 
 <template>
@@ -398,9 +456,10 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }
     :sidebar-width="sidebarWidth"
     :navigation="navigation"
     :sidebar-open="isPhone && isDrawerOpen"
+    :skip-to-content-label="props.skipToContentLabel"
     @update:sidebar-open="setDrawerOpen"
   >
-    <AppShellHeader height="md" :variant="props.variant" :class="headerClasses" data-app-frame-bar>
+    <AppShellHeader height="md" :variant="props.variant" :class="[headerClasses, props.barClass]" data-app-frame-bar>
       <div class="flex h-full w-full min-w-0 items-stretch">
         <!-- From tablets up the brand sits above the sidebar, as wide as it, divided from the bar by a hairline. -->
         <div
@@ -426,6 +485,8 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }
             v-if="props.version && !isRail"
             :version="props.version"
             :running-version="props.runningVersion"
+            :label="props.versionLabel"
+            :update-label="props.versionUpdateLabel"
             @reload="reload"
           />
         </div>
@@ -448,6 +509,8 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }
               v-if="props.version && !isPhone"
               :version="props.version"
               :running-version="props.runningVersion"
+              :label="props.versionLabel"
+              :update-label="props.versionUpdateLabel"
               @reload="reload"
             />
           </div>
@@ -469,9 +532,10 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }
           <slot name="bar-start" />
           <slot name="trail">
             <Breadcrumb
-              v-if="props.crumbs.length > 0"
-              :items="props.crumbs"
+              v-if="trail.length > 0"
+              :items="trail"
               is-single-line
+              v-bind="trailAttrs"
               class="flex-1"
               @click="onTrailClick"
             />
@@ -496,17 +560,29 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }
         </div>
       </div>
     </AppShellHeader>
-    <AppShellSidebar v-if="hasSidebar" :variant="props.variant" :class="[edgeClass, 'print:hidden']">
+    <AppShellSidebar
+      v-if="hasSidebar"
+      :variant="props.variant"
+      :class="[edgeClass, 'print:hidden', props.sidebarClass]"
+    >
       <div class="flex min-h-0 flex-1 flex-col" @click="onNavClick">
         <slot name="nav" :is-rail="isRail" :close="closeNavigation" />
       </div>
+      <div
+        v-if="slots['nav-footer']"
+        :class="['mt-2 shrink-0 border-t pt-2', edgeClass]"
+        data-app-frame-nav-footer
+        @click="onNavClick"
+      >
+        <slot name="nav-footer" :is-rail="isRail" />
+      </div>
     </AppShellSidebar>
-    <AppShellMain ref="main" class="min-w-0 print:block print:overflow-visible">
+    <AppShellMain ref="main" :class="['min-w-0 print:block print:overflow-visible', props.mainClass]">
       <AppShellContent
         v-if="props.contentWidth === 'default'"
         gutter="lg"
-        max-width="var(--frame-content-max)"
-        class="lg:px-6 xl:px-8 print:p-0 print:*:max-w-none"
+        :max-width="props.contentMaxWidth ?? 'var(--frame-content-max)'"
+        :class="['lg:px-6 xl:px-8 print:p-0 print:*:max-w-none', props.contentClass]"
       >
         <slot name="notice" />
         <slot />
@@ -526,6 +602,14 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }
       <OverlayTitle class="sr-only">{{ props.navigationLabel }}</OverlayTitle>
       <div class="flex min-h-0 flex-1 flex-col" @click="onNavClick">
         <slot name="nav" :is-rail="false" :close="closeNavigation" />
+      </div>
+      <div
+        v-if="slots['nav-footer']"
+        :class="['mt-2 shrink-0 border-t pt-2', edgeClass]"
+        data-app-frame-nav-footer
+        @click="onNavClick"
+      >
+        <slot name="nav-footer" :is-rail="false" />
       </div>
     </DrawerContent>
   </Drawer>

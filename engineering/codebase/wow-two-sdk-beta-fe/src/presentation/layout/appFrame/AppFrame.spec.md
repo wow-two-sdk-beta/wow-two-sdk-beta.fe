@@ -32,18 +32,25 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   closes it too.
 - The toggle is a button named `collapseLabel`, `expandLabel` or `openNavigationLabel` by what it does, with
   `aria-expanded` for the sidebar or the drawer.
-- `crumbs` render as a single-line `Breadcrumb`. With `onNavigate`, a plain left click on a link whose `href` starts
+- `crumbs` render as a single-line `Breadcrumb` named `trailLabel`; a plain string is an item without a link. With
+  `onNavigate`, a plain left click on a link whose `href` starts
   with one `/` is handed to the app's router; modified clicks and other origins keep the browser's behaviour. The
   `trail` slot replaces the breadcrumb.
 - `account` renders the SDK `AccountMenu` at the bar's end, with the `account-items` slot as its destinations; the
   frame binds `accountOpen`, `locale` and `organization` as models. The `account` slot replaces the menu.
 - `contentWidth="default"` wraps the page in the shared column: the widening gutter, capped at
-  `--frame-content-max`. `full` hands the page the whole main region. `notice` renders above the page in both.
+  `--frame-content-max` or at the app's own `contentMaxWidth`. `full` hands the page the whole main region: no
+  gutter, no cap, a flex column that is the only scroller. `notice` renders above the page in both.
+- `nav-footer` renders at the sidebar's foot and the drawer's, under a hairline, and receives `isRail`.
+- `barClass`, `sidebarClass`, `mainClass` and `contentClass` add classes to their regions; the regions also carry
+  `data-app-frame-bar`, `-brand`, `-row`, `-toggle`, `-nav-footer` and `-phone-nav` for an app's own CSS.
 - Without a `nav` slot, or with `hasNavigation` false, the frame has no sidebar, no brand cell and no toggle.
 - Print hides the bar, the sidebar and the bottom bar and lets the page flow.
 - Strings resolve through the nearest `LocaleProvider` when their prop is omitted: `AppFrame.collapseLabel`
   (`Collapse sidebar`), `.expandLabel` (`Expand sidebar`), `.openNavigationLabel` (`Open navigation`) and
-  `.navigationLabel` (`Navigation`).
+  `.navigationLabel` (`Navigation`). `versionLabel`, `versionUpdateLabel`, `trailLabel` and `skipToContentLabel`
+  override the badge's, the breadcrumb's and the skip link's own localized strings, so an app without a
+  `LocaleProvider` passes every string as a prop.
 - The server and the first client render use the phone layout, then the frame adopts the viewport on mount.
 - Attributes and `class` land on the frame root. Automatic attribute inheritance is disabled; the source explicitly
   forwards and merges supported fallthrough attributes.
@@ -55,7 +62,8 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 | `version` | `string` | no | — | The version this tab loaded; shown beside the brand. |
 | `runningVersion` | `string \| null` | no | — | The version the host serves now. |
 | `onReload` | `() => unknown` | no | page reload | Runs when the reader asks for the newer release. |
-| `crumbs` | `ReadonlyArray<BreadcrumbItem>` | no | `[]` | The trail to the current place. |
+| `crumbs` | `ReadonlyArray<BreadcrumbItem \| string>` | no | `[]` | The trail to the current place. |
+| `trailLabel` | `string` | no | locale `Breadcrumb` | The trail landmark's accessible name. |
 | `onNavigate` | `(href: string, event: MouseEvent) => unknown` | no | — | Opens a trail link through the app's router. |
 | `apps` | `ReadonlyArray<AppSwitcherItem>` | no | — | The suite's apps and sites; makes the brand a switcher. |
 | `currentApp` | `string` | no | — | The key of this app among `apps`. |
@@ -70,11 +78,19 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 | `collapseStorageKey` | `string` | no | `wow-two.app-frame.sidebar-collapsed` | Where the collapse persists; read once. |
 | `isCollapsedByDefault` | `boolean` | no | `false` | Whether the desktop sidebar starts as the rail. |
 | `contentWidth` | `AppFrameContentWidth` | no | `default` | `default` for the shared column, `full` for edge to edge. |
+| `contentMaxWidth` | `ContainerLayoutSize \| SizeValue` | no | `--frame-content-max` | The page column's cap. |
+| `barClass` | `HTMLAttributes['class']` | no | — | Extra classes on the bar. |
+| `sidebarClass` | `HTMLAttributes['class']` | no | — | Extra classes on the sidebar. |
+| `mainClass` | `HTMLAttributes['class']` | no | — | Extra classes on the main region. |
+| `contentClass` | `HTMLAttributes['class']` | no | — | Extra classes on the page column. |
 | `variant` | `AppFrameVariant` | no | `glass` | The chrome's surface: `glass` or `solid`. |
 | `collapseLabel` | `string` | no | locale `Collapse sidebar` | The toggle's name while the sidebar is open. |
 | `expandLabel` | `string` | no | locale `Expand sidebar` | The toggle's name while the sidebar is the rail. |
 | `openNavigationLabel` | `string` | no | locale `Open navigation` | The toggle's name where it opens the drawer. |
 | `navigationLabel` | `string` | no | locale `Navigation` | The drawer's accessible title. |
+| `versionLabel` | `string` | no | locale `Version {version}` | The version badge's tooltip. |
+| `versionUpdateLabel` | `string` | no | locale | The stale badge's name; `{version}` loaded, `{running}` served. |
+| `skipToContentLabel` | `string` | no | locale `Skip to content` | The skip link's text. |
 
 `AppFrameAccount` is `AccountMenuProps` without `open`, `defaultOpen`, `locale` and `organization`. `AppFrameSwitcher`
 is `title`, `sitesLabel`, `closeLabel`, `newTabLabel`, `triggerLabel` and `breakpoint` of `AppSwitcherMenuProps`.
@@ -95,6 +111,7 @@ is `title`, `sitesLabel`, `closeLabel`, `newTabLabel`, `triggerLabel` and `break
 | `default` | `default?(): unknown` | The page. |
 | `brand` | `brand?(props: { isRail: boolean }): unknown` | The home link and mark; the switcher's mark with `apps`. |
 | `nav` | `nav?(props: { isRail: boolean; close: () => void }): unknown` | The sidebar's navigation. |
+| `nav-footer` | `'nav-footer'?(props: { isRail: boolean }): unknown` | What stands at the sidebar's foot. |
 | `bar-start` | `'bar-start'?(): unknown` | Controls between the toggle and the trail. |
 | `trail` | `trail?(): unknown` | Replaces the breadcrumb. |
 | `bar-end` | `'bar-end'?(): unknown` | The app's own bar controls, before the account menu. |
@@ -105,8 +122,8 @@ is `title`, `sitesLabel`, `closeLabel`, `newTabLabel`, `triggerLabel` and `break
 
 ## Exposed handle
 
-`{ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation }` — the frame root, the scrolling main region, the
-rail state, the persisted collapse and the two actions. Read this through a component template ref after mount; the
+`{ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, scrollToTop }` — the frame root, the scrolling
+main region, the rail state, the persisted collapse and the three actions. Read this through a component template ref after mount; the
 referenced DOM nodes may be absent while unmounted.
 
 ## Verification

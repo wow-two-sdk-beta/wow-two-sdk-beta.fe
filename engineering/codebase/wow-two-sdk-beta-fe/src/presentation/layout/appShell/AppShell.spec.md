@@ -27,6 +27,7 @@ Public import: `import { AppShell } from '@wow-two-beta/fe/presentation/layout';
 | `defaultSidebarOpen` | `boolean` | no | `false` | The initial mobile-sidebar state when uncontrolled. Default `false`. |
 | `scroll` | `AppShellScroll` | no | `region` | What scrolls: `region` scrolls only `AppShellMain`, so the header spans the full window beside a classic scrollbar; `document` scrolls the page. |
 | `navigation` | `AppShellNavigation` | no | inferred | Where the navigation sits; omitted, an `AppShellSidebar` child makes it `vertical` and none makes it `horizontal`, so a top-bar app reserves no empty column. |
+| `skipToContentLabel` | `string` | no | locale `Skip to content` | The skip link's text. |
 
 ## Emits
 

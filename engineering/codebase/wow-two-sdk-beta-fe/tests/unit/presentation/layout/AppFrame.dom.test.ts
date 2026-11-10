@@ -317,3 +317,89 @@ describe('AppFrame version', () => {
     expect(document.querySelector('[data-version-badge]')!.tagName).toBe('SPAN');
   });
 });
+
+describe('AppFrame per-app options', () => {
+  it('caps the page column at the app’s own width', async () => {
+    viewport(Desktop);
+    await frame({ contentMaxWidth: 1800 });
+    expect(document.querySelector<HTMLElement>('[data-content-container]')!.style.maxWidth).toBe('1800px');
+  });
+
+  it('passes a class to the bar, the sidebar, the main region and the page column', async () => {
+    viewport(Desktop);
+    await frame({ barClass: 'no-print', sidebarClass: 'app-side', mainClass: 'app-main', contentClass: 'app-page' });
+    expect(document.querySelector('[data-app-frame-bar]')!.classList.contains('no-print')).toBe(true);
+    expect(document.querySelector('aside')!.classList.contains('app-side')).toBe(true);
+    expect(document.querySelector('main')!.classList.contains('app-main')).toBe(true);
+    expect(document.querySelector('[data-content-container]')!.parentElement!.classList.contains('app-page')).toBe(
+      true,
+    );
+  });
+
+  it('renders the sidebar footer under the navigation, with the rail state', async () => {
+    viewport(Desktop);
+    const rails: boolean[] = [];
+    await frame(
+      {},
+      {
+        'nav-footer': ((slot: { isRail: boolean }) => {
+          rails.push(slot.isRail);
+          return h('a', { href: '#/home', 'data-foot-link': '' }, 'Home');
+        }) as never,
+      },
+    );
+    const footer = document.querySelector('[data-app-frame-nav-footer]')!;
+    expect(footer.querySelector('[data-foot-link]')).not.toBeNull();
+    const nav = document.querySelector('[data-nav-link]')!;
+    expect(nav.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(rails.at(-1)).toBe(false);
+
+    toggle().click();
+    await settle();
+    expect(rails.at(-1)).toBe(true);
+  });
+
+  it('takes plain strings as a trail without links, under the app’s own landmark name', async () => {
+    viewport(Desktop);
+    await frame({ crumbs: ['Catalogues', 'Winter'], trailLabel: 'You are here' });
+    const trail = document.querySelector('nav[aria-label="You are here"]')!;
+    expect(trail.textContent).toContain('Catalogues');
+    expect(trail.querySelector('a')).toBeNull();
+    expect(trail.querySelector('[aria-current=page]')!.textContent).toContain('Winter');
+  });
+
+  it('names the version badge and the skip link in the app’s words', async () => {
+    viewport(Desktop);
+    await frame({
+      version: '0.4.2',
+      runningVersion: '0.4.3',
+      versionUpdateLabel: 'Yangi {running}; hozir {version}',
+      skipToContentLabel: 'Asosiy qismga o‘tish',
+      onReload: () => undefined,
+    });
+    expect(document.querySelector('[data-version-badge]')!.getAttribute('aria-label')).toBe(
+      'Yangi v0.4.3; hozir v0.4.2',
+    );
+    expect(document.querySelector('a[href="#app-shell-main"]')!.textContent!.trim()).toBe('Asosiy qismga o‘tish');
+  });
+
+  it('returns the main region to its top', async () => {
+    viewport(Desktop);
+    const { wrapper } = await frame();
+    const main = document.querySelector('main')!;
+    const scrollTo = vi.fn();
+    main.scrollTo = scrollTo as never;
+    (wrapper.vm as unknown as { scrollToTop: () => void }).scrollToTop();
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0 });
+  });
+
+  it('adds and drops the sidebar when the app’s navigation appears at runtime', async () => {
+    viewport(Desktop);
+    const { wrapper } = await frame({ hasNavigation: false });
+    expect(document.querySelector('aside')).toBeNull();
+    await wrapper.setProps({ hasNavigation: true });
+    await settle();
+    expect(document.querySelector('aside')).not.toBeNull();
+    expect(toggle()).not.toBeNull();
+  });
+});

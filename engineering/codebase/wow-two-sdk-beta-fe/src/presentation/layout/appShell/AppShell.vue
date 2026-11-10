@@ -111,6 +111,9 @@ export interface AppShellProps {
    * `vertical`, none makes it `horizontal`, so a top-bar app never reserves an empty sidebar column.
    */
   readonly navigation?: AppShellNavigation;
+
+  /** The skip link's text. Default `"Skip to content"`, localized. */
+  readonly skipToContentLabel?: string;
 }
 </script>
 
@@ -148,6 +151,7 @@ const props = withDefaults(defineProps<AppShellProps>(), {
   defaultSidebarOpen: false,
   scroll: AppShellScroll.Region,
   navigation: undefined,
+  skipToContentLabel: undefined,
 });
 
 const emit = defineEmits<{
@@ -239,7 +243,7 @@ defineExpose({ el });
       href="#app-shell-main"
       class="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-modal focus:rounded-md focus:bg-card focus:px-3 focus:py-2 focus:shadow"
     >
-      {{ locale.t('AppShell.skipToContent', undefined, 'Skip to content') }}
+      {{ props.skipToContentLabel ?? locale.t('AppShell.skipToContent', undefined, 'Skip to content') }}
     </a>
     <slot />
   </div>
