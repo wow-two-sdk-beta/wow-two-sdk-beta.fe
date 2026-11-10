@@ -18,13 +18,7 @@ import {
   Tag,
 } from '@wow-two-beta/fe/presentation/display';
 import { Alert, Banner, ProgressBar } from '@wow-two-beta/fe/presentation/feedback';
-import {
-  CheckboxField,
-  SwitchField,
-  TextInput,
-  ToggleGroup,
-  ToggleInput,
-} from '@wow-two-beta/fe/presentation/forms';
+import { CheckboxField, SwitchField, TextInput, ToggleGroup, ToggleInput } from '@wow-two-beta/fe/presentation/forms';
 
 /* A product surface built only from SDK components and theme tokens — "how does this theme feel". Everything
    stays inline (no popovers or dialogs): portaled UI would leave the preview scope for the atlas theme. */

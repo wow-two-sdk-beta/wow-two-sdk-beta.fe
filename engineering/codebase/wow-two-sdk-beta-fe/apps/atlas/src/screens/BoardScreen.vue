@@ -2,14 +2,7 @@
 import { computed, ref, shallowRef } from 'vue';
 import { Plus } from 'lucide-vue-next';
 import { Button } from '@wow-two-beta/fe/presentation/actions';
-import {
-  Avatar,
-  EmptyState,
-  KanbanBoard,
-  KanbanCard,
-  KanbanColumn,
-  Tag,
-} from '@wow-two-beta/fe/presentation/display';
+import { Avatar, EmptyState, KanbanBoard, KanbanCard, KanbanColumn, Tag } from '@wow-two-beta/fe/presentation/display';
 import { SearchInput, ToggleGroup, ToggleInput } from '@wow-two-beta/fe/presentation/forms';
 
 /* Board archetype: filters shared with the list view above stage columns. Filtering hides cards without

@@ -2,13 +2,7 @@
 import { computed, shallowRef, watch } from 'vue';
 import { generateTheme, themeToCss, type ThemeSeed } from '@wow-two-beta/fe/foundation/themes';
 import { Button, CopyButton } from '@wow-two-beta/fe/presentation/actions';
-import {
-  Badge,
-  TabsGroup,
-  TabsGroupList,
-  TabsGroupPanel,
-  TabsGroupTab,
-} from '@wow-two-beta/fe/presentation/display';
+import { Badge, TabsGroup, TabsGroupList, TabsGroupPanel, TabsGroupTab } from '@wow-two-beta/fe/presentation/display';
 import { SliderInput, TextInput } from '@wow-two-beta/fe/presentation/forms';
 import {
   DefaultSeed,

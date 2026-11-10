@@ -1,9 +1,4 @@
-import {
-  contrastPairRatio,
-  contrastPairs,
-  type ContrastPair,
-  type Theme,
-} from '@wow-two-beta/fe/foundation/themes';
+import { contrastPairRatio, contrastPairs, type ContrastPair, type Theme } from '@wow-two-beta/fe/foundation/themes';
 
 /** One evaluated foreground↔surface pair. */
 export interface PairResult {
