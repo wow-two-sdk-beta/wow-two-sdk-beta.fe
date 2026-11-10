@@ -55,29 +55,32 @@ const brand = (): HTMLElement => document.querySelector<HTMLElement>('[data-app-
 const sidebar = (): HTMLElement => document.querySelector<HTMLElement>('aside')!;
 const width = (element: HTMLElement): number => Math.round(element.getBoundingClientRect().width);
 
+/* The sidebar eases between its widths over 200ms; a loaded runner can stretch that well past a second. */
+const Settled = { timeout: 8000 };
+
 describe('AppFrame dimensions', () => {
   for (const { name, ...options } of Cases) {
-    it(`holds the frame tokens on a desktop, ${name}`, async () => {
+    it(`holds the frame tokens on a desktop, ${name}`, { timeout: 30_000 }, async () => {
       await page.viewport(1280, 800);
       setup(options);
       mountFrame();
-      await expect.poll(() => getComputedStyle(bar()).height).toBe('56px');
-      await expect.poll(() => width(brand())).toBe(248);
-      expect(width(sidebar())).toBe(248);
+      await expect.poll(() => getComputedStyle(bar()).height, Settled).toBe('56px');
+      await expect.poll(() => width(brand()), Settled).toBe(248);
+      await expect.poll(() => width(sidebar()), Settled).toBe(248);
 
       document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!.click();
-      await expect.poll(() => width(brand())).toBe(64);
-      await expect.poll(() => width(sidebar())).toBe(64);
+      await expect.poll(() => width(brand()), Settled).toBe(64);
+      await expect.poll(() => width(sidebar()), Settled).toBe(64);
       expect(getComputedStyle(bar()).height).toBe('56px');
     });
   }
 
-  it('holds the bar and the rail on a tablet', async () => {
+  it('holds the bar and the rail on a tablet', { timeout: 30_000 }, async () => {
     await page.viewport(800, 800);
     setup({ theme: false, dark: false });
     mountFrame();
-    await expect.poll(() => getComputedStyle(bar()).height).toBe('56px');
-    await expect.poll(() => width(sidebar())).toBe(64);
-    expect(width(brand())).toBe(64);
+    await expect.poll(() => getComputedStyle(bar()).height, Settled).toBe('56px');
+    await expect.poll(() => width(sidebar()), Settled).toBe(64);
+    await expect.poll(() => width(brand()), Settled).toBe(64);
   });
 });
