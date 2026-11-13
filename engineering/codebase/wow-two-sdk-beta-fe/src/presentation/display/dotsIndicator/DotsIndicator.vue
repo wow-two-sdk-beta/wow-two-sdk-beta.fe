@@ -24,9 +24,10 @@ const locale = useLocale();
  * window: with more items than `visibleCount` it shows that many dots, keeps the current item's dot highlighted on
  * the centre while it can, slides along as `index` moves, and draws the edge dot smaller when more items lie beyond it.
  *
- * The dots are drawn in the current text colour, so a text colour utility such as `text-white` on a photograph colours
- * them; the current dot is solid and the rest are faded. It is presentational: the row is one image named by its
- * position, `3 of 10`.
+ * The dots are drawn in the current text colour, so a text colour utility such as `text-white` on a photograph
+ * colours them; the current dot is solid and the rest are faded. Each dot is a slot of the row, not an item: when the
+ * window slides and the current dot stays on the same slot, that dot does nothing at all, and only a slot whose state
+ * changes animates. It is presentational: the row is one image named by its position, `3 of 10`.
  */
 defineOptions({ name: 'DotsIndicator', inheritAttrs: false });
 
@@ -67,8 +68,8 @@ defineExpose({ el });
 <template>
   <div v-if="dots.length" ref="el" role="img" :aria-label="label" v-bind="rest" :class="classes">
     <span
-      v-for="dot in dots"
-      :key="dot.position"
+      v-for="(dot, slot) in dots"
+      :key="slot"
       :class="dotClasses(dot)"
       aria-hidden="true"
       v-bind="{ 'data-dot': '', 'data-active': dot.isActive || undefined, 'data-edge': dot.edge }"

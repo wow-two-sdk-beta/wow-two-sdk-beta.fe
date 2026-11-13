@@ -65,6 +65,23 @@ describe('DotsIndicator', () => {
     expect(dots[2]!.attributes('data-edge')).toBe('end');
   });
 
+  it('leaves the highlighted dot alone while the window slides under it', async () => {
+    const wrapper = mount(DotsIndicator, { props: { count: 10, index: 3, visibleCount: 3 } });
+    const centre = wrapper.findAll('[data-dot]')[1]!.element;
+    const classesBefore = centre.className;
+    await wrapper.setProps({ index: 4 });
+    const after = wrapper.findAll('[data-dot]');
+    expect(after[1]!.element).toBe(centre);
+    expect(after[1]!.element.className).toBe(classesBefore);
+    expect(after[1]!.attributes('data-active')).toBe('true');
+    await wrapper.setProps({ index: 9 });
+    expect(wrapper.findAll('[data-dot]').map((dot) => dot.attributes('data-active'))).toEqual([
+      undefined,
+      undefined,
+      'true',
+    ]);
+  });
+
   it('shows every dot of a short series, five by default for a long one', () => {
     expect(mount(DotsIndicator, { props: { count: 3, index: 0 } }).findAll('[data-dot]')).toHaveLength(3);
     expect(mount(DotsIndicator, { props: { count: 12, index: 6 } }).findAll('[data-dot]')).toHaveLength(5);
