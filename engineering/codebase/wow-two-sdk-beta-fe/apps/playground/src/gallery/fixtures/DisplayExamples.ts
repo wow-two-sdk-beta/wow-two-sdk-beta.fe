@@ -57,6 +57,7 @@ import {
   DescriptionGroup,
   DiffViewer,
   DotsGlyph,
+  DotsIndicator,
   EmptyState,
   EventCalendarViewer,
   EyebrowText,
@@ -359,6 +360,8 @@ export const displayExamples: readonly SmokeCase[] = [
   smokeCase('FrameGlyph', FrameGlyph, { frameRx: 0.25, pupilRoundness: 0.5 }),
 
   smokeCase('DotsGlyph', DotsGlyph, {}),
+
+  smokeCase('DotsIndicator', DotsIndicator, { count: 10, index: 2, visibleCount: 5 }),
 
   smokeCase('VerticalBarsGlyph', VerticalBarsGlyph, {}),
 

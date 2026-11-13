@@ -37,6 +37,7 @@ export * from './treeViewer';
 export * from './table';
 export * from './dataTable';
 export * from './carousel';
+export * from './dotsIndicator';
 export * from './diffViewer';
 export * from './sparkline';
 export * from './radiusGlyph';
