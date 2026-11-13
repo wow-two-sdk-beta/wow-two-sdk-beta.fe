@@ -2,7 +2,7 @@
 
 Renders a row of dots for a position in a longer series, calculating its own window of dots around the current item.
 
-Source: [DotsIndicator.vue](DotsIndicator.vue); the window rule is [DotsIndicatorWindow.ts](DotsIndicatorWindow.ts).
+Source: [DotsIndicator.vue](DotsIndicator.vue); the dots come from [DotsIndicatorWindow.ts](DotsIndicatorWindow.ts), which draws the general window rule `slidingWindowOf` of `foundation/collections`.
 
 Public import: `import { DotsIndicator } from '@wow-two-beta/fe/presentation/display';`.
 
@@ -39,7 +39,7 @@ None declared.
 
 ## Window function
 
-`dotsIndicatorWindowOf(count, index, visibleCount)` returns the dots to draw as `{ position, isActive, edge? }`, `position` being the zero-based item. It is exported for a consumer that draws its own dots.
+The window rule is general and lives in `foundation/collections`: `slidingWindowOf(count, index, size)` is a pure function returning `{ start, size, current, offset, hasBefore, hasAfter }`, for dots, thumbnail strips or any "a few around the current one" display. `dotsIndicatorWindowOf(count, index, visibleCount)` builds on it and returns the dots to draw as `{ position, isActive, edge? }`, `position` being the zero-based item; it is exported for a consumer that draws its own dots.
 
 ## Verification
 

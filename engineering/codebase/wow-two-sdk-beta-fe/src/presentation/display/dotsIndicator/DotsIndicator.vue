@@ -24,7 +24,7 @@ const locale = useLocale();
  * window: with more items than `visibleCount` it shows that many dots, keeps the current item's dot highlighted on
  * the centre while it can, slides along as `index` moves, and draws the edge dot smaller when more items lie beyond it.
  *
- * The dots are drawn in the current text colour, so `text-white` on a photograph or `text-primary` on a page colours
+ * The dots are drawn in the current text colour, so a text colour utility such as `text-white` on a photograph colours
  * them; the current dot is solid and the rest are faded. It is presentational: the row is one image named by its
  * position, `3 of 10`.
  */

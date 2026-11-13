@@ -7,6 +7,7 @@ import {
   keyBy,
   move,
   shallowEqual,
+  slidingWindowOf,
   unique,
 } from '@src/foundation/collections';
 
@@ -90,5 +91,63 @@ describe('trees', () => {
 
     expect(tree).toHaveLength(1);
     expect(flattenTree(tree)).toHaveLength(3);
+  });
+});
+
+describe('slidingWindowOf', () => {
+  it('keeps the current item in the middle of an odd window', () => {
+    expect(slidingWindowOf(10, 2, 3)).toEqual({
+      start: 1,
+      size: 3,
+      current: 2,
+      offset: 1,
+      hasBefore: true,
+      hasAfter: true,
+    });
+    expect(slidingWindowOf(10, 2, 5)).toEqual({
+      start: 0,
+      size: 5,
+      current: 2,
+      offset: 2,
+      hasBefore: false,
+      hasAfter: true,
+    });
+    expect(slidingWindowOf(10, 5, 5)).toMatchObject({ start: 3, offset: 2 });
+  });
+
+  it('stops at either end of the series and lets the current item drift to the edge', () => {
+    expect(slidingWindowOf(10, 0, 5)).toMatchObject({ start: 0, offset: 0, hasBefore: false, hasAfter: true });
+    expect(slidingWindowOf(10, 9, 5)).toMatchObject({ start: 5, offset: 4, hasBefore: true, hasAfter: false });
+  });
+
+  it('puts the current item one place before the middle of an even window', () => {
+    expect(slidingWindowOf(10, 5, 4)).toMatchObject({ start: 4, size: 4, offset: 1 });
+  });
+
+  it('covers the whole series when the window is larger, and nothing for an empty series', () => {
+    expect(slidingWindowOf(3, 1, 5)).toEqual({
+      start: 0,
+      size: 3,
+      current: 1,
+      offset: 1,
+      hasBefore: false,
+      hasAfter: false,
+    });
+    expect(slidingWindowOf(0, 0, 5)).toEqual({
+      start: 0,
+      size: 0,
+      current: 0,
+      offset: 0,
+      hasBefore: false,
+      hasAfter: false,
+    });
+  });
+
+  it('clamps an out-of-range or non-finite input instead of throwing, and is pure', () => {
+    expect(slidingWindowOf(10, 99, 3)).toMatchObject({ start: 7, current: 9, offset: 2 });
+    expect(slidingWindowOf(10, -4, 3)).toMatchObject({ start: 0, current: 0 });
+    expect(slidingWindowOf(10, Number.NaN, 3)).toMatchObject({ start: 0, current: 0 });
+    expect(slidingWindowOf(Number.NaN, 2, 3).size).toBe(0);
+    expect(slidingWindowOf(10, 4, 5)).toEqual(slidingWindowOf(10, 4, 5));
   });
 });

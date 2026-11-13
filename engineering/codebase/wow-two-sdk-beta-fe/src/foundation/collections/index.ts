@@ -40,6 +40,9 @@ export {
   zip,
 } from './Arrays';
 
+// Windows — the few items around the current one in a longer series, as dots, strips and trails draw them
+export { slidingWindowOf, type SlidingWindow } from './SlidingWindow';
+
 // Set relations over arrays — arrays in, arrays out, order defined by the first argument
 export { difference, intersection, symmetricDifference, union } from './SetOps';
 
