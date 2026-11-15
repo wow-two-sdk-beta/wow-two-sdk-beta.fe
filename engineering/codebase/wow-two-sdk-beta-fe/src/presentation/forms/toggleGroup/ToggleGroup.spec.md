@@ -17,32 +17,38 @@ Public import: `import { ToggleGroup } from '@wow-two-beta/fe/presentation/forms
 ## Props
 
 Inherited contracts: `extends /* @vue-ignore */ Omit<
-  HTMLAttributes,
-  'defaultValue' | 'onChange'
->`. These members remain part of the component surface.
+HTMLAttributes,
+'defaultValue' | 'onChange'
 
-| Prop | Type | Required | Default | Meaning |
-|---|---|---|---|---|
-| `type` | `ToggleMode` | no | `undefined` | The selection cardinality — `Single` for at-most-one, `Multi` for any number. |
-| `modelValue` | `T \| null \| ReadonlyArray<string>` | no | `undefined` | The controlled value — `T \| null` in single mode, a string array in multi mode. |
-| `defaultValue` | `T \| null \| ReadonlyArray<string>` | no | `undefined` | The uncontrolled initial value. Ignored once `modelValue` is set. |
-| `orientation` | `Orientation` | no | `OrientationValue.Horizontal` | The layout axis of the button row/column. |
-| `isAttached` | `boolean` | no | `true` | The attached state — collapses inner radii into a connected row/column. |
-| `variant` | `ToggleGroupVariant` | no | `ToggleGroupVariantValue.Default` | The visual style. - `default` — standard button row/column (borders + attached radii). - `segmented` — iOS-style connected pill row on a muted track; the active segment lifts to a `background` surface. Forces `isAttached`. - `pill` — individually-separated rounded pills (each item its own detached chip). Forces detached (never attaches). |
+> `. These members remain part of the component surface.
+
+| Prop           | Type                                 | Required | Default                           | Meaning                                                                                                                                                                                                                                                                                                                                             |
+| -------------- | ------------------------------------ | -------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`         | `ToggleMode`                         | no       | `undefined`                       | The selection cardinality — `Single` for at-most-one, `Multi` for any number.                                                                                                                                                                                                                                                                       |
+| `modelValue`   | `T \| null \| ReadonlyArray<string>` | no       | `undefined`                       | The controlled value — `T \| null` in single mode, a string array in multi mode.                                                                                                                                                                                                                                                                    |
+| `defaultValue` | `T \| null \| ReadonlyArray<string>` | no       | `undefined`                       | The uncontrolled initial value. Ignored once `modelValue` is set.                                                                                                                                                                                                                                                                                   |
+| `orientation`  | `Orientation`                        | no       | `OrientationValue.Horizontal`     | The layout axis of the button row/column.                                                                                                                                                                                                                                                                                                           |
+| `isAttached`   | `boolean`                            | no       | `true`                            | The attached state — collapses inner radii into a connected row/column.                                                                                                                                                                                                                                                                             |
+| `variant`      | `ToggleGroupVariant`                 | no       | `ToggleGroupVariantValue.Default` | The visual style. - `default` — standard button row/column (borders + attached radii). - `segmented` — iOS-style connected pill row on a muted track; the active segment lifts to a `background` surface. Forces `isAttached`. - `pill` — individually-separated rounded pills (each item its own detached chip). Forces detached (never attaches). |
+
 | `itemRole` | `ToggleItemRole` | no | `ToggleItemRoleValue.Group` | The ARIA role wiring. - `group` (default) — `role="group"` of independent toggle buttons. - `tab` — opt into tablist semantics: root renders `role="tablist"` and each item `role="tab"` + `aria-selected`. Pairs naturally with single-select. |
 | `equalWidth` | `boolean` | no | `false` | The equal-width state — lays items out as equal-width tiles (each `flex-1 basis-0`) for an icon category strip where every cell should share the row width. Additive; the default keeps intrinsic item widths. |
 | `isSkeleton` | `boolean` | no | `undefined` | Keeps every segment's box and draws its label as a bar; a segmented track lifts every segment. Defaults to the nearest `DataRegion` first load. |
 
+For compact pills, give each `ToggleInput` an accessible name with `aria-label`, a visible icon, and a label span with
+`data-toggle-label`. The label stays inline on the pressed pill and on touch devices. With a pointer it also appears
+below inactive pills on hover or keyboard focus, without moving the other pills.
+
 ## Emits
 
-| Event | Signature | Meaning |
-|---|---|---|
+| Event               | Signature                                                           | Meaning                                                                                            |
+| ------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `update:modelValue` | `'update:modelValue': [value: T \| null \| ReadonlyArray<string>];` | Fires when the reader changes the selection — `T \| null` in single mode, the array in multi mode. |
 
 ## Slots
 
-| Slot | Signature | Meaning |
-|---|---|---|
+| Slot      | Signature             | Meaning                                                            |
+| --------- | --------------------- | ------------------------------------------------------------------ |
 | `default` | `default(): unknown;` | The `ToggleInput` children whose selection this group coordinates. |
 
 ## Exposed handle

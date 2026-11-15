@@ -42,7 +42,8 @@ export interface ToggleGroupProps<T extends string = string> extends /* @vue-ign
    * - `segmented` — iOS-style connected pill row on a muted track; the active
    *   segment lifts to a `background` surface. Forces `isAttached`.
    * - `pill` — individually-separated rounded pills (each item its own detached
-   *   chip). Forces detached (never attaches).
+   *   chip). Forces detached (never attaches). Mark a label with `data-toggle-label`
+   *   to show it beside the pressed icon or on hover and keyboard focus.
    */
   readonly variant?: ToggleGroupVariant;
 
@@ -197,7 +198,26 @@ const rootClass = computed(() =>
     // Segmented skeleton: every segment lifts like the active one, so its label bar reads against the muted track.
     isSegmented.value && skeleton.isSkeleton.value && '[&>*]:bg-background!',
     // Pill: fully-rounded detached chips (gap already applied via the non-attached branch above).
-    isPill.value && '[&>*]:rounded-full!',
+    isPill.value && [
+      '[&>*]:rounded-full!',
+      // Only pills that opt in with a label marker change. On touch, their labels stay inline.
+      '[@media(hover:hover)]:[&>[data-pressed=false]:has([data-toggle-label])]:relative',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:pointer-events-none',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:invisible',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:absolute',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:start-0',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:top-full',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:z-10',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:mt-1',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:whitespace-nowrap',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:rounded-md',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:bg-popover',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:px-2',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:py-1',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:text-popover-foreground',
+      '[@media(hover:hover)]:[&>[data-pressed=false]_[data-toggle-label]]:shadow-md',
+      '[@media(hover:hover)]:[&>[data-pressed=false]:is(:hover,:focus-visible)_[data-toggle-label]]:visible',
+    ],
     // Equal-width tiles: every item shares the row/column extent (icon category strip).
     props.equalWidth && '[&>*]:flex-1 [&>*]:basis-0',
     attrs.class as ClassValue,
