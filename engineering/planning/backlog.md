@@ -75,6 +75,23 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Global state module | planned | — |
 | In-app devtools panel | planned | — |
 
+## Specced next
+
+ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-integration/tasks/tasks.md`; each row's spec is its id in the named file there. Delete a row when it ships, with any older row it covers.
+
+| Item | Type | Notes |
+|---|---|---|
+| F01 Toast work: fold features.md into backlog and track | engineering | spec in `tasks-platform.md` |
+| F02 Toast API: string enum values and an SFC action | fix | spec in `tasks-platform.md` |
+| F03 Split ToastHost into composables and test its untested paths | engineering | spec in `tasks-platform.md` |
+| F04 Release the toast overhaul | engineering | spec in `tasks-platform.md` |
+| F05 Grid: auto-fill columns by minimum width | feature | spec in `tasks-platform.md` |
+| F06 MediaCard: image-first card with a faded glass panel | feature | spec in `tasks-platform.md` |
+| F07 Button: unavailable state for glass icon buttons | feature | spec in `tasks-platform.md` |
+| F08 Badge: glass tones and a shrinkable label | feature | spec in `tasks-platform.md` |
+| F09 Carousel: hover-only glass arrows and touch swipe | feature | spec in `tasks-platform.md` |
+| F10 MetaInlineText: icon-led items with spoken text | feature | spec in `tasks-platform.md` |
+
 ## Vue
 
 | Item | Type | Notes |
