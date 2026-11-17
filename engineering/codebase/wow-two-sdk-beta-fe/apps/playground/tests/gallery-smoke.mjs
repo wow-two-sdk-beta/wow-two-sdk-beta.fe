@@ -239,7 +239,7 @@ try {
     const card = openCards.first();
     await card.waitFor();
     const draw = await card.evaluate((el) => {
-      const toast = el.querySelector('[role=status]');
+      const toast = el.querySelector('[data-toast-card]:not([data-toast-group-arrival])');
       const progress = el.querySelector('[data-toast-progress]');
       const toastStyle = getComputedStyle(toast);
       const progressStyle = getComputedStyle(progress);
@@ -259,7 +259,7 @@ try {
   await page.getByLabel('Toast surface').selectOption('solid');
   await queueBatch.click();
   await openCards.first().waitFor();
-  assert.equal(await openCards.first().locator('[role=status]').evaluate((el) => getComputedStyle(el).backdropFilter), 'none');
+  assert.equal(await openCards.first().locator('[data-toast-card]:not([data-toast-group-arrival])').evaluate((el) => getComputedStyle(el).backdropFilter), 'none');
   await clearToasts.click();
   await viewport.waitFor({ state: 'hidden' });
   await page.getByLabel('Toast surface').selectOption('glass');
@@ -584,7 +584,7 @@ try {
   assert.equal(await arrival.count(), 0);
 
   await openCards.getByRole('button', { name: 'Show details' }).click();
-  const morphsInPlace = await openCards.locator(':scope > [role="status"]').evaluate(async (el) => {
+  const morphsInPlace = await openCards.locator(':scope > [data-toast-card]:not([data-toast-group-arrival])').evaluate(async (el) => {
     const growth = el.getAnimations().find((animation) => {
       const frames = animation.effect.getKeyframes();
       return Number.parseFloat(frames.at(-1).height) > Number.parseFloat(frames[0].height);
@@ -680,7 +680,7 @@ try {
   await page.locator('iframe[title="Toast notification preview"]').scrollIntoViewIfNeeded();
   await openCards.getByRole('button', { name: 'Show details' }).click();
   await rows.first().waitFor();
-  await openCards.locator(':scope > [role="status"]').evaluate(async (el) => {
+  await openCards.locator(':scope > [data-toast-card]:not([data-toast-group-arrival])').evaluate(async (el) => {
     await Promise.all(el.getAnimations().map((animation) => animation.finished));
   });
   assert.ok(await groupDetails.evaluate(wholeRowsInView) < 3, 'A short phone viewport shows fewer full rows');

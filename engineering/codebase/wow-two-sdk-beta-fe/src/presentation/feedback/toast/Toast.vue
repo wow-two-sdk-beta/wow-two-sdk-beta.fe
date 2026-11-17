@@ -281,6 +281,7 @@ function fitGroupDetails(): void {
   <ToastSimple
     ref="inner"
     :severity="props.severity"
+    data-toast-card
     :data-toast-surface="isGlass ? ToastSurface.Glass : undefined"
     v-bind="rest"
     :class="classes"
