@@ -82,7 +82,7 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 
 | Item | Type | Notes |
 |---|---|---|
-| F01 Toast work: fold features.md into backlog and track | engineering | spec in `tasks-platform.md` |
+| F01 remainder: keep or fold `engineering/features.md` | engineering | waits on the developer's call; the rest of F01 shipped in v0.1 Iteration 25 |
 | F04 Release the toast overhaul | engineering | spec in `tasks-platform.md` |
 | F11 Escape keeps a dismissed tooltip closed | fix | spec in `tasks-platform.md` |
 | F05 Grid: auto-fill columns by minimum width | feature | spec in `tasks-platform.md` |
@@ -97,20 +97,18 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 [Design and SDK registration](../architecture/analysis/toast-notifications.md) · shipped work: v0.1 Iteration 25.
 Releasing the overhaul is `F04` above.
 
-### For product integration, in order
+### Next
 
 Product evidence (2026-11-17 scan): every product mounts `FeedbackToastHost` and publishes through `notify`; none
 mounts the notification center, calls `toastHost` directly (apart from med-text-fab on the pre-rename package) or
-renders on the server.
+renders on the server. Each product's re-pin is that product's backlog item; [MIGRATION.md](../codebase/wow-two-sdk-beta-fe/MIGRATION.md)
+lists what a re-pin changes.
 
 | Item | Type | Notes |
 |---|---|---|
 | Review the overhaul in the lab | product | Replay every capability at desktop, tablet and phone with keyboard, touch, reduced motion, reduced transparency and a screen reader. Settle the defaults: pause bypass, glass surface, timer display, group motion. |
 | Release the overhaul | engineering | `F04` above. |
-| Pilot SCFD on the release | product | Re-pin from `0.0.48`; `apps/web/tests/DemoPage.test.ts:34` selects `[aria-label="Notifications"]`, so select `[role="region"][data-toast-position]`; optionally replace the `ConsoleSession.vue:75` class pile with `--toast-top-offset`. No `src` change. |
-| Re-pin the bottom-anchored products | product | ListingShelf `AppRoot.vue:32` and Haven `HavenShell.vue:135` pass `position="bottom-right"`, ignored until now; lift the stack above their phone `BottomNavMenu` with `--toast-bottom-offset`. |
-| Re-pin the remaining products | product | 18 products mount a plain `FeedbackToastHost` with `notify`; a re-pin and a smoke check each. med-text-fab first moves off `@wow-two-beta/ui-vue`. |
-| Coalesce repeated identical notices | feature | Count repeats of the same tone and title inside a short window (×3) instead of stacking, for query-error bursts without a group key. Evidence: SCFD `HarvestConsole.ts:327-331`, ListingShelf `RequestFailureNotices.ts:20`. |
+| Coalesce repeated identical notices | feature | Count repeats of the same tone and title inside a short window (×3) instead of stacking, for query-error bursts without a group key. Evidence: two product consoles map each failed query to its own error notice. |
 
 ### Later
 
