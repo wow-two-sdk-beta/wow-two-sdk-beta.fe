@@ -19,7 +19,7 @@ Pull from the top of each group. [`version-track/`](version-track/) records impl
 | Validators and validation messages | shipped v0.1 | — |
 | Typed config | shipped v0.1 | — |
 | Feedback bus | shipped v0.1 | — |
-| Toast notifications | implemented, release pending | [toast-notifications.md](../architecture/analysis/toast-notifications.md) |
+| Toast notifications | shipped v0.1 | [toast-notifications.md](../architecture/analysis/toast-notifications.md) |
 | Incident reporting (Vue) | shipped v0.1 | — |
 | Analytics | shipped v0.1 | — |
 | Feature flags | shipped v0.1 | — |
@@ -83,12 +83,11 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 | Item | Type | Notes |
 |---|---|---|
 | F01 remainder: keep or fold `engineering/features.md` | engineering | waits on the developer's call; the rest of F01 shipped in v0.1 Iteration 25 |
-| F04 Release the toast overhaul | engineering | spec in `tasks-platform.md` |
 
 ## Notifications
 
 [Design and SDK registration](../architecture/analysis/toast-notifications.md) · shipped work: v0.1 Iteration 25.
-Releasing the overhaul is `F04` above.
+Released in `0.0.50`.
 
 ### Next
 
@@ -100,7 +99,6 @@ lists what a re-pin changes.
 | Item | Type | Notes |
 |---|---|---|
 | Review the overhaul in the lab | product | Replay every capability at desktop, tablet and phone with keyboard, touch, reduced motion, reduced transparency and a screen reader. Settle the defaults: pause bypass, glass surface, timer display, group motion. |
-| Release the overhaul | engineering | `F04` above. |
 | Coalesce repeated identical notices | feature | Count repeats of the same tone and title inside a short window (×3) instead of stacking, for query-error bursts without a group key. Evidence: two product consoles map each failed query to its own error notice. |
 
 ### Later
