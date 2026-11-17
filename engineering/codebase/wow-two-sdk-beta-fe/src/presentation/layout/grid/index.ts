@@ -4,6 +4,8 @@ export {
   resolveGridColumns,
   resolveGridGap,
   GridBreakpoint,
+  GridAutoFillColumns,
+  GridMinColumnVariable,
   type GridVariants,
   type GridColumns,
   type GridGap,

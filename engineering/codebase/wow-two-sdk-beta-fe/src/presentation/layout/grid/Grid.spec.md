@@ -1,6 +1,6 @@
 # Grid
 
-Renders a CSS grid container with column and gap variants.
+Renders a CSS grid container with column and gap variants, or auto-fill columns by a minimum width.
 
 Source: [Grid.vue](Grid.vue).
 
@@ -13,11 +13,12 @@ Public import: `import { Grid } from '@wow-two-beta/fe/presentation/layout';`.
 
 ## Props
 
-| Prop | Type | Required | Default | Meaning |
-|---|---|---|---|---|
-| `as` | `ElementType` | no | `'div'` | Declared by the source contract. |
-| `columns` | `GridColumns \| GridResponsive<GridColumns>` | no | `'2'` | The equal-column track count. Scalar (`'3'`) emits `grid-cols-3`; a responsive map (`{ base: '1', md: '2', lg: '3' }`) emits per-breakpoint prefixed classes. Default `'2'`. |
-| `gap` | `GridGap \| GridResponsive<GridGap>` | no | `'4'` | The gap between tracks. Scalar (`'4'`) emits `gap-4`; a responsive map (`{ base: '2', lg: '6' }`) emits per-breakpoint prefixed classes. Default `'4'`. |
+| Prop      | Type                                         | Required | Default | Meaning                                                                                                                                                                      |
+| --------- | -------------------------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `as`      | `ElementType`                                | no       | `'div'` | Declared by the source contract.                                                                                                                                             |
+| `columns` | `GridColumns \| GridResponsive<GridColumns>` | no       | `'2'`   | The equal-column track count. Scalar (`'3'`) emits `grid-cols-3`; a responsive map (`{ base: '1', md: '2', lg: '3' }`) emits per-breakpoint prefixed classes. Default `'2'`. |
+| `gap`     | `GridGap \| GridResponsive<GridGap>`         | no       | `'4'`   | The gap between tracks. Scalar (`'4'`) emits `gap-4`; a responsive map (`{ base: '2', lg: '6' }`) emits per-breakpoint prefixed classes. Default `'4'`.                      |
+| `minColumnWidth` | `string` | no | — | The minimum column width as a CSS length (`'16rem'`). When set, the grid holds as many equal auto-fill columns as fit its own width (4 → 3 → 2 → 1 as it narrows) through `--grid-min-column`, and `columns` is ignored. |
 
 ## Emits
 
@@ -25,8 +26,8 @@ None declared.
 
 ## Slots
 
-| Slot | Signature | Meaning |
-|---|---|---|
+| Slot      | Signature              | Meaning         |
+| --------- | ---------------------- | --------------- |
 | `default` | `default?(): unknown;` | The grid items. |
 
 ## Exposed handle
@@ -36,5 +37,5 @@ None declared.
 ## Verification
 
 - Public render fixture: [LayoutExamples.ts](../../../../apps/playground/src/gallery/fixtures/LayoutExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
-- Focused test references: [DisplayRequiredProps.dom.test.ts](../../../../tests/unit/presentation/display/DisplayRequiredProps.dom.test.ts). Consult the named test assertions for the behavior actually covered.
+- Focused test references: [GridAutoFill.browser.test.ts](../../../../tests/unit/presentation/layout/GridAutoFill.browser.test.ts) (auto-fill column counts at 1100, 900, 700 and 520 px), [DisplayRequiredProps.dom.test.ts](../../../../tests/unit/presentation/display/DisplayRequiredProps.dom.test.ts). Consult the named test assertions for the behavior actually covered.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

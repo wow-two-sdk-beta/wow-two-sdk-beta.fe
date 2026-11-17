@@ -182,6 +182,15 @@ const GapClasses: Record<GridBreakpoint, Record<GridGap, string>> = {
 
 const BreakpointOrder: ReadonlyArray<GridBreakpoint> = ['base', 'sm', 'md', 'lg', 'xl'];
 
+/** Defines the custom property `Grid` reads its `minColumnWidth` from. */
+export const GridMinColumnVariable = '--grid-min-column';
+
+/**
+ * Defines the auto-fill track list for `minColumnWidth`: as many equal columns as fit at the minimum width, one
+ * full-width column when even one does not fit.
+ */
+export const GridAutoFillColumns = 'grid-cols-[repeat(auto-fill,minmax(min(100%,var(--grid-min-column)),1fr))]';
+
 /** Resolves a scalar-or-responsive `columns` value to its complete Tailwind class string. */
 export function resolveGridColumns(value: GridColumns | GridResponsive<GridColumns> | undefined): string | undefined {
   if (value === undefined) return undefined;

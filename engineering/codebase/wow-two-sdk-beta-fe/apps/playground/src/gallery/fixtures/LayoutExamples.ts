@@ -69,7 +69,7 @@ export const layoutExamples: readonly SmokeCase[] = [
 
   smokeCase('VStackLayout', VStackLayout, {}, { slot: true }),
 
-  smokeCase('Grid', Grid, {}, { slot: true }),
+  smokeCase('Grid', Grid, { minColumnWidth: '16rem', gap: '3' }, { slot: true }),
 
   smokeCase('ContainerLayout', ContainerLayout, {}, { slot: true }),
 

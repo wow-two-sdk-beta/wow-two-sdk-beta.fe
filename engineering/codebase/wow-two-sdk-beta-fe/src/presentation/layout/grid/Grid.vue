@@ -12,6 +12,12 @@ export interface GridProps {
   readonly columns?: GridColumns | GridResponsive<GridColumns>;
 
   /**
+   * The minimum column width, as a CSS length (`'16rem'`). When set, the grid fills its own width with as many equal
+   * columns as fit — 4 → 3 → 2 → 1 as it narrows — and `columns` is ignored.
+   */
+  readonly minColumnWidth?: string;
+
+  /**
    * The gap between tracks. Scalar (`'4'`) emits `gap-4`; a responsive map
    * (`{ base: '2', lg: '6' }`) emits per-breakpoint prefixed classes. Default `'4'`.
    */
@@ -22,13 +28,14 @@ export interface GridProps {
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
-import { resolveGridColumns, resolveGridGap } from './Grid.variants';
+import { GridAutoFillColumns, GridMinColumnVariable, resolveGridColumns, resolveGridGap } from './Grid.variants';
 
 /**
  * Renders a CSS grid container with column and gap variants. Both `columns` and `gap`
- * accept a scalar value or a responsive `{ base, sm, md, lg, xl }` map. For
- * non-uniform tracks pass an explicit `:style="{ gridTemplateColumns }"` — the
- * variant covers the equal-column case.
+ * accept a scalar value or a responsive `{ base, sm, md, lg, xl }` map. `minColumnWidth`
+ * switches to auto-fill columns sized by the grid's own width. For non-uniform tracks
+ * pass an explicit `:style="{ gridTemplateColumns }"` — the variant covers the
+ * equal-column case.
  */
 defineOptions({ name: 'Grid', inheritAttrs: false });
 
@@ -47,7 +54,17 @@ const attrs = useAttrs();
 const el = useTemplateRef<HTMLElement>('el');
 
 const classes = computed(() =>
-  cn('grid', resolveGridColumns(props.columns), resolveGridGap(props.gap), attrs.class as string | undefined),
+  cn(
+    'grid',
+    props.minColumnWidth ? GridAutoFillColumns : resolveGridColumns(props.columns),
+    resolveGridGap(props.gap),
+    attrs.class as string | undefined,
+  ),
+);
+
+/** The minimum column width as the custom property the auto-fill track list reads. */
+const autoFillStyle = computed(() =>
+  props.minColumnWidth ? { [GridMinColumnVariable]: props.minColumnWidth } : undefined,
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */
@@ -60,5 +77,5 @@ defineExpose({ el });
 </script>
 
 <template>
-  <component :is="props.as" ref="el" v-bind="rest" :class="classes"><slot /></component>
+  <component :is="props.as" ref="el" v-bind="rest" :class="classes" :style="autoFillStyle"><slot /></component>
 </template>
