@@ -84,11 +84,9 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 |---|---|---|
 | F01 remainder: keep or fold `engineering/features.md` | engineering | waits on the developer's call; the rest of F01 shipped in v0.1 Iteration 25 |
 | F04 Release the toast overhaul | engineering | spec in `tasks-platform.md` |
-| F06 MediaCard: image-first card with a faded glass panel | feature | spec in `tasks-platform.md` |
 | F07 Button: unavailable state for glass icon buttons | feature | spec in `tasks-platform.md` |
 | F08 Badge: glass tones and a shrinkable label | feature | spec in `tasks-platform.md` |
 | F09 Carousel: hover-only glass arrows and touch swipe | feature | spec in `tasks-platform.md` |
-| F10 MetaInlineText: icon-led items with spoken text | feature | spec in `tasks-platform.md` |
 
 ## Notifications
 

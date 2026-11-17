@@ -4,7 +4,7 @@ import { SeparatorLayout } from '@wow-two-beta/fe/presentation/layout';
 import { Tooltip } from '@wow-two-beta/fe/presentation/overlays';
 import * as display from '@wow-two-beta/fe/presentation/display';
 import { Button } from '@wow-two-beta/fe/presentation/actions';
-import { Inbox } from 'lucide-vue-next';
+import { ArrowUpRight, CalendarRange, History, ImageOff, Inbox } from 'lucide-vue-next';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
@@ -85,6 +85,10 @@ const {
   CarouselPrev,
   CarouselNext,
   CarouselDots,
+  DotsIndicator,
+  MediaCard,
+  MetaInlineText,
+  MetaInlineItem,
   ActivityTimeline,
   ActivityItem,
   OverflowGroup,
@@ -203,6 +207,8 @@ const covered = [
   'CarouselPrev',
   'CarouselNext',
   'CarouselDots',
+  'MediaCard',
+  'MetaInlineItem',
   'ActivityTimeline',
   'ActivityItem',
   'Tooltip',
@@ -238,6 +244,19 @@ const ROW_COLUMNS = [
   },
 ];
 const selectedRows = ref<Array<string | number>>([]);
+
+/** An offline stand-in photo: a diagonal gradient with a soft sun, as an SVG data URI. */
+function photoOf(from: string, to: string): string {
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'><defs><linearGradient id='g' x2='1' y2='1'>` +
+    `<stop stop-color='${from}'/><stop offset='1' stop-color='${to}'/></linearGradient></defs>` +
+    `<rect width='400' height='500' fill='url(#g)'/><circle cx='290' cy='130' r='70' fill='#fff' fill-opacity='.4'/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+/** The media card demo's photos and the slide its carousel shows. */
+const MEDIA_PHOTOS = [photoOf('#f97316', '#7c3aed'), photoOf('#0ea5e9', '#14b8a6'), photoOf('#facc15', '#ef4444')];
+const mediaIndex = ref(0);
 </script>
 
 <template>
@@ -690,6 +709,76 @@ const selectedRows = ref<Array<string | number>>([]);
             <CarouselNext />
           </div>
         </Carousel>
+      </Demo>
+
+      <Demo
+        name="MediaCard / MetaInlineItem"
+        note="image-first cards: carousel · fallback · dimmed — light, then dark"
+        is-wide
+      >
+        <div
+          v-for="mode in ['', 'dark']"
+          :key="mode || 'light'"
+          :class="mode"
+          class="mb-3 grid grid-cols-[repeat(auto-fill,minmax(min(100%,13rem),1fr))] gap-3 rounded-lg bg-background p-3 text-foreground"
+        >
+          <MediaCard href="#media-card">
+            <template #media>
+              <Carousel v-model:index="mediaIndex" :slides-count="MEDIA_PHOTOS.length" can-loop>
+                <CarouselViewport class="size-full rounded-none" v-bind="{ tabindex: -1 }">
+                  <CarouselSlides class="size-full">
+                    <CarouselSlide v-for="src in MEDIA_PHOTOS" :key="src">
+                      <img :src="src" alt="" class="size-full object-cover" />
+                    </CarouselSlide>
+                  </CarouselSlides>
+                </CarouselViewport>
+                <CarouselPrev class="z-20" />
+                <CarouselNext class="z-20" />
+              </Carousel>
+            </template>
+            <template #topCenter>
+              <span class="rounded-full bg-black/30 px-2 py-1.5 text-white backdrop-blur-md">
+                <DotsIndicator :count="MEDIA_PHOTOS.length" :index="mediaIndex" />
+              </span>
+            </template>
+            <template #topEnd>
+              <Button variant="glass" shape="circle" size="sm" aria-label="Open the original">
+                <ArrowUpRight :size="15" />
+              </Button>
+            </template>
+            <span class="line-clamp-2 text-[15px] leading-snug font-semibold">Autumn light: a city in watercolour</span>
+            <MetaInlineText gap="3" class="text-[13px] text-white/75">
+              <MetaInlineItem tone="success" label="21 to 23 November, ongoing">
+                <template #icon><CalendarRange :size="14" /></template>
+                21–23 Nov
+              </MetaInlineItem>
+              <MetaInlineItem label="posted 3 days ago" class="shrink-0">
+                <template #icon><History :size="14" /></template>
+                3 days
+              </MetaInlineItem>
+            </MetaInlineText>
+          </MediaCard>
+          <MediaCard href="#media-card">
+            <template #fallback><ImageOff :size="28" /></template>
+            <span class="line-clamp-2 text-[15px] leading-snug font-semibold">A post with no image</span>
+            <MetaInlineText gap="3" class="text-[13px] text-white/75">
+              <MetaInlineItem tone="muted" label="12 November, finished">
+                <template #icon><CalendarRange :size="14" /></template>
+                12 Nov
+              </MetaInlineItem>
+            </MetaInlineText>
+          </MediaCard>
+          <MediaCard href="#media-card" is-dimmed>
+            <template #media><img :src="MEDIA_PHOTOS[1]" alt="" /></template>
+            <span class="line-clamp-2 text-[15px] leading-snug font-semibold">Removed from the source</span>
+            <MetaInlineText gap="3" class="text-[13px] text-white/75">
+              <MetaInlineItem label="posted 1 year ago">
+                <template #icon><History :size="14" /></template>
+                1 year
+              </MetaInlineItem>
+            </MetaInlineText>
+          </MediaCard>
+        </div>
       </Demo>
 
       <Demo name="ActivityTimeline">

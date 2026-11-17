@@ -8,6 +8,8 @@ Public import: `import { MetaInlineText } from '@wow-two-beta/fe/presentation/di
 
 ## Contract
 
+- An icon-led item with a fuller phrase for screen readers and a tone is a
+  [`MetaInlineItem`](MetaInlineItem.spec.md) in the default slot; bare content works as before.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 

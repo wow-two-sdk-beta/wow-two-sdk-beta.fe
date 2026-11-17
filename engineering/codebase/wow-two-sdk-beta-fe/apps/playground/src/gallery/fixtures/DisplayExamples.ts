@@ -78,7 +78,9 @@ import {
   ListGroupItem,
   MarkText,
   MarqueeGroup,
+  MediaCard,
   MessageGroup,
+  MetaInlineItem,
   MetaInlineText,
   MetricBadge,
   NotificationIndicator,
@@ -265,6 +267,13 @@ export const displayExamples: readonly SmokeCase[] = [
 
   smokeCase('MetaInlineText', MetaInlineText, {}, { slot: true }),
 
+  smokeCase(
+    'MetaInlineItem',
+    MetaInlineItem,
+    { label: 'posted 3 days ago', tone: 'muted' },
+    { slot: true, wrap: (node) => h(MetaInlineText, null, () => node) },
+  ),
+
   smokeCase('BadgeOverlay', BadgeOverlay, {}, { slot: true }),
 
   smokeCase('SectionHeading', SectionHeading, {}),
@@ -422,6 +431,8 @@ export const displayExamples: readonly SmokeCase[] = [
   smokeCase('ActivityItem', ActivityItem, {}, { slot: true }),
 
   smokeCase('FeatureCard', FeatureCard, { title: 'Fast' }, { slot: true }),
+
+  smokeCase('MediaCard', MediaCard, { href: '/posts/1', ratio: 4 / 5 }, { slot: true }),
 
   smokeCase('StepCard', StepCard, { step: 1, title: 'Install' }, { slot: true }),
 

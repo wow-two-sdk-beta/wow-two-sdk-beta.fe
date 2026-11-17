@@ -66,6 +66,7 @@ export * from './threadView';
 export * from './commentThreadGroup';
 export * from './activityTimeline';
 export * from './featureCard';
+export * from './mediaCard';
 export * from './stepCard';
 export * from './pricingCard';
 export * from './legendText';
