@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Engineering Rules
 
-*Last updated: 2026-10-16*
+*Last updated: 2026-10-29*
 
 > Working rules for agents in this repo — repo-specific deltas only. Shared rules: wow-two-ws/conventions/.
 > Planning: [`backlog.md`](../planning/backlog.md) and the newest [`version-track/`](../planning/version-track/) folder.
@@ -12,6 +12,10 @@
 - A new component ships source, spec, gallery fixture, focused DOM tests and the SSR/mount breadth cases, and
   passes the package gates.
 - A renamed public prop keeps its old name one release as a deprecated alias.
+- After a rename sweep, grep UI string literals for the old component names: earlier sweeps leaked them into
+  labels (guard `RenameDamage.test.ts`).
+- Behaviour tests for an untested component keep finding real defects (13 in the 2026-09-28 sweep); an
+  "improve" pass starts there.
 
 ## Parallel lanes
 
@@ -43,7 +47,9 @@
    `AssertExact` (`presentation/layout/stack/Stack.vue`), or mark the heritage `/* @vue-ignore */`.
 3. `defineOptions()` cannot reference a local const — it is hoisted outside `setup()`.
 4. An optional `Boolean` prop with no default is cast to `false`; a tri-state boolean needs `x: undefined` in
-   `withDefaults`.
+   `withDefaults`. A wrapper that extends an inner input's props and forwards them (`v-bind="{ ...props }"`)
+   defaults every inherited boolean to `undefined`, or it forwards `false` past the Field fallback and pins a
+   boolean `modelValue` (guard `FieldWrappers.dom.test.ts`). `useId` is per app: mount id-comparing pairs in one app.
 5. Use `inheritAttrs: false` + `cn(attrs.class)`, never `inheritAttrs: true` — fallthrough concatenates `class`
    without tailwind-merge, so consumer classes stop winning.
 6. `vue/no-reserved-component-names` is off for `src/presentation/**`; no component is globally registered.
@@ -60,6 +66,10 @@
     constrain with `(keyof TValues & string) | (string & {})`.
 12. Vue drops an event stamped in the millisecond its listener attached; DOM tests wait for `Date.now()` to
     advance after mounting (`MenuVector.dom.test.ts` `settle()`).
+13. Dev builds keep template comments, so a template opening with `<!-- … -->` has a fragment root in dev only:
+    `$el` is the empty anchor, fallthrough fails, and VTU `wrapper.element` reads the comment. `resolveElement`
+    (`foundation/dom`) walks past the anchor (guard `FragmentRoots.test.ts`); tests query the element
+    (`wrapper.get('span')`), not the wrapper root.
 
 - Forward attrs in this order: `inheritAttrs: false` → own attrs → `v-bind="rest"` → own handlers last, each
   guarded by `if (event.defaultPrevented) return`.
