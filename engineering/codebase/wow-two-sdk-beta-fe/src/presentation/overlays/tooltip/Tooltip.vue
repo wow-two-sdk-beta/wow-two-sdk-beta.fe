@@ -31,19 +31,16 @@ import {
   computed,
   createCommentVNode,
   onBeforeUnmount,
-  ref,
   shallowRef,
   useSlots,
   watch,
   type VNode,
 } from 'vue';
 import { AriaAttribute, resolveElement } from '../../../foundation/dom';
-import { cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { useEscape } from '../../../foundation/shortcuts';
 import { useId } from '../../../foundation/identifiers';
-import { useReducedMotion } from '../../../foundation/device';
-import { AnchoredPositioner, Portal, Presence, renderableChildren } from '../../../foundation/primitives';
+import { AnchoredPositioner, Portal, renderableChildren } from '../../../foundation/primitives';
 
 /**
  * Renders a hover- or focus-triggered tooltip into a Portal, positioned by Floating UI.
@@ -96,46 +93,63 @@ const tooltipId = useId('tooltip');
 
 let openTimer: ReturnType<typeof setTimeout> | null = null;
 let closeTimer: ReturnType<typeof setTimeout> | null = null;
+const trigger = { pointer: false, focus: false };
 
-function clear(): void {
-  if (openTimer) clearTimeout(openTimer);
-  if (closeTimer) clearTimeout(closeTimer);
+function cancelOpen(): void {
+  if (openTimer !== null) clearTimeout(openTimer);
   openTimer = null;
+}
+
+function cancelClose(): void {
+  if (closeTimer !== null) clearTimeout(closeTimer);
   closeTimer = null;
 }
 
-function show(): void {
-  clear();
-  if (props.isDisabled) return;
-  openTimer = setTimeout(() => {
-    if (!props.isDisabled) setOpen(true);
-  }, props.openDelay);
+function clearTimers(): void {
+  cancelOpen();
+  cancelClose();
 }
 
-function hide(): void {
-  clear();
-  closeTimer = setTimeout(() => setOpen(false), props.closeDelay);
+function updateTrigger(channel: keyof typeof trigger, active: boolean): void {
+  if (props.isDisabled) return;
+  trigger[channel] = active;
+  if (trigger.pointer || trigger.focus) {
+    cancelClose();
+    if (open.value || openTimer !== null) return;
+    openTimer = setTimeout(() => {
+      openTimer = null;
+      if (!props.isDisabled) setOpen(true);
+    }, props.openDelay);
+    return;
+  }
+
+  cancelOpen();
+  if (!open.value || closeTimer !== null) return;
+  closeTimer = setTimeout(() => {
+    closeTimer = null;
+    setOpen(false);
+  }, props.closeDelay);
 }
 
 watch(
   () => props.isDisabled,
   (disabled) => {
     if (!disabled) return;
-    clear();
+    clearTimers();
+    trigger.pointer = false;
+    trigger.focus = false;
     setOpen(false);
   },
 );
 
 /* Clear pending timers on unmount. */
-onBeforeUnmount(clear);
+onBeforeUnmount(clearTimers);
 
 /* WCAG 1.4.13 — Escape dismisses immediately, without moving focus. */
 useEscape(() => {
-  clear();
+  clearTimers();
   setOpen(false);
 }, open);
-
-const reducedMotion = useReducedMotion();
 
 /**
  * React gated on `!!content`; a Vue consumer can supply the body through the `content` slot
@@ -144,24 +158,6 @@ const reducedMotion = useReducedMotion();
 const hasContent = computed(() => !!props.content || !!slots.content);
 
 const visible = computed(() => !props.isDisabled && open.value && hasContent.value);
-
-/* Keep the Portal + positioner mounted while the exit animation plays.
-   Becomes true with `visible`; cleared on the body's pop-out `animationend`
-   (see `onAnimationEnd` below). With reduced motion no exit animation runs,
-   so tear the shell down immediately on close. */
-const mounted = ref(false);
-watch(
-  [visible, reducedMotion],
-  ([isVisible, isReduced]) => {
-    if (isVisible) mounted.value = true;
-    else if (isReduced) mounted.value = false;
-  },
-  { immediate: true },
-);
-
-function onAnimationEnd(): void {
-  if (!visible.value) mounted.value = false;
-}
 
 /** A function ref may receive a component's public instance; the positioner needs the DOM node. */
 function setAnchor(value: unknown): void {
@@ -191,46 +187,28 @@ function renderTrigger(): VNode {
     {
       ref: setAnchor,
       [AriaAttribute.DescribedBy]: visible.value ? [own, tooltipId].filter(Boolean).join(' ') : own,
-      onPointerenter: show,
-      onPointerleave: hide,
-      onFocus: show,
-      onBlur: hide,
+      onPointerenter: () => updateTrigger('pointer', true),
+      onPointerleave: () => updateTrigger('pointer', false),
+      onFocus: () => updateTrigger('focus', true),
+      onBlur: () => updateTrigger('focus', false),
     },
     true,
   );
 }
-
-const contentClasses = cn(
-  'rounded-md bg-inverse px-2.5 py-1.5 text-xs text-inverse-foreground shadow-md',
-  'motion-safe:data-[state=open]:animate-(--animate-pop-in)',
-  'motion-safe:data-[state=closed]:animate-(--animate-pop-out)',
-);
 </script>
 
 <template>
   <component :is="renderTrigger()" />
-  <Portal v-if="mounted">
-    <!-- Exit animation bubbles up from the body; once the closed-state pop-out ends, tear down
-         the Portal shell. Also covers the reduced-motion path, where no animation runs and
-         `Presence` has already unmounted the body.
-         z-tooltip (100) sits on this positioned root, as Popover and Menu put their layer on theirs: its
-         transform makes the stacking context, so a z-index on the body inside never lifts it above a sticky
-         bar (z-sticky, 30) or a modal (z-modal, 70). -->
-    <AnchoredPositioner
-      :anchor="anchor"
-      :placement="props.placement"
-      :offset="6"
-      class="z-tooltip"
-      @animationend="onAnimationEnd"
-    >
-      <!-- `Presence` clones `data-state` ("open" | "closed") + its tracking ref onto the body,
-           which is what gates the pop-in / pop-out keyframes. Motion sits behind `motion-safe:`
-           so reduced-motion users get an instant show/hide. -->
-      <Presence :is-present="visible">
-        <div :id="tooltipId" role="tooltip" :class="contentClasses">
-          <slot name="content">{{ props.content }}</slot>
-        </div>
-      </Presence>
+  <Portal v-if="visible">
+    <!-- Put the layer on the positioned root because its transform creates a stacking context. -->
+    <AnchoredPositioner :anchor="anchor" :placement="props.placement" :offset="6" class="z-tooltip">
+      <div
+        :id="tooltipId"
+        role="tooltip"
+        class="rounded-md border border-border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-md"
+      >
+        <slot name="content">{{ props.content }}</slot>
+      </div>
     </AnchoredPositioner>
   </Portal>
 </template>

@@ -14,6 +14,9 @@ Public import: `import { Tooltip } from '@wow-two-beta/fe/presentation/overlays'
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - The trigger clone is built during render, so its anchor ref is owned by the rendering tooltip; a consumer ref on the trigger is kept beside it.
 - The positioned floating root carries the `z-tooltip` layer (100), above sticky bars, menus, popovers and modals; the body inside sets no z-index of its own.
+- Hover and focus share one pending open. The tooltip closes when both leave or Escape dismisses it.
+- The tooltip mounts and unmounts without an animation after its open and close delays.
+- The body uses the active theme's popover background, foreground and border tokens.
 
 ## Props
 

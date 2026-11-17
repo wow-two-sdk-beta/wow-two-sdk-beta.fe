@@ -119,7 +119,6 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 | Fix `@vue-ignore` props breaking `strictTemplates` | fix | ListingShelf, Haven (strict-template-friendly components) |
 | Fix `SelectPicker` dropping `class` | fix | ListingShelf; `0.0.13` added `isFullWidth` and `width` |
 | Fix `SliderInput` lacking `step` and emitting strings | fix | PbnStudio |
-| Fix `Tooltip`'s ref owner under interaction | fix | TNIS on `0.0.7`; re-check at HEAD |
 | Verify `Button` types `onClick` and fires `@press` | fix | Arcade, Hijinx on `0.0.7`; `onClick` typing landed in `0.0.8` |
 | Replace `lucide-vue-next` | engineering | Haven; the package depends on it too |
 | Ability to follow the system colour scheme | feature | ListingShelf, Hijinx (theme-mode helper) |
