@@ -17,6 +17,8 @@ export interface BadgeProps {
   readonly isSpinning?: boolean;
   /** Draws the pill as its placeholder; defaults to the nearest `DataRegion` first load. */
   readonly isSkeleton?: boolean;
+  /** Lets the pill shrink below its copy in a flex row and cuts the label with an ellipsis; the leading icon stays. */
+  readonly isShrinkable?: boolean;
 }
 </script>
 
@@ -50,6 +52,7 @@ const props = withDefaults(defineProps<BadgeProps>(), {
   detail: undefined,
   isSpinning: false,
   isSkeleton: undefined,
+  isShrinkable: false,
 });
 
 const attrs = useAttrs();
@@ -64,6 +67,8 @@ const variant = computed(() => props.variant ?? 'neutral');
 const size = computed(() => (props.size === 'sm' || props.size === 'lg' ? props.size : 'md'));
 const hasLeading = computed(() => Boolean(slots.leading));
 const hasDetail = computed(() => Boolean(props.detail) || Boolean(slots.detail));
+/** Whether the label sits in its own truncating span: a leading icon or detail beside it, or a shrinkable pill. */
+const hasParts = computed(() => hasLeading.value || hasDetail.value || props.isShrinkable);
 
 /* The placeholder merges last: the pill keeps its size, padding and radius while its fill and copy are masked. */
 const classes = computed(() =>
@@ -74,6 +79,7 @@ const classes = computed(() =>
       isOutlined: props.isOutlined,
       borderStyle: props.borderStyle,
       hasLeading: hasLeading.value,
+      isShrinkable: props.isShrinkable,
     }),
     (hasLeading.value || hasDetail.value) && 'whitespace-nowrap',
     attrs.class as string | undefined,
@@ -111,10 +117,10 @@ defineExpose({ el });
     v-bind="rest"
     :class="classes"
     ><span v-if="skeleton.isSkeleton.value && !hasContent()" class="inline-block w-[4ch]">&nbsp;</span
-    ><template v-else-if="hasLeading || hasDetail"
+    ><template v-else-if="hasParts"
       ><span v-if="hasLeading" data-badge-leading aria-hidden="true" :class="leadingClasses"
         ><slot name="leading" /></span
-      ><span class="min-w-0 truncate"><slot /></span
+      ><span data-badge-label class="min-w-0 truncate"><slot /></span
       ><span v-if="hasDetail" data-detail :class="detailClasses"
         ><slot name="detail">{{ props.detail }}</slot></span
       ></template

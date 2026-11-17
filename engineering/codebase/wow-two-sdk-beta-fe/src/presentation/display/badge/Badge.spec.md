@@ -21,18 +21,27 @@ Public import: `import { Badge } from '@wow-two-beta/fe/presentation/display';`.
 - The detail (`data-detail`) follows the label in a normal weight with tabular figures — muted on neutral variants,
   the tint's colour on tinted ones.
 - `isSpinning` turns the leading icon slowly for a state still in progress and holds it still under reduced motion.
+- `glass` and `glassSuccess` are for a pill laid over imagery: a fixed dark wash (`bg-black/45`, as `Button`'s neutral
+  glass) or a success-tinted one, with light text and `backdrop-blur-md`. Neither flips with the theme, so the pill
+  reads over a picture in light and dark alike; `isOutlined` adds a hairline (`white/20`, `success/50`), and the detail
+  keeps the pill's light text.
+- `isShrinkable` lets the pill shrink below its copy in a flex row (`min-w-0 shrink`): the label (`data-badge-label`)
+  keeps one line and cuts with an ellipsis, and the leading icon stays at its full size. A row of pills that never
+  wraps is `flex flex-nowrap` with the long pills shrinkable. Without it a plain badge keeps its content width.
+- The glyph table stays in the app: the app picks each pill's icon and passes it through `Icon` in the `leading` slot.
 
 ## Props
 
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
-| `variant` | `BadgeVariant` | no | — | The color treatment. |
+| `variant` | `BadgeVariant` | no | — | The color treatment: `neutral` · `brand` · `success` · `warning` · `danger` · `info` · `outline` · `surface` · `quiet` · `glass` · `glassSuccess`. |
 | `size` | `Size` | no | — | The size step. |
 | `isOutlined` | `boolean` | no | `false` | Draws the border in the tint's colour. |
 | `borderStyle` | `BadgeBorderStyle` | no | `'solid'` | The border's line style: `solid` · `dashed` · `dotted`. |
 | `detail` | `string` | no | `undefined` | The quieter text after the label; the `detail` slot is the rich override. |
 | `isSpinning` | `boolean` | no | `false` | Turns the leading icon slowly; still under reduced motion. |
 | `isSkeleton` | `boolean` | no | `undefined` | Draws the pill as its placeholder; defaults to the nearest `DataRegion` first load. |
+| `isShrinkable` | `boolean` | no | `false` | Lets the pill shrink in a flex row; the label cuts with an ellipsis, the leading icon stays. |
 
 ## Emits
 
@@ -48,9 +57,24 @@ None declared.
 
 ```vue
 <Badge variant="warning" is-outlined detail="v1.4.2">
-  <template #leading><TriangleAlert /></template>
+  <template #leading><Icon :icon="TriangleAlert" /></template>
   prod
 </Badge>
+```
+
+Glass pills over imagery; the second shrinks in a row that never wraps:
+
+```vue
+<div class="flex min-w-0 flex-nowrap items-center gap-1.5">
+  <Badge variant="glass">
+    <template #leading><Icon :icon="Calendar" /></template>
+    event
+  </Badge>
+  <Badge variant="glassSuccess" is-shrinkable>
+    <template #leading><Icon :icon="Shapes" /></template>
+    contemporary exhibitions and installations
+  </Badge>
+</div>
 ```
 
 ## Exposed handle
@@ -60,5 +84,7 @@ None declared.
 ## Verification
 
 - Public render fixture: [DisplayExamples.ts](../../../../apps/playground/src/gallery/fixtures/DisplayExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
-- Focused test references: [Badge.dom.test.ts](../../../../tests/unit/presentation/display/Badge.dom.test.ts).
+- Focused test references: [Badge.dom.test.ts](../../../../tests/unit/presentation/display/Badge.dom.test.ts) and
+  [BadgeShrinkable.browser.test.ts](../../../../tests/unit/presentation/display/BadgeShrinkable.browser.test.ts), which
+  puts a shrinkable badge in a 120 px row and reads the ellipsis and the full-width glyph in a real browser.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

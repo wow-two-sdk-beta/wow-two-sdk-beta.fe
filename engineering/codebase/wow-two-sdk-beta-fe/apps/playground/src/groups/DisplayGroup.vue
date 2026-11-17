@@ -4,7 +4,8 @@ import { SeparatorLayout } from '@wow-two-beta/fe/presentation/layout';
 import { Tooltip } from '@wow-two-beta/fe/presentation/overlays';
 import * as display from '@wow-two-beta/fe/presentation/display';
 import { Button } from '@wow-two-beta/fe/presentation/actions';
-import { ArrowUpRight, CalendarRange, History, ImageOff, Inbox } from 'lucide-vue-next';
+import { ArrowUpRight, Calendar, CalendarRange, History, ImageOff, Inbox, Shapes } from 'lucide-vue-next';
+import { Icon } from '@wow-two-beta/fe/foundation/icons';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
@@ -269,6 +270,32 @@ const mediaIndex = ref(0);
           <Badge :variant="row as never" :size="col as never">badge</Badge>
         </template>
       </Matrix>
+    </Demo>
+
+    <Demo name="Badge glass" note="glass · glassSuccess over imagery, light and dark; isShrinkable in a 120 px row">
+      <div class="flex flex-wrap gap-3">
+        <div
+          v-for="theme in ['', 'dark']"
+          :key="theme"
+          :class="theme"
+          class="rounded-lg p-3"
+          style="background: linear-gradient(135deg, #f5d0a9, #7fb6e8 55%, #3b3f6b)"
+        >
+          <div class="flex flex-nowrap items-center gap-1.5" style="width: 120px">
+            <Badge variant="glass"
+              ><template #leading><Icon :icon="Calendar" :size="14" /></template>event</Badge
+            >
+            <Badge variant="glassSuccess" is-shrinkable
+              ><template #leading><Icon :icon="Shapes" :size="14" /></template>contemporary exhibitions and
+              installations</Badge
+            >
+          </div>
+          <div class="mt-2 flex gap-1.5">
+            <Badge variant="glass" is-outlined detail="3">posts</Badge>
+            <Badge variant="glassSuccess" is-outlined border-style="dashed">ok</Badge>
+          </div>
+        </div>
+      </div>
     </Demo>
 
     <Demo name="Avatar" note="size × tone — fallback initials, no src">

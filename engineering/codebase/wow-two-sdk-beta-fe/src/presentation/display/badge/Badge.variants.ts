@@ -20,6 +20,10 @@ export const BadgeVariant = {
   Surface: 'surface',
   /** Refers to a transparent fill with muted text — a state that asks for no attention. */
   Quiet: 'quiet',
+  /** Refers to a dark translucent wash with light text and a backdrop blur — a pill laid over imagery. */
+  Glass: 'glass',
+  /** Refers to a success-tinted translucent wash with light text and a backdrop blur — a positive pill over imagery. */
+  GlassSuccess: 'glassSuccess',
 } as const;
 
 export type BadgeVariant = (typeof BadgeVariant)[keyof typeof BadgeVariant];
@@ -49,6 +53,9 @@ export const badgeVariants = tv({
       outline: 'border border-border text-foreground',
       surface: 'bg-card text-foreground',
       quiet: 'bg-transparent text-muted-foreground',
+      /* Glass reads over any imagery in either theme: a fixed dark wash and light text, as `Button`'s neutral glass. */
+      glass: 'bg-black/45 text-white backdrop-blur-md',
+      glassSuccess: 'bg-success-900/60 text-success-50 backdrop-blur-md',
     },
     size: {
       sm: 'h-5 gap-1 px-2 text-xs',
@@ -68,6 +75,11 @@ export const badgeVariants = tv({
       true: '',
       false: '',
     },
+    /* The pill may shrink below its copy in a flex row; the label then cuts with an ellipsis. */
+    isShrinkable: {
+      true: 'min-w-0 shrink whitespace-nowrap',
+      false: '',
+    },
   },
   compoundVariants: [
     /* The outline takes the tint's own colour, a step stronger than its fill; neutral fills keep the plain border. */
@@ -77,6 +89,8 @@ export const badgeVariants = tv({
     { isOutlined: true, variant: 'warning', class: 'border-warning/45' },
     { isOutlined: true, variant: 'danger', class: 'border-destructive/45' },
     { isOutlined: true, variant: 'info', class: 'border-info/40' },
+    { isOutlined: true, variant: 'glass', class: 'border-white/20' },
+    { isOutlined: true, variant: 'glassSuccess', class: 'border-success/50' },
     /* A leading icon sits closer to the rounded start than text does. */
     { hasLeading: true, size: 'sm', class: 'ps-1' },
     { hasLeading: true, size: 'md', class: 'ps-1.5' },
@@ -88,6 +102,7 @@ export const badgeVariants = tv({
     isOutlined: false,
     borderStyle: 'solid',
     hasLeading: false,
+    isShrinkable: false,
   },
 });
 
@@ -98,7 +113,7 @@ export const badgeLeadingSize = {
   lg: '[&>svg]:size-4',
 } as const;
 
-/** Whether a variant tints its text, so the detail keeps the tint instead of turning muted. */
+/** Whether a variant sets its own text colour, so the detail keeps it instead of turning muted — glass included. */
 export function isTintedBadge(variant: BadgeVariant): boolean {
   return variant !== 'neutral' && variant !== 'outline' && variant !== 'surface' && variant !== 'quiet';
 }
