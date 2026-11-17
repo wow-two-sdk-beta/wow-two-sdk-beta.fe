@@ -1,4 +1,4 @@
-import { computed, nextTick, onUpdated, ref, watch, type Ref } from 'vue';
+import { computed, nextTick, ref, watch, type Ref } from 'vue';
 
 import { compareOrder } from './ToastHostStore';
 import type { ToastOptions } from './ToastOptions';
@@ -56,7 +56,8 @@ export function useToastCapacity(sources: ToastCapacitySources, settings: ToastC
   function measureCapacity(): void {
     const host = stack.value;
     if (!host) return;
-    const minButtonHeight = window.matchMedia('(pointer: coarse)').matches
+    // `matchMedia` is missing from some test DOMs (jsdom); without it the pointer counts as fine.
+    const minButtonHeight = window.matchMedia?.('(pointer: coarse)').matches
       ? TouchOverflowButtonHeight
       : OverflowButtonHeight;
     const buttonHeight = Math.max(overflowButton()?.offsetHeight ?? 0, minButtonHeight);
@@ -124,7 +125,9 @@ export function useToastCapacity(sources: ToastCapacitySources, settings: ToastC
     { flush: 'post' },
   );
 
-  onUpdated(measureCapacity);
+  // The stack renders inside `Portal`'s slot, so the host's own `onUpdated` never sees a list change; an updated
+  // card keeping its size gets its new nonce measured here.
+  watch(visible, measureCapacity, { flush: 'post' });
 
   /** Opens the overflow list on the first hidden card, or closes it and returns focus to its button. */
   async function toggleOverflow(): Promise<void> {
@@ -138,7 +141,7 @@ export function useToastCapacity(sources: ToastCapacitySources, settings: ToastC
     if (next) {
       const card = host.querySelector<HTMLElement>(`[data-toast-id="${next.id}"]`);
       card?.focus({ preventScroll: true });
-      card?.scrollIntoView({ block: 'nearest' });
+      card?.scrollIntoView?.({ block: 'nearest' });
     } else {
       host.scrollTop = 0;
       const target = overflowButton() ?? host.querySelector<HTMLElement>('[data-toast-id]:not([data-toast-exiting])');

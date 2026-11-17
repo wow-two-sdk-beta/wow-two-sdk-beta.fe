@@ -17,7 +17,8 @@ Public import: `import { FeedbackToastHost } from '@wow-two-beta/fe/presentation
 - Each notice becomes one toast. `tone` maps to `severity` and `durationMs` maps to `duration`.
   `title`, `description`, `compact`, `details`, `action`, `priority`, `expiresAtMs`, `canPin` and `report` pass through.
 - Matching `group.key` values share one live card with a disclosure containing each notice and its actions.
-  Stable IDs update their rows. The card takes the highest explicit priority of its members. Retention
+  Stable IDs update their rows. The card takes the highest explicit priority of its members, and none when no
+  member sets one, so the host's `durations` and `defaultDuration` time it. Retention
   and removal keep their per-notice identity.
 - Group rows use the notice's optional `compact` copy with its original actions. Buttons can wrap when the
   available width is narrow. Rows without compact copy display the original title and description.

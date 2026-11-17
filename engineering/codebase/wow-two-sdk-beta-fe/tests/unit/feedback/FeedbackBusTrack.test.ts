@@ -148,9 +148,12 @@ describe('track', () => {
     expect('progress' in seen.at(-1)!).toBe(false);
   });
 
-  it.each(['success', 'failure'] as const)(
-    'rejects with the callback error when the %s callback throws',
-    async (callback) => {
+  it.each([
+    { callback: 'success', settledTitle: 'Upload failed' },
+    { callback: 'failure', settledTitle: 'Uploading' },
+  ] as const)(
+    'rejects with the callback error when the $callback callback throws, and settles as $settledTitle',
+    async ({ callback, settledTitle }) => {
       const { bus, seen } = watch();
       const callbackError = new Error(`bad ${callback}`);
       const fail = (): never => {
@@ -166,9 +169,37 @@ describe('track', () => {
         }),
       ).rejects.toBe(callbackError);
 
-      expect(seen).toHaveLength(1);
+      expect(seen).toHaveLength(2);
+      expect(seen[1]).toMatchObject({ id: seen[0]!.id, title: settledTitle });
+      expect('progress' in seen[1]!).toBe(false);
     },
   );
+
+  it('hands a throwing success callback’s error to the failure callback, and falls back to running when both throw', async () => {
+    const { bus, seen } = watch();
+    const successError = new Error('bad value');
+    const failure = vi.fn((cause: unknown): FeedbackNotice => ({ ...failed, description: String(cause) }));
+    const throwSuccess = (): never => {
+      throw successError;
+    };
+
+    await expect(bus.track(Promise.resolve(1), { running, success: throwSuccess, failure })).rejects.toBe(successError);
+    expect(failure).toHaveBeenCalledExactlyOnceWith(successError);
+    expect(seen[1]?.description).toBe('Error: bad value');
+
+    const throwFailure = (): never => {
+      throw new Error('bad failure');
+    };
+    await expect(
+      bus.track(Promise.resolve(1), {
+        running: { ...running, id: 'both' },
+        success: throwSuccess,
+        failure: throwFailure,
+      }),
+    ).rejects.toBe(successError);
+    expect(seen.at(-1)).toMatchObject({ id: 'both', title: 'Uploading' });
+    expect('progress' in seen.at(-1)!).toBe(false);
+  });
 
   it('generates one stable id per call, distinct between calls', async () => {
     const { bus, seen } = watch();

@@ -522,6 +522,11 @@ export function createFeedbackBus(options: FeedbackBusOptions = {}): FeedbackBus
     }
   };
 
+  /** Reports whether a republished retained entry changed what the reader sees: its title, description or tone. */
+  function isNews(previous: PublishedNotice, next: PublishedNotice): boolean {
+    return previous.title !== next.title || previous.description !== next.description || previous.tone !== next.tone;
+  }
+
   function notify(notice: FeedbackNotice): string {
     const id = notice.id ?? nextId();
     const existingEntry = notices.find((item) => item.id === id);
@@ -546,8 +551,9 @@ export function createFeedbackBus(options: FeedbackBusOptions = {}): FeedbackBus
             : notices.filter((item) => item.id !== id),
         ),
       );
-      if (retained) unread.add(id);
-      else unread.delete(id);
+      // A progress tick or other unchanged republish keeps the reader's read mark; new copy or a new tone is news.
+      if (!retained) unread.delete(id);
+      else if (!existingEntry || isNews(existingEntry, published)) unread.add(id);
       publishRetained();
       publishNotificationState();
     }
@@ -585,15 +591,39 @@ export function createFeedbackBus(options: FeedbackBusOptions = {}): FeedbackBus
     } catch (failure) {
       operation = Promise.reject(failure);
     }
+    const failureFor = (error: unknown): FeedbackNotice =>
+      typeof tracked.failure === 'function' ? tracked.failure(error) : tracked.failure;
+    /**
+     * Settles with the built notice. A throwing formatter still settles the card — a failed `success` with the
+     * failure notice, else `running` without `progress` — and its error rejects the call.
+     */
+    const conclude = (build: () => FeedbackNotice, isSuccess: boolean): void => {
+      finished = true;
+      if (disposed) return;
+      let notice: FeedbackNotice;
+      try {
+        notice = build();
+      } catch (formatterError) {
+        let fallback: FeedbackNotice = tracked.running;
+        if (isSuccess) {
+          try {
+            fallback = failureFor(formatterError);
+          } catch {
+            // The failure formatter threw as well; the running copy stands in.
+          }
+        }
+        settle(fallback, id);
+        throw formatterError;
+      }
+      settle(notice, id);
+    };
     return operation.then(
       (value) => {
-        finished = true;
-        if (!disposed) settle(typeof tracked.success === 'function' ? tracked.success(value) : tracked.success, id);
+        conclude(() => (typeof tracked.success === 'function' ? tracked.success(value) : tracked.success), true);
         return value;
       },
       (failure: unknown) => {
-        finished = true;
-        if (!disposed) settle(typeof tracked.failure === 'function' ? tracked.failure(failure) : tracked.failure, id);
+        conclude(() => failureFor(failure), false);
         throw failure;
       },
     );

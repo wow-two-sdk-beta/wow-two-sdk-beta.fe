@@ -1,5 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, shallowRef, useAttrs, useTemplateRef, watch, type PropType } from 'vue';
+import {
+  computed,
+  defineComponent,
+  shallowRef,
+  useAttrs,
+  useTemplateRef,
+  watch,
+  type PropType,
+  type StyleValue,
+} from 'vue';
 
 import type { NoticePriority } from '../../../feedback';
 import { cn, OverlayPosition, Severity, Side } from '../../../foundation/styles';
@@ -184,7 +193,7 @@ import { useToastSwipe } from './UseToastSwipe';
 
 /**
  * Renders the app's transient notification stack. Mount once per app.
- * A caller's `class` attr lands on the stack container.
+ * A caller's `class` and `style` attrs land on the stack container.
  */
 defineOptions({ name: 'ToastHost', inheritAttrs: false });
 
@@ -322,8 +331,8 @@ const itemClasses = computed(() => {
   return cn(ItemClass, verticalMotion.value ? VerticalSlideClass : SideSlideClasses[edge]);
 });
 
-/** The stack's inline style — insets, gap and group duration, plus the vertical motion's properties. */
-const stackStyle = computed(() => {
+/** The stack's own inline style — insets, gap and group duration, plus the vertical motion's properties. */
+const ownStyle = computed(() => {
   const base = { ...StackInsets, gap: `${props.gap}px`, '--toast-group-duration': `${props.moveDuration}ms` };
   const slide = verticalMotion.value;
   if (!slide) return base;
@@ -338,6 +347,9 @@ const stackStyle = computed(() => {
     '--toast-motion-ease': slide.easing,
   };
 });
+
+/** The stack's inline style — its own, then a caller's `style` attr (`--toast-top-offset: 4rem`), which wins. */
+const stackStyle = computed<StyleValue>(() => [ownStyle.value, attrs.style as StyleValue]);
 
 // Open details close with their card's exit, or once the card has no details left to show.
 watch(
@@ -449,9 +461,12 @@ function countdownOf(t: VisibleToast & { present: boolean }) {
           @vue:before-unmount="t.present ? undefined : captureGap()"
           @vue:unmounted="t.present ? undefined : removeExiting(t.id)"
         >
+          <!-- The host announcer is the only speaker: the card drops `ToastSimple`'s `status` live region. -->
           <ToastNodeView v-if="t.content" :node="t.content" />
           <Toast
             v-else
+            :role="undefined"
+            aria-live="off"
             :severity="t.severity"
             :surface="surfaceOf(t)"
             :progress="t.progress"

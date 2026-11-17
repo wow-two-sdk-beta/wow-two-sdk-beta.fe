@@ -219,6 +219,21 @@ describe('toast durations', () => {
     await vi.advanceTimersByTimeAsync(3000);
     expect(visibleDeadline).toHaveBeenCalledOnce();
   });
+
+  it('holds a deadline past the 2^31 − 1 ms timer limit until it arrives', async () => {
+    useFakeClock();
+    host();
+    const day = 86_400_000;
+    const dismissed = vi.fn();
+    toastHost.toast({ title: 'Renew in 30 days', expiresAtMs: Date.now() + 30 * day, onDismiss: dismissed });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(dismissed).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(30 * day - 2000);
+    expect(dismissed).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(dismissed).toHaveBeenCalledOnce();
+  });
 });
 
 describe('toast pins', () => {
@@ -301,5 +316,25 @@ describe('toast focus hold', () => {
     await settle();
     await vi.advanceTimersByTimeAsync(110);
     expect(dismissed).toHaveBeenCalledOnce();
+  });
+
+  it('resumes once a card holding pointer focus leaves without a focusout', async () => {
+    useFakeClock();
+    host({ defaultDuration: 1000 });
+    // Pointer focus: the stack hands no focus to a neighbour, and the engine fires no `focusout` as the card goes.
+    const matches = Element.prototype.matches;
+    vi.spyOn(Element.prototype, 'matches').mockImplementation(function (this: Element, selector: string) {
+      return selector === ':focus-visible' ? false : matches.call(this, selector);
+    });
+    const kept = vi.fn();
+    const closing = toastHost.toast({ title: 'Closing', duration: Infinity });
+    toastHost.toast({ title: 'Kept', onDismiss: kept });
+    await settle();
+    card('Closing')!.querySelector<HTMLButtonElement>('[aria-label="Dismiss"]')!.focus();
+    await settle();
+    toastHost.dismiss(closing);
+    await settle();
+    await vi.advanceTimersByTimeAsync(1100);
+    expect(kept).toHaveBeenCalledOnce();
   });
 });

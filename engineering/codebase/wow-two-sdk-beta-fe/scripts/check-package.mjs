@@ -306,6 +306,7 @@ try {
     '.stroke-primary',
     '.text-destructive-soft-foreground',
     '.min-h-6',
+    '@keyframes indeterminate',
   ]) {
     if (!toastCss.includes(token)) throw new Error(`ToastHost CSS omits component styling: ${token}`);
   }

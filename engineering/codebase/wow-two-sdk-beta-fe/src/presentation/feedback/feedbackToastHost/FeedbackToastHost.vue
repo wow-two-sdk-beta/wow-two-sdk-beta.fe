@@ -191,10 +191,13 @@ watch(
         options.details = renderGroup(entry, rows);
         options.compact = undefined;
         options.canPin = rows.some((notice) => notice.canPin === false) ? false : first.canPin;
-        options.priority = rows.reduce<NoticePriority>((highest, notice) => {
-          const priority = notice.priority ?? NoticePriority.Normal;
-          return NoticePriorityRank[priority] > NoticePriorityRank[highest] ? priority : highest;
-        }, NoticePriority.Low);
+        // The highest explicit priority; unclassified members leave the host's severity durations in charge.
+        options.priority = rows.reduce<NoticePriority | undefined>((highest, { priority }) => {
+          if (priority === undefined) return highest;
+          return highest === undefined || NoticePriorityRank[priority] > NoticePriorityRank[highest]
+            ? priority
+            : highest;
+        }, undefined);
         options.action = undefined;
         options.report = undefined;
         options.progress = undefined;

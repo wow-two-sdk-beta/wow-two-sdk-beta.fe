@@ -70,7 +70,9 @@ stored pause preference by calling `setToastPause()` on the correct bus.
 the retained list's order) and `unreadCount`, which equals `unreadIds.length`. The snapshot is republished only
 when the pause or the unread id set changes. `markNotificationsRead()` clears every unread id and
 `markRead(id)` clears one, a no-op when the id is not unread; both preserve the rows. The initial retained
-snapshot is treated as read. Removing, clearing or capping an entry also clears its unread state.
+snapshot is treated as read. Removing, clearing or capping an entry also clears its unread state. Republishing a
+retained id marks it unread only when its title, description or tone changed, so a `track()` progress tick keeps
+the reader's read mark.
 
 `pauseBypass` (a `NoticePriority`, validated at creation with a `RangeError`) lets notices whose priority rank is
 at or above it pop up during a pause; a missing priority counts as `normal`. `suppresses(notice)` is `true` when
@@ -85,7 +87,9 @@ one) with `progress: running.progress ?? {}`. `work` is a promise, or a function
 (a notice or `(value) => notice`) under the same id with `progress` removed and returns the value. On reject it
 publishes `failure` the same way and rethrows the original error. A synchronous throw from `work` counts as a
 rejection. `report` is ignored after settlement. A `success` or `failure` callback that throws rejects the
-returned promise with that error. After `dispose()` the promise still settles with the work's outcome and nothing
+returned promise with that error and still settles the card: a throwing `success` publishes the `failure` notice
+for that error, and when that throws too, or `failure` itself throws, `running` is republished without
+`progress`. After `dispose()` the promise still settles with the work's outcome and nothing
 is published.
 
 ## Reminders

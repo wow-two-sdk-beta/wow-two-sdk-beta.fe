@@ -3,7 +3,7 @@ import { h } from 'vue';
 import { createFeedbackBus, NoticeCategory, NoticePriority, NoticeTone } from '@src/feedback';
 import NotificationCenterGroup from '@src/presentation/display/notificationCenterGroup/NotificationCenterGroup.vue';
 import { toastHost } from '@src/presentation/feedback/toastHost';
-import { attach, cards, click, feedbackHost, resetToasts, settle, stack } from './ToastHarness';
+import { attach, cards, click, feedbackHost, resetToasts, settle, stack, useFakeClock } from './ToastHarness';
 
 /*
  * The bus adapter: how `FeedbackToastHost` turns published notices into toasts — placement, grouping, the
@@ -102,6 +102,39 @@ describe('bus-fed toasts', () => {
     await vi.waitFor(() => expect(cards()[0]?.textContent).toContain('Reminder scheduled.'));
     expect(schedule).toHaveBeenCalledTimes(2);
     expect(bus.retained().map((notice) => notice.id)).toEqual(['review']);
+  });
+
+  it('applies a style attr to the stack, so a top bar can push it down', async () => {
+    const bus = createFeedbackBus();
+    feedbackHost(bus, { style: '--toast-top-offset: 4rem', gap: 12 });
+    bus.notify({ title: 'Saved', tone: NoticeTone.Success });
+    await settle();
+    expect(stack().style.getPropertyValue('--toast-top-offset')).toBe('4rem');
+    expect(stack().style.getPropertyValue('--toast-top-inset')).toContain('var(--toast-top-offset');
+    expect(stack().style.gap).toBe('12px');
+  });
+
+  it.each([
+    { name: 'the severity table', tone: NoticeTone.Danger, priorities: [undefined, undefined], lifetime: 15_000 },
+    { name: 'defaultDuration', tone: NoticeTone.Info, priorities: [undefined, undefined], lifetime: 3000 },
+    {
+      name: 'the highest explicit member priority',
+      tone: NoticeTone.Info,
+      priorities: [NoticePriority.High, undefined],
+      lifetime: 10_000,
+    },
+  ])('times a grouped card by $name', async ({ tone, priorities, lifetime }) => {
+    useFakeClock();
+    const bus = createFeedbackBus();
+    feedbackHost(bus, { defaultDuration: 3000, durations: { danger: 15_000 } });
+    const group = { key: 'imports', title: 'Imports' };
+    priorities.forEach((priority, index) => bus.notify({ tone, title: `Import ${index}`, group, priority }));
+    await settle();
+    expect(cards()).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(lifetime - 100);
+    expect(cards()).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(200);
+    expect(cards()).toHaveLength(0);
   });
 
   it('lets a notice at the bus’s pauseBypass priority pop up during a pause and holds the rest', async () => {

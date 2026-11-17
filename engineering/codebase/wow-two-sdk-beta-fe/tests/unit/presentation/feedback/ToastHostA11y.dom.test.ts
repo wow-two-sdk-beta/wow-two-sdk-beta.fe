@@ -59,6 +59,22 @@ describe('toast stack landmark', () => {
     expect(stack().getAttribute('aria-label')).toBe('Notifications');
   });
 
+  it('leaves speech to the announcers: the cards are no live regions', async () => {
+    host();
+    toastHost.toast({ title: 'Saved' });
+    toastHost.toast({ title: 'Upload failed', severity: 'danger' });
+    await settle();
+    expect(cards()).toHaveLength(2);
+    for (const node of cards()) {
+      const surface = node.firstElementChild!;
+      expect(surface.getAttribute('aria-live')).toBe('off');
+      expect(surface.hasAttribute('role')).toBe(false);
+    }
+    expect(
+      stack().querySelectorAll('[role="status"], [role="alert"], [aria-live="polite"], [aria-live="assertive"]'),
+    ).toHaveLength(0);
+  });
+
   it('localizes the region name', async () => {
     attach(
       defineComponent({

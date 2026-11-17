@@ -62,9 +62,9 @@ Component-only import: `@wow-two-beta/fe/presentation/feedback/toast-host` with 
   an explicit `duration`, then the priority duration, then `durations` by severity and `defaultDuration`.
   Setting `priorityDurations` replaces the SDK's priority table and counts notices without a priority as
   Normal. Without a custom table, unclassified notices use their severity duration.
-- Shell styles can set `--toast-top-offset`, `--toast-bottom-offset`, `--toast-gutter` and `--toast-width` (the
-  card width, default `20rem`, within `--toast-available-width`). The host includes safe-area insets and uses the
-  available width below the tablet breakpoint.
+- Shell styles, or the host's `style` and `class` attrs, can set `--toast-top-offset`, `--toast-bottom-offset`,
+  `--toast-gutter` and `--toast-width` (the card width, default `20rem`, within `--toast-available-width`). The
+  host includes safe-area insets and uses the available width below the tablet breakpoint.
 - A touch or pen drag across a present card follows the finger and fades toward 0.4 at the dismiss point. A
   release past 40% of the card's width, or a flick (50 px at 0.3 px/ms), toward the anchored side, or either
   side when centered, sends the card off that side and dismisses it; anything less springs back. A mouse, a
@@ -89,7 +89,8 @@ Component-only import: `@wow-two-beta/fe/presentation/feedback/toast-host` with 
   updates and toasts without string copy stay silent. Danger and Urgent toasts use the assertive region. Changes
   within 120 ms read as one message; more than three arrivals read as `ToastHost.manyArrivals`
   (`'{count} new notifications'`) plus the highest-priority one. Each message clears its region a frame first, so
-  repeated text is heard again. Every countdown display is `aria-hidden`.
+  repeated text is heard again. Every countdown display is `aria-hidden`. The cards are no live regions: each
+  drops `ToastSimple`'s `status` role and carries `aria-live="off"`, so nothing is read twice.
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.

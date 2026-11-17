@@ -80,3 +80,13 @@
     transform: translateY(-8px);
   }
 }
+
+/* The running bar's indeterminate sweep (`animate-[indeterminate_…]`); the same frames as the package-wide theme. */
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}

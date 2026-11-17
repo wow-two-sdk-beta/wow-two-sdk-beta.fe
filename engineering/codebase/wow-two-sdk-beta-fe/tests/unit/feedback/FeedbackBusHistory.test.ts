@@ -338,6 +338,21 @@ describe('per-entry unread state', () => {
     expect(ids(bus)).toEqual(['b', 'a']);
   });
 
+  it('keeps a read entry read when it is republished with the same copy and tone', () => {
+    const bus = createFeedbackBus();
+    bus.notify(keep('upload', { progress: { value: 1, max: 10 } }));
+    bus.markNotificationsRead();
+
+    bus.notify(keep('upload', { progress: { value: 2, max: 10 } }));
+    expect(bus.notificationState().unreadIds).toEqual([]);
+
+    bus.notify(keep('upload', { tone: NoticeTone.Success }));
+    expect(bus.notificationState().unreadIds).toEqual(['upload']);
+    bus.markRead('upload');
+    bus.notify(keep('upload', { tone: NoticeTone.Success, description: 'All 10 files' }));
+    expect(bus.notificationState().unreadIds).toEqual(['upload']);
+  });
+
   it('clears every id with markNotificationsRead and keeps the entries', () => {
     const bus = createFeedbackBus();
     for (const id of ['a', 'b']) bus.notify(keep(id));

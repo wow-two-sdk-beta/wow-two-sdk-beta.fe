@@ -35,12 +35,14 @@ Breaks:
 | `PublishedNotice` without a time | `publishedAtMs` is required: a hand-built notice adds it, a `toEqual` adds `publishedAtMs: expect.any(Number)`. |
 | `NotificationItem` | `NotificationCenterGroupItem`; the old name stays a deprecated alias for one release. |
 | `close` / `delete` / `select` / `dismiss` emits on `Toast`, `NotificationCenterGroup` and its item | Function props `onClose` / `onDelete` / `onSelect` / `onDismiss`: `@close="…"` still binds and still shows the button; a test reading `wrapper.emitted('close')` reads the prop's calls instead. |
+| A hand-written `FeedbackBus` (a test fake passed as `:bus`) | The interface adds `dismiss`, `clearRetained`, `markRead`, `markNotificationsRead`, `notificationState`, `subscribeNotificationState`, `setToastPause`, `suppresses` and `track`, and `FeedbackToastHost` calls `suppresses` on every notice: build the fake with `createFeedbackBus()`, or add the members. |
+| Each `ToastHost` card a `role="status"` live region | Cards carry no role and `aria-live="off"`; the host's two announcers speak. Tests select a card by `[data-toast-id]`. |
 
 New:
 
 | Area | Additions |
 |---|---|
-| `feedback` | `NoticePriority` with `NoticePriorityRank`; notice `priority`, `group`, `compact`, `details`, `historyAction`, `expiresAtMs`, `canPin`, `reminderKey`, `progress`, `publishedAtMs`. Bus `dismiss`, `clearRetained`, `markRead`, `markNotificationsRead`, `notificationState`, `subscribeNotificationState`, `setToastPause`, `suppresses`, `track`. Options `maxRetained` (default 200), `pauseBypass`, `reminders`; `initialRetained` takes `RetainedSeed`. [Spec](src/feedback/FeedbackBus.spec.md) |
+| `feedback` | `NoticePriority` with `NoticePriorityRank`; notice `priority`, `group`, `compact`, `details`, `historyAction`, `expiresAtMs`, `canPin`, `reminderKey`, `progress`, `publishedAtMs`. Bus `dismiss`, `clearRetained`, `markRead`, `markNotificationsRead`, `notificationState`, `subscribeNotificationState`, `setToastPause`, `suppresses`, `track`, and the optional `remindLater` (set when `reminders` is given). Options `maxRetained` (default 200), `pauseBypass`, `reminders`; `initialRetained` takes `RetainedSeed`. [Spec](src/feedback/FeedbackBus.spec.md) |
 | `ToastHost` | `motion` (`ToastMotion`), `groupMotion` (`ToastGroupMotion`), `moveDuration`, `priorityDurations`, `canPin` (default `true`), `surface` (`ToastSurface`), `hotkey` (default `'F8'`, `false` turns it off), `ToastTimer.CloseRing`; the overflow control, swipe to dismiss on touch, polite and urgent announcements; `--toast-width` (default 20 rem), `--toast-top-offset`, `--toast-bottom-offset`, `--toast-gutter`. [Spec](src/presentation/feedback/toastHost/ToastHost.spec.md) |
 | `Toast` | `surface`, `progress`, `isPinned`, `detailsOpen` (`v-model:details-open`), `isCompact`, and the `details` slot. [Spec](src/presentation/feedback/toast/Toast.spec.md) |
 | `NotificationCenterGroup` | Rows show their arrival time and unread mark; the header adds Mark all read, Clear all (`canClear`) and the pop-up pause (`canPause`). [Spec](src/presentation/display/notificationCenterGroup/NotificationCenterGroup.spec.md) |

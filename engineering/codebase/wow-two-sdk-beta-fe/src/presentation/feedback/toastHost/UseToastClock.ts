@@ -1,8 +1,11 @@
-import { computed, onScopeDispose, onUpdated, ref, watch, type Ref } from 'vue';
+import { computed, onScopeDispose, ref, watch, type Ref } from 'vue';
 
 import { hasDeadline } from './ToastHostStore';
 import type { VisibleToast } from './UseResolvedToasts';
 import type { ToastPinControls } from './UseToastPins';
+
+/** @internal The longest delay `setTimeout` keeps (2^31 − 1 ms); a longer one fires at once. */
+const MaxTimerDelay = 2_147_483_647;
 
 /** @internal One toast's expiry clock — its banked time and the timer running the rest. */
 interface ToastClock {
@@ -92,6 +95,37 @@ export function useToastClock(sources: ToastClockSources, settings: ToastClockSe
     clock.remaining = Math.max(0, clock.remaining - (now - clock.startedAt));
   }
 
+  /** Reports whether focus still sits on a card that stays — not outside the stack, not on an exiting card. */
+  function holdsFocus(): boolean {
+    const active = document.activeElement;
+    return !!active && !!stack.value?.contains(active) && !active.closest('[data-toast-exiting]');
+  }
+
+  // A focused card that leaves the stack fires no `focusout`, so each change of the rendered cards rechecks where
+  // focus went. Registered before the clocks, so they run on the settled focus in the same flush.
+  watch(
+    [visible, exiting],
+    () => {
+      if (focused.value && !holdsFocus()) focused.value = false;
+    },
+    { flush: 'post' },
+  );
+
+  /** Runs a clock's remaining time; a delay past the timer limit fires early and re-arms with the rest. */
+  function runClock(clock: ToastClock, id: string, now: number): void {
+    const delay = Math.min(clock.remaining, MaxTimerDelay);
+    clock.startedAt = now;
+    clock.handle = window.setTimeout(() => {
+      if (delay >= clock.remaining) {
+        expire(id);
+        return;
+      }
+      const at = Date.now();
+      clock.remaining = Math.max(0, clock.remaining - Math.max(delay, at - clock.startedAt));
+      runClock(clock, id, at);
+    }, delay);
+  }
+
   // Effective pins follow the host's pin default; the end of an exit releases that toast's pin.
   watch(
     [cards, visibleIds, pausedIds, pins.pinned, pins.effective, exiting],
@@ -128,18 +162,12 @@ export function useToastClock(sources: ToastClockSources, settings: ToastClockSe
         if (held.has(t.id)) {
           pauseClock(clock, now);
         } else if (clock.handle === undefined) {
-          clock.startedAt = now;
-          clock.handle = window.setTimeout(() => expire(t.id), clock.remaining);
+          runClock(clock, t.id, now);
         }
       }
     },
     { immediate: true, flush: 'post' },
   );
-
-  // A focused card that leaves the stack fires no `focusout`, so each patch rechecks where focus went.
-  onUpdated(() => {
-    if (focused.value && !stack.value?.contains(document.activeElement)) focused.value = false;
-  });
 
   onScopeDispose(() => {
     for (const clock of clocks.values()) window.clearTimeout(clock.handle);
