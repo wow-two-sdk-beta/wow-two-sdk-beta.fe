@@ -13,6 +13,11 @@ Public import: `import { Button } from '@wow-two-beta/fe/presentation/actions';`
 - Disabled, loading and skeleton states block activation before child or caller handlers, including slotted links.
 - Becoming inactive cancels a pending long press. Disabled targets leave the tab order; loading targets retain focus.
 - Loading swaps only the leading icon for the spinner and keeps the label; without a leading icon the spinner centers over the transparent label, so the width and the accessible name hold.
+- Unavailable keeps the tab stop and sets `aria-disabled`; the activation guard swallows clicks, Enter, Space and
+  presses, and an unavailable link does not navigate. Disabled, loading and skeleton states take precedence.
+- Unavailable draws a dashed border at reduced opacity; `square` and `circle` shapes add a diagonal slash.
+- `unavailableLabel` shows through `Tooltip` and is the accessible description: a hidden copy inside the element,
+  referenced by `aria-describedby` and merged with the caller's ids, holds it without hovering.
 
 ## Props
 
@@ -33,6 +38,8 @@ Inherited contracts: `extends /* @vue-ignore */ ButtonAttributes`. These members
 | `loadingText` | `string` | no | — | The text that replaces the label while loading. Omit it to keep the label. No default — consumer supplies (i18n). |
 | `isSkeleton` | `boolean` | no | `undefined` | The content-loading state — keeps size and radius, masks content, pulses under `motion-safe`. Defaults to the nearest `DataRegion` first load. Excludes `isLoading`. |
 | `isDisabled` | `boolean` | no | `undefined` | The disabled state — drops focus order and clicks. Inherited from an enclosing `Field`. |
+| `isUnavailable` | `boolean` | no | `undefined` | The unavailable state — keeps its tab stop with `aria-disabled`, swallows presses, and draws a dashed, dimmed box; `circle` and `square` shapes add a slash over the icon. Disabled, loading and skeleton states win. |
+| `unavailableLabel` | `string` | no | — | The reason shown through `Tooltip` and set as the accessible description while unavailable. Consumer-supplied (i18n). Defining it mounts the tooltip wrapper, so keep it defined while `isUnavailable` toggles. |
 | `isFullWidth` | `boolean` | no | `undefined` | The full-width state — stretches to fill container width. |
 | `isMultiline` | `boolean` | no | `undefined` | The multi-line state — allows label wrap; default truncates to single line. |
 | `asChild` | `boolean` | no | `false` | The as-child flag — renders as the single child element via `Primitive`'s `asChild` merge. |
@@ -78,7 +85,7 @@ Inherited contracts: `extends /* @vue-ignore */ ButtonAttributes`. These members
 ## Verification
 
 - Public render fixture: [ActionsExamples.ts](../../../../apps/playground/src/gallery/fixtures/ActionsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
-- Focused test references: [Actions.a11y.dom.test.ts](../../../../tests/unit/presentation/actions/Actions.a11y.dom.test.ts), [Focus.browser.test.ts](../../../../tests/unit/presentation/actions/Focus.browser.test.ts), [GoogleSignInButton.dom.test.ts](../../../../tests/unit/presentation/actions/GoogleSignInButton.dom.test.ts), [EditingBehavior.dom.test.ts](../../../../tests/unit/presentation/forms/EditingBehavior.dom.test.ts). Consult the named test assertions for the behavior actually covered.
+- Focused test references: [Actions.a11y.dom.test.ts](../../../../tests/unit/presentation/actions/Actions.a11y.dom.test.ts), [Focus.browser.test.ts](../../../../tests/unit/presentation/actions/Focus.browser.test.ts), [GoogleSignInButton.dom.test.ts](../../../../tests/unit/presentation/actions/GoogleSignInButton.dom.test.ts), [ButtonUnavailable.dom.test.ts](../../../../tests/unit/presentation/actions/ButtonUnavailable.dom.test.ts), [ButtonUnavailable.browser.test.ts](../../../../tests/unit/presentation/actions/ButtonUnavailable.browser.test.ts), [EditingBehavior.dom.test.ts](../../../../tests/unit/presentation/forms/EditingBehavior.dom.test.ts). Consult the named test assertions for the behavior actually covered.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
 
 A pointer leaving the action ends its owned press, because release may target another element.

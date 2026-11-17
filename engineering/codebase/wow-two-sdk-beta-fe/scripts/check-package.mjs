@@ -315,8 +315,10 @@ try {
   // JS-only production consumers; Vue is external, all other dependencies are included.
   // UI ceilings retain headroom while rejecting the previous duplicate class-merge engine.
   // Each consumer also lists the date and decimal engines its symbol really needs.
+  // Button carries the SDK Tooltip (and its positioner) for `unavailableLabel` since F07: ~29.7 kB, still below a
+  // duplicate class-merge engine.
   for (const [entry, symbol, maximumGzip, needs = []] of [
-    ['presentation/actions', 'Button', 24_000],
+    ['presentation/actions', 'Button', 32_000],
     ['presentation/display', 'Text', 18_000],
     ['presentation/display', 'Card', 19_500],
     ['foundation/http', 'createApiClient', 4_500],

@@ -110,6 +110,12 @@ export const buttonVariants = tv({
       true: 'whitespace-normal text-left',
       false: 'whitespace-nowrap text-ellipsis overflow-hidden',
     },
+    // Unavailable: still a tab stop, but dashed and dimmed. `relative` anchors the slash below and yields to a
+    // consumer's own position class through `cn`.
+    unavailable: {
+      true: 'relative border-dashed opacity-60 cursor-not-allowed',
+      false: '',
+    },
   },
   compoundVariants: [
     // === SOLID × tone ===
@@ -327,6 +333,17 @@ export const buttonVariants = tv({
     { variant: 'glass-surface', tone: 'danger', class: 'border-destructive/50' },
     { variant: 'glass-surface', tone: 'success', class: 'border-success/50' },
     { variant: 'glass-surface', tone: 'warning', class: 'border-warning/50' },
+
+    // === UNAVAILABLE === last, so the dashed border's colour beats every tone's own border colour.
+    { unavailable: true, class: 'border-current/40' },
+    // The icon shapes cross the icon with a slash, drawn by `::after` so the markup stays the consumer's; it keeps
+    // the forced text colour, since forced colours would otherwise repaint its fill as `Canvas`.
+    {
+      unavailable: true,
+      shape: ['square', 'circle'],
+      class:
+        'after:pointer-events-none after:absolute after:inset-x-[20%] after:top-1/2 after:h-0.5 after:-translate-y-1/2 after:rotate-45 after:rounded-full after:bg-current after:[forced-color-adjust:none]',
+    },
   ],
   defaultVariants: {
     variant: 'solid',
@@ -335,6 +352,7 @@ export const buttonVariants = tv({
     shape: 'default',
     fullWidth: false,
     wrap: false,
+    unavailable: false,
   },
 });
 

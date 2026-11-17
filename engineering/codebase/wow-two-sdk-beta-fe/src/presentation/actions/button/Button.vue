@@ -21,7 +21,7 @@ export type ButtonSize = SizeUnion<ButtonSizePreset>;
 /** @internal The type-only surface `ButtonProps` inherits — native attributes plus the variant keys. `onClick` stays
     typed so `@click` compiles under strict templates; the button still gates it at runtime (see `handleClick`). */
 type ButtonAttributes = Omit<ButtonHTMLAttributes, 'type' | 'disabled' | 'color'> &
-  Omit<ButtonVariants, 'size' | 'variant' | 'tone' | 'shape'>;
+  Omit<ButtonVariants, 'size' | 'variant' | 'tone' | 'shape' | 'unavailable'>;
 
 /** Defines props for the button. */
 export interface ButtonProps extends /* @vue-ignore */ ButtonAttributes {
@@ -65,6 +65,14 @@ export interface ButtonProps extends /* @vue-ignore */ ButtonAttributes {
 
   /** The disabled state — drops focus order and clicks. Inherited from an enclosing `Field`. */
   readonly isDisabled?: boolean;
+
+  /** The unavailable state — keeps its tab stop with `aria-disabled`, swallows presses, and draws a dashed, dimmed
+     box; `circle` and `square` shapes add a slash over the icon. Disabled, loading and skeleton states win. */
+  readonly isUnavailable?: boolean;
+
+  /** The reason shown through `Tooltip` and set as the accessible description while unavailable. Consumer-supplied
+     (i18n). Defining it mounts the tooltip wrapper, so keep it defined while `isUnavailable` toggles. */
+  readonly unavailableLabel?: string;
 
   /** The full-width state — stretches to fill container width. */
   readonly isFullWidth?: boolean;
@@ -114,11 +122,13 @@ import {
   getCurrentInstance,
   normalizeStyle,
   onBeforeUnmount,
+  shallowRef,
   useAttrs,
   useTemplateRef,
   watch,
   watchEffect,
   type ComponentPublicInstance,
+  type FunctionalComponent,
   type StyleValue,
 } from 'vue';
 import type { ClassValue } from 'clsx';
@@ -134,11 +144,13 @@ import {
 import { cn, ColorExtensions, CssExtensions, type BoxSizeOverrides } from '../../../foundation/styles';
 import { IsDevelopment } from '../../../foundation/config';
 import { OptionalExtensions } from '../../../foundation/optionals';
-import { Primitive } from '../../../foundation/primitives';
+import { Primitive, Slottable, renderableChildren } from '../../../foundation/primitives';
 import { useFormControl } from '../../../foundation/primitives/formControlContext/FormControlContext';
 import { Spinner } from '../../../foundation/icons';
 import { useDebounceHandler } from '../../../foundation/async';
+import { useId } from '../../../foundation/identifiers';
 import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
+import Tooltip from '../../overlays/tooltip/Tooltip.vue';
 import { buttonVariants } from './Button.variants';
 
 const ComponentName = 'Button';
@@ -150,6 +162,7 @@ const ButtonDataState = {
   Loading: 'loading',
   Skeleton: 'skeleton',
   Disabled: 'disabled',
+  Unavailable: 'unavailable',
 } as const;
 type ButtonDataState = (typeof ButtonDataState)[keyof typeof ButtonDataState];
 
@@ -169,6 +182,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   /* Explicit `undefined` defaults keep Vue's boolean casting from turning an absent prop into
      `false` — `isDisabled` must stay undefined to inherit from an enclosing `Field`. */
   isDisabled: undefined,
+  isUnavailable: undefined,
   isLoading: undefined,
   isSkeleton: undefined,
   isFullWidth: undefined,
@@ -230,7 +244,11 @@ const resolvedDisabled = computed(() => props.isDisabled ?? formControl?.isDisab
 const skeleton = useSkeletonState(() => props.isSkeleton);
 const skeletonActive = computed(() => skeleton.isSkeleton.value);
 const loadingActive = computed(() => !skeletonActive.value && !!props.isLoading);
-const isInactive = computed(() => loadingActive.value || skeletonActive.value || resolvedDisabled.value);
+/* Unavailable joins the inactive set — `aria-disabled` arms `Primitive`'s activation guard, which also stops a link
+   from navigating — but, unlike disabled, keeps the tab stop so the reason stays reachable. */
+const isInactive = computed(
+  () => loadingActive.value || skeletonActive.value || resolvedDisabled.value || !!props.isUnavailable,
+);
 
 /* The spinner swaps with a leading icon when there is one; without one it centers over the label, whose
    box keeps the button's width. */
@@ -245,8 +263,46 @@ const dataState = computed<ButtonDataState | undefined>(() =>
       ? ButtonDataState.Loading
       : resolvedDisabled.value
         ? ButtonDataState.Disabled
-        : undefined,
+        : props.isUnavailable
+          ? ButtonDataState.Unavailable
+          : undefined,
 );
+
+const unavailableShown = computed(() => dataState.value === ButtonDataState.Unavailable);
+
+/* The reason reaches the tooltip and the description only while the unavailable state is the one shown. */
+const unavailableReason = computed(() =>
+  unavailableShown.value && props.unavailableLabel ? props.unavailableLabel : undefined,
+);
+
+/* The hidden copy of the reason, referenced by `aria-describedby` so the description holds without hovering. */
+const descriptionId = useId('unavailable');
+
+/* An open `Tooltip` adds its own id to `aria-describedby`; the hidden copy steps out meanwhile, so the reason is
+   described once. */
+const tooltipOpen = shallowRef(false);
+
+/* The wrapper while no `unavailableLabel` asks for a `Tooltip`: it renders its single child as is, so the button
+   keeps one template and its element root. */
+const PassThrough: FunctionalComponent = (_props, { slots }) => renderableChildren(slots.default?.())[0] ?? null;
+
+const wrapperProps = computed(() =>
+  props.unavailableLabel === undefined
+    ? {}
+    : {
+        content: props.unavailableLabel,
+        isDisabled: unavailableReason.value === undefined,
+        'onUpdate:open': (open: boolean) => {
+          tooltipOpen.value = open;
+        },
+      },
+);
+
+const describedBy = computed(() => {
+  const ids = [attrs[AriaAttribute.DescribedBy] as string | undefined];
+  if (unavailableReason.value !== undefined && !tooltipOpen.value) ids.push(descriptionId);
+  return ids.filter(Boolean).join(' ') || undefined;
+});
 
 const safeLongPressDelay = computed(() =>
   !Number.isFinite(props.longPressDelay) ||
@@ -291,6 +347,7 @@ const rootClass = computed(() =>
       shape: props.shape,
       fullWidth: props.isFullWidth,
       wrap: props.isMultiline,
+      unavailable: unavailableShown.value,
     }),
     attrs.class as ClassValue,
   ),
@@ -451,12 +508,14 @@ function handleClick(event: MouseEvent): void {
   debouncedOnClick(event);
 }
 
-/* The attrs the component owns rather than forwards — see the `inheritAttrs: false` note above.
+/* The attrs the component owns rather than forwards — see the `inheritAttrs: false` note above;
+   `aria-describedby` is merged with the unavailable reason's id.
    Event names carry the single casing Vue's runtime understands (`on` + the event name with only
    its first letter capitalised); `onPointerDown` would bind a `pointer-down` listener. */
 const OwnedAttributes: ReadonlySet<string> = new Set([
   'class',
   'style',
+  AriaAttribute.DescribedBy,
   'onClick',
   'onPointerdown',
   'onPointerup',
@@ -484,6 +543,7 @@ const rootProps = computed(() => ({
   disabled: OptionalExtensions.from(resolvedDisabled.value, true),
   [AriaAttribute.Busy]: OptionalExtensions.from(loadingActive.value || skeletonActive.value, true),
   [AriaAttribute.Disabled]: OptionalExtensions.from(isInactive.value, true),
+  [AriaAttribute.DescribedBy]: describedBy.value,
   tabindex: OptionalExtensions.from(skeletonActive.value || resolvedDisabled.value, -1),
   'data-state': dataState.value,
   onClick: handleClick,
@@ -508,63 +568,71 @@ defineExpose({ el });
 </script>
 
 <template>
-  <!-- Renders an action button — for text and/or icon content. -->
-  <Primitive ref="root" :as="HtmlElement.Button" :as-child="asChild" v-bind="rootProps">
-    <!-- asChild → the merge target owns its children; leading/trailing/loading chrome is not rendered. -->
-    <slot v-if="asChild" />
+  <!-- Renders an action button — for text and/or icon content; an `unavailableLabel` wraps it in a `Tooltip`. -->
+  <component :is="unavailableLabel === undefined ? PassThrough : Tooltip" v-bind="wrapperProps">
+    <Primitive ref="root" :as="HtmlElement.Button" :as-child="asChild" v-bind="rootProps">
+      <!-- asChild → the merge target owns its children; leading/trailing/loading chrome is not rendered. With an
+         unavailable reason, `Slottable` marks the target so the hidden reason below composes inside it. -->
+      <Slottable v-if="asChild && unavailableReason !== undefined"><slot /></Slottable>
+      <slot v-else-if="asChild" />
 
-    <template v-else-if="loadingActive && (hasLeading() || loadingText !== undefined)">
-      <!-- The spinner stands where the leading icon was; the label (or loadingText) stays readable. -->
-      <slot name="loading">
-        <LoadingSlotProp v-if="loadingSlot !== undefined" />
-        <Spinner v-else />
-      </slot>
-      <span v-if="loadingText !== undefined">{{ loadingText }}</span>
-      <slot v-else />
-      <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
-    </template>
+      <template v-else-if="loadingActive && (hasLeading() || loadingText !== undefined)">
+        <!-- The spinner stands where the leading icon was; the label (or loadingText) stays readable. -->
+        <slot name="loading">
+          <LoadingSlotProp v-if="loadingSlot !== undefined" />
+          <Spinner v-else />
+        </slot>
+        <span v-if="loadingText !== undefined">{{ loadingText }}</span>
+        <slot v-else />
+        <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
+      </template>
 
-    <template v-else-if="loadingActive">
-      <!-- No icon to swap: the label turns transparent, keeping the width and the accessible name, and the
+      <template v-else-if="loadingActive">
+        <!-- No icon to swap: the label turns transparent, keeping the width and the accessible name, and the
            spinner centers over it. -->
-      <span class="relative inline-flex items-center justify-center">
-        <span class="inline-flex items-center gap-2 opacity-0">
-          <slot />
-          <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
+        <span class="relative inline-flex items-center justify-center">
+          <span class="inline-flex items-center gap-2 opacity-0">
+            <slot />
+            <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
+          </span>
+          <span class="absolute inset-0 inline-flex items-center justify-center">
+            <slot name="loading">
+              <LoadingSlotProp v-if="loadingSlot !== undefined" />
+              <Spinner v-else />
+            </slot>
+          </span>
         </span>
-        <span class="absolute inset-0 inline-flex items-center justify-center">
-          <slot name="loading">
-            <LoadingSlotProp v-if="loadingSlot !== undefined" />
-            <Spinner v-else />
-          </slot>
-        </span>
-      </span>
-    </template>
+      </template>
 
-    <template v-else-if="hoverSlot !== undefined || $slots.hover">
-      <slot name="leading"><LeadingSlotProp v-if="leadingSlot !== undefined" /></slot>
-      <!-- CSS-only hover/focus-visible swap: children occupy the box and reserve its size;
+      <template v-else-if="hoverSlot !== undefined || $slots.hover">
+        <slot name="leading"><LeadingSlotProp v-if="leadingSlot !== undefined" /></slot>
+        <!-- CSS-only hover/focus-visible swap: children occupy the box and reserve its size;
            the hover content overlays it centered. Toggle via `group-hover`/`group-focus-visible`
            on the root `group` — no JS hover state. `aria-hidden` on the hidden layer so AT
            reads one label. -->
-      <span class="relative inline-flex items-center justify-center">
-        <span class="inline-flex items-center justify-center group-hover:invisible group-focus-visible:invisible">
-          <slot />
+        <span class="relative inline-flex items-center justify-center">
+          <span class="inline-flex items-center justify-center group-hover:invisible group-focus-visible:invisible">
+            <slot />
+          </span>
+          <span
+            aria-hidden="true"
+            class="invisible absolute inset-0 inline-flex items-center justify-center group-hover:visible group-focus-visible:visible"
+          >
+            <slot name="hover"><HoverSlotProp v-if="hoverSlot !== undefined" /></slot>
+          </span>
         </span>
-        <span
-          aria-hidden="true"
-          class="invisible absolute inset-0 inline-flex items-center justify-center group-hover:visible group-focus-visible:visible"
-        >
-          <slot name="hover"><HoverSlotProp v-if="hoverSlot !== undefined" /></slot>
-        </span>
-      </span>
-      <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
-    </template>
+        <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
+      </template>
 
-    <template v-else>
-      <slot name="leading"><LeadingSlotProp v-if="leadingSlot !== undefined" /></slot>
-      <slot />
-      <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
-    </template>
-  </Primitive>
+      <template v-else>
+        <slot name="leading"><LeadingSlotProp v-if="leadingSlot !== undefined" /></slot>
+        <slot />
+        <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
+      </template>
+
+      <!-- Hidden, so the name computed from content skips it, yet `aria-describedby` still reads it; inside the
+         element, so a parent's `:last-child` rules (ButtonGroup) still see the button. -->
+      <span v-if="unavailableReason !== undefined" :id="descriptionId" hidden>{{ unavailableReason }}</span>
+    </Primitive>
+  </component>
 </template>

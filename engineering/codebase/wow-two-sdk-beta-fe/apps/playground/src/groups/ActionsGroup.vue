@@ -9,7 +9,7 @@ import {
 import { LinkItem } from '@wow-two-beta/fe/presentation/nav';
 import { ref } from 'vue';
 import * as actions from '@wow-two-beta/fe/presentation/actions';
-import { Check, Copy, Pencil, Plus, Share2, Star, Trash2 } from 'lucide-vue-next';
+import { ArrowUpRight, Check, Copy, Pencil, Plus, Share2, Star, Trash2 } from 'lucide-vue-next';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
@@ -103,6 +103,48 @@ const tile = ref('b');
             </Button>
           </template>
         </Matrix>
+      </Demo>
+
+      <!-- The unavailable state stays a tab stop: hover or Tab onto a dimmed one for its reason. -->
+      <Demo name="Button" note="glass icon buttons — available vs unavailable (dashed, dimmed, slashed)">
+        <div
+          class="flex flex-wrap items-center gap-3 rounded-lg bg-linear-to-br from-slate-800 via-slate-500 to-amber-700 p-4"
+        >
+          <Button variant="glass" shape="circle" size="sm" aria-label="Open the original">
+            <ArrowUpRight :size="15" />
+          </Button>
+          <Button
+            variant="glass"
+            shape="circle"
+            size="sm"
+            aria-label="Open the original"
+            is-unavailable
+            unavailable-label="No link to the original"
+          >
+            <ArrowUpRight :size="15" />
+          </Button>
+          <Button
+            variant="glass-surface"
+            shape="square"
+            size="sm"
+            aria-label="Open the original"
+            is-unavailable
+            unavailable-label="Removed from the source"
+          >
+            <ArrowUpRight :size="15" />
+          </Button>
+          <Button
+            variant="glass"
+            tone="primary"
+            shape="circle"
+            aria-label="Share"
+            is-unavailable
+            unavailable-label="Sharing is off for this post"
+          >
+            <Share2 :size="16" />
+          </Button>
+          <Button variant="glass-surface" is-unavailable unavailable-label="Sign in to export">Export</Button>
+        </div>
       </Demo>
 
       <Demo name="Button" note="states: loading / disabled / skeleton / fullWidth / multiline">
