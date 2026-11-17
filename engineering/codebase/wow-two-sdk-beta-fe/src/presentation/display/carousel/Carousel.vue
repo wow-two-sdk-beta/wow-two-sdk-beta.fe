@@ -1,4 +1,6 @@
 <script lang="ts">
+import { CarouselControls } from './Carousel.variants';
+
 export interface CarouselProps {
   /** The controlled active slide index. */
   readonly index?: number;
@@ -14,6 +16,11 @@ export interface CarouselProps {
   readonly resumeLabel?: string;
   /** The explicit slide count — overrides the automatic count (use for virtualised slides). */
   readonly slidesCount?: number;
+  /**
+   * When `CarouselPrev` / `CarouselNext` show — `hover` reveals them while the carousel is hovered or holds focus, and
+   * always on a device that cannot hover. Default `always`.
+   */
+  readonly controls?: CarouselControls;
 }
 </script>
 
@@ -42,6 +49,7 @@ const componentProps = withDefaults(defineProps<CarouselProps>(), {
   canLoop: false,
   autoPlay: undefined,
   slidesCount: undefined,
+  controls: CarouselControls.Always,
 });
 const props = useLocaleDefaults(componentProps, 'Carousel', {
   pauseLabel: 'Pause slides',
@@ -155,9 +163,13 @@ provide<CarouselContextValue>(CarouselKey, {
   get autoPlay() {
     return props.autoPlay;
   },
+  get controls() {
+    return props.controls;
+  },
 });
 
-const classes = computed(() => cn('relative', attrs.class as string | undefined));
+/* `group/carousel` is what a hover-revealed arrow listens to — named, so a consumer's own `group` stays theirs. */
+const classes = computed(() => cn('group/carousel relative', attrs.class as string | undefined));
 
 /** Everything but `class`, which is re-applied through `cn` above. */
 const rest = computed(() => {

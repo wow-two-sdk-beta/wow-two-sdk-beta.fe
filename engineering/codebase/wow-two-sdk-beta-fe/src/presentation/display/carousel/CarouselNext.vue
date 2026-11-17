@@ -1,9 +1,8 @@
 <script lang="ts">
-/* No props of its own — `aria-label` and `type` both stay FALLTHROUGH attrs, and
-   the shared `CarouselNavButtonProps` name lives in `CarouselContext.ts`. The block
-   itself is load-bearing: in a `<script setup>`-only SFC, `vue-eslint-parser` loses
-   `ignoreRestSiblings` and the `const { class: _class, ...others }` omission below
-   trips `no-unused-vars`. */
+import { CarouselNavVariant } from './Carousel.variants';
+/* `aria-label` and `type` stay FALLTHROUGH attrs; the props are the shared `CarouselNavButtonProps` in
+   `CarouselContext.ts`. The block is load-bearing besides: in a `<script setup>`-only SFC, `vue-eslint-parser` loses
+   `ignoreRestSiblings` and the `const { class: _class, ...others }` omission below trips `no-unused-vars`. */
 </script>
 
 <script setup lang="ts">
@@ -12,7 +11,8 @@ import { computed, useAttrs, useTemplateRef } from 'vue';
 import { ChevronRight } from 'lucide-vue-next';
 import { cn } from '../../../foundation/styles';
 import { Icon } from '../../../foundation/icons';
-import { useCarouselContext } from './CarouselContext';
+import { useCarouselContext, type CarouselNavButtonProps } from './CarouselContext';
+import { carouselNavVariants } from './Carousel.variants';
 
 const locale = useLocale();
 
@@ -22,11 +22,15 @@ defineOptions({ name: 'CarouselNext', inheritAttrs: false });
 /** Overrides the chevron — React's `children ?? <Icon …>`. */
 defineSlots<{ default(): unknown }>();
 
+const props = withDefaults(defineProps<CarouselNavButtonProps>(), { variant: CarouselNavVariant.Surface });
+
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLButtonElement>('el');
 const carousel = useCarouselContext();
 
-const isDisabled = computed(() => !carousel.loop && carousel.index === carousel.count - 1);
+/** One slide (or none yet) has nowhere to go, looping or not; past the edge only an unlooped carousel stops. */
+const isSingle = computed(() => carousel.count <= 1);
+const isDisabled = computed(() => isSingle.value || (!carousel.loop && carousel.index === carousel.count - 1));
 
 /**
  * Runs after a consumer's own `click` — `rest` sits ahead of this binding in the
@@ -40,7 +44,8 @@ function onClick(event: MouseEvent): void {
 
 const classes = computed(() =>
   cn(
-    'absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground shadow ring-1 ring-border transition-colors hover:bg-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40',
+    carouselNavVariants({ variant: props.variant, controls: carousel.controls, isDisabled: isDisabled.value }),
+    'right-2',
     attrs.class as string | undefined,
   ),
 );
@@ -62,6 +67,7 @@ defineExpose({ el });
     type="button"
     :aria-label="locale.t('CarouselNext.nextSlide', undefined, 'Next slide')"
     :disabled="isDisabled"
+    :inert="isSingle || undefined"
     v-bind="rest"
     :class="classes"
     @click="onClick"

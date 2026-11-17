@@ -12,6 +12,9 @@ Public import: `import { Carousel } from '@wow-two-beta/fe/presentation/display'
 - Autoplay starts only after client mount; SSR never accesses window for its timer.
 - User pause, pointer hover and focus within are independent reasons to suspend autoplay.
 - Reduced motion suppresses autoplay.
+- `controls` decides when `CarouselPrev` / `CarouselNext` show. `hover` hides them until the root is hovered or
+  holds focus within, and shows them always under `(hover: none)`, where nothing could reveal them. The root carries
+  the named `group/carousel` class the arrows listen to; a consumer's own `group` stays theirs.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -26,6 +29,7 @@ Public import: `import { Carousel } from '@wow-two-beta/fe/presentation/display'
 | `pauseLabel` | `string` | no | `'Pause slides'` | The localized pause action label. |
 | `resumeLabel` | `string` | no | `'Resume slides'` | The localized resume action label. |
 | `slidesCount` | `number` | no | `undefined` | The explicit slide count — overrides the automatic count (use for virtualised slides). |
+| `controls` | `CarouselControls` | no | `CarouselControls.Always` | When the arrows show: `always`, or `hover` (on hover or focus within; always on a device that cannot hover). |
 
 ## Emits
 
@@ -46,5 +50,5 @@ Public import: `import { Carousel } from '@wow-two-beta/fe/presentation/display'
 ## Verification
 
 - Public render fixture: [DisplayExamples.ts](../../../../apps/playground/src/gallery/fixtures/DisplayExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
-- Focused test references: [CarouselAutoplay.ssr.test.ts](../../../../tests/unit/presentation/display/CarouselAutoplay.ssr.test.ts), [MotionControls.dom.test.ts](../../../../tests/unit/presentation/display/MotionControls.dom.test.ts). Consult the named test assertions for the behavior actually covered.
+- Focused test references: [CarouselAutoplay.ssr.test.ts](../../../../tests/unit/presentation/display/CarouselAutoplay.ssr.test.ts), [MotionControls.dom.test.ts](../../../../tests/unit/presentation/display/MotionControls.dom.test.ts), [CarouselControls.dom.test.ts](../../../../tests/unit/presentation/display/CarouselControls.dom.test.ts), [CarouselSwipe.browser.test.ts](../../../../tests/unit/presentation/display/CarouselSwipe.browser.test.ts). Consult the named test assertions for the behavior actually covered.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

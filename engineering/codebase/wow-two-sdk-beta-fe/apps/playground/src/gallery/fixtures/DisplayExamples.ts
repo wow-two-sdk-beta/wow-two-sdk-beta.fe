@@ -35,6 +35,8 @@ import {
   CardHeader,
   CardTitle,
   Carousel,
+  CarouselControls,
+  CarouselNavVariant,
   CarouselDot,
   CarouselDots,
   CarouselNext,
@@ -346,17 +348,17 @@ export const displayExamples: readonly SmokeCase[] = [
 
   smokeCase('DataTable', DataTable, { columns: [{ key: 'name', header: 'Name' }], data: [{ name: 'Ada' }] }),
 
-  smokeCase('Carousel', Carousel, {}, { slot: true }),
+  smokeCase('Carousel', Carousel, { controls: CarouselControls.Hover }, { slot: true }),
 
-  smokeCase('CarouselViewport', CarouselViewport, {}, { slot: true, wrap: inCarousel }),
+  smokeCase('CarouselViewport', CarouselViewport, { canSwipe: true }, { slot: true, wrap: inCarousel }),
 
   smokeCase('CarouselSlides', CarouselSlides, {}, { wrap: inCarouselViewport }),
 
   smokeCase('CarouselSlide', CarouselSlide, {}, { slot: true, wrap: inCarouselViewport }),
 
-  smokeCase('CarouselPrev', CarouselPrev, {}, { slot: true, wrap: inCarousel }),
+  smokeCase('CarouselPrev', CarouselPrev, { variant: CarouselNavVariant.Glass }, { slot: true, wrap: inCarousel }),
 
-  smokeCase('CarouselNext', CarouselNext, {}, { slot: true, wrap: inCarousel }),
+  smokeCase('CarouselNext', CarouselNext, { variant: CarouselNavVariant.Glass }, { slot: true, wrap: inCarousel }),
 
   smokeCase('CarouselDots', CarouselDots, {}, { wrap: inCarousel }),
 

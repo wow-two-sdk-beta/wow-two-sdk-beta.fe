@@ -1,4 +1,5 @@
 import { inject, type InjectionKey } from 'vue';
+import type { CarouselControls, CarouselNavVariant } from './Carousel.variants';
 
 /**
  * The seam between `Carousel` and its `Viewport` / `Slides` / `Prev` / `Next` /
@@ -32,6 +33,8 @@ export interface CarouselContextValue {
   setPaused: (paused: boolean) => void;
   /** The auto-play interval in ms, when enabled. */
   readonly autoPlay: number | undefined;
+  /** When the arrows show — always, or on hover and focus. */
+  readonly controls: CarouselControls;
 }
 
 export const CarouselKey: InjectionKey<CarouselContextValue> = Symbol('wow-two.carousel');
@@ -42,10 +45,12 @@ export function useCarouselContext(): CarouselContextValue {
   return context;
 }
 
-/* eslint-disable-next-line @typescript-eslint/no-empty-object-type -- kept as an
-   exported name: React declared `CarouselNavButtonProps` and consumers import it.
-   Its only member was `aria-label`, which stays a FALLTHROUGH attr here — declaring
-   a hyphenated prop name would have Vue camelize it to `ariaLabel` and the default
-   would never apply. Shared by `CarouselPrev` and `CarouselNext`, so it lives here
-   rather than in either SFC. */
-export interface CarouselNavButtonProps {}
+/**
+ * The props `CarouselPrev` and `CarouselNext` share, so it lives here rather than in either SFC. `aria-label` stays a
+ * FALLTHROUGH attr — declaring a hyphenated prop name would have Vue camelize it to `ariaLabel`, and the localized
+ * default would never apply.
+ */
+export interface CarouselNavButtonProps {
+  /** The arrow's surface — `glass` reads over a photo. Default `surface`. */
+  readonly variant?: CarouselNavVariant;
+}
