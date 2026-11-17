@@ -37,3 +37,30 @@ it('keeps the original open delay and stays open until hover and focus both leav
   expect(trigger.attributes('aria-describedby')).toBe('help');
   expect(wrapper.emitted('update:open')).toEqual([[true], [false]]);
 });
+
+it('keeps a tooltip dismissed with Escape closed until a new pointer enter', async () => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  wrapper = mount(Tooltip, {
+    props: { content: 'Filter options', openDelay: 150 },
+    slots: { default: '<button>Filter</button>' },
+    attachTo: document.body,
+  });
+  const trigger = wrapper.get('button');
+
+  await trigger.trigger('pointerenter');
+  await trigger.trigger('focus');
+  await vi.advanceTimersByTimeAsync(150);
+  expect(document.querySelector('[role=tooltip]')).not.toBeNull();
+
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  await vi.advanceTimersByTimeAsync(0);
+  expect(document.querySelector('[role=tooltip]')).toBeNull();
+
+  await trigger.trigger('pointerleave');
+  await vi.advanceTimersByTimeAsync(1000);
+  expect(document.querySelector('[role=tooltip]')).toBeNull();
+
+  await trigger.trigger('pointerenter');
+  await vi.advanceTimersByTimeAsync(150);
+  expect(document.querySelector('[role=tooltip]')?.textContent).toBe('Filter options');
+});

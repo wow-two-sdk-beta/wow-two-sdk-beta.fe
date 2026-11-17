@@ -110,6 +110,17 @@ function clearTimers(): void {
   cancelClose();
 }
 
+/**
+ * Closes now and forgets both channels, so a channel that leaves afterwards cannot schedule a reopen; only a new
+ * pointer enter or focus opens it again.
+ */
+function dismiss(): void {
+  clearTimers();
+  trigger.pointer = false;
+  trigger.focus = false;
+  setOpen(false);
+}
+
 function updateTrigger(channel: keyof typeof trigger, active: boolean): void {
   if (props.isDisabled) return;
   trigger[channel] = active;
@@ -134,22 +145,15 @@ function updateTrigger(channel: keyof typeof trigger, active: boolean): void {
 watch(
   () => props.isDisabled,
   (disabled) => {
-    if (!disabled) return;
-    clearTimers();
-    trigger.pointer = false;
-    trigger.focus = false;
-    setOpen(false);
+    if (disabled) dismiss();
   },
 );
 
 /* Clear pending timers on unmount. */
 onBeforeUnmount(clearTimers);
 
-/* WCAG 1.4.13 — Escape dismisses immediately, without moving focus. */
-useEscape(() => {
-  clearTimers();
-  setOpen(false);
-}, open);
+/* WCAG 1.4.13 — Escape dismisses immediately, without moving focus, and stays dismissed. */
+useEscape(dismiss, open);
 
 /**
  * React gated on `!!content`; a Vue consumer can supply the body through the `content` slot
