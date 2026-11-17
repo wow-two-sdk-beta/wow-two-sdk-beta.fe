@@ -188,9 +188,28 @@ describe('Carousel swipe', () => {
   it('leaves a tap to the link it pressed', async () => {
     await mountCard();
     if (isChromium) {
-      const box = link(0).getBoundingClientRect();
-      await finger({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
-      await expect.poll(() => linkClicks).toEqual([{ slide: 0, wasPrevented: false }]);
+      /* A finger's tap keeps the link as its pointer target and leaves every default alone. Whether the browser then
+         synthesizes the click depends on the platform's gesture support (macOS does, CI's Linux does not), so the
+         mouse click below proves the click itself. */
+      const faults: string[] = [];
+      const releases: Element[] = [];
+      const record = (event: Event): void => {
+        const target = event.target as Element;
+        if (event.type === 'gotpointercapture' && target !== link(0)) faults.push(`captured by ${target.tagName}`);
+        if (event.defaultPrevented) faults.push(`${event.type} prevented`);
+        if (event.type === 'pointerup') releases.push(target);
+      };
+      const types = ['gotpointercapture', 'pointerdown', 'pointerup', 'touchstart', 'touchend'];
+      for (const type of types) window.addEventListener(type, record);
+      try {
+        const box = link(0).getBoundingClientRect();
+        await finger({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
+        await expect.poll(() => releases).toEqual([link(0)]);
+      } finally {
+        for (const type of types) window.removeEventListener(type, record);
+      }
+      expect(faults).toEqual([]);
+      expect(indexes).toEqual([]);
       linkClicks = [];
     }
     await userEvent.click(link(0));
