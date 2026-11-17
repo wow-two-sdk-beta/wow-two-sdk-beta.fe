@@ -85,6 +85,7 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 | F02 Toast API: string enum values and an SFC action | fix | spec in `tasks-platform.md` |
 | F03 Split ToastHost into composables and test its untested paths | engineering | spec in `tasks-platform.md` |
 | F04 Release the toast overhaul | engineering | spec in `tasks-platform.md` |
+| F11 Escape keeps a dismissed tooltip closed | fix | spec in `tasks-platform.md` |
 | F05 Grid: auto-fill columns by minimum width | feature | spec in `tasks-platform.md` |
 | F06 MediaCard: image-first card with a faded glass panel | feature | spec in `tasks-platform.md` |
 | F07 Button: unavailable state for glass icon buttons | feature | spec in `tasks-platform.md` |
