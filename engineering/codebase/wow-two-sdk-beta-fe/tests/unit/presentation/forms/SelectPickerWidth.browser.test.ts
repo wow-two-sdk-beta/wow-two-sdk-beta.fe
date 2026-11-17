@@ -52,3 +52,22 @@ it('sizes to its value when not full width', async () => {
   expect(width).toBeGreaterThan(0);
   expect(width).toBeLessThan(400);
 });
+
+it('only plays the enter animation when the picker opens', async () => {
+  const button = await trigger({});
+  const animations: string[] = [];
+  const record = (event: AnimationEvent) => {
+    if ((event.target as HTMLElement).matches('[role="dialog"]')) animations.push(event.animationName);
+  };
+  document.addEventListener('animationstart', record);
+  try {
+    button.click();
+    await nextTick();
+    const panel = document.querySelector<HTMLElement>('[role="dialog"]')!;
+    expect(getComputedStyle(panel).animationName).not.toBe('pop-out');
+    await expect.poll(() => animations).toContain('pop-in');
+    expect(animations).toEqual(['pop-in']);
+  } finally {
+    document.removeEventListener('animationstart', record);
+  }
+});

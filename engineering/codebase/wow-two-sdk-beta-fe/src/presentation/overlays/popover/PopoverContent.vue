@@ -72,11 +72,13 @@ const resolvedPadding = computed(() => props.padding ?? (props.isBare ? 'none' :
 
 const classes = computed(() =>
   cn(
-    /* pop (fade+scale) gated on the portal-root data-state + motion-safe
-       so reduced-motion users get no movement. */
+    /* Presence also reports "closed" while mounting. Keep those frames transparent
+       and reserve the exit animation for a popover that is actually closing. */
     'outline-hidden',
-    'motion-safe:group-data-[state=open]:animate-(--animate-pop-in)',
-    'motion-safe:group-data-[state=closed]:animate-(--animate-pop-out) motion-reduce:animate-none',
+    isOpen.value
+      ? 'group-data-[state=closed]:opacity-0 motion-safe:group-data-[state=open]:animate-(--animate-pop-in)'
+      : 'motion-safe:group-data-[state=closed]:animate-(--animate-pop-out)',
+    'motion-reduce:animate-none',
     !props.isBare &&
       cn(
         DefaultWidth,
