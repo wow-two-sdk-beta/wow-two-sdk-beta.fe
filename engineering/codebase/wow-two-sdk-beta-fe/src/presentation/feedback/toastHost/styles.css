@@ -1,5 +1,7 @@
-/* Scan the compiled host and card modules; consumers provide Tailwind and semantic theme tokens. */
-@source './ToastHost*.vue.js';
+/* Scan the compiled host, countdown and card modules; consumers provide Tailwind and semantic theme tokens. */
+@source './Toast*.vue.js';
+@source './ToastHostStyles.js';
+@source '../feedbackToastHost/FeedbackToastHost*.vue.js';
 @source '../toast/Toast*.vue.js';
 @source '../toastSimple/ToastSimple*.vue.js';
 /* The severity glyph colours, and the Report action's button with its busy spinner, compile to their own modules. */

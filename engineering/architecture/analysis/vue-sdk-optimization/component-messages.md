@@ -165,7 +165,7 @@ in their capability specifications and are not inferred by this catalogue.
 | `NotificationCenterGroup.notifications` | Notifications | [NotificationCenterGroup.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/notificationCenterGroup/NotificationCenterGroup.vue) |
 | `NotificationCenterGroup.title` | Notifications | [NotificationCenterGroup.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/notificationCenterGroup/NotificationCenterGroup.vue) |
 | `NotificationCenterGroup.youreAllCaughtUp` | You're all caught up. | [NotificationCenterGroup.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/notificationCenterGroup/NotificationCenterGroup.vue) |
-| `NotificationItem.dismissNotification` | Dismiss notification | [NotificationItem.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/notificationCenterGroup/NotificationItem.vue) |
+| `NotificationItem.dismissNotification` | Dismiss notification | [NotificationCenterGroupItem.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/notificationCenterGroup/NotificationCenterGroupItem.vue) |
 | `NumberInput.decrementLabel` | Decrement | [NumberInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/numberInput/NumberInput.vue) |
 | `NumberInput.incrementLabel` | Increment | [NumberInput.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/numberInput/NumberInput.vue) |
 | `OnboardingChecklistCard.progress` | {done} of {total} tasks complete | [OnboardingChecklistCard.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/onboardingChecklistCard/OnboardingChecklistCard.vue) |

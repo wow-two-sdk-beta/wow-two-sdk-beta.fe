@@ -296,11 +296,13 @@ try {
     .map((item) => String(item.source))
     .join('\n');
   for (const token of [
-    '.w-80',
+    '--toast-width',
     '.bg-popover',
     '.z-toast',
     '.origin-left',
     '--animate-slide-in-right',
+    '--toast-motion-transform',
+    '--toast-available-height',
     '.stroke-primary',
     '.text-destructive-soft-foreground',
     '.min-h-6',

@@ -27,6 +27,8 @@ export const ElementTag = {
   Article: 'article',
   /** Refers to an `<li>`. */
   Li: 'li',
+  /** Refers to a `<ul>`. */
+  Ul: 'ul',
 } as const;
 
 export type ElementTag = (typeof ElementTag)[keyof typeof ElementTag];

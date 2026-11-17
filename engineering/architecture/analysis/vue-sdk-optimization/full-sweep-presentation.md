@@ -40,6 +40,6 @@ Not changed in this bounded pass: Button pointerleave cancels its timer but may 
 - tests/unit/presentation/layout/ResizablePanels.dom.test.ts
 - tests/unit/presentation/display/StepperGroup.dom.test.ts
 - tests/unit/presentation/display/MediaPlayerState.dom.test.ts
-- tests/unit/presentation/feedback/FeedbackOwnership.dom.test.ts
+- tests/unit/presentation/feedback/FeedbackOwnership.dom.test.ts (split on 2026-11-17 into `ToastHostStack`, `ToastHostTimer` and `UndoBarTimer`)
 
 Parent closure: Button pointer-leave and secondary/IME gesture regressions passed; SpeedDial disabled/focus/exit behavior gained four passing regressions. Combined gates below supersede lane-local snapshots.

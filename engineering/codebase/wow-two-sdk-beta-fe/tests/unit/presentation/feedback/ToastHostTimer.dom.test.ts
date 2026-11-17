@@ -1,43 +1,42 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { h, nextTick } from 'vue';
-import { mount, type VueWrapper } from '@vue/test-utils';
-import ToastHost, { toastHost, ToastTimer } from '@src/presentation/feedback/toastHost/ToastHost.vue';
+import { h } from 'vue';
+import { NoticePriority } from '@src/feedback';
+import { toastHost, ToastTimer, type ToastOptions } from '@src/presentation/feedback/toastHost';
+import {
+  bars,
+  card,
+  fakeAnimations,
+  host,
+  hover,
+  resetToasts,
+  settle,
+  stack,
+  timers,
+  useFakeClock,
+} from './ToastHarness';
 
 /*
- * The toast's own chrome: which countdown display a toast gets and where it sits, how long each severity
- * stays, the severity glyphs, and content that arrives after the first render. The bar's animation contract
- * is covered by `ToastHostProgress`; these cases assert placement and the clock of the seconds display.
+ * A toast's clock: which countdown display it gets and where it sits, the bar's animation, how long each
+ * toast stays, Pin, and what holds the clock (hover, focus).
  */
 
-const wrappers: VueWrapper[] = [];
+afterEach(resetToasts);
 
-afterEach(() => {
-  wrappers.splice(0).forEach((wrapper) => wrapper.unmount());
-  toastHost.dismissAll();
-  vi.useRealTimers();
-  document.body.innerHTML = '';
-});
-
-const settle = async () => {
-  await nextTick();
-  await nextTick();
-};
-
-const host = (props: Record<string, unknown> = {}) => {
-  const wrapper = mount(ToastHost, { props: { defaultDuration: 5000, ...props }, attachTo: document.body });
-  wrappers.push(wrapper);
-  return wrapper;
-};
-
-const stack = () => document.querySelector('[aria-label="Notifications"]')!;
-const bars = () => document.querySelectorAll('[data-toast-progress]');
-const timers = (kind: string) => document.querySelectorAll(`[data-toast-timer="${kind}"]`);
+const pinButton = () => stack().querySelector<HTMLButtonElement>('[aria-label="Pin notification"]');
 
 describe('toast timer display', () => {
+  it('is off by default', async () => {
+    host();
+    toastHost.toast({ title: 'Saved' });
+    await settle();
+    expect(document.querySelectorAll('[data-toast-timer], [data-toast-progress]')).toHaveLength(0);
+  });
+
   it('draws a ring or counts seconds beside the close button, and a bar along the bottom', async () => {
     host({ timer: ToastTimer.Ring });
     toastHost.toast({ title: 'Ringed' });
     toastHost.toast({ title: 'Counted', timer: ToastTimer.Seconds });
+    toastHost.toast({ title: 'Close ring', timer: ToastTimer.CloseRing });
     toastHost.toast({ title: 'Barred', timer: ToastTimer.Bar });
     toastHost.toast({ title: 'Plain', timer: ToastTimer.None });
     await settle();
@@ -45,17 +44,13 @@ describe('toast timer display', () => {
     expect(timers('ring')).toHaveLength(1);
     expect(timers('seconds')).toHaveLength(1);
     expect(bars()).toHaveLength(1);
+    expect(bars()[0]!.getAttribute('aria-hidden')).toBe('true');
     const ring = timers('ring')[0]!;
     expect(ring.getAttribute('aria-hidden')).toBe('true');
     expect(ring.parentElement!.nextElementSibling?.getAttribute('aria-label')).toBe('Dismiss');
-  });
-
-  it('keeps the deprecated flags working under the new display', async () => {
-    host({ showProgress: true });
-    toastHost.toast({ title: 'Bar by default' });
-    toastHost.toast({ title: 'Opted out', progress: false });
-    await settle();
-    expect(bars()).toHaveLength(1);
+    const closeRing = timers('closeRing')[0]!;
+    expect(closeRing.closest('button')?.getAttribute('aria-label')).toBe('Dismiss');
+    expect(closeRing.firstElementChild?.getAttribute('stroke-opacity')).toBe('0.22');
   });
 
   it('shows no display on sticky toasts, and the bar for custom content', async () => {
@@ -68,7 +63,7 @@ describe('toast timer display', () => {
   });
 
   it('counts whole seconds down, rounding up, and holds while the stack is hovered', async () => {
-    vi.useFakeTimers();
+    useFakeClock();
     host({ timer: ToastTimer.Seconds, defaultDuration: 3000 });
     toastHost.toast({ title: 'Saved' });
     await settle();
@@ -77,107 +72,234 @@ describe('toast timer display', () => {
     expect(seconds()).toBe('3s');
     await vi.advanceTimersByTimeAsync(1100);
     expect(seconds()).toBe('2s');
-    stack().dispatchEvent(new MouseEvent('mouseenter'));
+    hover(true);
     await settle();
     await vi.advanceTimersByTimeAsync(5000);
     expect(seconds()).toBe('2s');
-    stack().dispatchEvent(new MouseEvent('mouseleave'));
+    hover(false);
     await settle();
+    hover(true, 'touch');
     await vi.advanceTimersByTimeAsync(1000);
     expect(seconds()).toBe('1s');
+  });
+
+  it('starts a display swapped in mid-countdown from the time already spent', async () => {
+    useFakeClock();
+    const wrapper = host({ timer: ToastTimer.Ring, defaultDuration: 3000, canPauseOnHover: false });
+    toastHost.toast({ title: 'Saved' });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1100);
+    await wrapper.setProps({ timer: ToastTimer.Seconds });
+    await settle();
+    expect(timers('ring')).toHaveLength(0);
+    expect(timers('seconds')[0]?.textContent).toBe('2s');
+  });
+});
+
+describe('toast countdown bar', () => {
+  it('counts down over the resolved duration and pauses with the expiry timer', async () => {
+    const { animate, created } = fakeAnimations();
+    host({ timer: ToastTimer.Bar, defaultDuration: 2500 });
+    toastHost.toast({ title: 'Material saved' });
+    await settle();
+    expect(animate).toHaveBeenCalledOnce();
+    expect(animate.mock.calls[0]![1]).toMatchObject({ duration: 2500, easing: 'linear', fill: 'forwards' });
+    hover(true);
+    await settle();
+    expect(created[0]!.pause).toHaveBeenCalled();
+    hover(false);
+    await settle();
+    expect(created[0]!.play).toHaveBeenCalled();
+  });
+
+  it('restarts when the toast updates in place', async () => {
+    const { animate, created, highlights } = fakeAnimations();
+    host({ timer: ToastTimer.Bar, defaultDuration: 1000 });
+    const id = toastHost.toast({ title: 'Saving', key: 'save' });
+    await settle();
+    toastHost.update(id, { title: 'Saved' });
+    await settle();
+    expect(animate.mock.calls.filter(([frames]) => frames[0]?.transform === 'scaleX(1)')).toHaveLength(2);
+    expect(highlights()).toBe(1);
+    expect(created[0]!.cancel).toHaveBeenCalled();
   });
 });
 
 describe('toast durations', () => {
-  it('keeps errors on screen longer than the default', async () => {
-    vi.useFakeTimers();
-    host({ defaultDuration: 1000 });
-    const saved = vi.fn();
-    const failed = vi.fn();
-    toastHost.toast({ title: 'Saved', severity: 'success', onDismiss: saved });
-    toastHost.toast({ title: 'Failed', severity: 'danger', onDismiss: failed });
+  it.each<{ name: string; props: Record<string, unknown>; toast: Partial<ToastOptions>; lifetime: number }>([
+    {
+      name: 'keeps errors on screen longer than the default',
+      props: {},
+      toast: { severity: 'danger' },
+      lifetime: 8000,
+    },
+    {
+      name: 'reads a severity the table leaves out from the default',
+      props: {},
+      toast: { severity: 'success' },
+      lifetime: 1000,
+    },
+    {
+      name: 'replaces the table, so an error it leaves out falls back to the default',
+      props: { durations: { info: 4000 } },
+      toast: { severity: 'danger' },
+      lifetime: 1000,
+    },
+    {
+      name: 'reads a replacing table’s own entries',
+      props: { durations: { info: 4000 } },
+      toast: { severity: 'info' },
+      lifetime: 4000,
+    },
+    {
+      name: 'lets a toast’s own duration win over the table',
+      props: {},
+      toast: { severity: 'danger', duration: 500 },
+      lifetime: 500,
+    },
+  ])('$name', async ({ props, toast, lifetime }) => {
+    useFakeClock();
+    host({ defaultDuration: 1000, ...props });
+    const dismissed = vi.fn();
+    toastHost.toast({ title: 'Timed', ...toast, onDismiss: dismissed });
     await settle();
-    await vi.advanceTimersByTimeAsync(1100);
-    expect(saved).toHaveBeenCalledOnce();
-    expect(failed).not.toHaveBeenCalled();
-    await vi.advanceTimersByTimeAsync(7000);
-    expect(failed).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(lifetime - 100);
+    expect(dismissed).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(200);
+    expect(dismissed).toHaveBeenCalledOnce();
   });
 
-  it('replaces the table, reading a severity it leaves out from the default duration', async () => {
-    vi.useFakeTimers();
-    host({ defaultDuration: 1000, durations: { info: 4000 } });
-    const info = vi.fn();
-    const failed = vi.fn();
-    toastHost.toast({ title: 'Heads up', severity: 'info', onDismiss: info });
-    toastHost.toast({ title: 'Failed', severity: 'danger', onDismiss: failed });
+  it('uses priority lifetimes and preserves a displaced toast’s elapsed time', async () => {
+    useFakeClock();
+    host({
+      max: 1,
+      timer: ToastTimer.Seconds,
+      priorityDurations: { [NoticePriority.Normal]: 3000, [NoticePriority.High]: 10000 },
+    });
+    const ordinary = vi.fn();
+    toastHost.toast({ title: 'Ordinary', severity: 'danger', onDismiss: ordinary });
     await settle();
-    await vi.advanceTimersByTimeAsync(1100);
-    expect(failed).toHaveBeenCalledOnce();
-    expect(info).not.toHaveBeenCalled();
-    await vi.advanceTimersByTimeAsync(3000);
-    expect(info).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(timers('seconds')[0]?.textContent).toBe('2s');
+    const id = toastHost.toast({ title: 'High priority', priority: NoticePriority.High });
+    await settle();
+    expect(stack().textContent).toContain('High priority');
+    expect(timers('seconds')[0]?.textContent).toBe('10s');
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(ordinary).not.toHaveBeenCalled();
+    toastHost.dismiss(id);
+    await settle();
+    expect(card('Ordinary')?.querySelector('[data-toast-timer="seconds"]')?.textContent).toBe('2s');
+    await vi.advanceTimersByTimeAsync(2100);
+    expect(ordinary).toHaveBeenCalledOnce();
   });
 
-  it('lets a toast’s own duration win over the table', async () => {
-    vi.useFakeTimers();
-    host();
-    const failed = vi.fn();
-    toastHost.toast({ title: 'Failed', severity: 'danger', duration: 500, onDismiss: failed });
-    await settle();
-    await vi.advanceTimersByTimeAsync(600);
-    expect(failed).toHaveBeenCalledOnce();
-  });
-});
-
-describe('toast severity glyphs', () => {
-  const glyphs = () => [...document.querySelectorAll('[data-toast-icon]')];
-
-  it('gives every intent its own glyph and leaves neutral bare', async () => {
-    host();
-    for (const severity of ['info', 'success', 'warning', 'danger', 'neutral'] as const) {
-      toastHost.toast({ title: severity, severity });
-    }
-    await settle();
-    const icons = glyphs();
-    expect(icons).toHaveLength(4);
-    const shapes = new Set(icons.map((icon) => icon.querySelector('svg')!.innerHTML));
-    expect(shapes.size).toBe(4);
-    expect(icons[3]!.querySelector('svg')!.getAttribute('class')).toContain('text-destructive-soft-foreground');
-  });
-
-  it('yields to a custom icon and switches off per toast', async () => {
-    host();
-    toastHost.toast({ title: 'Custom', severity: 'info', icon: '🚀' });
-    toastHost.toast({ title: 'Bare', severity: 'info', showSeverityIcon: false });
-    await settle();
-    expect(glyphs().map((icon) => icon.textContent?.trim())).toEqual(['🚀']);
-  });
-
-  it('switches off for a whole host, which a toast can still override', async () => {
-    host({ showSeverityIcon: false });
-    toastHost.toast({ title: 'Host off', severity: 'warning' });
-    toastHost.toast({ title: 'Toast on', severity: 'warning', showSeverityIcon: true });
-    await settle();
-    expect(glyphs()).toHaveLength(1);
-  });
-});
-
-describe('toast updates', () => {
-  it('renders a description and an action that arrive after the first render', async () => {
-    host();
-    const id = toastHost.toast({ title: 'Deploying' });
-    await settle();
-    toastHost.update(id, {
-      title: 'Deploy failed',
-      severity: 'danger',
-      description: 'The health check timed out.',
-      action: h('button', { type: 'button' }, 'Retry'),
+  it('expires a hard deadline through hover and without an available slot', async () => {
+    useFakeClock();
+    host({ max: 1 });
+    const visibleDeadline = vi.fn();
+    const queuedDeadline = vi.fn();
+    toastHost.toast({
+      title: 'Urgent Undo',
+      priority: NoticePriority.Urgent,
+      expiresAtMs: Date.now() + 6000,
+      onDismiss: visibleDeadline,
+    });
+    toastHost.toast({
+      title: 'Other deadline',
+      priority: NoticePriority.High,
+      expiresAtMs: Date.now() + 3000,
+      onDismiss: queuedDeadline,
     });
     await settle();
-    const text = stack().textContent ?? '';
-    expect(text).toContain('The health check timed out.');
-    expect(text).toContain('Retry');
-    expect(document.querySelectorAll('[data-toast-icon]')).toHaveLength(1);
+    hover(true);
+    await vi.advanceTimersByTimeAsync(3100);
+    expect(queuedDeadline).toHaveBeenCalledOnce();
+    expect(visibleDeadline).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(visibleDeadline).toHaveBeenCalledOnce();
+  });
+});
+
+describe('toast pins', () => {
+  it('omits Pin for sticky, custom and explicitly time-limited toasts', async () => {
+    host();
+    toastHost.toast({ title: 'Timed' });
+    toastHost.toast({ title: 'Sticky', duration: Infinity });
+    toastHost.toast({ content: 'Custom content' });
+    toastHost.toast({ title: 'Undo expires', canPin: false });
+    await settle();
+    const pins = stack().querySelectorAll('[aria-label="Pin notification"]');
+    expect(pins).toHaveLength(1);
+    expect(pins[0]?.closest('[data-toast-id]')?.textContent).toContain('Timed');
+  });
+
+  it('removes a pinned card’s timer and gives it the full configured duration on unpin', async () => {
+    useFakeClock();
+    host({ max: 2, timer: ToastTimer.Seconds, canPauseOnHover: false });
+    const task = vi.fn();
+    const refresh = vi.fn();
+    const queued = vi.fn();
+    toastHost.toast({ title: 'Running', canPin: true, duration: 7000, onDismiss: task });
+    toastHost.toast({ title: 'Refreshed', duration: 2000, onDismiss: refresh });
+    toastHost.toast({ title: 'Queued', duration: 2000, onDismiss: queued });
+    await settle();
+    const pin = pinButton()!;
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(timers('seconds')[0]?.textContent).toBe('6s');
+    pin.click();
+    await settle();
+    expect(pin.getAttribute('aria-pressed')).toBe('true');
+    expect(timers('seconds')).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(8000);
+    expect(refresh).toHaveBeenCalledOnce();
+    expect(queued).toHaveBeenCalledOnce();
+    expect(task).not.toHaveBeenCalled();
+    expect(timers('seconds')).toHaveLength(0);
+    pin.click();
+    await settle();
+    expect(pin.getAttribute('aria-pressed')).toBe('false');
+    expect(timers('seconds')[0]?.textContent).toBe('7s');
+    await vi.advanceTimersByTimeAsync(6900);
+    expect(task).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(200);
+    expect(task).toHaveBeenCalledOnce();
+  });
+
+  it('restarts a pinned card’s clock when the host stops offering Pin', async () => {
+    useFakeClock();
+    const wrapper = host({ canPauseOnHover: false });
+    const dismissed = vi.fn();
+    toastHost.toast({ title: 'Running', duration: 2000, onDismiss: dismissed });
+    await settle();
+    pinButton()!.click();
+    await settle();
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(dismissed).not.toHaveBeenCalled();
+    await wrapper.setProps({ canPin: false });
+    await settle();
+    expect(pinButton()).toBeNull();
+    await vi.advanceTimersByTimeAsync(2100);
+    expect(dismissed).toHaveBeenCalledOnce();
+  });
+});
+
+describe('toast focus hold', () => {
+  it('pauses expiry for descendant focus and resumes only after focus leaves the stack', async () => {
+    useFakeClock();
+    host({ defaultDuration: 100 });
+    const dismissed = vi.fn();
+    toastHost.toast({ title: 'Saved', onDismiss: dismissed });
+    await settle();
+    const button = stack().querySelector('button')!;
+    button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    hover(false);
+    await settle();
+    await vi.advanceTimersByTimeAsync(200);
+    expect(dismissed).not.toHaveBeenCalled();
+    button.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+    await settle();
+    await vi.advanceTimersByTimeAsync(110);
+    expect(dismissed).toHaveBeenCalledOnce();
   });
 });

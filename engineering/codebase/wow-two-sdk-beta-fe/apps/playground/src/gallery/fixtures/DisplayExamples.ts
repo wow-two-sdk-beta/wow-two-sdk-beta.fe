@@ -11,7 +11,8 @@ import {
   OnboardingChecklistCard,
   OnboardingChecklistCardTask,
   NotificationCenterGroup,
-  NotificationItem,
+  NotificationCenterButton,
+  NotificationCenterGroupItem,
   AccordionGroup,
   AccordionGroupContent,
   AccordionGroupItem,
@@ -127,6 +128,7 @@ import {
   KanbanCard,
   VersionBadge,
 } from '../../../../../src/presentation/display';
+import { createFeedbackBus } from '../../../../../src/feedback';
 import { h, type VNode } from 'vue';
 
 const inKanban = (node: VNode): VNode => h(KanbanBoard, null, () => node);
@@ -447,5 +449,7 @@ export const displayExamples: readonly SmokeCase[] = [
 
   smokeCase('NotificationCenterGroup', NotificationCenterGroup, {}, { slot: true }),
 
-  smokeCase('NotificationItem', NotificationItem, {}, { wrap: inNotificationCenter }),
+  smokeCase('NotificationCenterGroupItem', NotificationCenterGroupItem, {}, { wrap: inNotificationCenter }),
+
+  smokeCase('NotificationCenterButton', NotificationCenterButton, { bus: createFeedbackBus() }),
 ];

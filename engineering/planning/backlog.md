@@ -1,8 +1,8 @@
 # wow-two-sdk-beta.fe — Backlog
 
-*Last updated: 2026-11-10*
+*Last updated: 2026-11-17*
 
-Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`version-track/`](version-track/).
+Pull from the top of each group. [`version-track/`](version-track/) records implementation history.
 
 ## Features
 
@@ -19,6 +19,7 @@ Every unbuilt item, grouped; top of each group = next. Shipped work lives in [`v
 | Validators and validation messages | shipped v0.1 | — |
 | Typed config | shipped v0.1 | — |
 | Feedback bus | shipped v0.1 | — |
+| Toast notifications | implemented, release pending | [toast-notifications.md](../architecture/analysis/toast-notifications.md) |
 | Incident reporting (Vue) | shipped v0.1 | — |
 | Analytics | shipped v0.1 | — |
 | Feature flags | shipped v0.1 | — |
@@ -82,8 +83,6 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 | Item | Type | Notes |
 |---|---|---|
 | F01 Toast work: fold features.md into backlog and track | engineering | spec in `tasks-platform.md` |
-| F02 Toast API: string enum values and an SFC action | fix | spec in `tasks-platform.md` |
-| F03 Split ToastHost into composables and test its untested paths | engineering | spec in `tasks-platform.md` |
 | F04 Release the toast overhaul | engineering | spec in `tasks-platform.md` |
 | F11 Escape keeps a dismissed tooltip closed | fix | spec in `tasks-platform.md` |
 | F05 Grid: auto-fill columns by minimum width | feature | spec in `tasks-platform.md` |
@@ -93,6 +92,38 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 | F09 Carousel: hover-only glass arrows and touch swipe | feature | spec in `tasks-platform.md` |
 | F10 MetaInlineText: icon-led items with spoken text | feature | spec in `tasks-platform.md` |
 
+## Notifications
+
+[Design and SDK registration](../architecture/analysis/toast-notifications.md) · shipped work: v0.1 Iteration 25.
+Releasing the overhaul is `F04` above.
+
+### For product integration, in order
+
+Product evidence (2026-11-17 scan): every product mounts `FeedbackToastHost` and publishes through `notify`; none
+mounts the notification center, calls `toastHost` directly (apart from med-text-fab on the pre-rename package) or
+renders on the server.
+
+| Item | Type | Notes |
+|---|---|---|
+| Review the overhaul in the lab | product | Replay every capability at desktop, tablet and phone with keyboard, touch, reduced motion, reduced transparency and a screen reader. Settle the defaults: pause bypass, glass surface, timer display, group motion. |
+| Release the overhaul | engineering | `F04` above. |
+| Pilot SCFD on the release | product | Re-pin from `0.0.48`; `apps/web/tests/DemoPage.test.ts:34` selects `[aria-label="Notifications"]`, so select `[role="region"][data-toast-position]`; optionally replace the `ConsoleSession.vue:75` class pile with `--toast-top-offset`. No `src` change. |
+| Re-pin the bottom-anchored products | product | ListingShelf `AppRoot.vue:32` and Haven `HavenShell.vue:135` pass `position="bottom-right"`, ignored until now; lift the stack above their phone `BottomNavMenu` with `--toast-bottom-offset`. |
+| Re-pin the remaining products | product | 18 products mount a plain `FeedbackToastHost` with `notify`; a re-pin and a smoke check each. med-text-fab first moves off `@wow-two-beta/ui-vue`. |
+| Coalesce repeated identical notices | feature | Count repeats of the same tone and title inside a short window (×3) instead of stacking, for query-error bursts without a group key. Evidence: SCFD `HarvestConsole.ts:327-331`, ListingShelf `RequestFailureNotices.ts:20`. |
+
+### Later
+
+| Item | Type | Notes |
+|---|---|---|
+| One toast store per app and bus | engineering | Today one module-level `toastHost` serves every `ToastHost`, and `FeedbackToastHost` forwards its own `bus` into it: notices can leak across SSR requests and a second host renders every toast twice. Move the store to a `*Bus` seam beside `src/feedback/`, publish only through `useToastHost()`, and warn on a second renderer per scope. |
+| Align the notifications slice with conventions — design items | engineering | The 24 design findings of the 2026-11-17 audit left after the mechanical pass: `TransitionGroup` → `Presence` / `AnimatedLayout`, `onBeforeUpdate` → pre-flush `watch`, `OverlayPositionExtensions` for edge reads, `ToastEntryExtensions`, a `tv()` `ToastHostStyles`, a shared node renderer, part names, a bus-free `NotificationCenterGroup` with a `row` slot, value sources for the pause choices and the lab's scenarios. |
+| Group History entries by their key | feature | Collapse entries sharing a `group.key` under one History row with a count and a disclosure; keep per-entry actions, unread state and Delete. No product mounts the notification center yet. |
+| Persist History through `/storage` | feature | An opt-in adapter that stores safe copy and resource references per account scope, restores through `initialRetained`, and lets the product rebind actions when rendering. Clears on sign-out and account switch. Nearest need: Wheelhouse's durable post-rollout notice. |
+| Sync pause and read state across tabs | feature | Share the pop-up pause and read marks over `foundation/channels` so another tab of the same scope agrees. No product evidence yet. |
+| Bridge urgent notices to OS notifications in hidden tabs | feature | Opt-in, permission-gated through `foundation/notifications`; only priorities at or above a threshold, deduped by notice id. No product evidence yet. |
+| Host the Vue lab on the platform | engineering | Serve the built playground as a platform dev service and verify the Toast Motion Lab route. |
+
 ## Vue
 
 | Item | Type | Notes |
@@ -100,7 +131,7 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 | Add focused tests to parts covered only by the render smoke | engineering | 223 SFCs lacked one at the 2026-09-28 scan; re-measure first |
 | Sweep the remaining small convention breaches | engineering | `Avatar`'s 68 raw palette classes, 4 inline `defineProps<{…}>`; re-measure the rest |
 | Remove the one-release deprecated prop aliases | engineering | `isDisabled`/`isReadOnly`/`isRequired` (S1), the `is`/`has`/`can`/`show` boolean renames (S8), the toast `showProgress`/`progress`; 109 files still carry `@deprecated … removed next release`; keep `BooleanPropNames.test.ts` |
-| Ability to show severity glyphs on `Alert`, `Callout` and `Banner` | feature | reuse `SeverityIcons` + `SeverityIconClasses` from `foundation/icons`, as `Toast` and `NotificationItem` do |
+| Ability to show severity glyphs on `Alert`, `Callout` and `Banner` | feature | reuse `SeverityIcons` + `SeverityIconClasses` from `foundation/icons`, as `Toast` and `NotificationCenterGroupItem` do |
 | Ability to make the node editor read-only as a whole | feature | whole-control read-only API and Field adoption |
 | Give the remaining controls the read-only look and a role that allows their state | feature | `ImageEditor`, `ImageCropEditor`, `RecurrenceEditor` and `AddressEditor` lock their parts like a disabled control; `TransferPicker`, `OptionTilePicker`, `SegmentedPicker`, `ToggleGroup`, `ReactionPicker`, `ChatComposerInput` and `PointControl` take no `isReadOnly`; `CheckboxInput`, `SwitchInput`, `SliderInput`, `KnobInput` and the colour sliders block changes with `aria-readonly` but keep the editable look. The shared pieces are `ReadOnlyLook`, `useReadOnlyHint` and the `readonly:` variant |
 | Ability to set the calendar week start per locale | feature | — |

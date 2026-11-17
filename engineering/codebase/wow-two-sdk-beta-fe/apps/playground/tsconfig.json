@@ -19,6 +19,7 @@
     // bundler does — `dist/` may be stale or absent during a port.
     "paths": {
       "@wow-two-beta/fe": ["../../src/index.ts"],
+      "@wow-two-beta/fe/feedback": ["../../src/feedback/index.ts"],
       "@wow-two-beta/fe/foundation/*": ["../../src/foundation/*/index.ts"],
       "@wow-two-beta/fe/domain/*": ["../../src/domain/*/index.ts"],
       "@wow-two-beta/fe/presentation/*": ["../../src/presentation/*/index.ts"]

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import ReportAction, { toReference } from '@src/presentation/feedback/reportAction/ReportAction.vue';
-import ToastHost, { toastHost } from '@src/presentation/feedback/toastHost/ToastHost.vue';
+import { ToastHost, toastHost } from '@src/presentation/feedback/toastHost';
 import FeedbackToastHost from '@src/presentation/feedback/feedbackToastHost/FeedbackToastHost.vue';
 import { createFeedbackBus, feedbackQueryErrors } from '@src/feedback';
 import { ApiFailureFactory, type ApiFailure } from '@src/foundation/http';

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   NotificationCenterGroup,
-  NotificationItem,
+  NotificationCenterGroupItem,
   OnboardingChecklistCard,
   OnboardingChecklistCardTask,
 } from '@wow-two-beta/fe/presentation/display';
@@ -66,7 +66,7 @@ const covered = [
   'LoadingState',
   'SplashScreen',
   'NotificationCenterGroup',
-  'NotificationItem',
+  'NotificationCenterGroupItem',
   'OnboardingChecklistCard',
   'OnboardingChecklistCardTask',
   'UndoBar',
@@ -324,11 +324,11 @@ function repair(reset: () => void): void {
         </SplashScreen>
       </Demo>
 
-      <Demo name="NotificationCenterGroup / NotificationItem">
+      <Demo name="NotificationCenterGroup / NotificationCenterGroupItem">
         <NotificationCenterGroup class="w-full">
-          <NotificationItem title="Build finished" description="2 minutes ago" @dismiss="() => {}" />
-          <NotificationItem title="New comment" description="9 minutes ago" @select="() => {}" />
-          <NotificationItem title="Deploy failed" description="1 hour ago" />
+          <NotificationCenterGroupItem title="Build finished" description="2 minutes ago" @dismiss="() => {}" />
+          <NotificationCenterGroupItem title="New comment" description="9 minutes ago" @select="() => {}" />
+          <NotificationCenterGroupItem title="Deploy failed" description="1 hour ago" />
         </NotificationCenterGroup>
       </Demo>
 

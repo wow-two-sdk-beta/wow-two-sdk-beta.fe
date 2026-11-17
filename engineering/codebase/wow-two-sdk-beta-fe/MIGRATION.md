@@ -1,10 +1,56 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-11-09*
+*Last updated: 2026-11-17*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## Next release — notifications overhaul
+
+Measured against `0.0.49`. No import moves. An app that mounts `FeedbackToastHost` and publishes through `notify`
+needs no code change; on re-pin it gains Pin on timed toasts, the "Show N more notifications" overflow, the F8
+hotkey and an honoured `position`.
+
+What a re-pin changes on screen:
+
+- Pin: every timed toast shows a Pin button (`canPin` defaults to `true`); pinning drops the countdown, unpinning
+  restarts it at full length. `:can-pin="false"` on the host, or `canPin: false` on a notice, turns it off.
+- Overflow: the stack fits the available height; the rest collapse behind a full-width "Show N more notifications"
+  button, which opens them as compact rows. `max` still caps the count.
+- Position: `position` is honoured again, so a host passing `bottom-right` moves its stack from the top to the
+  bottom; lift it above a bottom bar with `--toast-bottom-offset`.
+- Card layout: the card's copy goes through one `ToastContent` column — title, description, running progress,
+  actions, then details — with a round Close and an optional Pin beside it; grouped and overflow rows use its compact
+  one-row layout. Tests that reached into the old card markup select `[data-toast-summary]` instead.
+
+Breaks:
+
+| Was (`0.0.49`) | Now |
+|---|---|
+| `ToastHost` `showProgress` | Removed: `timer: ToastTimer.Bar`. |
+| Toast option `progress: boolean` (deprecated) | `progress` is a running operation's progress (`NoticeProgress`); a countdown bar is `timer: ToastTimer.Bar`. |
+| `position` accepted but ignored (always top-right) | Honoured: a `bottom-right` stack moves to the bottom; lift it above a bottom bar with `--toast-bottom-offset`. |
+| Region named "Notifications" | Named "Notifications (F8)"; select it by `[role="region"][data-toast-position]` (`getByLabel('Notifications')` still matches as a substring). |
+| `PublishedNotice` without a time | `publishedAtMs` is required: a hand-built notice adds it, a `toEqual` adds `publishedAtMs: expect.any(Number)`. |
+| `NotificationItem` | `NotificationCenterGroupItem`; the old name stays a deprecated alias for one release. |
+| `close` / `delete` / `select` / `dismiss` emits on `Toast`, `NotificationCenterGroup` and its item | Function props `onClose` / `onDelete` / `onSelect` / `onDismiss`: `@close="…"` still binds and still shows the button; a test reading `wrapper.emitted('close')` reads the prop's calls instead. |
+
+New:
+
+| Area | Additions |
+|---|---|
+| `feedback` | `NoticePriority` with `NoticePriorityRank`; notice `priority`, `group`, `compact`, `details`, `historyAction`, `expiresAtMs`, `canPin`, `reminderKey`, `progress`, `publishedAtMs`. Bus `dismiss`, `clearRetained`, `markRead`, `markNotificationsRead`, `notificationState`, `subscribeNotificationState`, `setToastPause`, `suppresses`, `track`. Options `maxRetained` (default 200), `pauseBypass`, `reminders`; `initialRetained` takes `RetainedSeed`. [Spec](src/feedback/FeedbackBus.spec.md) |
+| `ToastHost` | `motion` (`ToastMotion`), `groupMotion` (`ToastGroupMotion`), `moveDuration`, `priorityDurations`, `canPin` (default `true`), `surface` (`ToastSurface`), `hotkey` (default `'F8'`, `false` turns it off), `ToastTimer.CloseRing`; the overflow control, swipe to dismiss on touch, polite and urgent announcements; `--toast-width` (default 20 rem), `--toast-top-offset`, `--toast-bottom-offset`, `--toast-gutter`. [Spec](src/presentation/feedback/toastHost/ToastHost.spec.md) |
+| `Toast` | `surface`, `progress`, `isPinned`, `detailsOpen` (`v-model:details-open`), `isCompact`, and the `details` slot. [Spec](src/presentation/feedback/toast/Toast.spec.md) |
+| `NotificationCenterGroup` | Rows show their arrival time and unread mark; the header adds Mark all read, Clear all (`canClear`) and the pop-up pause (`canPause`). [Spec](src/presentation/display/notificationCenterGroup/NotificationCenterGroup.spec.md) |
+| `NotificationCenterButton` | The bell: unread badge, hidden while open; marks entries read when the panel closes; shows the pause cue. |
+
+| App copy | SDK |
+|---|---|
+| A sticky loading toast republished by hand | `bus.track(work, { running, success, failure })` |
+| A shell CSS override for glass toasts | `<FeedbackToastHost :surface="ToastSurface.Glass" />` |
+| A class pile offsetting the stack under a top bar | `--toast-top-offset` on the host |
 
 ## 0.0.42 — session picture, tab-scoped storage
 

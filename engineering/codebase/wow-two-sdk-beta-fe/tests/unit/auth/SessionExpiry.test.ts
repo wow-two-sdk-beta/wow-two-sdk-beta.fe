@@ -164,7 +164,7 @@ describe('session expiry feedback', () => {
 
     feedbackSessionExpiry(bus)();
 
-    expect(received).toEqual([SessionExpiredNotice]);
+    expect(received).toEqual([{ ...SessionExpiredNotice, publishedAtMs: expect.any(Number) }]);
     expect(received[0]).toMatchObject({ id: 'session-expired', tone: NoticeTone.Info });
   });
 });

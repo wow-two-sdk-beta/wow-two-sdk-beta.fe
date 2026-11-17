@@ -1,10 +1,11 @@
 <script lang="ts">
-import type { VNode } from 'vue';
-import type { OverlayPosition } from '../../../foundation/styles';
-import type { ReportSend } from '../../../reporting';
-import type { ToastSimpleVariants } from '../toastSimple/ToastSimple.variants';
+import { computed, defineComponent, shallowRef, useAttrs, useTemplateRef, watch, type PropType } from 'vue';
 
-export type ToastSeverity = NonNullable<ToastSimpleVariants['severity']>;
+import type { NoticePriority } from '../../../feedback';
+import { cn, OverlayPosition, Severity, Side } from '../../../foundation/styles';
+import { ToastSurface } from '../toast/ToastSurface';
+import type { ToastNode } from './ToastNode';
+import type { ToastSeverity } from './ToastSeverity';
 
 /** Defines how a toast shows the time left before it dismisses itself. */
 export const ToastTimer = {
@@ -14,694 +15,526 @@ export const ToastTimer = {
   Bar: 'bar',
   /** Refers to a ring draining beside the close button. */
   Ring: 'ring',
+  /** Refers to a ring around the close button, with a dim arc for elapsed time. */
+  CloseRing: 'closeRing',
   /** Refers to the whole seconds left, counted beside the close button. */
   Seconds: 'seconds',
 } as const;
 
 export type ToastTimer = (typeof ToastTimer)[keyof typeof ToastTimer];
 
-/** Provides the per-severity expiry a `ToastHost` starts from — an error stays long enough to read and report. */
-export const DefaultToastDurations: Readonly<Partial<Record<ToastSeverity, number>>> = Object.freeze({
-  danger: 8000,
-});
+/** Defines the entry and exit motion of a toast stack. */
+export const ToastMotion = {
+  /** Refers to a horizontal slide in from the side of the selected corner. */
+  SideSlide: 'sideSlide',
+  /** Refers to a short move toward the selected top or bottom edge. */
+  ShortSlide: 'shortSlide',
+  /** Refers to a move by the card's height toward the selected top or bottom edge. */
+  EdgeSlide: 'edgeSlide',
+  /** Refers to a move toward the edge while scaling to full size. */
+  SlideAndSettle: 'slideAndSettle',
+} as const;
 
-/**
- * A renderable slice of a toast. These travel through the imperative
- * `toastHost.toast()` payload, not through a slot, so a caller who wants
- * markup builds it with `h()`.
- */
-export type ToastNode = string | VNode;
+export type ToastMotion = (typeof ToastMotion)[keyof typeof ToastMotion];
 
-export interface ToastOptions {
-  title?: ToastNode;
-  description?: ToastNode;
-  icon?: ToastNode;
-  severity?: ToastSeverity;
-  /**
-   * ms before auto-dismiss. Default: the ToastHost's `durations` entry for the severity, then its
-   * `defaultDuration`. `Infinity` = sticky.
-   */
-  duration?: number;
-  action?: ToastNode;
-  /**
-   * Sends a one-click report of the failure this toast shows; the toast renders a Report action that walks
-   * sending → reported (with the reference) → retry on failure. Pairs with `/reporting`'s `capture(error).send`.
-   */
-  report?: ReportSend;
-  /** Shows the severity's own glyph when no `icon` is given. Default: the ToastHost's `showSeverityIcon`. */
-  showSeverityIcon?: boolean;
-  /**
-   * Fully custom body — replaces the default `Toast` chrome (icon/title/description/close).
-   * Still animates + auto-dismisses; the content owns its close via the returned id.
-   */
-  content?: ToastNode;
-  /**
-   * Fired when the toast is removed — auto-dismiss, close button, `dismiss(id)`, or `dismissAll()`.
-   * Not fired on a dedup-update. For undo cleanup / analytics.
-   */
-  onDismiss?: () => void;
-  /** Deletes an explicitly retained notification; omitted for transient toasts. */
-  onDelete?: () => void;
-  /**
-   * Dedup key — a `toast` whose `key` is already showing updates that toast in place,
-   * refreshing its timer instead of stacking a duplicate.
-   */
-  key?: string;
-  /** How this toast shows its time left. Default: the ToastHost's `timer`. */
-  timer?: ToastTimer;
-  /**
-   * Shows or hides this toast's countdown bar.
-   * @deprecated Use `timer` — `ToastTimer.Bar` or `ToastTimer.None`.
-   */
-  progress?: boolean;
-}
+/** Defines how a group shows a new arrival. */
+export const ToastGroupMotion = {
+  /** Refers to a preview that passes over the stack and merges into its group. */
+  Card: 'card',
+  /** Refers to an in-place update whose count briefly glows. */
+  Highlight: 'highlight',
+} as const;
 
-/** Content for a `toastHost.promise` phase — a title string, or a full partial options object. */
-export type ToastContent = string | Partial<ToastOptions>;
+export type ToastGroupMotion = (typeof ToastGroupMotion)[keyof typeof ToastGroupMotion];
 
-/**
- * Options for `toastHost.promise` — loading / success / error content
- * (success + error may be a fn of the settled value).
- */
-export interface ToastPromiseOptions<T> {
-  loading: ToastContent;
-  success: ToastContent | ((value: T) => ToastContent);
-  error: ToastContent | ((err: unknown) => ToastContent);
-  /** Auto-dismiss (ms) for the settled toast; defaults to the ToastHost's `defaultDuration`. */
-  duration?: number;
-}
-
-function normalizeContent(content: ToastContent): Partial<ToastOptions> {
-  return typeof content === 'string' ? { title: content } : content;
-}
-
-interface ToastEntry extends ToastOptions {
-  id: string;
-  /** Bumped on every `update` / dedup so the viewport can reset that toast's auto-dismiss timer. */
-  nonce: number;
-}
-
-type Listener = (toasts: ReadonlyArray<ToastEntry>) => void;
-
-class ToastHostStore {
-  private items: ReadonlyArray<ToastEntry> = [];
-  private listeners = new Set<Listener>();
-  private idSeq = 0;
-
-  toast(opts: ToastOptions): string {
-    if (opts.key !== undefined) {
-      const existing = this.items.find((t) => t.key === opts.key);
-      if (existing) {
-        this.update(existing.id, opts);
-        return existing.id;
-      }
-    }
-    const id = `t_${++this.idSeq}`;
-    this.items = [...this.items, { id, ...opts, nonce: 0 }];
-    this.emit();
-    return id;
-  }
-
-  /** Merges a patch into an existing toast (content + severity + duration), refreshing its timer. */
-  update(id: string, patch: Partial<ToastOptions>): void {
-    this.items = this.items.map((t) => (t.id === id ? { ...t, ...patch, nonce: t.nonce + 1 } : t));
-    this.emit();
-  }
-
-  /** Shows a sticky loading toast; returns the full content-update and promise settlement chain. */
-  promise<T>(promise: Promise<T>, opts: ToastPromiseOptions<T>): Promise<T> {
-    const id = this.toast({ ...normalizeContent(opts.loading), severity: 'info', duration: Infinity });
-    const settle = (content: ToastContent, severity: ToastSeverity) =>
-      this.update(id, { ...normalizeContent(content), severity, duration: opts.duration });
-    return promise.then(
-      (value) => {
-        settle(typeof opts.success === 'function' ? opts.success(value) : opts.success, 'success');
-        return value;
-      },
-      (err: unknown) => {
-        settle(typeof opts.error === 'function' ? opts.error(err) : opts.error, 'danger');
-        throw err;
-      },
-    );
-  }
-
-  dismiss(id: string): void {
-    const entry = this.items.find((t) => t.id === id);
-    this.items = this.items.filter((t) => t.id !== id);
-    try {
-      entry?.onDismiss?.();
-    } finally {
-      this.emit();
-    }
-  }
-
-  dismissAll(): void {
-    const gone = this.items;
-    this.items = [];
-    try {
-      for (const t of gone) t.onDismiss?.();
-    } finally {
-      this.emit();
-    }
-  }
-
-  subscribe(fn: Listener): () => void {
-    this.listeners.add(fn);
-    fn(this.items);
-    return () => {
-      this.listeners.delete(fn);
-    };
-  }
-
-  private emit() {
-    for (const fn of this.listeners) fn(this.items);
-  }
-}
-
-export const toastHost = new ToastHostStore();
-
-/**
- * The imperative toast API, bound to the app-wide store. A plain object — the
- * store is a module singleton, so there is nothing per-instance to memoize.
- */
-export function useToastHost() {
-  return {
-    toast: (opts: ToastOptions) => toastHost.toast(opts),
-    update: (id: string, patch: Partial<ToastOptions>) => toastHost.update(id, patch),
-    promise: <T,>(promise: Promise<T>, opts: ToastPromiseOptions<T>) => toastHost.promise(promise, opts),
-    dismiss: (id: string) => toastHost.dismiss(id),
-    dismissAll: () => toastHost.dismissAll(),
-  };
-}
-
-const PositionClasses = 'top-4 right-4 items-end';
-
-/** Toasts enter from the right; reduced-motion users get an instant swap. */
-const MotionClasses =
-  'motion-safe:data-[state=open]:animate-(--animate-slide-in-right) motion-safe:data-[state=closed]:animate-(--animate-slide-out-right) motion-reduce:animate-none';
-
+/** Defines props for the toast viewport. */
 export interface ToastHostProps {
-  /** @deprecated Toasts always anchor top-right. Accepted for one release, without changing placement. */
+  /** The corner or centered edge the stack grows from. Defaults to top-right. */
   readonly position?: OverlayPosition;
+
+  /** The entry and exit motion of the cards. Defaults to `ToastMotion.SideSlide`. */
+  readonly motion?: ToastMotion;
+
+  /** The motion a group shows for a new arrival. Defaults to `ToastGroupMotion.Highlight`. */
+  readonly groupMotion?: ToastGroupMotion;
+
+  /** The maximum number of cards shown at rest, subject to viewport height. Default 5. */
   readonly max?: number;
+
+  /** The time cards take to slide together after an exit, in ms. Default 200. Set to 0 for an instant reflow. */
+  readonly moveDuration?: number;
+
   /**
    * The auto-dismiss delay in ms for a severity missing from `durations`; per-toast `duration` overrides.
    * Default 5000. `Infinity` to disable.
    */
   readonly defaultDuration?: number;
+
   /**
    * The auto-dismiss delay in ms per severity; per-toast `duration` overrides, and a severity left out falls
    * back to `defaultDuration`. Default `DefaultToastDurations` — errors stay 8 seconds. Replaces, never merges.
    */
   readonly durations?: Readonly<Partial<Record<ToastSeverity, number>>>;
+
+  /** The display lifetime in ms per priority; unclassified notices count as Normal. */
+  readonly priorityDurations?: Readonly<Partial<Record<NoticePriority, number>>>;
+
+  /** The switch for holding the expiry clocks while the stack is hovered or focused. Default `true`. */
   readonly canPauseOnHover?: boolean;
+
+  /** The default for showing Pin on timed cards; a toast's `canPin` overrides. Default `true`. */
+  readonly canPin?: boolean;
+
+  /** The space between cards, in px. Default 8. */
   readonly gap?: number;
+
   /**
-   * How each auto-dismissing toast shows its time left; a toast's `timer` overrides. Every display pauses with
-   * the expiry timer and restarts when the toast updates; sticky toasts show none, and reduced motion drops the
-   * bar and the ring. Custom `content` has no close button to sit beside, so it takes the bar for a ring or
-   * seconds. Default `ToastTimer.None`.
+   * The display each auto-dismissing toast shows its time left in; a toast's `timer` overrides. Every display
+   * pauses with the expiry timer and restarts on update. Pinned, sticky and running toasts show none. Reduced
+   * motion drops bars and rings. Custom `content` uses a bar for any visible timer. Default `ToastTimer.None`.
    */
   readonly timer?: ToastTimer;
-  /**
-   * Shows a countdown bar along the bottom of each auto-dismissing toast.
-   * @deprecated Use `timer` — `ToastTimer.Bar`.
-   */
-  readonly showProgress?: boolean;
-  /** Shows each severity's glyph on toasts given no `icon`; a toast's `showSeverityIcon` overrides. Default `true`. */
+
+  /** The switch for each severity's glyph on toasts given no `icon`; a toast's `showSeverityIcon` overrides. */
   readonly showSeverityIcon?: boolean;
+
+  /** The card material; a toast's `surface` overrides. Default `ToastSurface.Solid`. */
+  readonly surface?: ToastSurface;
+
+  /**
+   * The key that moves focus to the card nearest the anchor, or `false` for none; Escape returns it. The stack's
+   * name includes it. Default `'F8'`.
+   */
+  readonly hotkey?: string | false;
 }
 
-interface VisibleToast extends ToastEntry {
-  resolvedDuration: number;
-}
+/** @internal The vertical presets: entry offset and scale, entry and exit durations, and easing. */
+const VerticalMotions = {
+  [ToastMotion.ShortSlide]: {
+    offset: '12px',
+    scale: 1,
+    enter: '200ms',
+    exit: '150ms',
+    easing: 'cubic-bezier(0, 0, 0.2, 1)',
+  },
+  [ToastMotion.EdgeSlide]: {
+    offset: 'calc(100% + 1rem)',
+    scale: 1,
+    enter: '260ms',
+    exit: '180ms',
+    easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+  [ToastMotion.SlideAndSettle]: {
+    offset: '24px',
+    scale: 0.97,
+    enter: '240ms',
+    exit: '140ms',
+    easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+  },
+} as const;
 
-/** Countdown fill per severity; the neutral countdown uses the brand primary. */
-const ProgressClasses: Record<ToastSeverity, string> = {
-  neutral: 'bg-primary',
-  info: 'bg-info',
-  success: 'bg-success',
-  warning: 'bg-warning',
-  danger: 'bg-destructive',
-};
-
-/** Countdown-ring stroke per severity — the bar's tones, drawn as an arc. */
-const RingClasses: Record<ToastSeverity, string> = {
-  neutral: 'stroke-primary',
-  info: 'stroke-info',
-  success: 'stroke-success',
-  warning: 'stroke-warning',
-  danger: 'stroke-destructive',
-};
-
-/** The ring's radius in the 16×16 view box; the circumference is the dash the countdown drains. */
-const RingRadius = 6;
-const RingCircumference = 2 * Math.PI * RingRadius;
-
-/** How often the seconds display re-reads its clock — a quarter second keeps a whole-second flip on time. */
-const SecondsTickMs = 250;
-</script>
-
-<script setup lang="ts">
-import { useLocale } from '../../../foundation/i18n';
-import {
-  computed,
-  defineComponent,
-  h,
-  onMounted,
-  onUnmounted,
-  ref,
-  shallowRef,
-  useAttrs,
-  watch,
-  type PropType,
-} from 'vue';
-import { cn, OverlayPosition as OverlayPositionToken } from '../../../foundation/styles';
-import { Announce, Portal, Presence } from '../../../foundation/primitives';
-import Toast from '../toast/Toast.vue';
-import ReportAction from '../reportAction/ReportAction.vue';
-
-const locale = useLocale();
-
-/** Renders a `ToastNode` — either a plain string or a caller-built VNode. */
+/** @internal Renders a `ToastNode` — either a plain string or a caller-built VNode. */
 const ToastNodeView = defineComponent({
   name: 'ToastNodeView',
   props: { node: { type: [String, Object] as PropType<ToastNode>, required: true } },
   setup: (nodeProps) => () => nodeProps.node,
 });
+</script>
 
-/** The props every countdown display shares — it mirrors the host's expiry timer, never drives it. */
-const CountdownProps = {
-  duration: { type: Number, required: true },
-  paused: { type: Boolean, default: false },
-  severity: { type: String as PropType<ToastSeverity>, default: 'neutral' },
-} as const;
+<script setup lang="ts">
+import { ChevronDown } from 'lucide-vue-next';
 
-/**
- * Runs one Web Animations API countdown on a template ref, paused and resumed in step with the host's expiry
- * timer; environments without `animate` leave the element static at full.
- */
-function useCountdownAnimation(
-  element: () => Element | null,
-  keyframes: Keyframe[],
-  countdown: { readonly duration: number; readonly paused: boolean },
-): void {
-  let animation: Animation | undefined;
-  onMounted(() => {
-    const target = element();
-    if (!target || typeof target.animate !== 'function') return;
-    animation = target.animate(keyframes, { duration: countdown.duration, easing: 'linear', fill: 'forwards' });
-    if (countdown.paused) animation.pause();
-  });
-  watch(
-    () => countdown.paused,
-    (isPaused) => {
-      if (isPaused) animation?.pause();
-      else animation?.play();
-    },
-  );
-  onUnmounted(() => animation?.cancel());
-}
-
-/** The countdown bar — a scale transform draining along the toast's bottom edge. */
-const ToastProgress = defineComponent({
-  name: 'ToastProgress',
-  props: CountdownProps,
-  setup(countdown) {
-    const fill = ref<HTMLElement | null>(null);
-    useCountdownAnimation(() => fill.value, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], countdown);
-    return () =>
-      h(
-        'div',
-        {
-          'aria-hidden': 'true',
-          'data-toast-progress': '',
-          class: 'absolute inset-x-0 bottom-0 h-1 motion-reduce:hidden',
-        },
-        [
-          h('div', {
-            ref: fill,
-            class: cn('h-full w-full origin-left opacity-80', ProgressClasses[countdown.severity]),
-          }),
-        ],
-      );
-  },
-});
-
-/** The countdown ring — an arc draining clockwise from twelve o'clock, drawn beside the close button. */
-const ToastRing = defineComponent({
-  name: 'ToastRing',
-  props: CountdownProps,
-  setup(countdown) {
-    const arc = ref<SVGCircleElement | null>(null);
-    useCountdownAnimation(
-      () => arc.value,
-      [{ strokeDashoffset: '0' }, { strokeDashoffset: `${RingCircumference}` }],
-      countdown,
-    );
-    return () =>
-      h(
-        'svg',
-        {
-          'aria-hidden': 'true',
-          'data-toast-timer': ToastTimer.Ring,
-          viewBox: '0 0 16 16',
-          class: 'size-4 -rotate-90 motion-reduce:hidden',
-        },
-        [
-          h('circle', { cx: 8, cy: 8, r: RingRadius, fill: 'none', 'stroke-width': 2, class: 'stroke-border' }),
-          h('circle', {
-            ref: arc,
-            cx: 8,
-            cy: 8,
-            r: RingRadius,
-            fill: 'none',
-            'stroke-width': 2,
-            'stroke-linecap': 'round',
-            'stroke-dasharray': `${RingCircumference}`,
-            class: RingClasses[countdown.severity],
-          }),
-        ],
-      );
-  },
-});
+import { AnimationDefaults } from '../../../foundation/animation';
+import { useReducedMotion } from '../../../foundation/device';
+import { dataAttr, Key } from '../../../foundation/dom';
+import { useLocale } from '../../../foundation/i18n';
+import { Icon } from '../../../foundation/icons';
+import { Announce, Portal, Presence } from '../../../foundation/primitives';
+import { Button } from '../../actions/button';
+import ReportAction from '../reportAction/ReportAction.vue';
+import Toast from '../toast/Toast.vue';
+import { compareOrder, toastHost } from './ToastHostStore';
+import {
+  GroupArrivalClass,
+  GroupCountClass,
+  ItemClass,
+  OverflowButtonClass,
+  PositionClasses,
+  SideSlideClasses,
+  StackClass,
+  StackInsets,
+  UpdateHighlightClass,
+  VerticalSlideClass,
+} from './ToastHostStyles';
+import type { ToastOptions } from './ToastOptions';
+import ToastProgress from './ToastProgress.vue';
+import ToastRing from './ToastRing.vue';
+import ToastSeconds from './ToastSeconds.vue';
+import { DefaultToastDurations, useResolvedToasts, type VisibleToast } from './UseResolvedToasts';
+import { useToastAnnouncer } from './UseToastAnnouncer';
+import { useToastCapacity } from './UseToastCapacity';
+import { useToastClock } from './UseToastClock';
+import { useToastEntries } from './UseToastEntries';
+import { useToastExits } from './UseToastExits';
+import { ToastChange, useToastGroupMotion } from './UseToastGroupMotion';
+import { useToastHotkey } from './UseToastHotkey';
+import { useToastPins } from './UseToastPins';
+import { useToastStackMotion } from './UseToastStackMotion';
+import { useToastSwipe } from './UseToastSwipe';
 
 /**
- * The seconds display — the whole seconds left, rounded up so it reads `1s` until the toast goes. It keeps its
- * own clock, advancing only while unpaused; the announcement region already carries the toast, so it is hidden.
- */
-const ToastSeconds = defineComponent({
-  name: 'ToastSeconds',
-  props: CountdownProps,
-  setup(countdown) {
-    const left = ref(countdown.duration);
-    let lastTick = 0;
-    let handle: number | undefined;
-    const tick = () => {
-      const now = Date.now();
-      left.value = Math.max(0, left.value - (now - lastTick));
-      lastTick = now;
-    };
-    const start = () => {
-      if (handle !== undefined) return;
-      lastTick = Date.now();
-      handle = window.setInterval(tick, SecondsTickMs);
-    };
-    const stop = () => {
-      if (handle === undefined) return;
-      tick();
-      window.clearInterval(handle);
-      handle = undefined;
-    };
-    onMounted(() => {
-      if (!countdown.paused) start();
-    });
-    watch(
-      () => countdown.paused,
-      (isPaused) => (isPaused ? stop() : start()),
-    );
-    onUnmounted(() => {
-      if (handle !== undefined) window.clearInterval(handle);
-    });
-    return () =>
-      h(
-        'span',
-        {
-          'aria-hidden': 'true',
-          'data-toast-timer': ToastTimer.Seconds,
-          class: 'text-xs tabular-nums text-muted-foreground',
-        },
-        `${Math.ceil(left.value / 1000)}s`,
-      );
-  },
-});
-
-/**
- * Renders the toast viewport — subscribes to the global `toastHost` store and stacks `Toast` cards.
- * Mount once, per app.
- *
+ * Renders the app's transient notification stack. Mount once per app.
  * A caller's `class` attr lands on the stack container.
  */
 defineOptions({ name: 'ToastHost', inheritAttrs: false });
 
 const props = withDefaults(defineProps<ToastHostProps>(), {
-  position: OverlayPositionToken.TopRight,
+  position: OverlayPosition.TopRight,
+  motion: ToastMotion.SideSlide,
+  groupMotion: ToastGroupMotion.Highlight,
   max: 5,
+  moveDuration: AnimationDefaults.duration,
   defaultDuration: 5000,
   durations: () => DefaultToastDurations,
   canPauseOnHover: true,
+  canPin: true,
   gap: 8,
   timer: undefined,
-  showProgress: false,
   showSeverityIcon: true,
+  surface: undefined,
+  hotkey: 'F8',
 });
 
 const attrs = useAttrs();
+const locale = useLocale();
+const reducedMotion = useReducedMotion();
+const stack = useTemplateRef<HTMLDivElement>('stack');
+const overflowButton = useTemplateRef<InstanceType<typeof Button>>('overflowButton');
 
-const items = shallowRef<ReadonlyArray<ToastEntry>>([]);
-const hovered = ref(false);
-const focused = ref(false);
-const paused = computed(() => props.canPauseOnHover && (hovered.value || focused.value));
+const expandedDetails = shallowRef<ReadonlySet<string>>(new Set());
 
-/* Non-reactive state — mutated across ticks, never rendered. */
-const timers = new Map<string, number>();
-const remaining = new Map<string, number>();
-const startedAt = new Map<string, number>();
-const nonces = new Map<string, number>();
-
-let unsubscribe: (() => void) | undefined;
-onMounted(() => {
-  unsubscribe = toastHost.subscribe((next) => {
-    items.value = next;
-  });
-});
-
-// Visible window (FIFO).
-const visible = computed<ReadonlyArray<VisibleToast>>(() =>
-  items.value.slice(0, props.max).map((t) => ({
-    ...t,
-    resolvedDuration: t.duration ?? props.durations[t.severity ?? 'neutral'] ?? props.defaultDuration,
-  })),
+/** The stack's position — the prop, else top-right when it names no known position. */
+const position = computed(() =>
+  Object.hasOwn(PositionClasses, props.position) ? props.position : OverlayPosition.TopRight,
 );
-const visibleIds = computed(() => new Set(visible.value.map((v) => v.id)));
-
-// Toasts that just left `visible` (dismissed, or pushed out of the FIFO
-// window) but must still play their exit animation. Kept mounted with
-// `data-state="closed"` until `Presence` unmounts the child — the `@vue:unmounted`
-// hook below then prunes the entry here.
-const exiting = shallowRef<ReadonlyArray<VisibleToast>>([]);
-let prevVisible: ReadonlyArray<VisibleToast> = [];
-
-watch(
-  visibleIds,
-  (ids) => {
-    const gone = prevVisible.filter((p) => !ids.has(p.id));
-    prevVisible = visible.value;
-    const current = exiting.value;
-    const known = new Set(current.map((e) => e.id));
-    // Add newly-gone toasts; drop any that re-entered `visible`.
-    const merged = [...current, ...gone.filter((g) => !known.has(g.id))].filter((e) => !ids.has(e.id));
-    if (merged.length !== current.length || !merged.every((e, i) => e.id === current[i]?.id)) {
-      exiting.value = merged;
-    }
-  },
-  { immediate: true, flush: 'post' },
+const verticalMotion = computed(() =>
+  props.motion === ToastMotion.SideSlide ? undefined : VerticalMotions[props.motion],
 );
 
-const removeExiting = (id: string) => {
-  exiting.value = exiting.value.filter((e) => e.id !== id);
-};
+const resolved = useResolvedToasts(useToastEntries(), props);
+const pins = useToastPins(resolved, props);
+const { overflowOpen, needsScroll, overflowCount, visible, copyOf, measureCapacity, toggleOverflow, ...capacity } =
+  useToastCapacity(
+    { stack, overflowButton: () => overflowButton.value?.el, cards: resolved, ordered: pins.ordered },
+    props,
+  );
+const activeIds = computed(() => new Set(resolved.value.map((card) => card.id)));
+const visibleIds = computed(() => new Set(visible.value.map((card) => card.id)));
+const { exiting, removeExiting } = useToastExits(stack, visible, visibleIds, activeIds);
 
-// Visible (present) first, then the ones animating out.
-const rendered = computed<Array<VisibleToast & { present: boolean }>>(() => [
-  ...visible.value.map((v) => ({ ...v, present: true })),
-  ...exiting.value.map((e) => ({ ...e, present: false })),
-]);
-
-const latestTitle = computed(() => {
-  const last = visible.value[visible.value.length - 1];
-  if (typeof last?.title === 'string') return last.title;
-  if (typeof last?.description === 'string') return last.description;
-  return '';
+const { swiping, onPointerDown: onSwipeStart } = useToastSwipe({
+  stack,
+  position: () => position.value,
+  reducedMotion,
+  dismiss: (id) => toastHost.dismiss(id),
 });
 
-// Schedule auto-dismiss timers.
-watch(
-  [items, () => props.max, () => props.defaultDuration, () => props.durations, paused],
-  () => {
-    const ids = visibleIds.value;
-    // Clear timers for items that are no longer visible.
-    for (const [id, handle] of timers) {
-      if (!ids.has(id)) {
-        window.clearTimeout(handle);
-        timers.delete(id);
-        remaining.delete(id);
-        startedAt.delete(id);
-      }
-    }
-    for (const id of nonces.keys()) {
-      if (!ids.has(id)) nonces.delete(id);
-    }
-    if (paused.value) return;
-    // A content update / dedup bumps `nonce` — clear that toast's timer so it reschedules fresh.
-    for (const v of visible.value) {
-      const seen = nonces.get(v.id);
-      if (seen !== undefined && seen !== v.nonce) {
-        const handle = timers.get(v.id);
-        if (handle !== undefined) window.clearTimeout(handle);
-        timers.delete(v.id);
-        remaining.delete(v.id);
-        startedAt.delete(v.id);
-      }
-      nonces.set(v.id, v.nonce);
-    }
-    for (const v of visible.value) {
-      if (v.resolvedDuration === Infinity) continue;
-      if (timers.has(v.id)) continue;
-      const left = remaining.get(v.id) ?? v.resolvedDuration;
-      const handle = window.setTimeout(() => {
-        toastHost.dismiss(v.id);
-      }, left);
-      timers.set(v.id, handle);
-      startedAt.set(v.id, Date.now());
-      remaining.set(v.id, left);
-    }
+const { pausedIds, hasCountdown, countdownKey, timerElapsed, ...clock } = useToastClock(
+  {
+    stack,
+    cards: resolved,
+    visible,
+    activeIds,
+    visibleIds,
+    exiting,
+    expandedDetails,
+    pins,
+    browsing: () => overflowOpen.value,
+    swiping: () => swiping.value,
+    expire: (id) => toastHost.dismiss(id),
   },
-  { immediate: true, flush: 'post' },
+  props,
+);
+const { captureToastChange } = useToastGroupMotion(
+  {
+    stack,
+    visible,
+    position: () => position.value,
+    groupMotion: () => props.groupMotion,
+    reducedMotion,
+    scrolls: () => overflowOpen.value || needsScroll.value,
+    isExpanded: (id) => expandedDetails.value.has(id),
+    copyOf,
+  },
+  props,
+);
+const { captureGap } = useToastStackMotion(
+  { stack, visible, position: () => position.value, reducedMotion, browsing: () => overflowOpen.value },
+  props,
+);
+const { polite: politeMessage, assertive: assertiveMessage } = useToastAnnouncer(resolved, locale);
+const hotkey = useToastHotkey({
+  stack,
+  hotkey: () => props.hotkey,
+  hasCards: () => visible.value.length > 0,
+});
+
+const rendered = computed(() =>
+  [
+    ...visible.value.map((toast) => ({ ...toast, present: true, copy: copyOf(toast) })),
+    ...exiting.value.map((toast) => ({ ...toast, present: false, copy: copyOf(toast) })),
+  ].sort(compareOrder),
 );
 
-// Cleanup on unmount.
-onUnmounted(() => {
-  unsubscribe?.();
-  for (const handle of timers.values()) window.clearTimeout(handle);
-  timers.clear();
+const regionLabel = computed(() => {
+  const label = locale.t('ToastHost.notifications', undefined, 'Notifications');
+  const key = hotkey.label.value;
+  return key ? locale.t('ToastHost.notificationsHotkey', { label, hotkey: key }, '{label} ({hotkey})') : label;
 });
 
+const overflowLabel = computed(() =>
+  overflowOpen.value
+    ? locale.t('ToastHost.showFewer', undefined, 'Show fewer notifications')
+    : locale.t('ToastHost.showMore', { count: overflowCount.value }, 'Show {count} more notifications'),
+);
+
+const stackClasses = computed(() =>
+  cn(
+    StackClass,
+    PositionClasses[position.value],
+    (overflowOpen.value || needsScroll.value) && 'overflow-y-auto overscroll-contain',
+    overflowOpen.value &&
+      (position.value.startsWith('top')
+        ? 'scroll-pb-(--toast-overflow-control-height)'
+        : 'scroll-pt-(--toast-overflow-control-height)'),
+    attrs.class as string | undefined,
+  ),
+);
+
+const itemClasses = computed(() => {
+  const [vertical, horizontal] = position.value.split('-');
+  const edge =
+    horizontal === Side.Left || horizontal === Side.Right
+      ? horizontal
+      : vertical === Side.Bottom
+        ? Side.Bottom
+        : Side.Top;
+  return cn(ItemClass, verticalMotion.value ? VerticalSlideClass : SideSlideClasses[edge]);
+});
+
+/** The stack's inline style — insets, gap and group duration, plus the vertical motion's properties. */
+const stackStyle = computed(() => {
+  const base = { ...StackInsets, gap: `${props.gap}px`, '--toast-group-duration': `${props.moveDuration}ms` };
+  const slide = verticalMotion.value;
+  if (!slide) return base;
+  const bottom = position.value.startsWith('bottom');
+  const offset = bottom ? `calc(-1 * ${slide.offset})` : slide.offset;
+  return {
+    ...base,
+    '--toast-motion-origin': bottom ? 'center bottom' : 'center top',
+    '--toast-motion-transform': `translateY(${offset}) scale(${slide.scale})`,
+    '--toast-motion-enter': slide.enter,
+    '--toast-motion-exit': slide.exit,
+    '--toast-motion-ease': slide.easing,
+  };
+});
+
+// Open details close with their card's exit, or once the card has no details left to show.
 watch(
-  paused,
-  (isPaused) => {
-    if (!isPaused) return;
-    for (const [id, handle] of timers) {
-      window.clearTimeout(handle);
-      const start = startedAt.get(id) ?? Date.now();
-      remaining.set(id, Math.max(0, (remaining.get(id) ?? 0) - (Date.now() - start)));
-    }
-    timers.clear();
+  [resolved, exiting],
+  ([cards, leaving]) => {
+    if (expandedDetails.value.size === 0) return;
+    const open = new Set([...cards.filter((card) => card.details), ...leaving].map((card) => card.id));
+    const kept = [...expandedDetails.value].filter((id) => open.has(id));
+    if (kept.length !== expandedDetails.value.size) expandedDetails.value = new Set(kept);
   },
-  { flush: 'sync' },
+  { flush: 'post' },
 );
 
 watch(
   () => rendered.value.length,
   (count) => {
-    if (count === 0) {
-      hovered.value = false;
-      focused.value = false;
-    }
+    if (count > 0) return;
+    clock.release();
+    capacity.reset();
   },
 );
 
-function onFocusout(event: FocusEvent): void {
-  const stack = event.currentTarget as HTMLElement;
-  if (!(event.relatedTarget instanceof Node) || !stack.contains(event.relatedTarget)) focused.value = false;
-}
-
-const stackClasses = computed(() =>
-  cn('pointer-events-none fixed z-toast flex flex-col', PositionClasses, attrs.class as string | undefined),
+// The last card leaving hands focus back to where the hotkey found it.
+watch(
+  () => visible.value.length === 0,
+  (empty) => {
+    if (empty) hotkey.release();
+  },
 );
 
-const itemClasses = computed(() => cn('pointer-events-auto relative w-80 overflow-hidden rounded-md', MotionClasses));
-
-/** The display a toast asked for — its own `timer`, its deprecated `progress`, then the host's two. */
-function requestedTimer(t: VisibleToast): ToastTimer {
-  if (t.timer !== undefined) return t.timer;
-  if (t.progress !== undefined) return t.progress ? ToastTimer.Bar : ToastTimer.None;
-  if (props.timer !== undefined) return props.timer;
-  return props.showProgress ? ToastTimer.Bar : ToastTimer.None;
+/** Opens or closes a card's details, animating a group's resize. */
+function setDetails(id: string, expanded: boolean): void {
+  const next = new Set(expandedDetails.value);
+  if (expanded) next.add(id);
+  else next.delete(id);
+  expandedDetails.value = next;
+  if (visible.value.some((card) => card.id === id && card.group && card.group.count > 1)) {
+    captureToastChange(id, ToastChange.Resize);
+  }
 }
 
-/**
- * The display a toast gets — none while exiting or sticky, and the bar for custom `content`, which has no close
- * button for a ring or seconds to sit beside.
- */
-function timerFor(t: VisibleToast & { present: boolean }): ToastTimer {
-  if (!t.present || !Number.isFinite(t.resolvedDuration)) return ToastTimer.None;
-  const requested = requestedTimer(t);
+/** Collapses an open overflow list on Escape first, then returns focus to where the hotkey found it. */
+function onKeydown(event: KeyboardEvent): void {
+  if (event.key !== Key.Escape) return;
+  if (overflowOpen.value) capacity.onEscape(event);
+  else hotkey.returnFocus(event);
+}
+
+function onFocusout(event: FocusEvent): void {
+  clock.onFocusout(event);
+  hotkey.onFocusout(event);
+}
+
+/** Resolves the card material — the toast's own, the host's, then solid. */
+function surfaceOf(t: ToastOptions) {
+  return t.surface ?? props.surface ?? ToastSurface.Solid;
+}
+
+/** Resolves the timer display a toast gets — its own `timer`, then the host's. Custom `content` uses a bar. */
+function timerFor(t: VisibleToast): ToastTimer {
+  if (!hasCountdown(t)) return ToastTimer.None;
+  const requested = t.timer ?? props.timer ?? ToastTimer.None;
   return t.content && requested !== ToastTimer.None ? ToastTimer.Bar : requested;
 }
 
-/** Whether a toast's display sits beside the close button rather than along the bottom edge. */
-const isTrailingTimer = (timer: ToastTimer): boolean => timer === ToastTimer.Ring || timer === ToastTimer.Seconds;
-
-/** Vue does not auto-suffix numeric style values with `px`. */
-const stackStyle = computed(() => ({ gap: `${props.gap}px` }));
+/** Builds the props a countdown display mirrors from the toast's clock; an exiting card's display holds. */
+function countdownOf(t: VisibleToast & { present: boolean }) {
+  return {
+    duration: t.resolvedDuration,
+    elapsed: timerElapsed(t),
+    isPaused: !t.present || pausedIds.value.has(t.id),
+    severity: t.severity ?? Severity.Neutral,
+  };
+}
 </script>
 
 <template>
   <Portal>
     <div
       v-if="rendered.length > 0"
+      ref="stack"
       role="region"
-      :aria-label="locale.t('ToastHost.notifications', undefined, 'Notifications')"
+      :data-toast-position="position"
+      :aria-label="regionLabel"
       :style="stackStyle"
       :class="stackClasses"
-      @mouseenter="hovered = true"
-      @mouseleave="hovered = false"
-      @focusin="focused = true"
+      :data-toast-expanded="dataAttr(overflowOpen)"
+      @pointerenter="clock.onPointerEnter"
+      @pointerleave="clock.onPointerLeave"
+      @pointerdown="onSwipeStart"
+      @focusin="clock.onFocusin"
       @focusout="onFocusout"
+      @keydown="onKeydown"
     >
       <Presence v-for="t in rendered" :key="t.id" :is-present="t.present">
-        <!--
-          `Presence` clones `data-state` onto this node and keeps it mounted
-          until the exit animation ends; the `@vue:unmounted` hook is that
-          "exit finished" signal (the read-only `Presence` API exposes no
-          callback).
-        -->
-        <div :class="itemClasses" @vue:unmounted="t.present ? undefined : removeExiting(t.id)">
+        <!-- `Presence` keeps this node mounted until the exit ends; `@vue:unmounted` signals it. -->
+        <div
+          :class="[
+            itemClasses,
+            t.present ? 'pointer-events-auto motion-safe:data-[state=closed]:opacity-0' : 'pointer-events-none',
+            t.group && props.groupMotion === ToastGroupMotion.Card ? 'overflow-visible' : 'overflow-hidden',
+          ]"
+          :data-toast-exiting="dataAttr(!t.present)"
+          :data-toast-id="t.id"
+          :data-toast-swiping="dataAttr(t.present && swiping === t.id)"
+          tabindex="-1"
+          :inert="t.present ? undefined : true"
+          @vue:mounted="measureCapacity()"
+          @vue:before-unmount="t.present ? undefined : captureGap()"
+          @vue:unmounted="t.present ? undefined : removeExiting(t.id)"
+        >
           <ToastNodeView v-if="t.content" :node="t.content" />
           <Toast
             v-else
             :severity="t.severity"
+            :surface="surfaceOf(t)"
+            :progress="t.progress"
             :show-severity-icon="t.showSeverityIcon ?? props.showSeverityIcon"
-            v-on="t.onDelete ? { delete: t.onDelete } : {}"
+            :is-pinned="pins.canPin(t) ? pins.isPinned(t) : undefined"
+            :details-open="expandedDetails.has(t.id)"
+            :is-compact="overflowOpen"
+            :is-grouped="!!t.group && t.group.count > 1"
+            :on-delete="t.onDelete"
             @close="toastHost.dismiss(t.id)"
+            @toggle-pin="pins.toggle(t.id)"
+            @update:details-open="setDetails(t.id, $event)"
           >
             <template v-if="t.icon" #icon><ToastNodeView :node="t.icon" /></template>
-            <template v-if="t.title" #title><ToastNodeView :node="t.title" /></template>
-            <template v-if="t.description" #description>
-              <ToastNodeView :node="t.description" />
+            <template v-if="t.copy.title" #title><ToastNodeView :node="t.copy.title" /></template>
+            <template v-if="t.copy.description" #description>
+              <span v-if="t.group && t.group.count > 1" data-toast-group-count-highlight :class="GroupCountClass">
+                <ToastNodeView :node="t.copy.description" />
+              </span>
+              <ToastNodeView v-else :node="t.copy.description" />
             </template>
             <template v-if="t.action || t.report" #actions>
               <ToastNodeView v-if="t.action" :node="t.action" />
               <ReportAction v-if="t.report" :send="t.report" />
             </template>
-            <template v-if="isTrailingTimer(timerFor(t))" #trailing>
+            <template v-if="t.details" #details><ToastNodeView :node="t.details" /></template>
+            <template v-if="timerFor(t) === ToastTimer.Ring" #trailing>
+              <ToastRing :key="countdownKey(t)" v-bind="countdownOf(t)" :data-toast-timer="ToastTimer.Ring" />
+            </template>
+            <template v-else-if="timerFor(t) === ToastTimer.Seconds" #trailing>
+              <ToastSeconds :key="countdownKey(t)" v-bind="countdownOf(t)" :data-toast-timer="ToastTimer.Seconds" />
+            </template>
+            <template v-if="timerFor(t) === ToastTimer.CloseRing" #closeIndicator>
               <ToastRing
-                v-if="timerFor(t) === ToastTimer.Ring"
-                :key="`${t.id}:${t.nonce}`"
-                :duration="t.resolvedDuration"
-                :paused="paused"
-                :severity="t.severity ?? 'neutral'"
-              />
-              <ToastSeconds
-                v-else
-                :key="`${t.id}:${t.nonce}`"
-                :duration="t.resolvedDuration"
-                :paused="paused"
-                :severity="t.severity ?? 'neutral'"
+                :key="countdownKey(t)"
+                v-bind="countdownOf(t)"
+                :data-toast-timer="ToastTimer.CloseRing"
+                is-around-close
               />
             </template>
           </Toast>
-          <ToastProgress
-            v-if="timerFor(t) === ToastTimer.Bar"
-            :key="`${t.id}:${t.nonce}`"
-            :duration="t.resolvedDuration"
-            :paused="paused"
-            :severity="t.severity ?? 'neutral'"
+          <ToastProgress v-if="timerFor(t) === ToastTimer.Bar" :key="countdownKey(t)" v-bind="countdownOf(t)" />
+          <span v-if="!t.content" aria-hidden="true" data-toast-update-highlight :class="UpdateHighlightClass" />
+          <Toast
+            v-if="t.group && t.group.count > 1 && props.groupMotion === ToastGroupMotion.Card"
+            data-toast-group-arrival
+            aria-hidden="true"
+            aria-live="off"
+            role="presentation"
+            inert
+            :class="GroupArrivalClass"
+            :title="t.group.latest.title ?? locale.t('ToastHost.groupArrival', undefined, 'New notification')"
+            :description="t.group.latest.description"
+            :severity="t.group.latest.severity"
+            :surface="surfaceOf(t)"
+            :progress="t.progress"
+            :show-severity-icon="props.showSeverityIcon"
           />
         </div>
       </Presence>
+      <Button
+        v-if="overflowCount > 0 || overflowOpen"
+        ref="overflowButton"
+        variant="outline"
+        size="sm"
+        data-toast-overflow
+        :data-toast-surface="props.surface === ToastSurface.Glass ? ToastSurface.Glass : undefined"
+        :aria-expanded="overflowOpen"
+        :class="[OverflowButtonClass, position.startsWith('top') ? 'bottom-0' : 'top-0']"
+        @click="toggleOverflow"
+      >
+        <span class="min-w-0 [overflow-wrap:anywhere]">{{ overflowLabel }}</span>
+        <template #trailing>
+          <Icon
+            :icon="ChevronDown"
+            :size="14"
+            class="shrink-0"
+            :class="{ 'rotate-180': position.startsWith('bottom') !== overflowOpen }"
+          />
+        </template>
+      </Button>
     </div>
-    <Announce politeness="polite">{{ latestTitle }}</Announce>
+    <Announce politeness="polite" data-toast-announcer="polite">{{ politeMessage }}</Announce>
+    <Announce politeness="assertive" data-toast-announcer="assertive">{{ assertiveMessage }}</Announce>
   </Portal>
 </template>

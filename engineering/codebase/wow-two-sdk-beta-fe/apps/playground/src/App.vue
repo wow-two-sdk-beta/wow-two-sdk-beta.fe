@@ -13,6 +13,7 @@ const GROUPS = [
   { key: 'forms', label: 'forms', view: defineAsyncComponent(() => import('./groups/FormsGroup.vue')) },
   { key: 'display', label: 'display', view: defineAsyncComponent(() => import('./groups/DisplayGroup.vue')) },
   { key: 'feedback', label: 'feedback', view: defineAsyncComponent(() => import('./groups/FeedbackGroup.vue')) },
+  { key: 'toast-lab', label: 'toast lab', view: defineAsyncComponent(() => import('./toastLab/ToastLab.vue')) },
   { key: 'nav', label: 'nav', view: defineAsyncComponent(() => import('./groups/NavGroup.vue')) },
   { key: 'overlays', label: 'overlays', view: defineAsyncComponent(() => import('./groups/OverlaysGroup.vue')) },
 ] as const;

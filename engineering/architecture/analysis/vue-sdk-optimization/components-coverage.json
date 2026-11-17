@@ -1830,14 +1830,14 @@
       "riskFeatures": {}
     },
     {
-      "path": "src/presentation/display/notificationCenterGroup/NotificationItem.spec.md",
+      "path": "src/presentation/display/notificationCenterGroup/NotificationCenterGroupItem.spec.md",
       "lines": 49,
       "kind": "document",
       "inspection": "document-inventory-only",
       "riskFeatures": {}
     },
     {
-      "path": "src/presentation/display/notificationCenterGroup/NotificationItem.vue",
+      "path": "src/presentation/display/notificationCenterGroup/NotificationCenterGroupItem.vue",
       "lines": 176,
       "kind": "source",
       "inspection": "automated-content-inventory",

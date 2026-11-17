@@ -152,7 +152,7 @@ function expectSignedOutOnce(app: Harness, unauthorized: ReadonlyArray<string>):
     expect.objectContaining({ error: expect.objectContaining({ status: 401 }) }),
   );
   expect(app.auth.status).toBe(AuthStatus.Anonymous);
-  expect(app.notices).toEqual([SessionExpiredNotice]);
+  expect(app.notices).toEqual([{ ...SessionExpiredNotice, publishedAtMs: expect.any(Number) }]);
   expect(app.notices.some((notice) => notice.tone === NoticeTone.Danger)).toBe(false);
   expect(app.replace).toHaveBeenCalledOnce();
   expect(app.router.currentRoute.value.path).toBe('/login');
@@ -171,7 +171,7 @@ async function expectReturnAfterSignIn(app: Harness, signIn: () => Promise<unkno
   await flushPromises();
   expect(app.auth.status).toBe(AuthStatus.Authenticated);
   expect(app.router.currentRoute.value.fullPath).toBe(ReturnUrl);
-  expect(app.notices).toEqual([SessionExpiredNotice]);
+  expect(app.notices).toEqual([{ ...SessionExpiredNotice, publishedAtMs: expect.any(Number) }]);
 }
 
 describe('session expiry', () => {

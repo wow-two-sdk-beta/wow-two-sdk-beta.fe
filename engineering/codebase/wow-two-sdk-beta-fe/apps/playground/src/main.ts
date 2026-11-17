@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, defineAsyncComponent } from 'vue';
 import App from './App.vue';
 import './styles.css';
 import { componentName, record } from './diagnostics';
@@ -7,9 +7,11 @@ import { installThemesCss } from './theme';
 /* The themes stylesheet is emitted at BUILD time into `dist/themes.css`. The
    gallery runs against source, so it emits the same CSS at boot from the live
    registry — which also exercises the ported themes engine on every load. */
-const disposeThemes = installThemesCss();
+const isToastPreview = new URLSearchParams(location.search).has('toast-preview');
+const disposeThemes = isToastPreview ? undefined : installThemesCss();
 
-const app = createApp(App);
+const root = isToastPreview ? defineAsyncComponent(() => import('./toastLab/ToastPreview.vue')) : App;
+const app = createApp(root);
 
 /* Vue's warnings go to the console AND into an in-page panel: prop-type
    mismatches and missing required props are exactly the class of defect a
@@ -32,6 +34,6 @@ app.mount('#app');
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     app.unmount();
-    disposeThemes();
+    disposeThemes?.();
   });
 }
