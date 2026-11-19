@@ -18,7 +18,7 @@ Pull from the top of each group. [`version-track/`](version-track/) records impl
 | Forms engine | shipped v0.1 | [forms-engine.md](../architecture/analysis/forms-engine.md) |
 | Validators and validation messages | shipped v0.1 | — |
 | Typed config | shipped v0.1 | — |
-| Feedback bus | shipped v0.1 | — |
+| Feedback bus | shipped v0.1 | [FeedbackBus.spec.md](../codebase/wow-two-sdk-beta-fe/src/feedback/FeedbackBus.spec.md) |
 | Toast notifications | shipped v0.1 | [toast-notifications.md](../architecture/analysis/toast-notifications.md) |
 | Incident reporting (Vue) | shipped v0.1 | — |
 | Analytics | shipped v0.1 | — |
@@ -67,7 +67,7 @@ Pull from the top of each group. [`version-track/`](version-track/) records impl
 | Color and emoji domain | shipped v0.1 | — |
 | Action components | shipped v0.1 | — |
 | Display components | shipped v0.1 | — |
-| Feedback components | shipped v0.1 | — |
+| Feedback components | shipped v0.1 | [NotificationCenterGroup.spec.md](../codebase/wow-two-sdk-beta-fe/src/presentation/display/notificationCenterGroup/NotificationCenterGroup.spec.md) |
 | Form components | shipped v0.1 | — |
 | Image editing intent (Vue) | implemented; release verification pending | [Vector map](../architecture/analysis/image-editing-vector.md) |
 | Layout components | shipped v0.1 | — |
@@ -82,7 +82,6 @@ ChatGPT builds these in the pull order of wow-two-ws `system/sessions/events-int
 
 | Item | Type | Notes |
 |---|---|---|
-| F01 remainder: keep or fold `engineering/features.md` | engineering | waits on the developer's call; the rest of F01 shipped in v0.1 Iteration 25 |
 
 ## Notifications
 
