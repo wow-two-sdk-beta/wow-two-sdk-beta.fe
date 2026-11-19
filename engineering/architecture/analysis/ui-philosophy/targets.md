@@ -1,6 +1,6 @@
 # UI Implementation Targets — what we'll build
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-11-20*
 
 > Companion: [`ideas.md`](./ideas.md) — universe of options.
 >
@@ -135,6 +135,7 @@ Currently **EVERY** component is en-US-locked. The largest single gap. Plan:
 | High-contrast mode | **NEXT** — see §2.1 |
 | Multi-theme runtime (preview pane) | **MAYBE** — wait for need |
 | Multi-brand build-time | **SKIP** — single brand for foreseeable |
+| AI provider brand marks (Claude, Gemini, OpenAI…) | **DONE** (Vue, 2026-11-20) — `@wow-two-beta/fe/domain/aiBrands`: `AiBrandMark`, `resolveAiBrand` (model family, then provider), `aiModelLabel`; marks vendored from `@lobehub/icons-static-svg` (MIT) by `scripts/aiBrands/generate.mjs`; moves to `fe-ai` once that package publishes |
 | Density modes (compact/comfortable/spacious) | **NEXT** — applies to Table, FormField, Card, Listbox, Menu (P6) |
 | Per-component sizes (`xs`–`xl`) | **PARTIAL** — Button/Badge have sizes; standardize across L3/L4 (NEXT) |
 | Z-index tokens | **NEXT** — replace `z-50` literals with `z-modal`/`z-popover`/`z-tooltip`/`z-toast` (P6 cleanup) |

@@ -6,6 +6,7 @@ import * as display from '@wow-two-beta/fe/presentation/display';
 import { Button } from '@wow-two-beta/fe/presentation/actions';
 import { ArrowUpRight, Calendar, CalendarRange, History, ImageOff, Inbox, Shapes } from 'lucide-vue-next';
 import { Icon } from '@wow-two-beta/fe/foundation/icons';
+import { AiBrandIds, AiBrandMark, aiModelLabel } from '@wow-two-beta/fe/domain/aiBrands';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
@@ -220,6 +221,16 @@ const TEXT_COLORS = ['default', 'muted', 'subtle', 'brand', 'success', 'warning'
 const AVATAR_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
 const AVATAR_TONES = ['none', 'neutral', 'primary', 'danger', 'success', 'warning'] as const;
 
+/** What a console shows for a processed record: the provider key and model id the AI mark is resolved from. */
+const AI_MODELS = [
+  { provider: 'anthropic', model: 'claude-haiku-5-5' },
+  { provider: 'google', model: 'gemini-2.5-flash' },
+  { provider: 'openai', model: 'gpt-4.1-mini' },
+  { provider: 'groq', model: 'llama-3.3-70b-versatile' },
+  { provider: 'openrouter', model: 'deepseek/deepseek-chat' },
+  { provider: 'house', model: 'house-model-7' },
+] as const;
+
 const SPARK = [4, 9, 3, 12, 8, 15, 6, 18, 11, 20];
 const COUNTDOWN_TARGET = Date.now() + 3 * 60_000 + 7_000;
 const LONG_COPY =
@@ -304,6 +315,23 @@ const mediaIndex = ref(0);
           <Avatar :size="row as never" :tone="col as never" name="Ada Lovelace" />
         </template>
       </Matrix>
+    </Demo>
+
+    <Demo
+      name="AiBrandMark"
+      note="brand × variant (color draws the mono mark where the source has no color one) · resolved from provider and model · the neutral chip"
+    >
+      <Matrix row-axis="brand" col-axis="variant" :rows="AiBrandIds" :cols="['color', 'mono']">
+        <template #default="{ row, col }">
+          <AiBrandMark :brand="row as never" :variant="col as never" :size="28" :label="row" />
+        </template>
+      </Matrix>
+      <ul class="mt-3 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-3">
+        <li v-for="item in AI_MODELS" :key="item.model" class="flex items-center gap-2 text-sm">
+          <AiBrandMark :provider="item.provider" :model="item.model" :size="22" />
+          <span>{{ aiModelLabel(item.model) }}</span>
+        </li>
+      </ul>
     </Demo>
 
     <Demo name="Text" note="size × color">

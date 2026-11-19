@@ -298,6 +298,11 @@
       "import": "./dist/domain/emoji/index.js",
       "default": "./dist/domain/emoji/index.js"
     },
+    "./domain/aiBrands": {
+      "types": "./dist/domain/aiBrands/index.d.ts",
+      "import": "./dist/domain/aiBrands/index.js",
+      "default": "./dist/domain/aiBrands/index.js"
+    },
     "./presentation/actions": {
       "types": "./dist/presentation/actions/index.d.ts",
       "import": "./dist/presentation/actions/index.js",
@@ -479,6 +484,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
+    "@lobehub/icons-static-svg": "1.104.0",
     "@tailwindcss/vite": "^4.1.0",
     "@tanstack/vue-form": "^1.0.0",
     "@tanstack/vue-query": "^5.102.8",
