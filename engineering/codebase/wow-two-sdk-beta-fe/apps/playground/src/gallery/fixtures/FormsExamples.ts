@@ -3,6 +3,9 @@ import {
   ControlGroupField,
   ToggleInput,
   ToggleGroup,
+  ToggleGroupItem,
+  FacetBar,
+  CountryPicker,
   OptionTilePicker,
   OptionTileGroupField,
   SegmentedPicker,
@@ -445,6 +448,34 @@ export const formsExamples: readonly SmokeCase[] = [
   smokeCase('ToggleInput', ToggleInput, {}, { slot: true }),
 
   smokeCase('ToggleGroup', ToggleGroup, {}, { slot: true }),
+
+  smokeCase('ToggleGroupItem', ToggleGroupItem, { value: 'talks', label: 'Talks', count: 12 }, { slot: true }),
+
+  smokeCase('FacetBar', FacetBar, {
+    facets: [
+      {
+        key: 'stage',
+        label: 'Stage',
+        kind: 'single',
+        placement: 'inline',
+        options: [
+          { value: 'open', label: 'Open', count: 5 },
+          { value: 'closed', label: 'Closed', count: 2 },
+        ],
+      },
+      {
+        key: 'kind',
+        label: 'Format',
+        kind: 'multi',
+        placement: 'popover',
+        options: [{ value: 'fair', label: 'Fair', count: 3 }],
+      },
+    ],
+    matchCount: 7,
+    totalCount: 72,
+  }),
+
+  smokeCase('CountryPicker', CountryPicker, { defaultValue: 'UZ', preferred: ['UZ', 'KZ', 'KG'] }),
 
   smokeCase('OptionTilePicker', OptionTilePicker, { selected: false, label: 'Option' }, { slot: true }),
 

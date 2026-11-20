@@ -1,7 +1,27 @@
 <script lang="ts">
 import type { HTMLAttributes } from 'vue';
-import type { Orientation } from '../../../foundation/styles';
+import type { IconAdapter } from '../../../foundation/icons';
+import type { ColorTone, Orientation } from '../../../foundation/styles';
+import type { ToggleInputVariant } from '../toggleInput';
 import type { ToggleGroupVariant, ToggleItemRole, ToggleMode } from './ToggleGroup.variants';
+
+/** Defines one item the `options` prop renders as a `ToggleGroupItem`. */
+export interface ToggleGroupOption {
+  /** The identity keying the item in the selection. */
+  readonly value: string;
+
+  /** The item's text and, with the count, its accessible name. */
+  readonly label: string;
+
+  /** The tally after the label. */
+  readonly count?: number;
+
+  /** The icon before the label. */
+  readonly icon?: IconAdapter;
+
+  /** Blocks this item. */
+  readonly isDisabled?: boolean;
+}
 
 /**
  * Props for the group, generic over the value type `T`.
@@ -65,6 +85,15 @@ export interface ToggleGroupProps<T extends string = string> extends /* @vue-ign
   readonly equalWidth?: boolean;
   /** Keeps every segment's box and draws their labels as bars, inert; defaults to the nearest `DataRegion`. */
   readonly isSkeleton?: boolean;
+
+  /** The items to render, one `ToggleGroupItem` each, before any items in the default slot. */
+  readonly options?: ReadonlyArray<ToggleGroupOption>;
+
+  /** The press-state surface style of the `options` items. Items in the slot choose their own. */
+  readonly itemVariant?: ToggleInputVariant;
+
+  /** The semantic tone of the `options` items. Items in the slot choose their own. */
+  readonly itemTone?: ColorTone;
 }
 </script>
 
@@ -76,6 +105,7 @@ import { cn, Orientation as OrientationValue } from '../../../foundation/styles'
 import { useControlled } from '../../../foundation/state';
 import { provideSkeletonState, useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
 import { ToggleGroupKey } from './ToggleGroupContext';
+import ToggleGroupItem from './ToggleGroupItem.vue';
 import {
   ToggleGroupVariant as ToggleGroupVariantValue,
   ToggleItemRole as ToggleItemRoleValue,
@@ -97,6 +127,9 @@ const props = withDefaults(defineProps<ToggleGroupProps<T>>(), {
   modelValue: undefined,
   defaultValue: undefined,
   isSkeleton: undefined,
+  options: undefined,
+  itemVariant: undefined,
+  itemTone: undefined,
 });
 
 /* One flag switches every segment: each keeps its box and draws its label as a bar. */
@@ -109,7 +142,7 @@ const emit = defineEmits<{
 }>();
 
 defineSlots<{
-  /** The `ToggleInput` children whose selection this group coordinates. */
+  /** The `ToggleInput` or `ToggleGroupItem` children whose selection this group coordinates. */
   default(): unknown;
 }>();
 
@@ -248,6 +281,17 @@ const formResetRevision = useNativeFormReset(formResetAnchor, () => {
     :class="rootClass"
     v-bind="passthroughAttrs"
   >
+    <ToggleGroupItem
+      v-for="option in options"
+      :key="option.value"
+      :value="option.value"
+      :label="option.label"
+      :count="option.count"
+      :icon="option.icon"
+      :is-disabled="option.isDisabled"
+      :variant="itemVariant"
+      :tone="itemTone"
+    />
     <slot />
     <input
       ref="formResetAnchor"

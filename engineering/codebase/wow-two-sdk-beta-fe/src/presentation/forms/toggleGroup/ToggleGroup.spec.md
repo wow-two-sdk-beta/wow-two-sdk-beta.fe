@@ -34,6 +34,11 @@ HTMLAttributes,
 | `itemRole` | `ToggleItemRole` | no | `ToggleItemRoleValue.Group` | The ARIA role wiring. - `group` (default) — `role="group"` of independent toggle buttons. - `tab` — opt into tablist semantics: root renders `role="tablist"` and each item `role="tab"` + `aria-selected`. Pairs naturally with single-select. |
 | `equalWidth` | `boolean` | no | `false` | The equal-width state — lays items out as equal-width tiles (each `flex-1 basis-0`) for an icon category strip where every cell should share the row width. Additive; the default keeps intrinsic item widths. |
 | `isSkeleton` | `boolean` | no | `undefined` | Keeps every segment's box and draws its label as a bar; a segmented track lifts every segment. Defaults to the nearest `DataRegion` first load. |
+| `options` | `ReadonlyArray<ToggleGroupOption>` | no | `undefined` | The items to render, one [`ToggleGroupItem`](ToggleGroupItem.spec.md) each, before any items in the default slot: `{ value, label, count?, icon?, isDisabled? }`. |
+| `itemVariant` | `ToggleInputVariant` | no | `undefined` | The press-state surface style of the `options` items. Items in the slot choose their own. |
+| `itemTone` | `ColorTone` | no | `undefined` | The semantic tone of the `options` items. Items in the slot choose their own. |
+
+`options` items carry an optional `count` (a muted tabular figure after the label, part of the accessible name) and `icon`; see [ToggleGroupItem](ToggleGroupItem.spec.md). A group with no `options` renders exactly as before.
 
 For compact pills, give each `ToggleInput` an accessible name with `aria-label`, a visible icon, and a label span with
 `data-toggle-label`. The label stays inline on the pressed pill and on touch devices. With a pointer it also appears
@@ -49,7 +54,7 @@ below inactive pills on hover or keyboard focus, without moving the other pills.
 
 | Slot      | Signature             | Meaning                                                            |
 | --------- | --------------------- | ------------------------------------------------------------------ |
-| `default` | `default(): unknown;` | The `ToggleInput` children whose selection this group coordinates. |
+| `default` | `default(): unknown;` | The `ToggleInput` or `ToggleGroupItem` children whose selection this group coordinates. |
 
 ## Exposed handle
 
@@ -58,6 +63,7 @@ below inactive pills on hover or keyboard focus, without moving the other pills.
 ## Verification
 
 - Reset regressions: [CompositeReset.dom.test.ts](../../../../tests/unit/presentation/forms/CompositeReset.dom.test.ts).
+- `options` with count and icon: [ToggleGroupItems.dom.test.ts](../../../../tests/unit/presentation/forms/ToggleGroupItems.dom.test.ts).
 
 - Public render fixture: [ActionsExamples.ts](../../../../apps/playground/src/gallery/fixtures/ActionsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

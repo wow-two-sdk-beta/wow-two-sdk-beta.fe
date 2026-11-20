@@ -53,7 +53,10 @@
 // NOT HERE, on purpose:
 //  - `useResizeObserver` — it lives in `foundation/observers` and is not re-exported; one export site per composable.
 //  - The scroll container itself — that is `foundation/primitives`' `ScrollViewport` (see above).
-//  - Grid/2D windowing, sticky headers, and infinite-scroll paging — this is the primitive they would build on.
+//  - Grid/2D windowing and sticky headers — this is the primitive they would build on.
+//
+// PAGING, NOT WINDOWING: `useAdaptiveList` loads the next cursor page when a sentinel after the last item nears the
+// viewport. It never removes an item from the DOM; pair it with `useVirtualList` over its `items` for a long feed.
 
 export {
   buildMeasurements,
@@ -79,3 +82,10 @@ export {
 } from './Windowing';
 
 export { useVirtualList, type UseVirtualListOptions, type VirtualItem, type VirtualList } from './UseVirtualList';
+
+export {
+  useAdaptiveList,
+  type AdaptiveList,
+  type AdaptiveListPage,
+  type UseAdaptiveListOptions,
+} from './UseAdaptiveList';

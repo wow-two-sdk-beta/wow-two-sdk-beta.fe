@@ -20,6 +20,8 @@ import { computed, ref } from 'vue';
 import { Temporal } from 'temporal-polyfill';
 import { Star } from 'lucide-vue-next';
 import * as forms from '@wow-two-beta/fe/presentation/forms';
+import type { FacetDefinition, FacetSelection } from '@wow-two-beta/fe/presentation/forms';
+import { useAdaptiveList } from '@wow-two-beta/fe/foundation/virtualization';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
@@ -261,6 +263,91 @@ const combo = ref('');
 const comboQuery = ref('');
 const plan = ref('pro');
 const masked = ref('');
+
+/* FacetBar demo: counts follow the rule — each facet is counted with every other choice applied but not its own. */
+interface DemoEvent {
+  readonly title: string;
+  readonly stage: 'open' | 'closed';
+  readonly format: 'fair' | 'conference' | 'expo';
+  readonly city: 'tashkent' | 'samarkand' | 'bukhara';
+}
+const demoEvents: ReadonlyArray<DemoEvent> = [
+  { title: 'Tashkent Fashion Week', stage: 'open', format: 'fair', city: 'tashkent' },
+  { title: 'Silk Road Textile Expo', stage: 'open', format: 'expo', city: 'samarkand' },
+  { title: 'Jewelry Makers Conference', stage: 'closed', format: 'conference', city: 'bukhara' },
+  { title: 'Craft Fair Samarkand', stage: 'open', format: 'fair', city: 'samarkand' },
+  { title: 'Uzbek Design Conference', stage: 'open', format: 'conference', city: 'tashkent' },
+  { title: 'Ceramics Expo', stage: 'closed', format: 'expo', city: 'bukhara' },
+];
+const demoFacetKeys = ['stage', 'format', 'city'] as const;
+const facetSelection = ref<FacetSelection>({});
+const facetSearch = ref('');
+function demoMatches(event: DemoEvent, skip?: string): boolean {
+  const query = facetSearch.value.trim().toLowerCase();
+  if (query && !event.title.toLowerCase().includes(query)) return false;
+  return demoFacetKeys.every((key) => {
+    if (key === skip) return true;
+    const chosen = facetSelection.value[key];
+    const values = chosen == null ? [] : typeof chosen === 'string' ? [chosen] : chosen;
+    return values.length === 0 || values.includes(event[key]);
+  });
+}
+function demoOptions(key: (typeof demoFacetKeys)[number], labels: ReadonlyArray<readonly [string, string]>) {
+  return labels.map(([value, label]) => ({
+    value,
+    label,
+    count: demoEvents.filter((event) => demoMatches(event, key) && event[key] === value).length,
+  }));
+}
+const demoFacets = computed<FacetDefinition[]>(() => [
+  {
+    key: 'stage',
+    label: 'Stage',
+    kind: 'single',
+    placement: 'inline',
+    options: demoOptions('stage', [['open', 'Open'], ['closed', 'Closed']]),
+  },
+  {
+    key: 'format',
+    label: 'Format',
+    kind: 'single',
+    placement: 'popover',
+    options: demoOptions('format', [['fair', 'Fair'], ['conference', 'Conference'], ['expo', 'Expo']]),
+  },
+  {
+    key: 'city',
+    label: 'City',
+    kind: 'multi',
+    placement: 'popover',
+    options: demoOptions('city', [['tashkent', 'Tashkent'], ['samarkand', 'Samarkand'], ['bukhara', 'Bukhara']]),
+  },
+]);
+const demoMatched = computed(() => demoEvents.filter((event) => demoMatches(event)).length);
+
+/* ToggleGroup items with counts and icons, and CountryPicker. */
+const stageChip = ref<string | null>('open');
+const country = ref<string | null>('UZ');
+
+/* useAdaptiveList demo: a fake cursor-paged source, loaded as the sentinel nears the bottom of the scroller. */
+const feedScroller = ref<HTMLElement | null>(null);
+const {
+  items: feedItems,
+  isLoading: feedLoading,
+  hasMore: feedHasMore,
+  sentinel: feedSentinel,
+  reset: feedReset,
+} = useAdaptiveList<string, number>({
+  root: feedScroller,
+  load: async (cursor) => {
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const start = cursor ?? 0;
+    return {
+      items: Array.from({ length: 12 }, (_, index) => `Event ${start + index + 1}`),
+      next: start + 12,
+      hasMore: start + 12 < 60,
+    };
+  },
+});
 
 /* Rows register their label only while the panel is mounted, so a preselected value shows its
    raw key ("a") until the first open. `get-option-label` is the closed-trigger resolver. */
@@ -955,6 +1042,57 @@ const stamp = ref<Temporal.PlainDateTime | null>(
     </div>
 
     <h3 class="border-t border-border pt-4 font-mono text-xs uppercase text-subtle-foreground">auto-mounted tail</h3>
+    <Demo name="FacetBar" note="counts follow the other choices · Filters popover chips · polite match pill · Clear all">
+      <div class="space-y-3">
+        <forms.FacetBar
+          v-model="facetSelection"
+          v-model:search="facetSearch"
+          :facets="demoFacets"
+          :match-count="demoMatched"
+          :total-count="demoEvents.length"
+        >
+          <template #trailing><Button size="sm">Add</Button></template>
+        </forms.FacetBar>
+        <ul class="text-sm">
+          <li v-for="event in demoEvents.filter((e) => demoMatches(e))" :key="event.title">
+            {{ event.title }} · {{ event.format }} · {{ event.city }}
+          </li>
+        </ul>
+        <p class="text-xs text-subtle-foreground">selection = {{ facetSelection }}</p>
+      </div>
+    </Demo>
+    <Demo name="ToggleGroup items" note="count after the label (tabular, in the accessible name) and an icon">
+      <forms.ToggleGroup
+        v-model="stageChip"
+        variant="pill"
+        item-variant="solid"
+        item-tone="neutral"
+        aria-label="Stage"
+        :options="[
+          { value: 'open', label: 'Open', count: 1200, icon: Star },
+          { value: 'closed', label: 'Closed', count: 8 },
+          { value: 'draft', label: 'Draft', count: 0 },
+        ]"
+      />
+    </Demo>
+    <Demo name="CountryPicker" note="type Uzbekistan, O‘zbekiston, Узбекистан or uz · stores the alpha-2 code">
+      <div class="max-w-xs space-y-2">
+        <forms.CountryPicker v-model="country" :preferred="['UZ', 'KZ', 'KG']" is-clearable aria-label="Country" />
+        <p class="text-xs text-subtle-foreground">value = {{ country }}</p>
+      </div>
+    </Demo>
+    <Demo name="useAdaptiveList" note="scroll the box · the next page loads before the end · 60 items in all">
+      <div class="space-y-2">
+        <div ref="feedScroller" class="h-56 overflow-auto rounded-md border border-border p-2 text-sm">
+          <p v-for="item in feedItems" :key="item" class="py-1">{{ item }}</p>
+          <div ref="feedSentinel" aria-hidden="true" />
+          <p v-if="feedLoading" class="py-1 text-subtle-foreground">Loading…</p>
+          <p v-else-if="!feedHasMore" class="py-1 text-subtle-foreground">End of the feed.</p>
+        </div>
+        <Button size="sm" variant="outline" @click="feedReset()">Reset</Button>
+      </div>
+    </Demo>
+
     <Demo name="CodeEditor" note="Escape then Tab leaves the editor">
       <CodeEditor v-model="code" aria-label="Example source code" />
     </Demo>
@@ -985,6 +1123,9 @@ const stamp = ref<Temporal.PlainDateTime | null>(
         'SortableGroupItem',
         'SortableGroupHandle',
         'SortableGroupMoveButton',
+        'FacetBar',
+        'CountryPicker',
+        'ToggleGroupItem',
       ]"
     />
   </div>
