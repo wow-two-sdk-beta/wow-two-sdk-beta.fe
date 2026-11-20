@@ -19,6 +19,8 @@ export const EventCalendarViewerView = {
   Week: 'week',
   /** Refers to the single-day view. */
   Day: 'day',
+  /** Refers to the year of twelve mini months. */
+  Year: 'year',
   /** Refers to the chronological agenda list. */
   Agenda: 'agenda',
 } as const;
@@ -48,10 +50,22 @@ export function startOfCellInstant(day: Temporal.PlainDate, timeZone: string): T
   return zonedAtHour(day, 0, timeZone);
 }
 
-/** The order the header's view switcher renders its radios in. */
+/** The canonical order the header's view switcher renders its buttons in. */
 export const EventCalendarViewerViews: ReadonlyArray<EventCalendarViewerView> = [
-  EventCalendarViewerView.Month,
-  EventCalendarViewerView.Week,
   EventCalendarViewerView.Day,
+  EventCalendarViewerView.Week,
+  EventCalendarViewerView.Month,
+  EventCalendarViewerView.Year,
   EventCalendarViewerView.Agenda,
 ];
+
+/**
+ * The views a switcher offers: `requested` filtered into the canonical order, whatever order it came in.
+ * An empty or unrecognized request offers every view, so the viewer always has something to show.
+ */
+export function offeredViews(
+  requested: ReadonlyArray<EventCalendarViewerView>,
+): ReadonlyArray<EventCalendarViewerView> {
+  const offered = EventCalendarViewerViews.filter((view) => requested.includes(view));
+  return offered.length > 0 ? offered : EventCalendarViewerViews;
+}

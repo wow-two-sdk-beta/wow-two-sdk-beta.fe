@@ -28,6 +28,13 @@ export interface EventCalendarViewerProps {
 
   readonly weekStart?: 0 | 1;
   readonly hourRange?: [number, number];
+
+  /**
+   * The views the switcher offers, shown in canonical order (day, week, month, year, agenda) whatever order is
+   * passed. Defaults to every view. A current view that is not offered shows the first offered one, and a
+   * single offered view hides the switcher.
+   */
+  readonly views?: ReadonlyArray<EventCalendarViewerView>;
 }
 </script>
 
@@ -44,10 +51,12 @@ import { addDays, nowZoned } from '../../forms/DateExtensions';
 import {
   EventCalendarViewerViews,
   EventCalendarViewerView as EventCalendarViewerViewValue,
+  offeredViews,
   startOfWeek,
 } from './EventCalendarViewerTypes';
 import MonthView from './MonthView.vue';
 import TimeGridView from './TimeGridView.vue';
+import YearView from './YearView.vue';
 import AgendaView from './AgendaView.vue';
 
 const locale = useLocale();
@@ -55,7 +64,7 @@ const locale = useLocale();
 /* `inheritAttrs: false` so `class` folds into the component's own `cn()` call — plain fallthrough
    appends outside it and loses tailwind-merge conflict resolution. */
 /**
- * Renders a calendar in month, week, day, or agenda view, under a header of period controls.
+ * Renders a calendar in day, week, month, year, or agenda view, under a header of period controls.
  *
  * First generation: the header carries Today / Prev / Next / Title plus the view switcher, and events
  * are colored blocks. Drag-edit, recurrence, and "+N more" overflow are deferred.
@@ -70,6 +79,7 @@ const props = withDefaults(defineProps<EventCalendarViewerProps>(), {
   defaultView: EventCalendarViewerViewValue.Month,
   weekStart: 0,
   hourRange: () => [0, 24],
+  views: () => [...EventCalendarViewerViews],
 });
 
 const emit = defineEmits<{
@@ -108,6 +118,13 @@ const dateControlled = useControlled<Temporal.ZonedDateTime>({
 const currentView = viewControlled.value;
 const currentDate = dateControlled.value;
 
+/* The switcher's views in canonical order, and the view actually shown: a current view the consumer did not offer
+   gives way to the first offered one, without reporting a change the reader never made. */
+const switcherViews = computed(() => offeredViews(props.views));
+const activeView = computed(() =>
+  switcherViews.value.includes(currentView.value) ? currentView.value : switcherViews.value[0]!,
+);
+
 /** CalendarPicker day the view is anchored on, in the focus instant's own zone. */
 const focusDay = computed(() => currentDate.value.toPlainDate());
 
@@ -118,7 +135,10 @@ const sortedEvents = computed(() =>
 );
 
 function goPrev(): void {
-  switch (currentView.value) {
+  switch (activeView.value) {
+    case EventCalendarViewerViewValue.Year:
+      dateControlled.setValue(currentDate.value.add({ years: -1 }));
+      break;
     case EventCalendarViewerViewValue.Month:
       dateControlled.setValue(currentDate.value.add({ months: -1 }));
       break;
@@ -133,7 +153,10 @@ function goPrev(): void {
 }
 
 function goNext(): void {
-  switch (currentView.value) {
+  switch (activeView.value) {
+    case EventCalendarViewerViewValue.Year:
+      dateControlled.setValue(currentDate.value.add({ years: 1 }));
+      break;
     case EventCalendarViewerViewValue.Month:
       dateControlled.setValue(currentDate.value.add({ months: 1 }));
       break;
@@ -155,9 +178,25 @@ function setView(next: EventCalendarViewerView): void {
   viewControlled.setValue(next);
 }
 
+/* A year-view month opens the month grid on that month; a year-view day opens the day grid on that day. The
+   focused instant keeps its time of day and zone. A target view the consumer did not offer is not entered —
+   the focused date still moves, and the day click still reports `slot-click`. */
+function openMonth(month: Temporal.PlainDate): void {
+  dateControlled.setValue(currentDate.value.with({ year: month.year, month: month.month, day: 1 }));
+  if (switcherViews.value.includes(EventCalendarViewerViewValue.Month)) setView(EventCalendarViewerViewValue.Month);
+}
+
+function openDay(day: Temporal.PlainDate): void {
+  dateControlled.setValue(currentDate.value.with({ year: day.year, month: day.month, day: day.day }));
+  if (switcherViews.value.includes(EventCalendarViewerViewValue.Day)) setView(EventCalendarViewerViewValue.Day);
+  emit('slot-click', day);
+}
+
 const title = computed(() => {
   const day = focusDay.value;
-  switch (currentView.value) {
+  switch (activeView.value) {
+    case EventCalendarViewerViewValue.Year:
+      return day.toLocaleString(locale.locale.value, { year: 'numeric' });
     case EventCalendarViewerViewValue.Month:
       return day.toLocaleString(locale.locale.value, { month: 'long', year: 'numeric' });
     case EventCalendarViewerViewValue.Week: {
@@ -187,14 +226,15 @@ const weekFirstDay = computed(() => startOfWeek(focusDay.value, props.weekStart)
 function viewButtonClass(v: EventCalendarViewerView): string {
   return cn(
     'inline-flex h-6 items-center rounded px-2 text-xs font-medium transition-colors',
-    currentView.value === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+    activeView.value === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
   );
 }
 
-const isMonth = computed(() => currentView.value === EventCalendarViewerViewValue.Month);
-const isWeek = computed(() => currentView.value === EventCalendarViewerViewValue.Week);
-const isDay = computed(() => currentView.value === EventCalendarViewerViewValue.Day);
-const isAgenda = computed(() => currentView.value === EventCalendarViewerViewValue.Agenda);
+const isMonth = computed(() => activeView.value === EventCalendarViewerViewValue.Month);
+const isWeek = computed(() => activeView.value === EventCalendarViewerViewValue.Week);
+const isDay = computed(() => activeView.value === EventCalendarViewerViewValue.Day);
+const isYear = computed(() => activeView.value === EventCalendarViewerViewValue.Year);
+const isAgenda = computed(() => activeView.value === EventCalendarViewerViewValue.Agenda);
 
 const OwnedAttributes: ReadonlySet<string> = new Set(['class']);
 const passthroughAttrs = computed(() =>
@@ -243,15 +283,16 @@ defineExpose({ el: root });
       </button>
       <h3 class="ml-1 text-base font-semibold">{{ title }}</h3>
       <div
+        v-if="switcherViews.length > 1"
         role="group"
         :aria-label="locale.t('EventCalendarViewer.view', undefined, 'View')"
         class="ml-auto flex items-center gap-0.5 rounded-md bg-card p-0.5 ring-1 ring-border"
       >
         <button
-          v-for="v in EventCalendarViewerViews"
+          v-for="v in switcherViews"
           :key="v"
           type="button"
-          :aria-pressed="currentView === v"
+          :aria-pressed="activeView === v"
           :class="viewButtonClass(v)"
           @click="setView(v)"
         >
@@ -289,6 +330,15 @@ defineExpose({ el: root });
         :hour-range="hourRange"
         @event-click="emit('event-click', $event)"
         @slot-click="(day, hour) => emit('slot-click', day, hour)"
+      />
+      <YearView
+        v-else-if="isYear"
+        :focus-day="focusDay"
+        :time-zone="timeZone"
+        :events="sortedEvents"
+        :week-start="weekStart"
+        @month-click="openMonth"
+        @day-click="openDay"
       />
       <AgendaView
         :time-zone="timeZone"
