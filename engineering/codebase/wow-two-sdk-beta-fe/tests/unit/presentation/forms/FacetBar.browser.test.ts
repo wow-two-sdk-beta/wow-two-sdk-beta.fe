@@ -102,46 +102,52 @@ function controls(root: HTMLElement): HTMLElement[] {
   ];
 }
 
-const centerOf = (element: Element): number => {
-  const rect = element.getBoundingClientRect();
-  return rect.top + rect.height / 2;
-};
+/** The first-row controls: pill, search, Filters, sort and add. */
+function firstRow(root: HTMLElement): HTMLElement[] {
+  return [
+    root.querySelector<HTMLElement>('[data-facet-match] > *')!,
+    root.querySelector<HTMLElement>('input[type=search]')!,
+    filtersButton(root),
+    root.querySelector<HTMLElement>('[data-sort]')!,
+    root.querySelector<HTMLElement>('[data-add]')!,
+  ];
+}
 
 describe('FacetBar layout at 1440px', () => {
   beforeAll(async () => {
     await page.viewport(1440, 900);
   });
 
-  it('keeps the search, the inline chips, Filters, the sort and the add button on one row', async () => {
+  it('keeps the pill, search, Filters and trailing controls on the first row, chips below it', async () => {
     const root = mountBar(1440);
     await nextTick();
-    const all = controls(root);
-    expect(all).toHaveLength(1 + 8 + 3);
-    const first = all[0]!.getBoundingClientRect().top;
-    for (const control of all) {
-      expect(Math.abs(control.getBoundingClientRect().top - first)).toBeLessThanOrEqual(4);
+    const row = firstRow(root);
+    const middle = (control: Element) => {
+      const rect = control.getBoundingClientRect();
+      return rect.top + rect.height / 2;
+    };
+    for (const control of row) {
+      expect(Math.abs(middle(control) - middle(row[1]!))).toBeLessThanOrEqual(4);
     }
-    const pill = root.querySelector('[data-facet-match] > *')!;
-    expect(Math.abs(centerOf(pill) - centerOf(all[0]!))).toBeLessThanOrEqual(4);
-    expect(root.querySelector('[data-facet-row]')!.getBoundingClientRect().height).toBeLessThan(60);
+    const group = root.querySelector<HTMLElement>('[data-facet-inline]')!;
+    expect(group.scrollWidth).toBeLessThanOrEqual(group.clientWidth);
+    expect(getComputedStyle(group).overflowX).not.toBe('auto');
+    const chips = [...group.querySelectorAll<HTMLElement>('button')];
+    expect(chips).toHaveLength(8);
+    const bottom = Math.max(...row.map((control) => control.getBoundingClientRect().bottom));
+    for (const chip of chips) {
+      const rect = chip.getBoundingClientRect();
+      expect(rect.top).toBeGreaterThanOrEqual(bottom - 1);
+      expect(rect.right).toBeLessThanOrEqual(root.getBoundingClientRect().right + 1);
+    }
     expect(root.querySelector('[data-facet-chips]')).toBeNull();
   });
 
-  it('orders the row pill, search, chips, then Filters, sort and add at the end', async () => {
+  it('orders the first row pill, search, then Filters, sort and add at the end', async () => {
     const root = mountBar(1440);
     await nextTick();
     const left = (element: Element) => element.getBoundingClientRect().left;
-    const pill = root.querySelector('[data-facet-match] > *')!;
-    const search = root.querySelector('input[type=search]')!;
-    const chips = root.querySelector('[data-facet-inline]')!;
-    const sequence = [
-      pill,
-      search,
-      chips,
-      filtersButton(root),
-      root.querySelector('[data-sort]')!,
-      root.querySelector('[data-add]')!,
-    ];
+    const sequence = firstRow(root);
     for (let at = 1; at < sequence.length; at += 1)
       expect(left(sequence[at]!)).toBeGreaterThan(left(sequence[at - 1]!));
 
@@ -154,44 +160,27 @@ describe('FacetBar layout at 1440px', () => {
   it('opens the second line of chips only while a popover facet has a choice', async () => {
     const root = mountBar(1440, { city: 'tashkent' });
     await nextTick();
-    const row = root.querySelector('[data-facet-row]')!.getBoundingClientRect();
+    const group = root.querySelector('[data-facet-inline]')!.getBoundingClientRect();
     const chips = root.querySelector('[data-facet-chips]')!.getBoundingClientRect();
-    expect(chips.top).toBeGreaterThanOrEqual(row.bottom - 1);
-    const first = controls(root)[0]!.getBoundingClientRect().top;
-    for (const control of controls(root)) {
-      expect(Math.abs(control.getBoundingClientRect().top - first)).toBeLessThanOrEqual(4);
-    }
+    expect(chips.top).toBeGreaterThanOrEqual(group.bottom - 1);
   });
 });
 
-describe('FacetBar layout at 1100px', () => {
+describe('FacetBar layout at 900px', () => {
   beforeAll(async () => {
-    await page.viewport(1100, 900);
+    await page.viewport(900, 900);
   });
 
-  it('scrolls the inline chips inside their own group instead of opening a row', async () => {
-    const root = mountBar(1100);
+  it('wraps the inline chips onto more rows and never scrolls them sideways', async () => {
+    const root = mountBar(560);
     await nextTick();
     const group = root.querySelector<HTMLElement>('[data-facet-inline]')!;
-    expect(group.scrollWidth).toBeGreaterThan(group.clientWidth);
-    expect(getComputedStyle(group).overflowX).toBe('auto');
-    const first = controls(root)[0]!.getBoundingClientRect().top;
-    for (const control of controls(root)) {
-      expect(Math.abs(control.getBoundingClientRect().top - first)).toBeLessThanOrEqual(4);
-    }
-    expect(root.querySelector('[data-facet-row]')!.getBoundingClientRect().height).toBeLessThan(70);
-  });
-
-  it('leaves room for a chip focus ring inside the scroll box', async () => {
-    const root = mountBar(1100);
-    await nextTick();
-    const group = root.querySelector<HTMLElement>('[data-facet-inline]')!;
-    const chip = group.querySelector<HTMLElement>('button')!;
-    const box = group.getBoundingClientRect();
-    const inner = chip.getBoundingClientRect();
-    expect(inner.top - box.top).toBeGreaterThanOrEqual(4);
-    expect(box.bottom - inner.bottom).toBeGreaterThanOrEqual(4);
-    expect(inner.left - box.left).toBeGreaterThanOrEqual(4);
+    expect(group.scrollWidth).toBeLessThanOrEqual(group.clientWidth);
+    const tops = new Set(
+      [...group.querySelectorAll<HTMLElement>('button')].map((chip) => Math.round(chip.getBoundingClientRect().top)),
+    );
+    expect(tops.size).toBeGreaterThan(1);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
   });
 });
 

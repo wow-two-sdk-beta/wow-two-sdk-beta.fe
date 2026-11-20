@@ -300,8 +300,9 @@ const rest = computed(() => {
 
 <template>
   <div v-bind="rest" :class="rootClass" data-facet-bar>
-    <!-- One row while the controls fit: the search is capped, the inline chips take what is left and scroll
-         sideways inside their own group, and "Filters" and the trailing slot sit at the end. -->
+    <!-- First row: the match pill, the search, then "Filters", "Clear all" and the trailing slot at the end. From
+         `sm` the inline chips take a full-width row of their own below it and wrap freely, so none scrolls out of
+         view. -->
     <div class="flex flex-wrap items-center gap-x-2.5 gap-y-2" data-facet-row>
       <!-- Always mounted: a live region announces content that changes inside it, not one that appears with it. -->
       <span
@@ -327,11 +328,9 @@ const rest = computed(() => {
           @update:model-value="searchCtl.setValue($event)"
         />
       </div>
-      <!-- The padding, with a negative margin at the start and above and below, leaves room for the chips' focus
-           rings inside the scroll box without moving the chips or widening the row. -->
       <div
         v-if="inlineFacets.length > 0"
-        class="-my-1 -ms-1 flex min-w-[min(100%,12rem)] flex-[1_1_0%] items-center gap-x-3 overflow-x-auto px-1 py-1 [--scrollbar-size:0.375rem]"
+        class="flex w-full flex-wrap items-center gap-x-3 gap-y-2 sm:order-last sm:basis-full"
         data-facet-inline
       >
         <template v-for="facet in inlineFacets" :key="facet.key">
@@ -357,7 +356,7 @@ const rest = computed(() => {
             :options="facet.options"
             :model-value="isMulti(facet) ? valuesOf(facet.key) : singleOf(facet.key)"
             :aria-label="facet.label"
-            class="shrink-0 gap-1.5"
+            class="min-w-0 flex-wrap gap-1.5"
             @update:model-value="setFacet(facet.key, $event)"
           />
         </template>
