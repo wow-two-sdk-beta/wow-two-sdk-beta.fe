@@ -69,7 +69,7 @@ export interface ListboxPickerProps {
 <script setup lang="ts">
 import { DomOrderExtensions } from '../../../foundation/dom';
 import { useNativeFormReset } from '../UseNativeFormReset';
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, provide, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { cn, surfaceVariants } from '../../../foundation/styles';
 import { useFormControl } from '../../../foundation/primitives';
@@ -151,12 +151,22 @@ function reconcileActive(): void {
   activeId.value =
     (enabled.find((item) => values.value.some((value) => equals.value(value, item.value))) ?? enabled[0])?.id ?? null;
 }
+/* One reconcile per flush, however many rows registered, left or changed: a search that hides hundreds of rows
+   unregisters them one by one, and re-picking the active row after each would write `activeId` once per row — the
+   next hidden row each time — until Vue aborts the flush with "Maximum recursive updates exceeded". A post-flush
+   watcher over a revision counter runs once after every job of the flush, and the render it triggers still lands in
+   the same flush. */
+const registryRevision = ref(0);
 function scheduleReconcile(): void {
-  if (mounted) reconcileActive();
-  void nextTick(() => {
-    if (mounted) reconcileActive();
-  });
+  registryRevision.value++;
 }
+watch(
+  registryRevision,
+  () => {
+    if (mounted) reconcileActive();
+  },
+  { flush: 'post' },
+);
 onBeforeUnmount(() => {
   mounted = false;
 });

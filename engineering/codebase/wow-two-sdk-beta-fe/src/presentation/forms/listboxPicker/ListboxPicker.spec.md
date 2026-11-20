@@ -50,9 +50,10 @@ Public import: `import { ListboxPicker } from '@wow-two-beta/fe/presentation/for
 
 ## Verification
 
+- Active row while a search hides rows: [ListboxActiveReconcile.dom.test.ts](../../../../tests/unit/presentation/forms/ListboxActiveReconcile.dom.test.ts) — 240 leading rows hidden, the active one included, with no recursive-update error.
 - Public render fixture: [FormsExamples.ts](../../../../apps/playground/src/gallery/fixtures/FormsExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.
 
 ## Editing guarantees
 
-The active option reconciles when items unregister or become disabled. The selected enabled option wins; otherwise the first enabled option becomes active. Empty registries expose no stale active id. Disabled and read-only state inherit Field context and guard keyboard, pointer and selection callbacks.
+The active option reconciles once per update flush, after its jobs, when items register, unregister or become disabled, however many do, so a search that hides hundreds of rows moves the active option once. The selected enabled option wins; otherwise the first enabled option becomes active. Empty registries expose no stale active id. Disabled and read-only state inherit Field context and guard keyboard, pointer and selection callbacks.
