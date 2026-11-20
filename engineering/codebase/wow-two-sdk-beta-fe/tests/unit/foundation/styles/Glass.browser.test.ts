@@ -130,7 +130,7 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
     ['dark', ocharo.glass!.dark],
   ] as const;
 
-  it.each(modes)('paints the approved %s chrome, sidebar and menu materials', (mode, glass) => {
+  it.each(modes)('paints the approved %s chrome, the sidebar clear, the menu in the chrome fill', (mode, glass) => {
     root.className = mode === 'dark' ? 'theme-ocharo dark' : 'theme-ocharo';
     const chrome = surface('surface-glass border border-glass-edge shadow-(--glass-shadow)');
     const side = surface('surface-glass-side');
@@ -140,15 +140,18 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
     expect(read(chrome, 'background-color')).toBe(reference('background-color', `background-color: ${glass.fill}`));
     expect(read(card, 'background-color')).toBe(reference('background-color', `background-color: ${glass.fill}`));
     expect(read(side, 'background-color')).toBe(reference('background-color', `background-color: ${glass.sideFill}`));
-    expect(read(menu, 'background-color')).toBe(reference('background-color', `background-color: ${glass.menuFill}`));
+    /* No menu fill of its own: the menu keeps the chrome fill, as the platform block draws it. */
+    expect(read(menu, 'background-color')).toBe(reference('background-color', `background-color: ${glass.fill}`));
 
-    const filter = referenceBackdrop(`blur(${glass.blur}) saturate(${glass.saturate})`);
+    const filter = referenceBackdrop(`blur(${glass.blur}) saturate(100%)`);
     for (const node of [chrome, side, menu, card]) expect(backdrop(node)).toBe(filter);
 
     expect(read(chrome, 'border-top-color')).toBe(reference('color', `color: ${glass.edge}`));
-    expect(read(menu, 'border-top-color')).toBe(reference('color', `color: ${glass.edge}`));
     expect(read(chrome, 'box-shadow')).toBe(tailwindShadow(`${glass.shadow}, inset 0 1px 0 ${glass.highlight}`));
-    expect(read(menu, 'box-shadow')).toBe(tailwindShadow(`${glass.menuShadow}, inset 0 1px 0 ${glass.highlight}`));
+    /* No menu shadow of its own: the SDK's own large shadow draws the menu. */
+    expect(read(menu, 'box-shadow')).toBe(
+      tailwindShadow('0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)'),
+    );
   });
 
   it.each(modes)('paints the %s phone bar in the chrome glass, its shadow cast upward', (mode, glass) => {
@@ -156,7 +159,7 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
     const [bar, solid] = bottomBars();
 
     expect(read(bar, 'background-color')).toBe(reference('background-color', `background-color: ${glass.fill}`));
-    expect(backdrop(bar)).toBe(referenceBackdrop(`blur(${glass.blur}) saturate(${glass.saturate})`));
+    expect(backdrop(bar)).toBe(referenceBackdrop(`blur(${glass.blur}) saturate(100%)`));
     expect(read(bar, 'border-top-width')).toBe('1px');
     expect(read(bar, 'border-top-color')).toBe(reference('color', `color: ${glass.edge}`));
     expect(glass.bottomShadow).toMatch(/^0 -\d+px /u);
@@ -175,6 +178,7 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
     /* Wide enough that the sidebar is the rail, not the drawer. */
     await page.viewport(1280, 800);
     root.className = 'theme-ocharo';
+    const glass = ocharo.glass!.light;
     wrapper = mount(
       () =>
         h(AppShell, null, () => [
@@ -188,17 +192,13 @@ describe.skipIf(isForcedColors)('the ocharo glass strength', () => {
       await expect.poll(() => root.querySelector('aside')).not.toBeNull();
       const header = root.querySelector<HTMLElement>('header')!;
       const sidebar = root.querySelector<HTMLElement>('aside')!;
-      expect(read(header, 'background-color')).toBe(
-        reference('background-color', 'background-color: rgb(255 255 255 / 0.84)'),
-      );
-      expect(read(header, 'border-bottom-color')).toBe(reference('color', 'color: rgb(24 27 37 / 0.08)'));
-      expect(read(header, 'box-shadow')).toBe(
-        tailwindShadow('0 10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.9)'),
-      );
+      expect(read(header, 'background-color')).toBe(reference('background-color', `background-color: ${glass.fill}`));
+      expect(read(header, 'border-bottom-color')).toBe(reference('color', `color: ${glass.edge}`));
+      expect(read(header, 'box-shadow')).toBe(tailwindShadow(`${glass.shadow}, inset 0 1px 0 ${glass.highlight}`));
       expect(read(sidebar, 'background-color')).toBe(
-        reference('background-color', 'background-color: rgb(255 255 255 / 0.6)'),
+        reference('background-color', `background-color: ${glass.sideFill}`),
       );
-      expect(read(sidebar, 'border-right-color')).toBe(reference('color', 'color: rgb(24 27 37 / 0.08)'));
+      expect(read(sidebar, 'border-right-color')).toBe(reference('color', `color: ${glass.edge}`));
     } finally {
       await page.viewport(414, 896);
     }

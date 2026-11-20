@@ -8,8 +8,8 @@
  * `ambient` backdrop for `surface-ambient`.
  * Smart QR: brand fills and neutral backgrounds preserve the original app colors; foreground tokens were corrected
  * for the SDK's declared text/placeholder/glass contrast pairs and await visual review in the app.
- * Ocharo: the owner-approved Ink and Raspberry (light) and Neutral graphite (dark) palette under a raspberry-and-blue
- * backdrop, with the approved frame glass; the tones the approval left open are derived to match it.
+ * Ocharo: Samarkand Turquoise, the owner-approved dome-turquoise and terracotta palette under a turquoise-and-
+ * terracotta backdrop, with the approved frame glass; the tones the approval left open are derived to match it.
  * Smart QR and Ocharo stay candidates until a shipping app validates them through the registry. */
 
 import type { Theme, ThemeAmbient, ThemeGlass } from '../Theme';
@@ -325,144 +325,134 @@ const smartQr: Theme = {
 };
 
 /* ---------------------------------------------------------------------------
- * Ocharo — raspberry actions on cool white and ink (light) / neutral graphite (dark), under a raspberry-and-blue
- * backdrop. The owner approved Ink and Raspberry and Neutral graphite on 2026-10-02 and the glass-and-gradient
- * direction on 2026-10-17. Approved values are verbatim, except where a comment gives the original: those moved in
- * lightness only, by the least that clears the declared pairs. The approval left muted, subtle, inverse, field,
- * accent and the status families open; they are derived here (muted and the status tones start from Catalogue's
- * shipped values). The approved header and menu materials (light: white at 84% and 92%; dark: #29292d at 90% and
- * 96%) set the popover colour and, with the sidebar, blur, edge and shadows, the theme's glass strength.
+ * Ocharo — Samarkand Turquoise, approved 2026-11-20: dome turquoise actions and a terracotta accent on warm paper
+ * and ink (light) / deep teal surfaces, full colour, never black or neutral graphite (dark), under the Wheelhouse-
+ * style ambient gradient and glass. Candidate 4 of the 2026-11-20 palette round. Approved values are verbatim,
+ * except where a comment gives the original: those moved in lightness only, by the least that clears the declared
+ * pairs. The approval left muted, subtle, inverse, field, the status families and the soft/strong neutrals open;
+ * they are derived here in the same turquoise/terracotta hue family.
  * ------------------------------------------------------------------------- */
 
 const ocharoLight: TokenSet = {
-  background: '#f5f6fa',
-  foreground: '#181b25',
-  card: '#ffffff',
-  'card-foreground': '#181b25',
-  popover: '#ffffff',
-  'popover-foreground': '#181b25',
-  field: '#ffffff',
-  muted: '#eef0f6',
-  'muted-foreground': '#555e72',
-  'subtle-foreground': '#5f687b',
-  inverse: '#181b25',
-  'inverse-foreground': '#f5f6fa',
-  border: '#dfe3ed',
-  'border-strong': '#828b9f', // #858ea3: 2.88:1 on muted
-  input: '#828b9f', // #858ea3
-  ring: '#9d2e6a',
-  primary: '#8b2459',
+  background: '#f5f1ea',
+  foreground: '#13262d',
+  card: '#fffcf7',
+  'card-foreground': '#13262d',
+  popover: '#fffcf7',
+  'popover-foreground': '#13262d',
+  field: '#fffcf7',
+  muted: '#ece4d6',
+  'muted-foreground': '#55666c',
+  'subtle-foreground': '#59696f', // #66767c: 4.19:1 on background
+  inverse: '#13262d',
+  'inverse-foreground': '#f5f1ea',
+  border: '#e0d8cb',
+  'border-strong': '#8e816c', // #b8ab95: 2.01:1 on background
+  input: '#8e816c', // #b8ab95
+  ring: '#0e6a86',
+  primary: '#0e6a86',
   'primary-foreground': '#ffffff',
-  'primary-soft': '#f8e9f0',
-  'primary-soft-foreground': '#892257', // #8b2459: 4.39:1 on its 30% tone wash over muted
-  accent: '#2457ce',
+  'primary-soft': '#dff0f3',
+  'primary-soft-foreground': '#00516b', // #0b5a74: 4.40:1 on its 30% tone wash over background
+  accent: '#b8532e',
   'accent-foreground': '#ffffff',
-  'accent-soft': '#e8eefc',
-  'accent-soft-foreground': '#1545bb',
-  destructive: '#a0443d',
+  'accent-soft': '#f7e4da',
+  'accent-soft-foreground': '#843718', // #8a3d1e: 4.15:1 on its 30% tone wash over muted
+  destructive: '#a23a35',
   'destructive-foreground': '#ffffff',
-  'destructive-soft': '#fae9e6',
-  'destructive-soft-foreground': '#8d322d',
-  info: '#176d8b',
+  'destructive-soft': '#f7e3e0',
+  'destructive-soft-foreground': '#832a24',
+  info: '#2a6ca8',
   'info-foreground': '#ffffff',
-  'info-soft': '#e3f1f9',
-  'info-soft-foreground': '#005974',
-  success: '#426553',
+  'info-soft': '#e2edf6',
+  'info-soft-foreground': '#1a4f7e', // #1f5483: 4.24:1 on its 30% tone wash over muted
+  success: '#2f7a52',
   'success-foreground': '#ffffff',
-  'success-soft': '#e9f0e9',
-  'success-soft-foreground': '#365847',
-  warning: '#906623',
+  'success-soft': '#e5f1e9',
+  'success-soft-foreground': '#1c5937', // #1f5c3a: 4.32:1 on its 30% tone wash over muted
+  warning: '#9a6a1c',
   'warning-foreground': '#ffffff',
-  'warning-soft': '#f8efdd',
-  'warning-soft-foreground': '#744c00',
+  'warning-soft': '#faf0da',
+  'warning-soft-foreground': '#6c4900', // #704c00: 4.32:1 on its 30% tone wash over muted
 };
 
 const ocharoDark: TokenSet = {
-  background: '#141416',
-  foreground: '#f4f2f5',
-  card: '#1d1d20',
-  'card-foreground': '#f4f2f5',
-  popover: '#29292d',
-  'popover-foreground': '#f4f2f5',
-  field: '#141416',
-  muted: '#262629',
-  'muted-foreground': '#b7b3bd',
-  'subtle-foreground': '#a29ea8',
-  inverse: '#f4f2f5',
-  'inverse-foreground': '#141416',
-  border: '#3d3b42',
-  'border-strong': '#85808c',
-  input: '#85808c',
-  ring: '#e69abc',
-  primary: '#c24783',
-  'primary-foreground': '#ffffff',
-  'primary-soft': '#392330',
-  'primary-soft-foreground': '#e69abc',
-  accent: '#5b6cc8',
-  'accent-foreground': '#ffffff',
-  'accent-soft': '#262c44',
-  'accent-soft-foreground': '#b5c2f2',
-  destructive: '#efaaa1',
-  'destructive-foreground': '#3c1715',
-  'destructive-soft': '#492b28',
-  'destructive-soft-foreground': '#ffd0c8',
-  info: '#94c6e1',
-  'info-foreground': '#08222f',
-  'info-soft': '#20333c',
-  'info-soft-foreground': '#b8daed',
-  success: '#a6cfb4',
-  'success-foreground': '#11281a',
-  'success-soft': '#263d30',
-  'success-soft-foreground': '#c1e1ca',
-  warning: '#e1bd79',
-  'warning-foreground': '#382709',
-  'warning-soft': '#473b25',
-  'warning-soft-foreground': '#f0d299',
+  background: '#062a35',
+  foreground: '#e9f6f8',
+  card: '#0c3a48',
+  'card-foreground': '#e9f6f8',
+  popover: '#0c3a48',
+  'popover-foreground': '#e9f6f8',
+  field: '#062a35',
+  muted: '#113f4d',
+  'muted-foreground': '#9fc4cc',
+  'subtle-foreground': '#8eb3bc',
+  inverse: '#e9f6f8',
+  'inverse-foreground': '#062a35',
+  border: '#1b5566',
+  'border-strong': '#508c9d', // #4f8a9b: 2.95:1 on muted
+  input: '#508c9d', // #4f8a9b
+  ring: '#7fd6e8',
+  primary: '#7fd6e8',
+  'primary-foreground': '#062a35',
+  'primary-soft': '#12505f',
+  'primary-soft-foreground': '#b0ecf8', // #aeeaf5: 4.44:1 on its 30% tone wash over muted
+  accent: '#f0a07c',
+  'accent-foreground': '#4a2210',
+  'accent-soft': '#3a2318',
+  'accent-soft-foreground': '#ffc6a5', // #f3b896: 3.95:1 on its 30% tone wash over muted
+  destructive: '#f0a89e',
+  'destructive-foreground': '#3c1510',
+  'destructive-soft': '#452a26',
+  'destructive-soft-foreground': '#ffd0c7',
+  info: '#8fc3ea',
+  'info-foreground': '#0c2740',
+  'info-soft': '#1d3348',
+  'info-soft-foreground': '#c2e0f8', // #bfdcf4: 4.37:1 on its 30% tone wash over muted
+  success: '#9ad8b5',
+  'success-foreground': '#0f2a1b',
+  'success-soft': '#1f3b2a',
+  'success-soft-foreground': '#c2ecd0', // #bfe8cd: 4.37:1 on its 30% tone wash over muted
+  warning: '#e8c583',
+  'warning-foreground': '#352405',
+  'warning-soft': '#3c2f14',
+  'warning-soft-foreground': '#f6dba3',
 };
 
-/* The approved prototype's medium backdrop: a raspberry glow from the top left (16%), a cool blue one from the bottom
- * right (11%) and a faint rose one near the top right (8%), at the same alphas in both modes. */
+/* The Wheelhouse-style ambient: a turquoise glow from the top left, a terracotta one from the bottom right, at the
+ * picked alphas in both modes. */
 const ocharoAmbient: ThemeAmbient = {
   light: [
-    'radial-gradient(ellipse 60% 55% at 0% 0%, #8b245929, transparent 70%)',
-    'radial-gradient(ellipse 55% 60% at 100% 100%, #2457ce1c, transparent 70%)',
-    'radial-gradient(ellipse 40% 35% at 70% 8%, #c2478314, transparent 75%)',
+    'radial-gradient(ellipse 70rem 42rem at 0% 0%, #0e6a8616, transparent 72%)',
+    'radial-gradient(ellipse 58rem 42rem at 100% 10%, #d0703c16, transparent 74%)',
   ].join(', '),
   dark: [
-    'radial-gradient(ellipse 60% 55% at 0% 0%, #c2478329, transparent 70%)',
-    'radial-gradient(ellipse 55% 60% at 100% 100%, #5b6cc81c, transparent 70%)',
-    'radial-gradient(ellipse 40% 35% at 70% 8%, #8a6f9e14, transparent 75%)',
+    'radial-gradient(ellipse 70rem 42rem at 0% 0%, #1aa0b840, transparent 72%)',
+    'radial-gradient(ellipse 58rem 42rem at 100% 10%, #d8784a2a, transparent 74%)',
   ].join(', '),
 };
 
-/* The approved frame glass, verbatim from Ocharo Desk's `oc-glass` materials: the chrome at 84% / 90%, the sidebar at
- * 60% / 70% over #212125, menus at 92% / 96%, a 24px blur, and a white top highlight inside every shadow. The bottom
- * bar's shadow is derived, not approved: the chrome shadow mirrored upward, so the phone bar lifts off the page as
- * the top bar does (Desk's own phone bar had none). */
+/* The Wheelhouse-style frame glass, following the platform block's shape: the approved surface, edge, highlight and
+ * shadow verbatim; the sidebar stays clear over the backdrop, and the bottom bar's shadow is the chrome shadow
+ * mirrored upward, both derived rather than approved. */
 const ocharoGlass: ThemeGlass = {
   light: {
-    fill: 'rgb(255 255 255 / 0.84)',
-    sideFill: 'rgb(255 255 255 / 0.6)',
-    menuFill: 'rgb(255 255 255 / 0.92)',
-    blur: '24px',
-    saturate: '120%',
-    edge: 'rgb(24 27 37 / 0.08)',
-    highlight: 'rgb(255 255 255 / 0.9)',
-    shadow: '0 10px 30px rgb(24 27 37 / 0.06)',
-    bottomShadow: '0 -10px 30px rgb(24 27 37 / 0.06)',
-    menuShadow: '0 18px 50px rgb(24 27 37 / 0.16)',
+    fill: '#fffcf7db',
+    sideFill: 'transparent',
+    blur: '16px',
+    edge: '#13262d1f',
+    highlight: '#ffffffd9',
+    shadow: '0 10px 30px #0e6a861c',
+    bottomShadow: '0 -10px 30px #0e6a861c',
   },
   dark: {
-    fill: 'rgb(41 41 45 / 0.9)',
-    sideFill: 'rgb(33 33 37 / 0.7)',
-    menuFill: 'rgb(41 41 45 / 0.96)',
-    blur: '24px',
-    saturate: '100%',
-    edge: 'rgb(255 255 255 / 0.07)',
-    highlight: 'rgb(255 255 255 / 0.06)',
-    shadow: '0 12px 32px rgb(0 0 0 / 0.25)',
-    bottomShadow: '0 -12px 32px rgb(0 0 0 / 0.25)',
-    menuShadow: '0 20px 60px rgb(0 0 0 / 0.5)',
+    fill: '#0c3a48e0',
+    sideFill: 'transparent',
+    blur: '16px',
+    edge: '#b4eef82e',
+    highlight: '#dcf8fc1f',
+    shadow: '0 12px 32px #01182259',
+    bottomShadow: '0 -12px 32px #01182259',
   },
 };
 
@@ -471,8 +461,8 @@ const ocharo: Theme = {
   id: 'ocharo',
   name: 'Ocharo',
   description:
-    'Raspberry actions and a cobalt accent on cool white and ink (light) / neutral graphite (dark) under a raspberry-and-blue glass backdrop — the owner-approved Ocharo palette, awaiting validation in Desk.',
-  tags: ['brand', 'raspberry', 'ink', 'graphite', 'cobalt', 'glass', 'cool', 'neutral', 'candidate', 'aa', 'product'],
+    'Dome turquoise actions and a terracotta accent on warm paper and ink (light) / deep-teal surfaces, full colour (dark) under a turquoise-and-terracotta glass backdrop — Samarkand Turquoise, the owner-approved Ocharo palette.',
+  tags: ['brand', 'turquoise', 'teal', 'terracotta', 'glass', 'warm', 'deep-teal', 'candidate', 'aa', 'product'],
   light: ocharoLight,
   dark: ocharoDark,
   radius: ThemeRadius.Lg,

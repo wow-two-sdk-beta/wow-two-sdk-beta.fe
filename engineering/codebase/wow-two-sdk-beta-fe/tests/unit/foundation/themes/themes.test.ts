@@ -195,7 +195,7 @@ describe('the ocharo theme', () => {
     expect(theme.name).toBe('Ocharo');
     expect(theme.status).toBe(ThemeStatus.Candidate);
     expect(theme.radius).toBe('lg');
-    expect(theme.tags).toEqual(expect.arrayContaining(['raspberry', 'ink', 'graphite', 'glass']));
+    expect(theme.tags).toEqual(expect.arrayContaining(['turquoise', 'terracotta', 'glass']));
     for (const token of SemanticTokens) {
       expect(theme.light[token], `light \`${token}\``).toMatch(/^#[0-9a-f]{6}$/u);
       expect(theme.dark[token], `dark \`${token}\``).toMatch(/^#[0-9a-f]{6}$/u);
@@ -203,61 +203,63 @@ describe('the ocharo theme', () => {
     expect(theme.meta, theme.meta.failures?.join('; ')).toEqual({ contrastAA: true });
   });
 
-  it('carries the approved Ink and Raspberry and Neutral graphite values', () => {
+  it('carries the approved Samarkand Turquoise values', () => {
     expect(theme.light).toMatchObject({
-      background: '#f5f6fa',
-      card: '#ffffff',
-      popover: '#ffffff',
-      foreground: '#181b25',
-      'muted-foreground': '#555e72',
-      primary: '#8b2459',
+      background: '#f5f1ea',
+      card: '#fffcf7',
+      popover: '#fffcf7',
+      foreground: '#13262d',
+      'muted-foreground': '#55666c',
+      primary: '#0e6a86',
       'primary-foreground': '#ffffff',
-      'primary-soft': '#f8e9f0',
-      border: '#dfe3ed',
-      ring: '#9d2e6a',
-      // Approved #858ea3 and #8b2459, moved in lightness only to clear their declared pairs over `muted`.
-      input: '#828b9f',
-      'border-strong': '#828b9f',
-      'primary-soft-foreground': '#892257',
+      'primary-soft': '#dff0f3',
+      accent: '#b8532e',
+      border: '#e0d8cb',
+      ring: '#0e6a86',
+      // Approved #b8ab95, moved in lightness only to clear its declared pairs over `background`.
+      input: '#8e816c',
+      'border-strong': '#8e816c',
+      'primary-soft-foreground': '#00516b',
     });
     expect(theme.dark).toMatchObject({
-      background: '#141416',
-      card: '#1d1d20',
-      popover: '#29292d',
-      foreground: '#f4f2f5',
-      'muted-foreground': '#b7b3bd',
-      primary: '#c24783',
-      'primary-foreground': '#ffffff',
-      'primary-soft': '#392330',
-      'primary-soft-foreground': '#e69abc',
-      border: '#3d3b42',
-      input: '#85808c',
-      'border-strong': '#85808c',
-      ring: '#e69abc',
+      background: '#062a35',
+      card: '#0c3a48',
+      popover: '#0c3a48',
+      foreground: '#e9f6f8',
+      'muted-foreground': '#9fc4cc',
+      primary: '#7fd6e8',
+      'primary-foreground': '#062a35',
+      'primary-soft': '#12505f',
+      'primary-soft-foreground': '#b0ecf8',
+      accent: '#f0a07c',
+      border: '#1b5566',
+      input: '#508c9d',
+      'border-strong': '#508c9d',
+      ring: '#7fd6e8',
     });
   });
 
-  it('no longer carries the Studio pomegranate candidate', () => {
+  it('no longer carries the raspberry-and-ink or Studio pomegranate candidates', () => {
     const values = [...Object.values(theme.light), ...Object.values(theme.dark)];
-    for (const studio of ['#7a3944', '#daa0aa', '#f1f0eb', '#242b29']) expect(values).not.toContain(studio);
+    for (const retired of ['#8b2459', '#c24783', '#7a3944', '#daa0aa', '#f1f0eb', '#242b29']) {
+      expect(values).not.toContain(retired);
+    }
   });
 
-  it('paints the approved medium backdrop in both modes', () => {
+  it('paints the approved turquoise-and-terracotta backdrop in both modes', () => {
     expect(theme.ambient).toEqual({
       light:
-        'radial-gradient(ellipse 60% 55% at 0% 0%, #8b245929, transparent 70%), ' +
-        'radial-gradient(ellipse 55% 60% at 100% 100%, #2457ce1c, transparent 70%), ' +
-        'radial-gradient(ellipse 40% 35% at 70% 8%, #c2478314, transparent 75%)',
+        'radial-gradient(ellipse 70rem 42rem at 0% 0%, #0e6a8616, transparent 72%), ' +
+        'radial-gradient(ellipse 58rem 42rem at 100% 10%, #d0703c16, transparent 74%)',
       dark:
-        'radial-gradient(ellipse 60% 55% at 0% 0%, #c2478329, transparent 70%), ' +
-        'radial-gradient(ellipse 55% 60% at 100% 100%, #5b6cc81c, transparent 70%), ' +
-        'radial-gradient(ellipse 40% 35% at 70% 8%, #8a6f9e14, transparent 75%)',
+        'radial-gradient(ellipse 70rem 42rem at 0% 0%, #1aa0b840, transparent 72%), ' +
+        'radial-gradient(ellipse 58rem 42rem at 100% 10%, #d8784a2a, transparent 74%)',
     });
     const [light, dark] = themeToCss(theme).split('\n\n');
     expect(light).toMatch(/^\.theme-ocharo \{/u);
     expect(dark).toMatch(/^\.dark\.theme-ocharo, \.dark \.theme-ocharo \{/u);
-    expect(light).toContain('--color-primary: #8b2459;');
-    expect(dark).toContain('--color-primary: #c24783;');
+    expect(light).toContain('--color-primary: #0e6a86;');
+    expect(dark).toContain('--color-primary: #7fd6e8;');
     expect(light).toContain(`--theme-ambient: ${theme.ambient!.light};`);
     expect(dark).toContain(`--theme-ambient: ${theme.ambient!.dark};`);
   });
@@ -269,56 +271,31 @@ describe('the ocharo theme', () => {
     });
   });
 
-  it('emits the approved frame glass in both modes, the highlight inside every shadow', () => {
+  it('emits the approved frame glass in both modes, the sidebar clear, the highlight inside every shadow', () => {
     const [light, dark] = themeToCss(theme).split('\n\n');
     for (const line of [
-      '--glass-fill: rgb(255 255 255 / 0.84);',
-      '--glass-side-fill: rgb(255 255 255 / 0.6);',
-      '--glass-menu-fill: rgb(255 255 255 / 0.92);',
-      '--glass-blur: 24px;',
-      '--glass-saturate: 120%;',
-      '--glass-edge: rgb(24 27 37 / 0.08);',
-      '--glass-highlight: rgb(255 255 255 / 0.9);',
-      '--glass-shadow: 0 10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 var(--glass-highlight);',
-      '--glass-bottom-shadow: 0 -10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 var(--glass-highlight);',
-      '--glass-menu-shadow: 0 18px 50px rgb(24 27 37 / 0.16), inset 0 1px 0 var(--glass-highlight);',
+      '--glass-fill: #fffcf7db;',
+      '--glass-side-fill: transparent;',
+      '--glass-blur: 16px;',
+      '--glass-edge: #13262d1f;',
+      '--glass-highlight: #ffffffd9;',
+      '--glass-shadow: 0 10px 30px #0e6a861c, inset 0 1px 0 var(--glass-highlight);',
+      '--glass-bottom-shadow: 0 -10px 30px #0e6a861c, inset 0 1px 0 var(--glass-highlight);',
     ]) {
       expect(light).toContain(line);
     }
     for (const line of [
-      '--glass-fill: rgb(41 41 45 / 0.9);',
-      '--glass-side-fill: rgb(33 33 37 / 0.7);',
-      '--glass-menu-fill: rgb(41 41 45 / 0.96);',
-      '--glass-blur: 24px;',
-      '--glass-saturate: 100%;',
-      '--glass-edge: rgb(255 255 255 / 0.07);',
-      '--glass-highlight: rgb(255 255 255 / 0.06);',
-      '--glass-shadow: 0 12px 32px rgb(0 0 0 / 0.25), inset 0 1px 0 var(--glass-highlight);',
-      '--glass-bottom-shadow: 0 -12px 32px rgb(0 0 0 / 0.25), inset 0 1px 0 var(--glass-highlight);',
-      '--glass-menu-shadow: 0 20px 60px rgb(0 0 0 / 0.5), inset 0 1px 0 var(--glass-highlight);',
+      '--glass-fill: #0c3a48e0;',
+      '--glass-side-fill: transparent;',
+      '--glass-blur: 16px;',
+      '--glass-edge: #b4eef82e;',
+      '--glass-highlight: #dcf8fc1f;',
+      '--glass-shadow: 0 12px 32px #01182259, inset 0 1px 0 var(--glass-highlight);',
+      '--glass-bottom-shadow: 0 -12px 32px #01182259, inset 0 1px 0 var(--glass-highlight);',
     ]) {
       expect(dark).toContain(line);
     }
-  });
-
-  it('keeps body text AA on every glass fill over the page', () => {
-    /** An `rgb(r g b / a)` fill composited over an opaque `#rrggbb` page, as `#rrggbb`. */
-    const over = (fill: string, page: string): string => {
-      const [r, g, b, a] = fill.match(/[\d.]+/gu)!.map(Number);
-      const base = page.match(/[0-9a-f]{2}/giu)!.map((part) => Number.parseInt(part, 16));
-      const mix = [r!, g!, b!].map((channel, index) => Math.round(channel * a! + base[index]! * (1 - a!)));
-      return `#${mix.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
-    };
-    for (const mode of ['light', 'dark'] as const) {
-      const glass = theme.glass![mode];
-      for (const fill of [glass.fill!, glass.sideFill!, glass.menuFill!]) {
-        const backdrop = over(fill, theme[mode].background);
-        for (const text of ['foreground', 'muted-foreground'] as const) {
-          const ratio = contrastRatio(parseColor(theme[mode][text])!, parseColor(backdrop)!);
-          expect(ratio, `${mode} ${text} on ${fill}`).toBeGreaterThanOrEqual(4.5);
-        }
-      }
-    }
+    expect(light).not.toContain('--glass-menu-');
   });
 });
 
