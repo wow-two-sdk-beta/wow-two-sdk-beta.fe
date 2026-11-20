@@ -109,7 +109,7 @@ export const badgeVariants = tv({
 /** The leading icon's box per size step; an icon the caller sizes itself keeps its own size. */
 export const badgeLeadingSize = {
   sm: '[&>svg]:size-3',
-  md: '[&>svg]:size-[13px]',
+  md: '[&>svg]:size-3.5',
   lg: '[&>svg]:size-4',
 } as const;
 
