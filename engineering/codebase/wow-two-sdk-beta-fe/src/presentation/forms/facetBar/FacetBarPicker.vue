@@ -1,10 +1,10 @@
 <script lang="ts">
-import type { FacetDefinition } from './FacetBar.vue';
+import type { FacetChoiceDefinition } from './FacetBar.vue';
 
 /** Defines props for the picker of one popover facet. */
 export interface FacetBarPickerProps {
-  /** The facet whose options the picker offers. */
-  readonly facet: FacetDefinition;
+  /** The facet whose options the picker offers; a `toggle` facet has none and never reaches the picker. */
+  readonly facet: FacetChoiceDefinition;
 
   /** The chosen value of a `single` facet, or the chosen values of a `multi` one. */
   readonly modelValue?: string | ReadonlyArray<string> | null;

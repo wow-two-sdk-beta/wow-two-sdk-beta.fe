@@ -22,7 +22,7 @@ async function settle(): Promise<void> {
 
 const stageCounts = ref({ open: 5, closed: 2 });
 
-/** Two inline facets (one single, one multi) and two popover facets (one of each). */
+/** Two inline facets (one single, one multi), two popover facets (one of each), and a toggle of each placement. */
 const facets = (): FacetDefinition[] => [
   {
     key: 'stage',
@@ -64,6 +64,8 @@ const facets = (): FacetDefinition[] => [
       { value: 'samarkand', label: 'Samarkand', count: 6 },
     ],
   },
+  { key: 'priority', label: 'High priority', kind: 'toggle', placement: 'inline', count: 4, icon: Star },
+  { key: 'skipped', label: 'Show skipped, rejected', kind: 'toggle', placement: 'popover', count: 7 },
 ];
 
 interface Harness {
@@ -156,6 +158,86 @@ describe('FacetBar inline facets', () => {
     expect(selection.value).toEqual({ scope: ['uz'] });
     await wrapper.get('[aria-label="Scope"] button').trigger('click');
     expect(selection.value).toEqual({});
+  });
+});
+
+describe('FacetBar toggle facets', () => {
+  it('renders an inline toggle as one pressable chip with its label and count, never a select', async () => {
+    const { wrapper } = mountBar();
+    const chip = wrapper.get('[data-facet-toggle]');
+    expect(chip.element.tagName).toBe('BUTTON');
+    expect(chip.attributes('aria-pressed')).toBe('false');
+    expect(chip.attributes('aria-label')).toBe('High priority 4');
+    expect(chip.get('[data-toggle-count]').text()).toBe('4');
+    expect(chip.find('svg').exists()).toBe(true);
+    expect(wrapper.find('[aria-label="High priority"][role=group]').exists()).toBe(false);
+    expect(wrapper.find('select, [role=combobox]').exists()).toBe(false);
+  });
+
+  it('stores true when an inline toggle is pressed and drops the key when it is released', async () => {
+    const { wrapper, selection } = mountBar();
+    await wrapper.get('[data-facet-toggle]').trigger('click');
+    expect(selection.value).toEqual({ priority: true });
+    expect(wrapper.get('[data-facet-toggle]').attributes('aria-pressed')).toBe('true');
+    expect(wrapper.find('[data-facet-chips]').exists()).toBe(false);
+    expect(wrapper.find('[data-facet-clear-all]').exists()).toBe(true);
+
+    await wrapper.get('[data-facet-toggle]').trigger('click');
+    expect(selection.value).toEqual({});
+    expect(wrapper.get('[data-facet-toggle]').attributes('aria-pressed')).toBe('false');
+    expect(wrapper.find('[data-facet-clear-all]').exists()).toBe(false);
+  });
+
+  it('shows a pressed inline toggle from a bound selection', () => {
+    const { wrapper } = mountBar({ priority: true, stage: 'open' });
+    expect(wrapper.get('[data-facet-toggle]').attributes('aria-pressed')).toBe('true');
+  });
+
+  it('renders a popover toggle as a switch row, not a select, and turns it into a removable chip', async () => {
+    const { wrapper, selection } = mountBar();
+    await openFilters(wrapper);
+    const row = document.querySelector<HTMLElement>('[data-facet-toggle-row]')!;
+    expect(row.textContent).toContain('Show skipped, rejected');
+    expect(row.querySelector('[data-facet-option-count]')!.textContent).toBe('7');
+    const switchInput = row.querySelector<HTMLInputElement>('input[role=switch]')!;
+    expect(switchInput.getAttribute('aria-label')).toBe('Show skipped, rejected');
+    expect(switchInput.checked).toBe(false);
+    expect(row.querySelector('[role=combobox], select, button')).toBeNull();
+    // The two choice facets keep their select triggers.
+    expect(document.querySelector('button[aria-label="Format"]')).not.toBeNull();
+
+    switchInput.click();
+    await settle();
+    expect(selection.value).toEqual({ skipped: true });
+    expect(chipRemovers(wrapper)).toEqual(['Remove Show skipped, rejected']);
+    expect(wrapper.get('[data-facet-chips]').text()).toBe('Show skipped, rejected');
+    expect(wrapper.get('[data-facet-filters-count]').text()).toBe('1');
+    expect(document.querySelector<HTMLInputElement>('input[role=switch]')!.checked).toBe(true);
+
+    await wrapper.get('[data-facet-chips] button').trigger('click');
+    expect(selection.value).toEqual({});
+    expect(wrapper.find('[data-facet-chips]').exists()).toBe(false);
+    expect(wrapper.find('[data-facet-filters-count]').exists()).toBe(false);
+    expect(document.querySelector<HTMLInputElement>('input[role=switch]')!.checked).toBe(false);
+  });
+
+  it('turns a popover toggle off through its switch and counts it with the other popover chips', async () => {
+    const { wrapper, selection } = mountBar({ skipped: true, city: ['tashkent'] });
+    expect(chipRemovers(wrapper)).toEqual(['Remove City: Tashkent', 'Remove Show skipped, rejected']);
+    expect(wrapper.get('[data-facet-filters-count]').text()).toBe('2');
+
+    await openFilters(wrapper);
+    document.querySelector<HTMLInputElement>('input[role=switch]')!.click();
+    await settle();
+    expect(selection.value).toEqual({ city: ['tashkent'] });
+    expect(chipRemovers(wrapper)).toEqual(['Remove City: Tashkent']);
+  });
+
+  it('clears toggles along with every other choice', async () => {
+    const { wrapper, selection } = mountBar({ priority: true, skipped: true });
+    await wrapper.get('[data-facet-clear-all]').trigger('click');
+    expect(selection.value).toEqual({});
+    expect(wrapper.get('[data-facet-toggle]').attributes('aria-pressed')).toBe('false');
   });
 });
 

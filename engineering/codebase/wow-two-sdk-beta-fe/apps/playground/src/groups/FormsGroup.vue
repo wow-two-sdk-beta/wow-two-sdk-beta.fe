@@ -270,25 +270,64 @@ interface DemoEvent {
   readonly stage: 'open' | 'closed';
   readonly format: 'fair' | 'conference' | 'expo';
   readonly city: 'tashkent' | 'samarkand' | 'bukhara';
+  readonly isPriority: boolean;
+  readonly isOnline: boolean;
 }
 const demoEvents: ReadonlyArray<DemoEvent> = [
-  { title: 'Tashkent Fashion Week', stage: 'open', format: 'fair', city: 'tashkent' },
-  { title: 'Silk Road Textile Expo', stage: 'open', format: 'expo', city: 'samarkand' },
-  { title: 'Jewelry Makers Conference', stage: 'closed', format: 'conference', city: 'bukhara' },
-  { title: 'Craft Fair Samarkand', stage: 'open', format: 'fair', city: 'samarkand' },
-  { title: 'Uzbek Design Conference', stage: 'open', format: 'conference', city: 'tashkent' },
-  { title: 'Ceramics Expo', stage: 'closed', format: 'expo', city: 'bukhara' },
+  {
+    title: 'Tashkent Fashion Week',
+    stage: 'open',
+    format: 'fair',
+    city: 'tashkent',
+    isPriority: true,
+    isOnline: false,
+  },
+  {
+    title: 'Silk Road Textile Expo',
+    stage: 'open',
+    format: 'expo',
+    city: 'samarkand',
+    isPriority: false,
+    isOnline: false,
+  },
+  {
+    title: 'Jewelry Makers Conference',
+    stage: 'closed',
+    format: 'conference',
+    city: 'bukhara',
+    isPriority: false,
+    isOnline: true,
+  },
+  {
+    title: 'Craft Fair Samarkand',
+    stage: 'open',
+    format: 'fair',
+    city: 'samarkand',
+    isPriority: true,
+    isOnline: false,
+  },
+  {
+    title: 'Uzbek Design Conference',
+    stage: 'open',
+    format: 'conference',
+    city: 'tashkent',
+    isPriority: false,
+    isOnline: true,
+  },
+  { title: 'Ceramics Expo', stage: 'closed', format: 'expo', city: 'bukhara', isPriority: false, isOnline: false },
 ];
 const demoFacetKeys = ['stage', 'format', 'city'] as const;
+const demoToggleKeys = ['isPriority', 'isOnline'] as const;
 const facetSelection = ref<FacetSelection>({});
 const facetSearch = ref('');
 function demoMatches(event: DemoEvent, skip?: string): boolean {
   const query = facetSearch.value.trim().toLowerCase();
   if (query && !event.title.toLowerCase().includes(query)) return false;
+  if (!demoToggleKeys.every((key) => key === skip || facetSelection.value[key] !== true || event[key])) return false;
   return demoFacetKeys.every((key) => {
     if (key === skip) return true;
     const chosen = facetSelection.value[key];
-    const values = chosen == null ? [] : typeof chosen === 'string' ? [chosen] : chosen;
+    const values = chosen == null || typeof chosen === 'boolean' ? [] : typeof chosen === 'string' ? [chosen] : chosen;
     return values.length === 0 || values.includes(event[key]);
   });
 }
@@ -299,28 +338,50 @@ function demoOptions(key: (typeof demoFacetKeys)[number], labels: ReadonlyArray<
     count: demoEvents.filter((event) => demoMatches(event, key) && event[key] === value).length,
   }));
 }
+function demoToggleCount(key: (typeof demoToggleKeys)[number]): number {
+  return demoEvents.filter((event) => demoMatches(event, key) && event[key]).length;
+}
 const demoFacets = computed<FacetDefinition[]>(() => [
   {
     key: 'stage',
     label: 'Stage',
     kind: 'single',
     placement: 'inline',
-    options: demoOptions('stage', [['open', 'Open'], ['closed', 'Closed']]),
+    options: demoOptions('stage', [
+      ['open', 'Open'],
+      ['closed', 'Closed'],
+    ]),
+  },
+  {
+    key: 'isPriority',
+    label: 'High priority',
+    kind: 'toggle',
+    placement: 'inline',
+    count: demoToggleCount('isPriority'),
   },
   {
     key: 'format',
     label: 'Format',
     kind: 'single',
     placement: 'popover',
-    options: demoOptions('format', [['fair', 'Fair'], ['conference', 'Conference'], ['expo', 'Expo']]),
+    options: demoOptions('format', [
+      ['fair', 'Fair'],
+      ['conference', 'Conference'],
+      ['expo', 'Expo'],
+    ]),
   },
   {
     key: 'city',
     label: 'City',
     kind: 'multi',
     placement: 'popover',
-    options: demoOptions('city', [['tashkent', 'Tashkent'], ['samarkand', 'Samarkand'], ['bukhara', 'Bukhara']]),
+    options: demoOptions('city', [
+      ['tashkent', 'Tashkent'],
+      ['samarkand', 'Samarkand'],
+      ['bukhara', 'Bukhara'],
+    ]),
   },
+  { key: 'isOnline', label: 'Online only', kind: 'toggle', placement: 'popover', count: demoToggleCount('isOnline') },
 ]);
 const demoMatched = computed(() => demoEvents.filter((event) => demoMatches(event)).length);
 
@@ -1042,7 +1103,10 @@ const stamp = ref<Temporal.PlainDateTime | null>(
     </div>
 
     <h3 class="border-t border-border pt-4 font-mono text-xs uppercase text-subtle-foreground">auto-mounted tail</h3>
-    <Demo name="FacetBar" note="counts follow the other choices · Filters popover chips · polite match pill · Clear all">
+    <Demo
+      name="FacetBar"
+      note="one row · counts follow the other choices · toggle chip and switch · Filters popover chips · polite match pill · Clear all"
+    >
       <div class="space-y-3">
         <forms.FacetBar
           v-model="facetSelection"
