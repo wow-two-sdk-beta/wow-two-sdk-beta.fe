@@ -41,7 +41,7 @@ export const BadgeBorderStyle = {
 export type BadgeBorderStyle = (typeof BadgeBorderStyle)[keyof typeof BadgeBorderStyle];
 
 export const badgeVariants = tv({
-  base: 'inline-flex max-w-full items-center rounded-full font-medium',
+  base: 'inline-flex max-w-full items-center rounded-full font-semibold',
   variants: {
     variant: {
       neutral: 'bg-muted text-foreground',
@@ -109,7 +109,7 @@ export const badgeVariants = tv({
 /** The leading icon's box per size step; an icon the caller sizes itself keeps its own size. */
 export const badgeLeadingSize = {
   sm: '[&>svg]:size-3',
-  md: '[&>svg]:size-3.5',
+  md: '[&>svg]:size-[13px]',
   lg: '[&>svg]:size-4',
 } as const;
 

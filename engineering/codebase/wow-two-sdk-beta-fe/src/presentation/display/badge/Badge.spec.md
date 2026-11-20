@@ -11,6 +11,7 @@ Public import: `import { Badge } from '@wow-two-beta/fe/presentation/display';`.
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- The label is semibold, and the `md` leading icon is 13 px, matching the SCFD console pills.
 - Skeleton mode keeps the pill's size, padding and radius and masks its fill and copy; the pill is `aria-hidden`.
 - A status pill pairs a leading icon with the label, so the state reads by shape as well as colour; the icon is
   decorative (`aria-hidden`) and the label carries the meaning.
