@@ -1,6 +1,6 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { h } from 'vue';
+import { h, type VNodeChild } from 'vue';
 import { CardLink, MediaCard } from '@src/presentation/display';
 
 let wrapper: VueWrapper | null = null;
@@ -54,7 +54,20 @@ describe('MediaCard link', () => {
     /* The media sits under the link's stretched area: nothing interactive wraps it to catch the click first. */
     expect(card.get('img').element.closest('a, button, [role="button"]')).toBeNull();
     expect(card.get('[data-media-card-panel]').classes()).toContain('z-10');
-    expect(card.get('[data-media-card-panel]').classes()).not.toEqual(expect.arrayContaining(['relative', 'absolute']));
+  });
+
+  it('keeps the link stretched over the card although the panel is positioned for the blur', () => {
+    const panel = mountCard().get('[data-media-card-panel]');
+    expect(panel.classes()).toContain('relative');
+    /* The positioned panel would confine the link's pseudo-element to itself: it reaches up over the card instead. */
+    expect(panel.classes()).toEqual(
+      expect.arrayContaining([
+        '[&_[data-card-link]::after]:inset-x-0',
+        '[&_[data-card-link]::after]:-top-[100rem]',
+        '[&_[data-card-link]::after]:bottom-0',
+      ]),
+    );
+    expect(panel.classes()).not.toContain('overflow-hidden');
   });
 
   it('does not follow the link from a topEnd control, which sits above it', async () => {
@@ -87,25 +100,74 @@ describe('MediaCard link', () => {
 });
 
 describe('MediaCard layout', () => {
-  it('holds the 4 / 5 ratio and an 8.5rem panel by default', () => {
+  it('holds the 4 / 5 ratio and lets the text take at most 8.5rem of the panel by default', () => {
     const card = mountCard();
     expect((card.element as HTMLElement).style.aspectRatio).toMatch(/^0\.8( \/ 1)?$/u);
-    expect(card.get<HTMLElement>('[data-media-card-panel]').element.style.height).toBe('8.5rem');
+    expect(card.get<HTMLElement>('[data-media-card-text]').element.style.maxHeight).toBe('calc(8.5rem - 1rem)');
+    expect(card.get<HTMLElement>('[data-media-card-panel]').element.style.height).toBe('');
   });
 
   it('takes a ratio and a panel height, and lets a caller style win', () => {
     const card = mountCard({ ratio: 12 / 5, panelHeight: '6rem', style: { aspectRatio: '1' } });
     expect((card.element as HTMLElement).style.aspectRatio).toMatch(/^1( \/ 1)?$/u);
-    expect(card.get<HTMLElement>('[data-media-card-panel]').element.style.height).toBe('6rem');
+    expect(card.get<HTMLElement>('[data-media-card-text]').element.style.maxHeight).toBe('calc(6rem - 1rem)');
   });
 
-  it('draws the panel as a dark stage under white text, over a masked blur', () => {
-    const card = mountCard();
-    expect(card.get('[data-media-card-panel]').classes()).toEqual(expect.arrayContaining(['dark', 'text-white']));
-    const blur = card.get('[aria-hidden="true"].backdrop-blur-xl');
+  it('draws the panel as a dark stage under white text', () => {
+    const panel = mountCard().get('[data-media-card-panel]');
+    expect(panel.classes()).toEqual(expect.arrayContaining(['dark', 'text-white']));
+  });
+
+  it.each<[string, Record<string, unknown>, () => VNodeChild]>([
+    ['an href link', { href: '/posts/7' }, () => 'Autumn light'],
+    ['a slotted CardLink', {}, () => h(CardLink, { href: '/listings/3' }, () => 'Flat in Yunusabad')],
+    ['a plain panel', {}, () => 'No link'],
+  ])('anchors the blur to the content block, whatever it holds: %s', (_name, props, content) => {
+    wrapper = mount(MediaCard, {
+      props,
+      slots: {
+        media: () => h('img', { src: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=', alt: '' }),
+        default: content,
+      },
+    });
+    const panel = wrapper.get('[data-media-card-panel]');
+    const blurs = wrapper.findAll('[aria-hidden="true"].backdrop-blur-xl');
+    expect(blurs).toHaveLength(1);
+    const blur = blurs[0]!;
+    /* A child of the content block, never of the card: it follows the content, not a share of the card. */
+    expect(blur.element.parentElement).toBe(panel.element);
+    expect(wrapper.element.contains(blur.element)).toBe(true);
+    expect(blur.element.parentElement).not.toBe(wrapper.element);
+    expect(panel.classes()).toContain('relative');
     expect(blur.classes()).toEqual(
-      expect.arrayContaining(['h-3/5', 'from-black/80', '[mask-image:linear-gradient(to_top,black_50%,transparent)]']),
+      expect.arrayContaining([
+        'absolute',
+        'inset-x-0',
+        'bottom-0',
+        '-top-8',
+        '-z-10',
+        'pointer-events-none',
+        'from-black/80',
+        'via-black/45',
+      ]),
     );
+    for (const property of ['mask-image', '-webkit-mask-image']) {
+      expect(blur.classes()).toContain(`[${property}:linear-gradient(to_top,black_calc(100%_-_2rem),transparent)]`);
+    }
+    expect(wrapper.html()).not.toContain('h-3/5');
+    expect(wrapper.html()).not.toContain('black_50%');
+  });
+
+  it('keeps the blur behind the text and cuts only the text, never the panel', () => {
+    const card = mountCard();
+    const panel = card.get('[data-media-card-panel]');
+    const text = card.get('[data-media-card-text]');
+    expect(text.element.parentElement).toBe(panel.element);
+    expect(text.element.contains(card.get('[data-title]').element)).toBe(true);
+    expect(text.classes()).toEqual(expect.arrayContaining(['overflow-hidden', 'justify-end']));
+    expect(panel.classes()).not.toContain('overflow-hidden');
+    /* The blur sits outside the clipped text, so its feather rises above the text without being cut. */
+    expect(text.element.contains(card.get('.backdrop-blur-xl').element)).toBe(false);
   });
 
   it('zooms the images on hover only when motion is allowed', () => {

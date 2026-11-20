@@ -1,7 +1,7 @@
 # MediaCard
 
-Renders an image-first card: the media fills the card at a fixed ratio, and the text sits on a panel at the bottom
-where a blur fades upward into the image.
+Renders an image-first card: the media fills the card at a fixed ratio, and the text sits on a panel at the bottom.
+The panel carries a blur that reaches full strength at the text's top edge and fades out over the `2rem` above it.
 
 Source: [MediaCard.vue](MediaCard.vue).
 
@@ -13,16 +13,28 @@ Public import: `import { MediaCard } from '@wow-two-beta/fe/presentation/display
   instead of cropping it to a strip. A direct `img` or `video` in `media` fills the card with `object-cover`; any other
   direct child (a `Carousel`) is sized to the card.
 - With no `media` slot the card shows a soft tile (`primary-soft` → `muted`) with the `fallback` slot centred on it.
-- The text panel is `panelHeight` tall (default `8.5rem`) and anchored to the bottom, so the cards of a row line up;
-  content beyond it is cut. It is a dark stage in both themes: white text, and the `dark` class, so tokens inside it —
-  a `MetaInlineItem` tone, a plain `Badge` — resolve to their dark values.
-- Under the panel a blur layer covers the lower 60 % of the card over a dark gradient (`black/80` → transparent),
-  masked `linear-gradient(to top, black 50%, transparent)`, so the blur fades out upward rather than ending in a strip.
+- The text panel sits at the bottom of the card and is as tall as its content, which may take at most `panelHeight`
+  (default `8.5rem`, the foot padding included): a shorter text gives a shorter panel, and text beyond the most is cut
+  at its top edge. The text stays anchored to the card's foot either way, so the cards of a row line up on it. It is a
+  dark stage in both themes: white text, and the `dark` class, so tokens inside it — a `MetaInlineItem` tone, a plain
+  `Badge` — resolve to their dark values.
+- The blur belongs to the content block, the panel: it is the panel's child, `absolute inset-x-0 bottom-0 -top-8`, so
+  its top sits `2rem` above the top of the text's first row — pills included — and its bottom is the card's foot. A
+  taller or wrapped text carries the blur up with it; a fixed share of the card never decides where it starts.
+- The blur and the dark wash (`from-black/80 via-black/45`, `backdrop-blur-xl`) hold full strength from the text's top
+  edge to the card's foot; the mask `linear-gradient(to top, black calc(100% - 2rem), transparent)` fades only that
+  `2rem` feather above the edge, so nothing of the blur shows higher. The layer sits behind the text (`-z-10` inside
+  the panel's stacking context) and over the media; no ancestor of it filters, fades, masks or backdrop-blurs, so the
+  media stays under its `backdrop-filter`.
+- The panel is never clipped, so the feather is not cut off; the text inside it (`data-media-card-text`) is the clipped
+  part, at `panelHeight` less the `1rem` foot padding. The top-corner controls stay on the sharp image, each on its own
+  glass.
 - The media zooms to 105 % while the card is hovered; under `prefers-reduced-motion: reduce` it stays still. The zoom
   and `isDimmed`'s grayscale act on the `img` and `video` elements, never on the media layer, so media controls keep
   their stacking.
 - `href` makes the whole text panel one link (`data-card-link`, the panel's text as its name) whose pseudo-element
-  covers the card: a click anywhere on the media follows it. An address with a scheme other than http(s), `mailto:` or
+  covers the card: a click anywhere on the media follows it. The panel is positioned to hold the blur, so it re-anchors
+  the pseudo-element of any `data-card-link` inside it to reach up over the whole card (the card clips it). An address with a scheme other than http(s), `mailto:` or
   `tel:` renders no link.
 - For an in-app route, omit `href` and put a [`CardLink`](../card/CardLink.spec.md) around the title in the default
   slot, `as-child` around an `AppLink` or `RouterLink`: it stretches over the card the same way, named by the title.
@@ -40,7 +52,7 @@ Public import: `import { MediaCard } from '@wow-two-beta/fe/presentation/display
 | `ratio` | `number` | no | `4 / 5` | The card's width divided by its height. |
 | `href` | `string` | no | — | The address the card opens; the panel becomes a link stretched over the card. |
 | `isDimmed` | `boolean` | no | `false` | Draws the media in grayscale (`data-dimmed`) — a subject that is gone or inactive. |
-| `panelHeight` | `string` | no | `'8.5rem'` | The text panel's fixed height, any CSS length. |
+| `panelHeight` | `string` | no | `'8.5rem'` | The most the text panel may take, any CSS length; text beyond it is cut. |
 
 ## Emits
 
@@ -121,8 +133,11 @@ An in-app route, the title as the link:
 
 - Public render fixture: [DisplayExamples.ts](../../../../apps/playground/src/gallery/fixtures/DisplayExamples.ts). This covers render/SSR compatibility, not all interaction behavior.
 - Focused tests: [MediaCard.dom.test.ts](../../../../tests/unit/presentation/display/MediaCard.dom.test.ts) covers the
-  link, the top slots outside it, the fallback, the ratio and panel styles and the dimmed media;
+  link, the top slots outside it, the fallback, the ratio and text height styles, the dimmed media, and the blur as a
+  masked child of the panel with no `h-3/5` left;
   [MediaCard.browser.test.ts](../../../../tests/unit/presentation/display/MediaCard.browser.test.ts) hit-tests a click
-  on the media and on a `topEnd` button, measures the ratio in 1, 2 and 4 columns, and renders the fixture in light and
-  dark.
+  on the media (corners included, for an `href` and a slotted `CardLink`) and on a `topEnd` button, measures the ratio
+  in 1, 2 and 4 columns, measures the blur's top at `2rem` above the first row and its bottom at the card's foot for a
+  pill row with a two-line title, a title alone and overflowing text, checks its computed mask and that no ancestor
+  makes a backdrop root, and renders the fixture in light and dark.
 - Required follow-through for changes: verify the affected state, keyboard, focus, composition and cleanup paths; the existence of this specification is not a passing-test claim.

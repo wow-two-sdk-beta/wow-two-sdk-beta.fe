@@ -13,7 +13,7 @@ export interface MediaCardProps {
   /** Draws the media in grayscale — a subject that is gone or inactive. Default `false`. */
   readonly isDimmed?: boolean;
 
-  /** The text panel's fixed height, any CSS length, so the cards of a row line up. Default `8.5rem`. */
+  /** The most height the text panel may take, any CSS length; text beyond it is cut. Default `8.5rem`. */
   readonly panelHeight?: string;
 }
 </script>
@@ -26,8 +26,9 @@ import CardLink from '../card/CardLink.vue';
 
 /**
  * Renders an image-first card: the media fills the card at a fixed ratio, and the text sits on a panel at the
- * bottom where a blur fades upward into the image over a dark gradient. One link spans the whole card; the controls
- * in the top slots, and media controls raised with `z-20`, sit above it.
+ * bottom. The panel carries its own blur, which reaches full strength at the text's top edge and fades out over the
+ * `2rem` above it. One link spans the whole card; the controls in the top slots, and media controls raised with
+ * `z-20`, sit above it.
  */
 defineOptions({ name: 'MediaCard', inheritAttrs: false });
 
@@ -53,10 +54,7 @@ const props = withDefaults(defineProps<MediaCardProps>(), {
   panelHeight: '8.5rem',
 });
 
-/*
- * The link's pseudo-element covers the card, the nearest positioned ancestor; the card draws its focus ring. The
- * panel is a flex item lifted with `z-10` but never positioned, so the link it holds still spans the whole card.
- */
+/* The card draws the focus ring while its link is focused; the panel's link spans the whole card, see `PanelClass`. */
 const RootClass =
   'group/media-card relative isolate flex min-w-0 flex-col justify-end overflow-hidden rounded-2xl border ' +
   'border-border bg-muted transition-colors has-[[data-card-link]]:hover:border-primary/40 ' +
@@ -78,14 +76,29 @@ const DimmedMediaClass = '[&_img]:grayscale [&_video]:grayscale';
 const FallbackClass =
   'absolute inset-0 grid place-items-center bg-gradient-to-br from-primary-soft to-muted text-muted-foreground';
 
-/* The blur covers the lower 60 % and fades out upward, so it reads as a soft edge rather than a strip. */
+/*
+ * The blur belongs to the content, so it is a child of the panel: its top sits one feather (`2rem`) above the text's
+ * top edge, it reaches the card's foot, and the mask holds it at full strength until that last `2rem`. It stays
+ * behind the text (`-z-10` inside the panel's own stacking context) and above the media, which it blurs.
+ */
 const BlurClass =
-  'pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/80 via-black/45 ' +
-  'to-transparent backdrop-blur-xl [-webkit-mask-image:linear-gradient(to_top,black_50%,transparent)] ' +
-  '[mask-image:linear-gradient(to_top,black_50%,transparent)]';
+  'pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-10 bg-gradient-to-t from-black/80 via-black/45 ' +
+  'to-transparent backdrop-blur-xl [-webkit-mask-image:linear-gradient(to_top,black_calc(100%_-_2rem),transparent)] ' +
+  '[mask-image:linear-gradient(to_top,black_calc(100%_-_2rem),transparent)]';
 
-/* A dark stage in both themes: `dark` resolves the tokens inside it, such as a meta item tone, to dark values. */
-const PanelClass = 'dark z-10 flex min-w-0 shrink-0 flex-col justify-end gap-2 overflow-hidden p-4 text-white';
+/*
+ * A dark stage in both themes: `dark` resolves the tokens inside it, such as a meta item tone, to dark values. It is
+ * positioned to hold the blur, which would confine a link's stretched pseudo-element to the panel, so the pseudo-
+ * element of any `data-card-link` inside — the `href` link or a slotted `CardLink` — reaches up over the whole card
+ * instead (the card clips it). The panel itself never clips: the blur's feather rises above it.
+ */
+const PanelClass =
+  'dark relative z-10 flex min-w-0 shrink-0 flex-col justify-end px-4 pb-4 text-white ' +
+  '[&_[data-card-link]::after]:inset-x-0 [&_[data-card-link]::after]:-top-[100rem] ' +
+  '[&_[data-card-link]::after]:bottom-0';
+
+/* Holds the text and cuts what exceeds `panelHeight`; the panel above stays unclipped for the blur. */
+const TextClass = 'flex min-w-0 flex-col justify-end gap-2 overflow-hidden';
 
 const attrs = useAttrs();
 const el = useTemplateRef<HTMLDivElement>('el');
@@ -94,6 +107,9 @@ const el = useTemplateRef<HTMLDivElement>('el');
 const safeHref = computed(() => UrlExtensions.safeNavigation(props.href));
 
 const classes = computed(() => cn(RootClass, attrs.class as string | undefined));
+
+/** The text may take the panel's height less the foot padding; the blur's feather is not part of it. */
+const textStyles = computed(() => ({ maxHeight: `calc(${props.panelHeight} - 1rem)` }));
 
 /** `normalizeStyle` merges left → right, so a caller's `style` lands last and wins. */
 const styles = computed(() => normalizeStyle([{ aspectRatio: `${props.ratio}` }, attrs.style]));
@@ -113,13 +129,15 @@ defineExpose({ el });
 
 <template>
   <div ref="el" :data-dimmed="props.isDimmed || undefined" v-bind="rest" :class="classes" :style="styles">
-    <div data-media-card-panel :class="PanelClass" :style="{ height: props.panelHeight }">
-      <CardLink v-if="safeHref" :href="safeHref" class="flex min-w-0 flex-col justify-end gap-2"><slot /></CardLink>
-      <slot v-else />
+    <div data-media-card-panel :class="PanelClass">
+      <div :class="BlurClass" aria-hidden="true"></div>
+      <div data-media-card-text :class="TextClass" :style="textStyles">
+        <CardLink v-if="safeHref" :href="safeHref" class="flex min-w-0 flex-col justify-end gap-2"><slot /></CardLink>
+        <slot v-else />
+      </div>
     </div>
     <div v-if="$slots.media" data-media-card-media :class="mediaClasses"><slot name="media" /></div>
     <div v-else data-media-card-fallback :class="fallbackClasses"><slot name="fallback" /></div>
-    <div :class="BlurClass" aria-hidden="true"></div>
     <div
       v-if="$slots.topStart"
       data-media-card-top="start"
