@@ -303,6 +303,11 @@
       "import": "./dist/domain/aiBrands/index.js",
       "default": "./dist/domain/aiBrands/index.js"
     },
+    "./domain/maps": {
+      "types": "./dist/domain/maps/index.d.ts",
+      "import": "./dist/domain/maps/index.js",
+      "default": "./dist/domain/maps/index.js"
+    },
     "./presentation/actions": {
       "types": "./dist/presentation/actions/index.d.ts",
       "import": "./dist/presentation/actions/index.js",

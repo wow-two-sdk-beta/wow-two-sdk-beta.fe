@@ -4,9 +4,10 @@ import { SeparatorLayout } from '@wow-two-beta/fe/presentation/layout';
 import { Tooltip } from '@wow-two-beta/fe/presentation/overlays';
 import * as display from '@wow-two-beta/fe/presentation/display';
 import { Button } from '@wow-two-beta/fe/presentation/actions';
-import { ArrowUpRight, Calendar, CalendarRange, History, ImageOff, Inbox, Shapes } from 'lucide-vue-next';
+import { ArrowUpRight, Calendar, CalendarRange, History, ImageOff, Inbox, MapPin, Shapes } from 'lucide-vue-next';
 import { Icon } from '@wow-two-beta/fe/foundation/icons';
 import { AiBrandIds, AiBrandMark, aiModelLabel } from '@wow-two-beta/fe/domain/aiBrands';
+import { MapBrandMark, MapLinks, MapProviders } from '@wow-two-beta/fe/domain/maps';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
 import AutoGroup from '../gallery/AutoGroup.vue';
@@ -332,6 +333,60 @@ const mediaIndex = ref(0);
           <span>{{ aiModelLabel(item.model) }}</span>
         </li>
       </ul>
+    </Demo>
+
+    <Demo
+      name="MapLinks"
+      note="by text · by coordinates · one map with an Uzbek interface · size 24 · nothing to link renders nothing · inside a MediaCard link, a click opens the map and never the card"
+      is-wide
+    >
+      <ul class="flex flex-col gap-2 text-sm">
+        <li class="flex items-center gap-1">
+          <span>Chorsu bazaar, Tashkent</span>
+          <MapLinks query="Chorsu bazaar, Tashkent" />
+        </li>
+        <li class="flex items-center gap-1">
+          <span>41.2995, 69.2401</span>
+          <MapLinks :lat="41.2995" :lng="69.2401" />
+        </li>
+        <li class="flex items-center gap-1">
+          <span>Registan, Samarkand (Google only, hl=uz)</span>
+          <MapLinks query="Registan, Samarkand" :providers="['google']" locale="uz" />
+        </li>
+        <li class="flex items-center gap-1">
+          <span>Size 24</span>
+          <MapLinks query="Amir Temur Square, Tashkent" :size="24" />
+        </li>
+        <li class="flex items-center gap-1">
+          <span>No place (renders nothing):</span>
+          <MapLinks />
+        </li>
+      </ul>
+      <ul class="mt-3 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-3 text-sm">
+        <li v-for="provider in MapProviders" :key="provider" class="flex items-center gap-2">
+          <MapBrandMark :provider="provider" :size="28" :label="provider" />
+          <MapBrandMark :provider="provider" :size="28" is-monochrome class="text-muted-foreground" />
+          <span>{{ provider }}: color · monochrome</span>
+        </li>
+      </ul>
+      <div
+        v-for="mode in ['', 'dark']"
+        :key="mode || 'light'"
+        :class="mode"
+        class="mt-3 grid max-w-sm grid-cols-1 rounded-lg bg-background p-3 text-foreground"
+      >
+        <MediaCard href="#map-links-card">
+          <template #fallback><ImageOff :size="28" /></template>
+          <span class="line-clamp-2 text-[15px] leading-snug font-semibold">A card link with map links</span>
+          <MetaInlineText gap="3" class="text-[13px] text-white/75">
+            <MetaInlineItem label="location">
+              <template #icon><MapPin :size="14" /></template>
+              Chorsu bazaar
+            </MetaInlineItem>
+            <MapLinks query="Chorsu bazaar, Tashkent" :size="14" />
+          </MetaInlineText>
+        </MediaCard>
+      </div>
     </Demo>
 
     <Demo name="Text" note="size × color">
