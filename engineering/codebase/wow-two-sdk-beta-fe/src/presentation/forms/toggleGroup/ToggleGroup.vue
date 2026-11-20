@@ -216,7 +216,14 @@ const passthroughAttrs = computed(() =>
 const rootClass = computed(() =>
   cn(
     'inline-flex',
-    isHorizontal.value ? 'flex-row' : 'flex-col',
+    // Horizontal wraps to a new line when the row is too narrow for every item — a vertical
+    // group already stacks, so wrapping is horizontal-only. `isAttached`'s corner-merge and
+    // `-ml-px` join below still address only the literal first/last child, not each wrapped
+    // line's edges: a middle row's start/end items stay square-cornered and the wrapped line's
+    // leading item carries a stray `-ml-px`. Left as-is — scoping either to "first/last of its
+    // own flex line" has no CSS selector (no `:has()` sees sibling geometry), and the review's
+    // complaint is the overflow, not the attached seam.
+    isHorizontal.value ? 'flex-row flex-wrap' : 'flex-col',
     attached.value
       ? isHorizontal.value
         ? '[&>*]:rounded-none [&>*:first-child]:rounded-l-md [&>*:last-child]:rounded-r-md [&>*:not(:first-child)]:-ml-px'

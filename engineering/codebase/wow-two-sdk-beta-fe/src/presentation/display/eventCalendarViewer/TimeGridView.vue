@@ -12,13 +12,18 @@ export interface TimeGridViewProps {
 
 /** The fixed pixel height of one hour row. */
 const HourPx = 48;
+
+/** The most rows the all-day strip grows to before folding the rest behind "+N more". */
+const MaxAllDayRows = 3;
 </script>
 
 <script setup lang="ts">
-import { computed, type StyleValue } from 'vue';
+import { computed, nextTick, ref, useTemplateRef, watch, type ComponentPublicInstance, type StyleValue } from 'vue';
+import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
 import { readableForeground } from '../../../foundation/themes';
 import { useLocale } from '../../../foundation/i18n';
+import { useResizeObserver } from '../../../foundation/observers';
 import { formatDay } from './EventCalendarViewerDates';
 import { formatZonedTime, isToday, maxZoned, nowZoned } from '../../forms/DateExtensions';
 import {
@@ -28,12 +33,17 @@ import {
   layoutCalendarEvents,
   type CalendarEventLayout,
 } from './EventCalendarViewerLayout';
+import { useIsPhone } from './EventCalendarViewerHelpers';
 
+/* `inheritAttrs: false`: the template's week/day branches are two root divs, one of which now opens with a
+   comment — a fragment root in dev builds, which cannot inherit a consumer's attrs. Neither branch takes
+   any (the parent passes only typed props and listeners), so this changes nothing observable. */
 /** Renders the week / day time grid of an `EventCalendarViewer`. Internal — never exported. */
-defineOptions({ name: 'TimeGridView' });
+defineOptions({ name: 'TimeGridView', inheritAttrs: false });
 
 const props = defineProps<TimeGridViewProps>();
 const locale = useLocale();
+const isPhone = useIsPhone();
 
 const emit = defineEmits<{
   /** Fires when an event block is clicked. */
@@ -68,6 +78,96 @@ const allDayEvents = computed(
     ),
 );
 
+/* Below `sm`, a week (`days === 7`) renders as a vertical day list instead of the 7-column time grid — the
+   grid's fixed-width `minmax(120px, …)` columns would otherwise force the page to scroll sideways at a phone
+   width. A single day (`days === 1`) is unaffected: one column already fits. */
+const showDayList = computed(() => isPhone.value && props.days > 1);
+
+/** Every event touching `d`, start ascending — all-day and timed together, the day list's own row set. */
+function dayListEvents(d: Temporal.PlainDate): ReadonlyArray<EventCalendarViewerEvent> {
+  return props.events
+    .filter((event) => intersectsCalendarDay(event, d, props.timeZone))
+    .slice()
+    .sort((a, b) => TemporalValue.ZonedDateTime.compare(a.start, b.start));
+}
+
+function dayListHeadingClass(d: Temporal.PlainDate): string {
+  return cn('mb-1 text-xs font-semibold uppercase text-muted-foreground', isToday(d) && 'text-primary-soft-foreground');
+}
+
+function dayListHeadingLabel(d: Temporal.PlainDate): string {
+  return formatDay(d, locale.locale.value, { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
+/** All day → "All day"; a zero-length event → its start only, never a start–start range; else the full range. */
+function dayListTimeLabel(e: EventCalendarViewerEvent): string {
+  if (e.isAllDay) return locale.t('EventCalendarViewer.allDay', undefined, 'All day');
+  const start = formatZonedTime(e.start.withTimeZone(props.timeZone), locale.locale.value);
+  if (TemporalValue.ZonedDateTime.compare(e.end, e.start) === 0) return start;
+  return `${start} – ${formatZonedTime(e.end.withTimeZone(props.timeZone), locale.locale.value)}`;
+}
+
+/*
+ * The all-day strip grows to `MaxAllDayRows` rows of chips before folding the rest behind "+N more" — the
+ * row count comes from measuring real wrapped layout (chip widths vary with their titles and the locale),
+ * not an estimate. Every chip renders until measured (`allDayVisible` has no entry yet for the day), then
+ * the measured count takes over; the "+N more" badge itself is excluded from the count via
+ * `data-allday-more`, so re-measuring after it appears does not fold it into its own row.
+ */
+const allDayRefs = new Map<string, HTMLElement>();
+function setAllDayRef(day: string, el: Element | ComponentPublicInstance | null): void {
+  if (el instanceof HTMLElement) allDayRefs.set(day, el);
+  else allDayRefs.delete(day);
+}
+const allDayVisible = ref<Record<string, number>>({});
+const gridEl = useTemplateRef<HTMLDivElement>('gridEl');
+
+function measureAllDay(): void {
+  const next: Record<string, number> = {};
+  for (const [day, el] of allDayRefs) {
+    const chips = Array.from(el.children).filter(
+      (child): child is HTMLElement => child instanceof HTMLElement && !child.hasAttribute('data-allday-more'),
+    );
+    let visible = chips.length;
+    let rows = 0;
+    let lastTop = Number.NaN;
+    for (const [index, chip] of chips.entries()) {
+      if (chip.offsetTop !== lastTop) {
+        rows += 1;
+        lastTop = chip.offsetTop;
+      }
+      if (rows > MaxAllDayRows) {
+        visible = index;
+        break;
+      }
+    }
+    next[day] = visible;
+  }
+  allDayVisible.value = next;
+}
+
+function allDayVisibleEvents(day: string): ReadonlyArray<EventCalendarViewerEvent> {
+  const all = allDayEvents.value.get(day) ?? [];
+  const visible = allDayVisible.value[day];
+  return visible === undefined ? all : all.slice(0, visible);
+}
+
+function allDayMoreCount(day: string): number {
+  const all = allDayEvents.value.get(day) ?? [];
+  const visible = allDayVisible.value[day];
+  return visible === undefined ? 0 : Math.max(0, all.length - visible);
+}
+
+useResizeObserver(gridEl, measureAllDay, () => !showDayList.value);
+watch(
+  [allDayEvents, dayDates],
+  () => {
+    allDayVisible.value = {};
+    void nextTick(measureAllDay);
+  },
+  { flush: 'post', immediate: true },
+);
+
 /* Numeric CSS lengths are spelled with their unit — React's style object auto-appended `px`,
    Vue's does not, so a bare `48` would be dropped as an invalid declaration. */
 const HourStyle: StyleValue = { height: `${HourPx}px` };
@@ -95,8 +195,13 @@ function dayHeaderLabel(d: Temporal.PlainDate): string {
   return formatDay(d, locale.locale.value, { weekday: 'short', day: 'numeric' });
 }
 
+/* A fixed chip height (`h-5`) gives the measured-row logic a deterministic row boundary — a
+   content-driven height would make every chip its own ambiguous "row". */
 function allDayClass(e: EventCalendarViewerEvent): string {
-  return cn('truncate rounded-sm px-1 py-0.5', !e.color && 'bg-primary-soft text-primary-soft-foreground');
+  return cn(
+    'flex h-5 items-center truncate rounded-sm px-1',
+    !e.color && 'bg-primary-soft text-primary-soft-foreground',
+  );
 }
 
 function eventStyle(item: CalendarEventLayout): StyleValue {
@@ -115,9 +220,11 @@ function chipStyle(e: EventCalendarViewerEvent): StyleValue {
   return { background: e.color, color: readableForeground(e.color) ?? undefined };
 }
 
+/* `max-sm:min-h-7` gives a phone reader a 28px tap target without changing desktop's duration-driven sizing —
+   `min-height` only raises a shorter box, never shrinks a taller one. */
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'absolute overflow-hidden rounded-sm border border-border/60 px-1 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
+    'absolute max-sm:min-h-7 overflow-hidden rounded-sm border border-border/60 px-1 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
     !e.color && 'bg-primary text-primary-foreground',
   );
 }
@@ -145,7 +252,34 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
 </script>
 
 <template>
-  <div class="flex">
+  <!-- Below `sm`, a week (`days > 1`) renders as a vertical day list — no time grid, no 7 columns, no inner
+       horizontal scroll. A single day (`days === 1`) always keeps the time grid. -->
+  <div v-if="showDayList" data-time-grid-daylist="" class="divide-y divide-border overflow-x-hidden text-xs">
+    <div v-for="d in dayDates" :key="`dl-${d.toString()}`" class="p-2">
+      <div :class="dayListHeadingClass(d)">{{ dayListHeadingLabel(d) }}</div>
+      <ul v-if="dayListEvents(d).length > 0" class="space-y-1">
+        <li v-for="e in dayListEvents(d)" :key="e.id">
+          <button
+            type="button"
+            class="flex w-full items-start gap-2 rounded-md p-2 text-left transition-colors hover:bg-muted"
+            @click="onEvent($event, e)"
+          >
+            <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="chipStyle(e)" />
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-medium">{{
+                e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
+              }}</span>
+              <span class="block text-muted-foreground tabular-nums">{{ dayListTimeLabel(e) }}</span>
+            </span>
+          </button>
+        </li>
+      </ul>
+      <div v-else class="px-2 py-1 text-muted-foreground">
+        {{ locale.t('AgendaView.noUpcomingEvents', undefined, 'No upcoming events.') }}
+      </div>
+    </div>
+  </div>
+  <div v-else data-time-grid="" class="flex">
     <!-- Hour gutter -->
     <div class="w-14 shrink-0 border-r border-border">
       <div class="h-6 border-b border-border bg-muted/40" />
@@ -160,20 +294,22 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
       </div>
     </div>
     <div class="flex-1 overflow-x-auto">
-      <div class="grid" :style="gridColumns">
+      <div ref="gridEl" class="grid" :style="gridColumns">
         <!-- Day headers -->
         <div v-for="d in dayDates" :key="`h-${d.toString()}`" :class="dayHeaderClass(d)">
           {{ dayHeaderLabel(d) }}
         </div>
-        <!-- All-day row -->
+        <!-- All-day row: grows to `MaxAllDayRows` rows of chips, the rest behind "+N more"; never a fixed
+             height, so overflowing chips can never bleed into the hour grid below. -->
         <div
           v-for="d in dayDates"
           :key="`ad-${d.toString()}`"
-          class="h-7 border-b border-r border-border bg-muted/10 p-0.5 text-[11px]"
+          data-all-day-cell=""
+          class="max-h-[68px] overflow-hidden border-b border-r border-border bg-muted/10 p-0.5 text-[11px]"
         >
-          <div class="flex flex-wrap gap-0.5">
+          <div class="flex flex-wrap gap-0.5" :ref="(el) => setAllDayRef(d.toString(), el)">
             <button
-              v-for="e in allDayEvents.get(d.toString())"
+              v-for="e in allDayVisibleEvents(d.toString())"
               :key="e.id"
               type="button"
               :style="chipStyle(e)"
@@ -182,6 +318,13 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
             >
               {{ e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)') }}
             </button>
+            <span
+              v-if="allDayMoreCount(d.toString()) > 0"
+              data-allday-more=""
+              class="inline-flex h-5 items-center rounded-sm bg-muted px-1 text-[10px] font-medium text-muted-foreground"
+            >
+              {{ locale.t('TimeGridView.moreAllDay', { count: allDayMoreCount(d.toString()) }, '+{count} more') }}
+            </span>
           </div>
         </div>
         <!-- Time grid columns -->
@@ -207,10 +350,12 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
             :style="HourStyle"
             @click="emit('slot-click', d, startHour + i - 1)"
           />
-          <!-- Today line -->
+          <!-- Today line — positioned within this column only, so it can never draw across the all-day strip
+               above it. -->
           <div
             v-if="todayLineTop(d)"
             aria-hidden="true"
+            data-now-line=""
             class="absolute inset-x-0 z-raised border-t border-primary"
             :style="{ top: todayLineTop(d) }"
           />

@@ -67,7 +67,8 @@ export function layoutCalendarEvents(
       const wallEnd = minutes(event.end);
       // A repeated hour can move the displayed clock backwards; preserve that event's elapsed duration.
       const projectedEnd = wallEnd <= start ? start + elapsed : wallEnd;
-      const end = Math.min(last * 60, Math.max(start + 15, projectedEnd));
+      // A zero-length (or very short) event still reads as a real block, 30 minutes tall at minimum.
+      const end = Math.min(last * 60, Math.max(start + 30, projectedEnd));
       return { event, start, end, column: 0, columns: 1 };
     })
     .sort((a, b) => a.start - b.start || b.end - a.end);

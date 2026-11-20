@@ -40,9 +40,11 @@ import { isToday } from '../../forms/DateExtensions';
 import { formatDay } from './EventCalendarViewerDates';
 import { startOfWeek } from './EventCalendarViewerTypes';
 import { intersectsCalendarDay } from './EventCalendarViewerLayout';
+import { useIsPhone } from './EventCalendarViewerHelpers';
 
 const locale = useLocale();
 const formatters = useLocaleFormatters();
+const isPhone = useIsPhone();
 
 /** Renders the year of twelve mini months of an `EventCalendarViewer`. Internal — never exported from the folder. */
 defineOptions({ name: 'YearView' });
@@ -161,7 +163,7 @@ function dayStyle(cell: YearDay): StyleValue | undefined {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+  <div class="grid grid-cols-2 gap-4 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
     <section
       v-for="month in months"
       :key="month.key"
@@ -196,6 +198,20 @@ function dayStyle(cell: YearDay): StyleValue | undefined {
         >
         <template v-for="(cell, index) in month.cells" :key="cell ? cell.key : `blank-${index}`">
           <span v-if="!cell" aria-hidden="true" />
+          <!-- Below `sm` a day is display-only — a cramped mini-month grid makes an accidental tap too easy;
+               `sm` and up keep the tappable button unchanged. -->
+          <span
+            v-else-if="isPhone"
+            :class="dayClass(cell)"
+            :style="dayStyle(cell)"
+            :aria-label="cell.label"
+            :aria-current="cell.isToday ? 'date' : undefined"
+            :title="cell.title"
+            :data-today="cell.isToday ? '' : undefined"
+            :data-event-count="cell.events.length > 0 ? cell.events.length : undefined"
+          >
+            {{ cell.day.day }}
+          </span>
           <button
             v-else
             type="button"

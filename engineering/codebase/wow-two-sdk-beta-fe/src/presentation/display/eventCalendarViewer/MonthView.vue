@@ -37,7 +37,12 @@ interface DayColumn {
   events: ReadonlyArray<EventCalendarViewerEvent>;
   /** What the day holds beyond what is drawn: hidden bars and single-day events together. */
   moreCount: number;
+  /** Every single-day event for the day, unsliced — the phone dot view's own, smaller cap. */
+  allEvents: ReadonlyArray<EventCalendarViewerEvent>;
 }
+
+/** The most dots a phone day cell draws before folding the rest into "+N". */
+const MaxPhoneDots = 3;
 
 interface WeekRow {
   key: string;
@@ -58,7 +63,7 @@ const WeekCount = 6;
 
 <script setup lang="ts">
 import { useLocale, weekdayName } from '../../../foundation/i18n';
-import { computed, type StyleValue } from 'vue';
+import { computed, ref, watch, type StyleValue } from 'vue';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
 import { readableForeground } from '../../../foundation/themes';
@@ -66,8 +71,10 @@ import { daysBetween, formatZonedTime, isToday } from '../../forms/DateExtension
 import { formatDay } from './EventCalendarViewerDates';
 import { startOfWeek } from './EventCalendarViewerTypes';
 import { intersectsCalendarDay } from './EventCalendarViewerLayout';
+import { useIsPhone } from './EventCalendarViewerHelpers';
 
 const locale = useLocale();
+const isPhone = useIsPhone();
 
 /** Renders the month grid of an `EventCalendarViewer`. Internal — never exported from the folder. */
 defineOptions({ name: 'MonthView' });
@@ -80,6 +87,45 @@ const emit = defineEmits<{
   /** Fires when an empty day cell's date button is clicked. */
   'slot-click': [day: Temporal.PlainDate, hour?: number];
 }>();
+
+/** The day tapped below `sm`, whose events draw as an agenda-style list beneath the grid. Desktop-only, so a
+    switch back to `sm` and up leaves nothing selected to clear. */
+const selectedDay = ref<Temporal.PlainDate | null>(null);
+watch(
+  () => props.focusDay,
+  () => {
+    selectedDay.value = null;
+  },
+);
+
+function onDateClick(day: Temporal.PlainDate): void {
+  if (isPhone.value) selectedDay.value = day;
+  emit('slot-click', day);
+}
+
+/** Every event touching `selectedDay`, start ascending — the same shape `AgendaView` lists a day in. */
+const selectedDayEvents = computed<ReadonlyArray<EventCalendarViewerEvent>>(() => {
+  const day = selectedDay.value;
+  if (!day) return [];
+  return props.events
+    .filter((event) => intersectsCalendarDay(event, day, props.timeZone))
+    .slice()
+    .sort((a, b) => TemporalValue.ZonedDateTime.compare(a.start, b.start));
+});
+
+const selectedDayLabel = computed(() =>
+  selectedDay.value
+    ? formatDay(selectedDay.value, locale.locale.value, { weekday: 'long', month: 'long', day: 'numeric' })
+    : '',
+);
+
+/** All day → "All day"; a zero-length event → its start only, never a start–start range; else the full range. */
+function selectedDayTimeLabel(e: EventCalendarViewerEvent): string {
+  if (e.isAllDay) return locale.t('EventCalendarViewer.allDay', undefined, 'All day');
+  const start = formatZonedTime(e.start.withTimeZone(props.timeZone), locale.locale.value);
+  if (TemporalValue.ZonedDateTime.compare(e.end, e.start) === 0) return start;
+  return `${start} – ${formatZonedTime(e.end.withTimeZone(props.timeZone), locale.locale.value)}`;
+}
 
 /** Reorder weekdays per weekStart. */
 const weekdayHeaders = computed(() =>
@@ -177,7 +223,7 @@ const weeks = computed<ReadonlyArray<WeekRow>>(() => {
       const events = day.slice(0, MaxSlots - laneCount);
       const covering = segments.filter((segment) => segment.column <= index && index < segment.column + segment.span);
       const shown = events.length + covering.filter((segment) => segment.lane < laneCount).length;
-      return { day: cell.day, events, moreCount: day.length + covering.length - shown };
+      return { day: cell.day, events, moreCount: day.length + covering.length - shown, allEvents: day };
     });
     return { key: rowStart.toString(), cells: rowCells, bars: drawn, laneCount, columns };
   });
@@ -213,8 +259,17 @@ function eventStyle(e: EventCalendarViewerEvent): StyleValue {
 }
 
 /* Logical corners, so a right-to-left grid rounds the bar's real first and last day. A segment that runs past the
-   row's edge stays square and flush with the cell border — the continuation edge. */
+   row's edge stays square and flush with the cell border — the continuation edge. Below `sm` the bar carries no
+   text — a thin color line is enough to read as "an event spans these days" in a cell too small for a label. */
 function barClass(bar: BarSegment): string {
+  if (isPhone.value) {
+    return cn(
+      'mb-0.5 h-1.5 min-w-0 rounded-full transition-colors hover:brightness-95',
+      !bar.event.color && 'bg-primary-soft',
+      bar.isStart ? 'ms-0.5 rounded-s-full' : 'rounded-s-none',
+      bar.isEnd ? 'me-0.5 rounded-e-full' : 'rounded-e-none',
+    );
+  }
   return cn(
     'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
     'px-1.5',
@@ -258,6 +313,11 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
   ev.stopPropagation();
   emit('event-click', e);
 }
+
+/** The phone dot's color, or the primary token for an event with none — same rule as `AgendaView`'s dot. */
+function dotStyle(e: EventCalendarViewerEvent): StyleValue {
+  return { background: e.color || 'var(--color-primary)' };
+}
 </script>
 
 <template>
@@ -286,11 +346,11 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
         type="button"
         :class="dateButtonClass(cell)"
         :style="{ gridColumn: String(index + 1), gridRow: '1' }"
-        @click="emit('slot-click', cell.day)"
+        @click="onDateClick(cell.day)"
       >
         {{ cell.day.day }}
       </button>
-      <!-- Multi-day bars: one per row, in lanes under the dates -->
+      <!-- Multi-day bars: one per row, in lanes under the dates. Below `sm` the bar carries no label text. -->
       <button
         v-for="bar in week.bars"
         :key="bar.key"
@@ -306,9 +366,12 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
         :aria-label="bar.label"
         @click="onEvent($event, bar.event)"
       >
-        {{ bar.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)') }}
+        <template v-if="!isPhone">{{
+          bar.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
+        }}</template>
       </button>
-      <!-- Single-day events, under the lanes -->
+      <!-- Single-day events, under the lanes: text chips at `sm` and up, color dots + "+N" below `sm` — tapping
+           the day (not a dot) opens that day's events in the list beneath the grid. -->
       <div
         v-for="(column, index) in week.columns"
         :key="`e-${column.day.toString()}`"
@@ -316,21 +379,62 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
         class="flex min-w-0 flex-col gap-0.5 px-1 pb-1"
         :style="{ gridColumn: String(index + 1), gridRow: String(week.laneCount + 2) }"
       >
-        <button
-          v-for="e in column.events"
-          :key="e.id"
-          type="button"
-          :style="eventStyle(e)"
-          :class="eventClass(e)"
-          :aria-label="eventLabel(e)"
-          @click="onEvent($event, e)"
-        >
-          {{ e.isAllDay ? '• ' : '' }}{{ e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)') }}
-        </button>
-        <span v-if="column.moreCount > 0" class="px-1 text-[10px] text-muted-foreground">{{
-          locale.t('MonthView.more', { count: column.moreCount }, '+{count} more')
-        }}</span>
+        <template v-if="isPhone">
+          <div class="flex flex-wrap items-center gap-0.5 pt-0.5">
+            <span
+              v-for="e in column.allEvents.slice(0, MaxPhoneDots)"
+              :key="e.id"
+              aria-hidden="true"
+              class="h-1.5 w-1.5 shrink-0 rounded-full"
+              :style="dotStyle(e)"
+            />
+            <span v-if="column.allEvents.length > MaxPhoneDots" class="text-[9px] text-muted-foreground">
+              +{{ column.allEvents.length - MaxPhoneDots }}
+            </span>
+          </div>
+        </template>
+        <template v-else>
+          <button
+            v-for="e in column.events"
+            :key="e.id"
+            type="button"
+            :style="eventStyle(e)"
+            :class="eventClass(e)"
+            :aria-label="eventLabel(e)"
+            @click="onEvent($event, e)"
+          >
+            {{ e.isAllDay ? '• ' : ''
+            }}{{ e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)') }}
+          </button>
+          <span v-if="column.moreCount > 0" class="px-1 text-[10px] text-muted-foreground">{{
+            locale.t('MonthView.more', { count: column.moreCount }, '+{count} more')
+          }}</span>
+        </template>
       </div>
+    </div>
+    <!-- Below `sm`, a tapped day's events as an agenda-style list beneath the grid. -->
+    <div v-if="isPhone && selectedDay" class="border-t border-border p-2" data-month-day-panel="">
+      <div class="mb-1 text-xs font-semibold uppercase text-muted-foreground">{{ selectedDayLabel }}</div>
+      <div v-if="selectedDayEvents.length === 0" class="px-2 py-3 text-xs text-muted-foreground">
+        {{ locale.t('AgendaView.noUpcomingEvents', undefined, 'No upcoming events.') }}
+      </div>
+      <ul v-else class="space-y-1">
+        <li v-for="e in selectedDayEvents" :key="e.id">
+          <button
+            type="button"
+            class="flex w-full items-start gap-2 rounded-md p-2 text-left text-xs transition-colors hover:bg-muted"
+            @click="onEvent($event, e)"
+          >
+            <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(e)" />
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-medium">{{
+                e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
+              }}</span>
+              <span class="block text-muted-foreground tabular-nums">{{ selectedDayTimeLabel(e) }}</span>
+            </span>
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>

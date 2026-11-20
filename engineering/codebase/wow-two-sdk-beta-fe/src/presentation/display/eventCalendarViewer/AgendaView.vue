@@ -8,10 +8,16 @@ export interface AgendaViewProps {
   readonly events: ReadonlyArray<EventCalendarViewerEvent>;
 }
 
+/** One agenda row: the event, and whether it started before the agenda's focus date and is still running. */
+interface AgendaEventEntry {
+  event: EventCalendarViewerEvent;
+  ongoing: boolean;
+}
+
 interface AgendaGroup {
   key: string;
   day: Temporal.PlainDate;
-  events: Array<EventCalendarViewerEvent>;
+  events: Array<AgendaEventEntry>;
 }
 </script>
 
@@ -36,11 +42,17 @@ const emit = defineEmits<{
   'event-click': [event: EventCalendarViewerEvent];
 }>();
 
+/*
+ * Lists events ending on or after the focus date, ordered by start — an event already running when the
+ * agenda opens (started before the focus date, not yet ended) still belongs here, sorted first by the same
+ * ascending-start order, and groups under the focus date itself rather than its own earlier start day: the
+ * agenda's purpose is "from here on", so a group heading before the focus date would read as a stale leftover.
+ */
 const groups = computed<Array<AgendaGroup>>(() => {
   const lower = calendarHour(props.focusDay, 0, props.timeZone);
   const upper = calendarHour(props.focusDay.add({ days: 31 }), 0, props.timeZone);
   const compare = TemporalValue.ZonedDateTime.compare;
-  const upcoming = props.events
+  const entries: Array<AgendaEventEntry> = props.events
     .filter((event) => {
       const duration = compare(event.end, event.start);
       return (
@@ -49,19 +61,19 @@ const groups = computed<Array<AgendaGroup>>(() => {
         (duration === 0 ? compare(event.start, lower) >= 0 : compare(event.end, lower) > 0)
       );
     })
-    .slice()
-    .sort((left, right) => compare(left.start, right.start));
-  /* Group by calendar day of the event start. */
-  const map = new Map<string, Array<EventCalendarViewerEvent>>();
-  for (const e of upcoming) {
-    const key = e.start.withTimeZone(props.timeZone).toPlainDate().toString();
+    .map((event) => ({ event, ongoing: compare(event.start, lower) < 0 }))
+    .sort((left, right) => compare(left.event.start, right.event.start));
+  const map = new Map<string, Array<AgendaEventEntry>>();
+  for (const entry of entries) {
+    const day = entry.ongoing ? props.focusDay : entry.event.start.withTimeZone(props.timeZone).toPlainDate();
+    const key = day.toString();
     const list = map.get(key);
-    if (list) list.push(e);
-    else map.set(key, [e]);
+    if (list) list.push(entry);
+    else map.set(key, [entry]);
   }
   return Array.from(map.entries()).map(([key, list]) => ({
     key,
-    day: list[0]!.start.withTimeZone(props.timeZone).toPlainDate(),
+    day: list[0]!.ongoing ? props.focusDay : list[0]!.event.start.withTimeZone(props.timeZone).toPlainDate(),
     events: list,
   }));
 });
@@ -81,10 +93,12 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
   return { background: e.color || 'var(--color-primary)' };
 }
 
+/** All day → "All day"; a zero-length event → its start only, never a start–start range; else the full range. */
 function timeLabel(e: EventCalendarViewerEvent): string {
-  return e.isAllDay
-    ? locale.t('EventCalendarViewer.allDay', undefined, 'All day')
-    : `${formatZonedTime(e.start.withTimeZone(props.timeZone), locale.locale.value)} – ${formatZonedTime(e.end.withTimeZone(props.timeZone), locale.locale.value)}`;
+  if (e.isAllDay) return locale.t('EventCalendarViewer.allDay', undefined, 'All day');
+  const start = formatZonedTime(e.start.withTimeZone(props.timeZone), locale.locale.value);
+  if (TemporalValue.ZonedDateTime.compare(e.end, e.start) === 0) return start;
+  return `${start} – ${formatZonedTime(e.end.withTimeZone(props.timeZone), locale.locale.value)}`;
 }
 </script>
 
@@ -96,19 +110,24 @@ function timeLabel(e: EventCalendarViewerEvent): string {
     <li v-for="group in groups" :key="group.key" class="px-4 py-3">
       <div :class="groupHeadingClass(group.day)">{{ groupLabel(group.day) }}</div>
       <ul class="space-y-1">
-        <li v-for="e in group.events" :key="e.id">
+        <li v-for="entry in group.events" :key="entry.event.id">
           <button
             type="button"
             class="flex w-full items-start gap-3 rounded-md p-2 text-left transition-colors hover:bg-muted"
-            @click="emit('event-click', e)"
+            @click="emit('event-click', entry.event)"
           >
-            <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(e)" />
-            <span class="flex-1">
-              <span class="block text-sm font-medium">{{
-                e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
+            <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(entry.event)" />
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-sm font-medium">{{
+                entry.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
               }}</span>
               <span class="block text-xs text-muted-foreground tabular-nums">
-                {{ timeLabel(e) }}
+                <span
+                  v-if="entry.ongoing"
+                  data-agenda-ongoing=""
+                  class="mr-1 rounded-sm bg-primary-soft px-1 py-0.5 text-[10px] font-semibold uppercase text-primary-soft-foreground"
+                  >{{ locale.t('AgendaView.ongoing', undefined, 'Ongoing') }}</span
+                >{{ timeLabel(entry.event) }}
               </span>
             </span>
           </button>

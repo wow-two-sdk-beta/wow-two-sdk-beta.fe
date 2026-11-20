@@ -70,7 +70,8 @@ describe('calendar event projection', () => {
       [0, 24],
     );
     expect(items.find((item) => item.event.id === 'fold')).toMatchObject({ start: 90, end: 135 });
-    expect(items.find((item) => item.event.id === 'instant')).toMatchObject({ start: 90, end: 105 });
+    // A zero-length event draws at the 30-minute minimum (fix: EventCalendarViewer time grid sliver height).
+    expect(items.find((item) => item.event.id === 'instant')).toMatchObject({ start: 90, end: 120 });
   });
   it('clips events to the visible interval and handles malformed visual options', () => {
     const events = [

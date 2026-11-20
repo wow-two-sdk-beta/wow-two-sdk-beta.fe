@@ -76,6 +76,15 @@ describe('BottomNavMenu', () => {
     expect(nav.classes()).not.toContain('bg-background');
   });
 
+  it('keeps a long label on one line whichever branch renders it: min-w-0 lets the item shrink, truncate clips it', () => {
+    const wrapper = mountBar();
+    for (const link of wrapper.findAll('li > a')) {
+      expect(link.classes()).toEqual(
+        expect.arrayContaining(['min-w-0', 'overflow-hidden', 'truncate', 'flex-col', 'items-center']),
+      );
+    }
+  });
+
   it('localizes the default landmark name', () => {
     const wrapper = mount(
       defineComponent({

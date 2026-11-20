@@ -55,12 +55,14 @@ import {
   startOfWeek,
 } from './EventCalendarViewerTypes';
 import { formatDay } from './EventCalendarViewerDates';
+import { useIsPhone } from './EventCalendarViewerHelpers';
 import MonthView from './MonthView.vue';
 import TimeGridView from './TimeGridView.vue';
 import YearView from './YearView.vue';
 import AgendaView from './AgendaView.vue';
 
 const locale = useLocale();
+const isPhone = useIsPhone();
 
 /* `inheritAttrs: false` so `class` folds into the component's own `cn()` call — plain fallthrough
    appends outside it and loses tailwind-merge conflict resolution. */
@@ -193,8 +195,11 @@ function openDay(day: Temporal.PlainDate): void {
   emit('slot-click', day);
 }
 
+/* Below `sm` the title shortens — no year on day/week, "From {date}" instead of "Upcoming from {date}" on
+   agenda — so it fits the two-line phone toolbar without wrapping; `sm` and up keep today's longer forms. */
 const title = computed(() => {
   const day = focusDay.value;
+  const phone = isPhone.value;
   switch (activeView.value) {
     case EventCalendarViewerViewValue.Year:
       return day.toLocaleString(locale.locale.value, { year: 'numeric' });
@@ -203,25 +208,37 @@ const title = computed(() => {
     case EventCalendarViewerViewValue.Week: {
       const ws = startOfWeek(day, props.weekStart);
       const we = addDays(ws, 6);
+      if (phone) {
+        const start = formatDay(ws, locale.locale.value, { month: 'short', day: 'numeric' });
+        const sameMonth = ws.month === we.month && ws.year === we.year;
+        const end = sameMonth
+          ? formatDay(we, locale.locale.value, { day: 'numeric' })
+          : formatDay(we, locale.locale.value, { month: 'short', day: 'numeric' });
+        return `${start} – ${end}`;
+      }
       return `${formatDay(ws, locale.locale.value, { month: 'short', day: 'numeric' })} – ${formatDay(we, locale.locale.value, { month: 'short', day: 'numeric', year: 'numeric' })}`;
     }
     case EventCalendarViewerViewValue.Day:
-      return formatDay(day, locale.locale.value, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    case EventCalendarViewerViewValue.Agenda:
-      return locale.t(
-        'EventCalendarViewer.upcomingFrom',
-        { date: formatDay(day, locale.locale.value, { month: 'short', day: 'numeric' }) },
-        'Upcoming from {date}',
-      );
+      return phone
+        ? formatDay(day, locale.locale.value, { weekday: 'short', month: 'short', day: 'numeric' })
+        : formatDay(day, locale.locale.value, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    case EventCalendarViewerViewValue.Agenda: {
+      const date = formatDay(day, locale.locale.value, { month: 'short', day: 'numeric' });
+      return phone
+        ? locale.t('EventCalendarViewer.fromDate', { date }, 'From {date}')
+        : locale.t('EventCalendarViewer.upcomingFrom', { date }, 'Upcoming from {date}');
+    }
   }
   return '';
 });
 
 const weekFirstDay = computed(() => startOfWeek(focusDay.value, props.weekStart));
 
+/* `h-10`/`flex-1` below `sm` give the phone row its 40px-tall, equal-width segments (fix: tap targets, never
+   clipped); `sm:h-6 sm:flex-none` restores today's compact desktop sizing unchanged. */
 function viewButtonClass(v: EventCalendarViewerView): string {
   return cn(
-    'inline-flex h-6 items-center rounded px-2 text-xs font-medium transition-colors',
+    'inline-flex h-10 min-w-0 flex-1 items-center justify-center rounded px-2 text-xs font-medium transition-colors sm:h-6 sm:flex-none',
     activeView.value === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
   );
 }
@@ -252,11 +269,12 @@ defineExpose({ el: root });
 
 <template>
   <div ref="root" :class="rootClass" v-bind="passthroughAttrs">
-    <!-- Header -->
-    <div class="flex items-center gap-2 border-b border-border bg-muted/30 px-3 py-2">
+    <!-- Header: below `sm` the switcher wraps to its own full-width row (the `w-full` it carries forces the
+         break); `sm` and up keep today's single row, unchanged. -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-border bg-muted/30 px-3 py-2 sm:flex-nowrap">
       <button
         type="button"
-        class="inline-flex h-7 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium hover:bg-muted"
+        class="inline-flex h-10 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium hover:bg-muted sm:h-7"
         @click="goToday"
       >
         {{ locale.t('EventCalendarViewer.today', undefined, 'Today') }}
@@ -264,7 +282,7 @@ defineExpose({ el: root });
       <button
         type="button"
         :aria-label="locale.t('EventCalendarViewer.previous', undefined, 'Previous')"
-        class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:h-7 sm:w-7"
         @click="goPrev"
       >
         <Icon :icon="ChevronLeft" :size="14" />
@@ -272,17 +290,17 @@ defineExpose({ el: root });
       <button
         type="button"
         :aria-label="locale.t('EventCalendarViewer.next', undefined, 'Next')"
-        class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:h-7 sm:w-7"
         @click="goNext"
       >
         <Icon :icon="ChevronRight" :size="14" />
       </button>
-      <h3 class="ml-1 text-base font-semibold">{{ title }}</h3>
+      <h3 class="ml-1 min-w-0 flex-1 truncate text-base font-semibold">{{ title }}</h3>
       <div
         v-if="switcherViews.length > 1"
         role="group"
         :aria-label="locale.t('EventCalendarViewer.view', undefined, 'View')"
-        class="ml-auto flex items-center gap-0.5 rounded-md bg-card p-0.5 ring-1 ring-border"
+        class="flex w-full items-center gap-0.5 rounded-md bg-card p-0.5 ring-1 ring-border sm:ml-auto sm:w-auto"
       >
         <button
           v-for="v in switcherViews"
@@ -292,7 +310,7 @@ defineExpose({ el: root });
           :class="viewButtonClass(v)"
           @click="setView(v)"
         >
-          {{ locale.t('EventCalendarViewer.' + v, undefined, v) }}
+          <span class="truncate">{{ locale.t('EventCalendarViewer.' + v, undefined, v) }}</span>
         </button>
       </div>
     </div>
