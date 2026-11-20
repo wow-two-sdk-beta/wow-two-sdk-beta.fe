@@ -20,6 +20,7 @@ import { useLocale } from '../../../foundation/i18n';
 import { computed, type StyleValue } from 'vue';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
+import { formatDay } from './EventCalendarViewerDates';
 import { calendarHour } from './EventCalendarViewerLayout';
 import { formatZonedTime, isToday } from '../../forms/DateExtensions';
 
@@ -73,7 +74,7 @@ function groupHeadingClass(day: Temporal.PlainDate): string {
 }
 
 function groupLabel(day: Temporal.PlainDate): string {
-  return day.toLocaleString(locale.locale.value, { weekday: 'long', month: 'short', day: 'numeric' });
+  return formatDay(day, locale.locale.value, { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
 function dotStyle(e: EventCalendarViewerEvent): StyleValue {

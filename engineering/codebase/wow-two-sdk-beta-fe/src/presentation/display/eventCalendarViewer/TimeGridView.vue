@@ -19,6 +19,7 @@ import { computed, type StyleValue } from 'vue';
 import { cn } from '../../../foundation/styles';
 import { readableForeground } from '../../../foundation/themes';
 import { useLocale } from '../../../foundation/i18n';
+import { formatDay } from './EventCalendarViewerDates';
 import { formatZonedTime, isToday, maxZoned, nowZoned } from '../../forms/DateExtensions';
 import {
   calendarHour,
@@ -91,7 +92,7 @@ function dayHeaderClass(d: Temporal.PlainDate): string {
 }
 
 function dayHeaderLabel(d: Temporal.PlainDate): string {
-  return d.toLocaleString(locale.locale.value, { weekday: 'short', day: 'numeric' });
+  return formatDay(d, locale.locale.value, { weekday: 'short', day: 'numeric' });
 }
 
 function allDayClass(e: EventCalendarViewerEvent): string {

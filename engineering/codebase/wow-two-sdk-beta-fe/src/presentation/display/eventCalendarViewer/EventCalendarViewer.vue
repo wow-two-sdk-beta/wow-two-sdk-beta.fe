@@ -39,7 +39,7 @@ export interface EventCalendarViewerProps {
 </script>
 
 <script setup lang="ts">
-import { useLocale } from '../../../foundation/i18n';
+import { formatMonthYear, useLocale } from '../../../foundation/i18n';
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
@@ -54,6 +54,7 @@ import {
   offeredViews,
   startOfWeek,
 } from './EventCalendarViewerTypes';
+import { formatDay } from './EventCalendarViewerDates';
 import MonthView from './MonthView.vue';
 import TimeGridView from './TimeGridView.vue';
 import YearView from './YearView.vue';
@@ -198,23 +199,18 @@ const title = computed(() => {
     case EventCalendarViewerViewValue.Year:
       return day.toLocaleString(locale.locale.value, { year: 'numeric' });
     case EventCalendarViewerViewValue.Month:
-      return day.toLocaleString(locale.locale.value, { month: 'long', year: 'numeric' });
+      return formatMonthYear(day, locale.locale.value);
     case EventCalendarViewerViewValue.Week: {
       const ws = startOfWeek(day, props.weekStart);
       const we = addDays(ws, 6);
-      return `${ws.toLocaleString(locale.locale.value, { month: 'short', day: 'numeric' })} – ${we.toLocaleString(locale.locale.value, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+      return `${formatDay(ws, locale.locale.value, { month: 'short', day: 'numeric' })} – ${formatDay(we, locale.locale.value, { month: 'short', day: 'numeric', year: 'numeric' })}`;
     }
     case EventCalendarViewerViewValue.Day:
-      return day.toLocaleString(locale.locale.value, {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
+      return formatDay(day, locale.locale.value, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     case EventCalendarViewerViewValue.Agenda:
       return locale.t(
         'EventCalendarViewer.upcomingFrom',
-        { date: day.toLocaleString(locale.locale.value, { month: 'short', day: 'numeric' }) },
+        { date: formatDay(day, locale.locale.value, { month: 'short', day: 'numeric' }) },
         'Upcoming from {date}',
       );
   }

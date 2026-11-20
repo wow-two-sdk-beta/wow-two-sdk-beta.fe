@@ -10,6 +10,7 @@ Internal implementation: compose through the family’s public exports in [index
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Undeclared attributes follow Vue fallthrough to the rendered root when the component has a single element root.
+- A column header and a slot's accessible name write the weekday through the viewer's date names, so a runtime with no data for the locale still reads the SDK's weekday word; the day number and the header's pattern stay `Intl`'s.
 
 ## Props
 

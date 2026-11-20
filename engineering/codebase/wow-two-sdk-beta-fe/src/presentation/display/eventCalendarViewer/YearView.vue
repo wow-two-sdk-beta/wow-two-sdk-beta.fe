@@ -32,11 +32,12 @@ interface YearMonth {
 </script>
 
 <script setup lang="ts">
-import { useLocale, useLocaleFormatters } from '../../../foundation/i18n';
+import { formatMonthYear, monthName, useLocale, useLocaleFormatters, weekdayName } from '../../../foundation/i18n';
 import { computed, type StyleValue } from 'vue';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
 import { isToday } from '../../forms/DateExtensions';
+import { formatDay } from './EventCalendarViewerDates';
 import { startOfWeek } from './EventCalendarViewerTypes';
 import { intersectsCalendarDay } from './EventCalendarViewerLayout';
 
@@ -61,11 +62,6 @@ const TintClass = 'bg-[color-mix(in_srgb,var(--year-day-tint,var(--color-primary
 /** The cell count of a mini month — six week rows of seven, so months line up in the grid. */
 const CellCount = 42;
 
-/** Formats a calendar day through a cached `Intl.DateTimeFormat`, pinned to UTC so no zone shifts it. */
-function format(day: Temporal.PlainDate, options: Intl.DateTimeFormatOptions): string {
-  return formatters.value.date(day.toZonedDateTime('UTC').epochMilliseconds, { ...options, timeZone: 'UTC' });
-}
-
 function eventsLabel(count: number): string {
   return formatters.value.plural(count) === 'one'
     ? locale.t('YearView.eventsOne', { count }, '{count} event')
@@ -74,7 +70,7 @@ function eventsLabel(count: number): string {
 
 const weekdayInitials = computed(() =>
   Array.from({ length: 7 }, (_, i) =>
-    format(startOfWeek(props.focusDay, props.weekStart).add({ days: i }), { weekday: 'narrow' }),
+    weekdayName(startOfWeek(props.focusDay, props.weekStart).add({ days: i }).dayOfWeek, locale.locale.value, 'narrow'),
   ),
 );
 
@@ -116,7 +112,12 @@ const months = computed<ReadonlyArray<YearMonth>>(() => {
       if (day.month !== first.month) return null;
       const key = day.toString();
       const events = byDay.get(key) ?? [];
-      const date = format(day, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      const date = formatDay(day, locale.locale.value, {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
       const count = events.length > 0 ? eventsLabel(events.length) : undefined;
       return {
         day,
@@ -130,8 +131,8 @@ const months = computed<ReadonlyArray<YearMonth>>(() => {
     return {
       first,
       key: first.toString(),
-      name: format(first, { month: 'long' }),
-      groupLabel: format(first, { month: 'long', year: 'numeric' }),
+      name: monthName(first.month, locale.locale.value, 'long'),
+      groupLabel: formatMonthYear(first, locale.locale.value),
       eventCount,
       countText: formatters.value.number(eventCount),
       countLabel,

@@ -13,7 +13,7 @@ Internal implementation: compose through the family’s public exports in [index
 - The year is the year of `focusDay`. Months render January first in a responsive grid: one column below `sm`, two from `sm`, three from `md`, four from `lg`.
 - Each mini month is a `group` named by its month and year. It holds a month-name button, a count of the events touching that month, weekday initials in `weekStart` order and day buttons. Every mini month is six week rows tall, so the grid stays aligned.
 - A day button's accessible name is its full date, followed by the event count when the day has events (`Thursday, March 5, 2026, 2 events`). A marked day also carries the count as its `title`.
-- Month names, weekday initials, date names and numbers come from `Intl` with the active locale.
+- Month names come from `monthName` (long), weekday initials from `weekdayName` (narrow, Monday first by ISO number and rotated by `weekStart`), the group label from `formatMonthYear`, and a day's date from the viewer's date names, so a runtime with no data for the locale still reads Uzbek words. Numbers and the date's pattern stay `Intl`'s.
 
 ## Event projection
 

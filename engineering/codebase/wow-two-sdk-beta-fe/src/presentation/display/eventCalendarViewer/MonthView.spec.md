@@ -10,6 +10,7 @@ Internal implementation: compose through the family’s public exports in [index
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Undeclared attributes follow Vue fallthrough to the rendered root when the component has a single element root.
+- Weekday headers are `weekdayName` short names, rotated to start on `weekStart`; a bar's date range names its months through the viewer's date names. Where the runtime has no data for the locale (Chrome has none for Uzbek) the SDK's own names stand in.
 - The grid is a weekday header and six week rows. Each row is one seven-column grid with explicit rows: dates first, then one row per bar lane, then the single-day chips, so a bar can span the days of its row.
 
 ## Multi-day bars

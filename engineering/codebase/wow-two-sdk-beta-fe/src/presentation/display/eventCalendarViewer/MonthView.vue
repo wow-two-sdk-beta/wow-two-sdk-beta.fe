@@ -57,12 +57,13 @@ const WeekCount = 6;
 </script>
 
 <script setup lang="ts">
-import { useLocale } from '../../../foundation/i18n';
+import { useLocale, weekdayName } from '../../../foundation/i18n';
 import { computed, type StyleValue } from 'vue';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
 import { readableForeground } from '../../../foundation/themes';
 import { daysBetween, formatZonedTime, isToday } from '../../forms/DateExtensions';
+import { formatDay } from './EventCalendarViewerDates';
 import { startOfWeek } from './EventCalendarViewerTypes';
 import { intersectsCalendarDay } from './EventCalendarViewerLayout';
 
@@ -83,9 +84,7 @@ const emit = defineEmits<{
 /** Reorder weekdays per weekStart. */
 const weekdayHeaders = computed(() =>
   Array.from({ length: 7 }, (_, i) =>
-    startOfWeek(props.focusDay, props.weekStart)
-      .add({ days: i })
-      .toLocaleString(locale.locale.value, { weekday: 'short' }),
+    weekdayName(startOfWeek(props.focusDay, props.weekStart).add({ days: i }).dayOfWeek, locale.locale.value, 'short'),
   ),
 );
 
@@ -112,7 +111,7 @@ function spanOf(event: EventCalendarViewerEvent): { first: Temporal.PlainDate; l
 }
 
 function dateLabel(day: Temporal.PlainDate): string {
-  return day.toLocaleString(locale.locale.value, { year: 'numeric', month: 'short', day: 'numeric' });
+  return formatDay(day, locale.locale.value, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function barLabel(event: EventCalendarViewerEvent, first: Temporal.PlainDate, last: Temporal.PlainDate): string {

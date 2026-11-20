@@ -64,6 +64,13 @@ axis position. When a fold reverses the end clock, the block uses clipped elapse
 position is an approximation on this 24-hour axis. Event labels/values retain their exact instants.
 Day/hour slots are keyboard buttons; the view selector uses pressed buttons. LocaleProvider supplies
 period/date labels, control labels and complete count messages.
+Month and weekday names come from the SDK's date names (`monthName`, `weekdayName`, `formatMonthYear` from
+`foundation/i18n`): the month title, the week and day titles' month words, the month grid's weekday headers, the
+time grid's weekday headers, the year view's month names and weekday initials, and the agenda's headings. A runtime
+with no data for the locale — Chrome has none for Uzbek — still reads Uzbek words (`noyabr 2026`, `Ya`, `Du`)
+instead of `M11` or English. The date's pattern, its numbers and a year-only title stay `Intl`'s, and a locale the
+runtime does have is written as `Intl` writes it, genitive months included. The shared helper is
+[EventCalendarViewerDates.ts](EventCalendarViewerDates.ts).
 The year view marks every day an event spans, clipped to the displayed year, with the same boundary rule.
 Regression: `tests/unit/presentation/display/CalendarAndTable.dom.test.ts` and
 `tests/unit/presentation/display/EventCalendarViewerViews.dom.test.ts`.
