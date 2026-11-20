@@ -6,16 +6,16 @@ Renders an inline row of icon-only links that open a place in Yandex Maps and Go
 
 ## Props
 
-| Prop          | Type                         | Default            | Meaning                                                                                              |
-| ------------- | ---------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- |
-| `query`       | `string \| null`             | —                  | The place's text, a name or an address. Whitespace is collapsed; blank counts as absent.             |
-| `lat`         | `number \| null`             | —                  | The latitude, −90 to 90. Counts only together with a valid `lng`.                                    |
-| `lng`         | `number \| null`             | —                  | The longitude, −180 to 180. Counts only together with a valid `lat`.                                 |
-| `providers`   | `ReadonlyArray<MapProvider>` | `['yandex', 'google']` | The maps to link, in display order. An unknown or repeated provider is skipped.                  |
-| `size`        | `number`                     | `16`               | Pixel size of each mark. A value that is not a positive number draws 16.                             |
-| `locale`      | `string \| null`             | —                  | A BCP-47 tag for the map's interface language; only Google honors it (see URL formats).              |
-| `yandexLabel` | `string`                     | `Open in Yandex Maps` | The Yandex link's accessible name and tooltip.                                                    |
-| `googleLabel` | `string`                     | `Open in Google Maps` | The Google link's accessible name and tooltip.                                                    |
+| Prop          | Type                         | Default                | Meaning                                                                                  |
+| ------------- | ---------------------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
+| `query`       | `string \| null`             | —                      | The place's text, a name or an address. Whitespace is collapsed; blank counts as absent. |
+| `lat`         | `number \| null`             | —                      | The latitude, −90 to 90. Counts only together with a valid `lng`.                        |
+| `lng`         | `number \| null`             | —                      | The longitude, −180 to 180. Counts only together with a valid `lat`.                     |
+| `providers`   | `ReadonlyArray<MapProvider>` | `['yandex', 'google']` | The maps to link, in display order. An unknown or repeated provider is skipped.          |
+| `size`        | `number`                     | `16`                   | Pixel size of each mark. A value that is not a positive number draws 16.                 |
+| `locale`      | `string \| null`             | —                      | A BCP-47 tag for the map's interface language; only Google honors it (see URL formats).  |
+| `yandexLabel` | `string`                     | `Open in Yandex Maps`  | The Yandex link's accessible name and tooltip.                                           |
+| `googleLabel` | `string`                     | `Open in Google Maps`  | The Google link's accessible name and tooltip.                                           |
 
 Other attributes fall through to the row (`inheritAttrs: false`; `class` merges through `cn`).
 
@@ -52,32 +52,30 @@ The row sits above a stretched card link, the MediaCard convention for controls 
 
 The root is an `<svg>` carrying `data-map-provider` and `data-variant` (`color` or `mono`). Without `label` it is `aria-hidden="true"` with no role; with it, `role="img"` and `aria-label`. It is never focusable. Other attributes fall through to the root.
 
-| Provider | Color variant                                 | Monochrome variant                                       |
-| -------- | --------------------------------------------- | -------------------------------------------------------- |
-| `yandex` | red pin `#FF4433` with a white dot            | one `currentColor` pin, the dot cut out (`evenodd`)      |
-| `google` | the pin in Google Maps blue `#4285F4`, one color | the same pin in `currentColor`                        |
+| Provider | Color variant                                    | Monochrome variant                                  |
+| -------- | ------------------------------------------------ | --------------------------------------------------- |
+| `yandex` | red pin `#FF4433` with a white dot               | one `currentColor` pin, the dot cut out (`evenodd`) |
+| `google` | the pin in Google Maps blue `#4285F4`, one color | the same pin in `currentColor`                      |
 
 Google's own artwork has four colors; simple-icons holds one color per brand, so the color variant paints the whole pin in its brand blue.
 
-### Marks and their terms
+### Marks and their sources
 
 The marks are vendored by hand into `MapBrandMarkData.ts`, whose header repeats this table. The path data is copied, never drawn; change a mark only by re-copying it from its source.
 
-| Mark   | Source                                                                                                                  | Terms                                                                                                                                                                                                                          |
-| ------ | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| google | simple-icons 16.38.0, `icons/googlemaps.svg`, brand color from `data/simple-icons.json`                                  | simple-icons is CC0 1.0. Its disclaimer says CC0 does not extend to a brand; the entry has no per-icon `license` field and cites Wikimedia Commons `File:Google_Maps_icon.svg` (public domain, trademarked) as its source. The pin is Google's trademark. |
-| yandex | the service's favicon `https://yandex.ru/maps/favicon.svg`, as mirrored by Commons `File:Yandex_Maps_icon.svg` (author Yandex LLC) | Commons tags it public domain (`PD-textlogo`, simple geometry) and trademarked. Yandex grants no licence for it: its logo rules cover the Yandex logo for non-commercial use and require written permission for anything else, and do not name the Maps pin. |
-
-Neither mark carries a licence from its brand owner. Both are public-domain as artwork by Commons' reading, and both stay trademarks. Use them only to label a link that opens that map, never to suggest a partnership. If a product needs a stronger footing, ask Yandex for written permission (`pr@yandex-team.ru`, per its logo rules) before it ships a commercial surface.
+| Mark   | Source                                                                                                                             |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| google | simple-icons 16.38.0, `icons/googlemaps.svg`, brand color from `data/simple-icons.json`                                            |
+| yandex | the service's favicon `https://yandex.ru/maps/favicon.svg`, as mirrored by Commons `File:Yandex_Maps_icon.svg` (author Yandex LLC) |
 
 ## URL formats
 
 `mapSearchUrl(provider, { query?, lat?, lng?, locale? })` returns an `https` URL, or `undefined` when the target names no place. It reaches no network.
 
-| Provider | Text                                                    | Coordinates                                                 | Both                                                                  |
-| -------- | ------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------- |
-| `yandex` | `https://yandex.com/maps/?text={query}`                  | `https://yandex.com/maps/?pt={lng},{lat}&z=16`              | `https://yandex.com/maps/?text={query}&pt={lng},{lat}&z=16`           |
-| `google` | `https://www.google.com/maps/search/?api=1&query={query}` | `https://www.google.com/maps/search/?api=1&query={lat}%2C{lng}` | the text wins: Google's `query` holds one thing                       |
+| Provider | Text                                                      | Coordinates                                                     | Both                                                        |
+| -------- | --------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------- |
+| `yandex` | `https://yandex.com/maps/?text={query}`                   | `https://yandex.com/maps/?pt={lng},{lat}&z=16`                  | `https://yandex.com/maps/?text={query}&pt={lng},{lat}&z=16` |
+| `google` | `https://www.google.com/maps/search/?api=1&query={query}` | `https://www.google.com/maps/search/?api=1&query={lat}%2C{lng}` | the text wins: Google's `query` holds one thing             |
 
 Rules:
 

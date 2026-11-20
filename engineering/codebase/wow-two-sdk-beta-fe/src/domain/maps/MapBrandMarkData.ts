@@ -3,10 +3,6 @@
 // google — Google Maps pin.
 //   Source:  simple-icons 16.38.0, `icons/googlemaps.svg` (viewBox 0 0 24 24, one path), brand color `#4285F4` from
 //            `data/simple-icons.json` (`hex`). npm: https://www.npmjs.com/package/simple-icons/v/16.38.0
-//   Terms:   simple-icons is CC0 1.0 (https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md). Its
-//            DISCLAIMER.md says CC0 does not extend to a brand: the entry has no per-icon `license` field, and its
-//            `source` is the Wikimedia Commons file `File:Google_Maps_icon.svg` (public domain, tagged trademarked).
-//            The pin is Google's trademark; this repo carries the vector, not the right to the mark.
 //   Color:   simple-icons holds one color per brand, so the color variant paints the whole pin `#4285F4`, not
 //            Google's four-color artwork.
 //
@@ -14,11 +10,6 @@
 //   Source:  https://yandex.ru/maps/favicon.svg, as mirrored by Wikimedia Commons `File:Yandex_Maps_icon.svg`
 //            (viewBox 0 0 16 16, a red `#FF4433` pin and a white dot), page
 //            https://commons.wikimedia.org/wiki/File:Yandex_Maps_icon.svg
-//   Terms:   Commons tags it public domain (`PD-textlogo`: simple geometry below the threshold of originality) and
-//            trademarked, author Yandex LLC. Yandex grants no licence for it: its logo rules
-//            (https://yandex.com/company/general_info/logotype_rules) cover the Yandex logo for non-commercial use
-//            and require written permission (pr@yandex-team.ru) for anything else, and do not name the Maps pin.
-//            Use it only to label a link that opens Yandex Maps, never to suggest a partnership.
 //
 // The mono variant paints `currentColor`; the Yandex dot becomes a cut-out (`evenodd`) instead of a white disc.
 

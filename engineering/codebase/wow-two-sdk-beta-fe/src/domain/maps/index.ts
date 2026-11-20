@@ -1,5 +1,5 @@
 // maps — domain module. Links that open a place in Yandex Maps and Google Maps: the URL builder, each map's brand mark
-// and the row of icon links. The marks are vendored in `MapBrandMarkData.ts` with their sources and terms; nothing here
+// and the row of icon links. The marks are vendored in `MapBrandMarkData.ts` with their sources; nothing here
 // reaches a network or a browser API.
 
 export { default as MapLinks, type MapLinksProps } from './MapLinks.vue';
