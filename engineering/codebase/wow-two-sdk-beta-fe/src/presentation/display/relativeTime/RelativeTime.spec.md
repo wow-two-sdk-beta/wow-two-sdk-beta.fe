@@ -12,6 +12,10 @@ Public import: `import { RelativeTime } from '@wow-two-beta/fe/presentation/disp
 - `value` takes a `Date`, epoch milliseconds or an ISO-8601 string; `datetime` carries it as ISO-8601.
 - The text picks the largest unit that keeps the distance at least one ("3 days ago", "in 2 hours"), formatted
   through the active locale's `Intl.RelativeTimeFormat`; `numeric: 'auto'` words near distances ("yesterday").
+- Uzbek reads correctly in every runtime: where `Intl` has no Uzbek patterns (Chrome's ICU writes "-4 h") the label
+  comes from the SDK's own wording, "4 soat oldin", "kecha", in Latin for `uz` and `uz-Latn` and Cyrillic for
+  `uz-Cyrl`; `unitDisplay` does not change those words. The rule lives in
+  [`formatRelativeTime`](../../../foundation/i18n/RelativeTimeFormatter.spec.md).
 - The tooltip shows the absolute time in the active locale on hover; the element takes no tab stop.
 - `isLive` re-renders on a timer that slows as the distance grows (5 s under a minute, 30 s under an hour, 5 min
   under a day, hourly beyond); a fixed `now` or an unreadable value stops it. Unmounting clears the timer.
@@ -43,4 +47,6 @@ None.
 
 - Public render fixture: [DisplayExamples.ts](../../../../apps/playground/src/gallery/fixtures/DisplayExamples.ts).
 - Focused test references: [RelativeTime.dom.test.ts](../../../../tests/unit/presentation/display/RelativeTime.dom.test.ts),
-  [RelativeTimeParts.test.ts](../../../../tests/unit/foundation/i18n/RelativeTimeParts.test.ts).
+  [RelativeTimeParts.test.ts](../../../../tests/unit/foundation/i18n/RelativeTimeParts.test.ts),
+  [FormattedRelative.dom.test.ts](../../../../tests/unit/foundation/i18n/FormattedRelative.dom.test.ts) (Uzbek on a
+  runtime without Uzbek patterns).

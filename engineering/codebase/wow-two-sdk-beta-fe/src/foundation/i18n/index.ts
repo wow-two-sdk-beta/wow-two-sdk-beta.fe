@@ -2,6 +2,8 @@ export * from './providers/LocaleContext';
 export * from './LocaleFormatters';
 export * from './ExactNumberFormatter';
 export { toRelativeTimeParts, toEpochMs, type RelativeTimeParts } from './RelativeTimeParts';
+export { formatRelativeTime } from './RelativeTimeFormatter';
+export { monthName, weekdayName, formatMonthYear, type DateNameStyle, type YearMonthLike } from './DateNames';
 
 // `LocaleProvider` and `FormattedRelative` are SFCs, so they need a named re-export rather than a `export *`
 // (a `.vue` module's only meaningful export is its default). The provide/inject half of `LocaleProvider` lives
@@ -11,3 +13,5 @@ export { FormattedRelative, type FormattedRelativeProps } from './formattedRelat
 
 export { createCollator, compareStrings } from './Compare';
 export { useLocaleDefaults, type LocaleDefaultProps } from './UseLocaleDefaults';
+
+export { RegionCodes, isRegionCode, regionName, regionFlag } from './RegionCodes';

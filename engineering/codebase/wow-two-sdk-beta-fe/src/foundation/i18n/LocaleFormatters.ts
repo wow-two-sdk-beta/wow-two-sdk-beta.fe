@@ -10,6 +10,8 @@ import {
   type ExactCurrencyFormatOptions,
   type ExactPercentFormatOptions,
 } from './ExactNumberFormatter';
+import { formatMonthYear, monthName, weekdayName, type DateNameStyle, type YearMonthLike } from './DateNames';
+import { formatRelativeTime } from './RelativeTimeFormatter';
 import { useLocale } from './providers/LocaleContext';
 
 import { intlOptionsKey as optKey, memoIntl as memo } from './IntlCache';
@@ -30,7 +32,14 @@ export interface LocaleFormatters {
   percent(value: number, options?: Intl.NumberFormatOptions): string;
   date(value: Date | number, options?: Intl.DateTimeFormatOptions): string;
   time(value: Date | number, options?: Intl.DateTimeFormatOptions): string;
+  /** Relative time ("3 days ago"); Uzbek reads correctly where the runtime has no Uzbek data — `formatRelativeTime`. */
   relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string;
+  /** A month's name, 1-12 — `monthName`. */
+  monthName(month: number, style?: DateNameStyle): string;
+  /** A weekday's name by ISO number, Monday 1 to Sunday 7 — `weekdayName`. */
+  weekdayName(isoDay: number, style?: DateNameStyle): string;
+  /** A month and year as a title ("November 2026") — `formatMonthYear`. */
+  monthYear(value: YearMonthLike): string;
   list(items: Iterable<string>, options?: Intl.ListFormatOptions): string;
   plural(value: number, options?: Intl.PluralRulesOptions): Intl.LDMLPluralRule;
 }
@@ -51,8 +60,10 @@ export function createLocaleFormatters(locale: string): LocaleFormatters {
     percent: (value, options) => nf({ ...options, style: 'percent' }).format(value),
     date: (value, options) => dtf(options ?? { dateStyle: 'medium' }).format(value),
     time: (value, options) => dtf(options ?? { timeStyle: 'short' }).format(value),
-    relativeTime: (value, unit, options) =>
-      memo(`r|${locale}|${optKey(options)}`, () => new Intl.RelativeTimeFormat(locale, options)).format(value, unit),
+    relativeTime: (value, unit, options) => formatRelativeTime(value, unit, locale, options),
+    monthName: (month, style) => monthName(month, locale, style),
+    weekdayName: (isoDay, style) => weekdayName(isoDay, locale, style),
+    monthYear: (value) => formatMonthYear(value, locale),
     list: (items, options) =>
       memo(`l|${locale}|${optKey(options)}`, () => new Intl.ListFormat(locale, options)).format(items),
     plural: (value, options) =>
