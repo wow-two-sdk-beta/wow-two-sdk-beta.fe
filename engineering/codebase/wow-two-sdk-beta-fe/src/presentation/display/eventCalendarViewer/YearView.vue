@@ -174,7 +174,7 @@ function dayStyle(cell: YearDay): StyleValue | undefined {
       <div class="mb-1 flex items-center justify-between gap-2">
         <button
           type="button"
-          class="rounded-sm px-1 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+          class="max-sm:flex max-sm:min-h-10 max-sm:w-full max-sm:items-center rounded-sm px-1 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
           @click="emit('month-click', month.first)"
         >
           {{ month.name }}

@@ -195,11 +195,12 @@ function dayHeaderLabel(d: Temporal.PlainDate): string {
   return formatDay(d, locale.locale.value, { weekday: 'short', day: 'numeric' });
 }
 
-/* A fixed chip height (`h-5`) gives the measured-row logic a deterministic row boundary — a
-   content-driven height would make every chip its own ambiguous "row". */
+/* A fixed chip height per breakpoint (`h-5` desktop, `max-sm:h-7` — 28px — phone, fix #6) gives the
+   measured-row logic a deterministic row boundary — a content-driven height would make every chip its
+   own ambiguous "row". */
 function allDayClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'flex h-5 items-center truncate rounded-sm px-1',
+    'flex h-5 max-sm:h-7 items-center truncate rounded-sm px-1',
     !e.color && 'bg-primary-soft text-primary-soft-foreground',
   );
 }
@@ -305,7 +306,7 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
           v-for="d in dayDates"
           :key="`ad-${d.toString()}`"
           data-all-day-cell=""
-          class="max-h-[68px] overflow-hidden border-b border-r border-border bg-muted/10 p-0.5 text-[11px]"
+          class="max-h-[68px] max-sm:max-h-[92px] overflow-hidden border-b border-r border-border bg-muted/10 p-0.5 text-[11px]"
         >
           <div class="flex flex-wrap gap-0.5" :ref="(el) => setAllDayRef(d.toString(), el)">
             <button
@@ -368,11 +369,11 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
             :class="eventClass(item.event)"
             @click="onEvent($event, item.event)"
           >
-            <div class="truncate">
-              {{ item.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)') }}
-            </div>
-            <div class="text-[10px] opacity-80 tabular-nums">
-              {{ eventStartLabel(item.event, d) }}
+            <div class="flex min-w-0 items-baseline gap-1">
+              <span class="shrink-0 text-[10px] tabular-nums opacity-80">{{ eventStartLabel(item.event, d) }}</span>
+              <span class="min-w-0 flex-1 truncate">{{
+                item.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
+              }}</span>
             </div>
           </button>
         </div>

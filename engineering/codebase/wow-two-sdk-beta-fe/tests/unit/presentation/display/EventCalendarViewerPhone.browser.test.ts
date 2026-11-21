@@ -114,6 +114,52 @@ describe('EventCalendarViewer on a phone (390×800)', () => {
     await expect.poll(() => document.querySelector('[data-time-grid]') !== null).toBe(true);
     expect(document.querySelector('[data-time-grid-daylist]')).toBeNull();
   });
+
+  it('keeps all-day and timed day-view chips at least 28px tall (row #6)', async () => {
+    const allDay = { ...event('Holiday', '2026-09-25T00:00Z', '2026-09-26T00:00Z'), isAllDay: true };
+    mountViewer({ view: 'day', events: [...events, allDay] });
+    await expect.poll(() => document.querySelector('[data-all-day-cell] button') !== null).toBe(true);
+    const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-all-day-cell] button'));
+    expect(chips.length).toBeGreaterThan(0);
+    for (const chip of chips) expect(chip.getBoundingClientRect().height).toBeGreaterThanOrEqual(28);
+    const timed = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-time-grid] button')).find((b) =>
+      b.textContent?.includes('Standup'),
+    )!;
+    expect(timed.getBoundingClientRect().height).toBeGreaterThanOrEqual(28);
+  });
+
+  it('draws a zero-length day-view event with no clipping at 390px (row #10)', async () => {
+    mountViewer({ view: 'day', events: [event('Ping', '2026-09-25T10:00Z', '2026-09-25T10:00Z')] });
+    await expect
+      .poll(() =>
+        Array.from(document.querySelectorAll<HTMLButtonElement>('[data-time-grid] button')).find((b) =>
+          b.textContent?.includes('Ping'),
+        ),
+      )
+      .not.toBeUndefined();
+    const chip = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-time-grid] button')).find((b) =>
+      b.textContent?.includes('Ping'),
+    )!;
+    expect(chip.scrollHeight).toBeLessThanOrEqual(chip.clientHeight);
+  });
+
+  it('makes the whole month-view day cell the tap target, at least 40px high, and tapping it selects the day', async () => {
+    mountViewer({ view: 'month', events });
+    await expect.poll(() => document.querySelector('button[aria-label^="Sep 25"]') !== null).toBe(true);
+    const dayButton = document.querySelector<HTMLButtonElement>('button[aria-label^="Sep 25"]')!;
+    expect(dayButton.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+    dayButton.click();
+    await expect.poll(() => document.querySelector('[data-month-day-panel]') !== null).toBe(true);
+  });
+
+  it('makes year-view month buttons at least 40px high', async () => {
+    mountViewer({ view: 'year' });
+    await expect.poll(() => document.querySelector('section[role="group"] button') !== null).toBe(true);
+    const monthButton = Array.from(document.querySelectorAll<HTMLButtonElement>('section[role="group"] button')).find(
+      (b) => b.textContent === 'September',
+    )!;
+    expect(monthButton.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+  });
 });
 
 describe('EventCalendarViewer all-day strip and zero-length events (1440×900)', () => {

@@ -246,6 +246,23 @@ function dateButtonClass(cell: MonthCell): string {
   );
 }
 
+/* Below `sm` the date button grows to the whole cell (fix: the cell body did nothing on tap) — one
+   tap target at least 40px high, `gridRow: '1 / -1'` so it covers the dot row below the date number
+   too. `sm` and up keep the small desktop button unchanged. */
+function phoneCellButtonClass(): string {
+  return 'flex min-h-10 w-full flex-col items-center gap-0.5 pt-1 pb-0.5 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+}
+
+/* The date number keeps its own small today-highlight, now inside the full-cell phone button rather
+   than being the button itself. */
+function phoneDateNumberClass(cell: MonthCell): string {
+  return cn(
+    'flex h-5 w-5 items-center justify-center rounded-sm text-xs tabular-nums',
+    cell.outOfMonth ? 'text-muted-foreground' : 'text-foreground',
+    isToday(cell.day) && 'bg-primary text-primary-foreground',
+  );
+}
+
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
     'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
@@ -340,15 +357,33 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
         :class="cellClass(cell)"
         :style="{ gridColumn: String(index + 1), gridRow: '1 / -1' }"
       />
+      <!-- Below `sm` this button grows to the whole cell (fix: the cell body did nothing on tap) and carries
+           the dot row too; `sm` and up keep the small date-only button at grid row 1 unchanged. -->
       <button
         v-for="(cell, index) in week.cells"
         :key="`d-${cell.day.toString()}`"
         type="button"
-        :class="dateButtonClass(cell)"
-        :style="{ gridColumn: String(index + 1), gridRow: '1' }"
+        :class="isPhone ? phoneCellButtonClass() : dateButtonClass(cell)"
+        :style="{ gridColumn: String(index + 1), gridRow: isPhone ? '1 / -1' : '1' }"
+        :aria-label="isPhone ? dateLabel(cell.day) : undefined"
         @click="onDateClick(cell.day)"
       >
-        {{ cell.day.day }}
+        <template v-if="isPhone">
+          <span :class="phoneDateNumberClass(cell)">{{ cell.day.day }}</span>
+          <span class="flex flex-wrap items-center justify-center gap-0.5">
+            <span
+              v-for="e in week.columns[index]!.allEvents.slice(0, MaxPhoneDots)"
+              :key="e.id"
+              aria-hidden="true"
+              class="h-1.5 w-1.5 shrink-0 rounded-full"
+              :style="dotStyle(e)"
+            />
+            <span v-if="week.columns[index]!.allEvents.length > MaxPhoneDots" class="text-[9px] text-muted-foreground">
+              +{{ week.columns[index]!.allEvents.length - MaxPhoneDots }}
+            </span>
+          </span>
+        </template>
+        <template v-else>{{ cell.day.day }}</template>
       </button>
       <!-- Multi-day bars: one per row, in lanes under the dates. Below `sm` the bar carries no label text. -->
       <button
@@ -370,30 +405,16 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
           bar.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
         }}</template>
       </button>
-      <!-- Single-day events, under the lanes: text chips at `sm` and up, color dots + "+N" below `sm` — tapping
-           the day (not a dot) opens that day's events in the list beneath the grid. -->
-      <div
-        v-for="(column, index) in week.columns"
-        :key="`e-${column.day.toString()}`"
-        :data-day="column.day.toString()"
-        class="flex min-w-0 flex-col gap-0.5 px-1 pb-1"
-        :style="{ gridColumn: String(index + 1), gridRow: String(week.laneCount + 2) }"
-      >
-        <template v-if="isPhone">
-          <div class="flex flex-wrap items-center gap-0.5 pt-0.5">
-            <span
-              v-for="e in column.allEvents.slice(0, MaxPhoneDots)"
-              :key="e.id"
-              aria-hidden="true"
-              class="h-1.5 w-1.5 shrink-0 rounded-full"
-              :style="dotStyle(e)"
-            />
-            <span v-if="column.allEvents.length > MaxPhoneDots" class="text-[9px] text-muted-foreground">
-              +{{ column.allEvents.length - MaxPhoneDots }}
-            </span>
-          </div>
-        </template>
-        <template v-else>
+      <!-- Single-day events, under the lanes, `sm` and up only — below `sm` the dots live in the date
+           button above instead, since it is now the whole cell's tap target. -->
+      <template v-if="!isPhone">
+        <div
+          v-for="(column, index) in week.columns"
+          :key="`e-${column.day.toString()}`"
+          :data-day="column.day.toString()"
+          class="flex min-w-0 flex-col gap-0.5 px-1 pb-1"
+          :style="{ gridColumn: String(index + 1), gridRow: String(week.laneCount + 2) }"
+        >
           <button
             v-for="e in column.events"
             :key="e.id"
@@ -409,8 +430,8 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
           <span v-if="column.moreCount > 0" class="px-1 text-[10px] text-muted-foreground">{{
             locale.t('MonthView.more', { count: column.moreCount }, '+{count} more')
           }}</span>
-        </template>
-      </div>
+        </div>
+      </template>
     </div>
     <!-- Below `sm`, a tapped day's events as an agenda-style list beneath the grid. -->
     <div v-if="isPhone && selectedDay" class="border-t border-border p-2" data-month-day-panel="">
