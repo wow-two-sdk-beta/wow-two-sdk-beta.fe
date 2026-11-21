@@ -86,7 +86,9 @@ Regression: `tests/unit/presentation/display/CalendarAndTable.dom.test.ts` and
 
 ## Slots
 
-None declared.
+| Slot            | Meaning                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `toolbar-extra` | Extra controls shown in the header between the title and the view switcher. Renders only when the consumer fills it. At `lg` (1024px) and up it shares the row and control height with Today and the switcher; below `lg` it is its own full-width row, between the title row and the switcher row. Unfilled, the header is byte-for-byte unchanged (the wrap breakpoint stays `sm`). |
 
 ## Exposed handle
 

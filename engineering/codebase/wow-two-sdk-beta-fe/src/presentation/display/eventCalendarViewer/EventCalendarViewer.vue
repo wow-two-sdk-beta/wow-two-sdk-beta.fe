@@ -40,7 +40,7 @@ export interface EventCalendarViewerProps {
 
 <script setup lang="ts">
 import { formatMonthYear, useLocale } from '../../../foundation/i18n';
-import { computed, useAttrs, useTemplateRef } from 'vue';
+import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
@@ -96,7 +96,17 @@ const emit = defineEmits<{
   'slot-click': [day: Temporal.PlainDate, hour?: number];
 }>();
 
+defineSlots<{
+  /** Extra controls shown in the header between the title and the view switcher. Renders only when filled. */
+  'toolbar-extra'?(): unknown;
+}>();
+
 const attrs = useAttrs();
+const slots = useSlots();
+
+/* Static below-`lg` wrapping (unfilled) keeps today's `sm` breakpoint untouched; a filled slot needs a third
+   row, so the header wraps up to `lg` instead — see `headerClass` / `switcherClass`. */
+const hasToolbarExtra = computed(() => !!slots['toolbar-extra']);
 
 const viewControlled = useControlled<EventCalendarViewerView>({
   controlled: () => props.view,
@@ -261,6 +271,24 @@ const rootClass = computed(() =>
   ),
 );
 
+/* Below `sm` the switcher always wraps to its own full-width row (its `w-full` forces the break). A filled
+   `toolbar-extra` slot needs a second wrap point for its own row, so the header stays `flex-wrap` through `lg`
+   instead of `sm`; unfilled, the breakpoint stays `sm` and the header is byte-for-byte what it always rendered. */
+const headerClass = computed(() =>
+  cn(
+    'flex flex-wrap items-center gap-2 border-b border-border bg-muted/30 px-3 py-2',
+    hasToolbarExtra.value ? 'lg:flex-nowrap' : 'sm:flex-nowrap',
+  ),
+);
+
+/* The switcher only needs to push itself to the row's right edge once that same breakpoint stops wrapping. */
+const switcherClass = computed(() =>
+  cn(
+    'flex w-full items-center gap-0.5 rounded-md bg-card p-0.5 ring-1 ring-border',
+    hasToolbarExtra.value ? 'lg:ml-auto lg:w-auto' : 'sm:ml-auto sm:w-auto',
+  ),
+);
+
 const root = useTemplateRef<HTMLDivElement>('root');
 
 /** The rendered element — the Vue stand-in for the React original's forwarded ref. */
@@ -269,9 +297,9 @@ defineExpose({ el: root });
 
 <template>
   <div ref="root" :class="rootClass" v-bind="passthroughAttrs">
-    <!-- Header: below `sm` the switcher wraps to its own full-width row (the `w-full` it carries forces the
-         break); `sm` and up keep today's single row, unchanged. -->
-    <div class="flex flex-wrap items-center gap-2 border-b border-border bg-muted/30 px-3 py-2 sm:flex-nowrap">
+    <!-- Header: below `sm` (or `lg` with a filled `toolbar-extra`) the switcher wraps to its own full-width row
+         (the `w-full` it carries forces the break); above that breakpoint keeps today's single row. -->
+    <div :class="headerClass">
       <button
         type="button"
         class="inline-flex h-10 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium hover:bg-muted sm:h-7"
@@ -295,12 +323,18 @@ defineExpose({ el: root });
       >
         <Icon :icon="ChevronRight" :size="14" />
       </button>
-      <h3 class="ml-1 min-w-0 flex-1 truncate text-base font-semibold">{{ title }}</h3>
+      <h3 class="ml-1 min-w-32 flex-1 truncate text-base font-semibold">{{ title }}</h3>
+      <!-- `lg:contents` drops this wrapper's own box at `lg` and up, so the slotted controls become flex items of
+           the header row itself — sharing its row and control height with Today and the switcher; below `lg` the
+           wrapper is a normal full-width block, its own row between the title row and the switcher. -->
+      <div v-if="hasToolbarExtra" class="flex w-full items-center gap-2 lg:contents">
+        <slot name="toolbar-extra" />
+      </div>
       <div
         v-if="switcherViews.length > 1"
         role="group"
         :aria-label="locale.t('EventCalendarViewer.view', undefined, 'View')"
-        class="flex w-full items-center gap-0.5 rounded-md bg-card p-0.5 ring-1 ring-border sm:ml-auto sm:w-auto"
+        :class="switcherClass"
       >
         <button
           v-for="v in switcherViews"

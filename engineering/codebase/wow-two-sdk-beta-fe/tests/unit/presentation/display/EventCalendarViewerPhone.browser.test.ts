@@ -2,6 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { page } from 'vitest/browser';
 import { Temporal } from 'temporal-polyfill';
+import { h } from 'vue';
 import EventCalendarViewer from '@src/presentation/display/eventCalendarViewer/EventCalendarViewer.vue';
 import type { EventCalendarViewerEvent } from '@src/presentation/display/eventCalendarViewer/EventCalendarViewerTypes';
 import '@src/index.css';
@@ -31,6 +32,19 @@ afterEach(() => {
 function mountViewer(props: Record<string, unknown> = {}): VueWrapper {
   wrapper = mount(EventCalendarViewer, {
     props: { events: [], date: focus, ...props },
+    attachTo: document.body,
+  });
+  return wrapper;
+}
+
+/** A `toolbar-extra` fixture control, sized like the toolbar's own buttons: 40px on a phone, 28px from `sm` up. */
+function mountViewerWithToolbarExtra(props: Record<string, unknown> = {}): VueWrapper {
+  wrapper = mount(EventCalendarViewer, {
+    props: { events: [], date: focus, ...props },
+    slots: {
+      'toolbar-extra': () =>
+        h('button', { type: 'button', 'data-test-slot-btn': '', class: 'h-10 px-2 sm:h-7' }, 'Region'),
+    },
     attachTo: document.body,
   });
   return wrapper;
@@ -213,5 +227,62 @@ describe('EventCalendarViewer all-day strip and zero-length events (1440×900)',
     expect(Math.round(chip.getBoundingClientRect().height)).toBe(24);
     const timeMatches = chip.textContent?.match(/\d{1,2}:\d{2}/g) ?? [];
     expect(timeMatches).toHaveLength(1);
+  });
+});
+
+describe('EventCalendarViewer toolbar-extra slot', () => {
+  afterEach(async () => {
+    await page.viewport(Desktop.width, Desktop.height);
+  });
+
+  it('sits between the title and the switcher on one row at 1440px, sharing Today’s top', async () => {
+    await page.viewport(Desktop.width, Desktop.height);
+    mountViewerWithToolbarExtra({ view: 'month' });
+    await expect.poll(() => document.querySelector('[data-test-slot-btn]') !== null).toBe(true);
+    const todayButton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Today')!;
+    const slotButton = document.querySelector<HTMLButtonElement>('[data-test-slot-btn]')!;
+    const group = document.querySelector('[aria-label="View"]')!;
+    expect(
+      Math.abs(slotButton.getBoundingClientRect().top - todayButton.getBoundingClientRect().top),
+    ).toBeLessThanOrEqual(4);
+    // Between the title and the switcher: after the title's right edge, before the switcher's left edge.
+    const h3 = document.querySelector('h3')!;
+    expect(slotButton.getBoundingClientRect().left).toBeGreaterThanOrEqual(h3.getBoundingClientRect().right - 1);
+    expect(slotButton.getBoundingClientRect().right).toBeLessThanOrEqual(group.getBoundingClientRect().left + 1);
+  });
+
+  it('with the slot unfilled, stays one row at 1440px — switcher shares Today’s top as before', async () => {
+    await page.viewport(Desktop.width, Desktop.height);
+    mountViewer({ view: 'month' });
+    const todayButton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Today')!;
+    const group = document.querySelector('[aria-label="View"]')!;
+    expect(Math.abs(group.getBoundingClientRect().top - todayButton.getBoundingClientRect().top)).toBeLessThanOrEqual(
+      4,
+    );
+  });
+
+  it('at 390px sits on its own row below the title row and above the switcher, every control 40px+ tall, no page overflow', async () => {
+    await page.viewport(Phone.width, Phone.height);
+    mountViewerWithToolbarExtra({ view: 'month' });
+    await expect.poll(() => document.querySelector('[data-test-slot-btn]') !== null).toBe(true);
+    const h3 = document.querySelector('h3')!;
+    const slotButton = document.querySelector<HTMLButtonElement>('[data-test-slot-btn]')!;
+    const group = document.querySelector('[aria-label="View"]')!;
+    expect(slotButton.getBoundingClientRect().top).toBeGreaterThan(h3.getBoundingClientRect().bottom - 1);
+    expect(group.getBoundingClientRect().top).toBeGreaterThan(slotButton.getBoundingClientRect().bottom - 1);
+    expect(slotButton.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+    for (const button of Array.from(group.querySelectorAll<HTMLButtonElement>('button'))) {
+      expect(button.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+    }
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth);
+  });
+
+  it('with the slot unfilled, the header is unchanged at 390px — two rows, as before', async () => {
+    await page.viewport(Phone.width, Phone.height);
+    mountViewer({ view: 'month' });
+    const todayButton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Today')!;
+    const group = document.querySelector('[aria-label="View"]')!;
+    expect(group.getBoundingClientRect().top).toBeGreaterThan(todayButton.getBoundingClientRect().bottom - 1);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth);
   });
 });
