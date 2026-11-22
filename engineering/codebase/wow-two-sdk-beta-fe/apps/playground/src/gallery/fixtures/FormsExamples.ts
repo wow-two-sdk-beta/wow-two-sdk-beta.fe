@@ -4,7 +4,7 @@ import {
   ToggleInput,
   ToggleGroup,
   ToggleGroupItem,
-  FacetBar,
+  ChipSelect,
   CountryPicker,
   OptionTilePicker,
   OptionTileGroupField,
@@ -125,6 +125,7 @@ import {
 import { ExactNumber } from '../../../../../src/foundation/numbers';
 const exactNumberExample = ExactNumber.parse('9223372036854775807.125');
 import { h, type VNode } from 'vue';
+import { Star } from 'lucide-vue-next';
 import { memoryStorageBroker } from '../../../../../src/foundation/storage';
 import { smokeCase, type SmokeCase } from './Example';
 
@@ -451,29 +452,15 @@ export const formsExamples: readonly SmokeCase[] = [
 
   smokeCase('ToggleGroupItem', ToggleGroupItem, { value: 'talks', label: 'Talks', count: 12 }, { slot: true }),
 
-  smokeCase('FacetBar', FacetBar, {
-    facets: [
-      {
-        key: 'stage',
-        label: 'Stage',
-        kind: 'single',
-        placement: 'inline',
-        options: [
-          { value: 'open', label: 'Open', count: 5, hint: { description: 'Still taking applications.' } },
-          { value: 'closed', label: 'Closed', count: 2 },
-          { value: 'draft', label: 'Draft', count: 0, hint: { description: 'Announced, not yet open.' } },
-        ],
-      },
-      {
-        key: 'kind',
-        label: 'Format',
-        kind: 'multi',
-        placement: 'popover',
-        options: [{ value: 'fair', label: 'Fair', count: 3 }],
-      },
+  smokeCase('ChipSelect', ChipSelect, {
+    options: [
+      { value: 'conference', label: 'Conference', count: 9, icon: Star, hint: { description: 'Talks and panels.' } },
+      { value: 'fair', label: 'Fair', count: 0, icon: Star },
+      { value: 'forum', label: 'Forum' },
     ],
-    matchCount: 7,
-    totalCount: 72,
+    defaultValue: ['conference', 'fair'],
+    isMultiple: true,
+    label: 'Format',
     hintOpenDelay: 400,
     hintFadeDuration: 150,
   }),

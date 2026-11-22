@@ -93,4 +93,4 @@ export * from './mentionInput';
 export * from './typedConfirmField';
 export * from './rowsField';
 export * from './countryPicker';
-export * from './facetBar';
+export * from './chipSelect';

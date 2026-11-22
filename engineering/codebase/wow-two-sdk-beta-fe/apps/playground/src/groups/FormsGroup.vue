@@ -18,9 +18,8 @@ import { Button } from '@wow-two-beta/fe/presentation/actions';
 import { FieldsetLayout, InputAddonLayout, InputGroup } from '@wow-two-beta/fe/presentation/layout';
 import { computed, ref } from 'vue';
 import { Temporal } from 'temporal-polyfill';
-import { Star } from 'lucide-vue-next';
+import { Building2, Castle, Landmark, MapPin, Mountain, Star } from 'lucide-vue-next';
 import * as forms from '@wow-two-beta/fe/presentation/forms';
-import type { FacetDefinition, FacetSelection } from '@wow-two-beta/fe/presentation/forms';
 import { useAdaptiveList } from '@wow-two-beta/fe/foundation/virtualization';
 import Demo from '../gallery/Demo.vue';
 import Matrix from '../gallery/Matrix.vue';
@@ -264,129 +263,30 @@ const comboQuery = ref('');
 const plan = ref('pro');
 const masked = ref('');
 
-/* FacetBar demo: counts follow the rule — each facet is counted with every other choice applied but not its own. */
-interface DemoEvent {
-  readonly title: string;
-  readonly stage: 'open' | 'closed';
-  readonly format: 'fair' | 'conference' | 'expo';
-  readonly city: 'tashkent' | 'samarkand' | 'bukhara';
-  readonly isPriority: boolean;
-  readonly isOnline: boolean;
-}
-const demoEvents: ReadonlyArray<DemoEvent> = [
-  {
-    title: 'Tashkent Fashion Week',
-    stage: 'open',
-    format: 'fair',
-    city: 'tashkent',
-    isPriority: true,
-    isOnline: false,
-  },
-  {
-    title: 'Silk Road Textile Expo',
-    stage: 'open',
-    format: 'expo',
-    city: 'samarkand',
-    isPriority: false,
-    isOnline: false,
-  },
-  {
-    title: 'Jewelry Makers Conference',
-    stage: 'closed',
-    format: 'conference',
-    city: 'bukhara',
-    isPriority: false,
-    isOnline: true,
-  },
-  {
-    title: 'Craft Fair Samarkand',
-    stage: 'open',
-    format: 'fair',
-    city: 'samarkand',
-    isPriority: true,
-    isOnline: false,
-  },
-  {
-    title: 'Uzbek Design Conference',
-    stage: 'open',
-    format: 'conference',
-    city: 'tashkent',
-    isPriority: false,
-    isOnline: true,
-  },
-  { title: 'Ceramics Expo', stage: 'closed', format: 'expo', city: 'bukhara', isPriority: false, isOnline: false },
+/* ChipSelect demo: eight kinds, the first two with a hint and the last holding nothing, and a single city select. */
+const chipKinds = ref<string[]>(['conference', 'workshop', 'fair', 'festival', 'concert']);
+const chipKindOptions = [
+  'Conference',
+  'Exhibition',
+  'Workshop',
+  'Fair',
+  'Festival',
+  'Concert',
+  'Charity',
+  'Auction',
+].map((label, index) => ({
+  value: label.toLowerCase(),
+  label,
+  count: index === 7 ? 0 : 20 - index,
+  icon: [Building2, Landmark, Castle, MapPin, Mountain, Star, Castle, Landmark][index],
+  hint: index < 2 ? { description: `About ${label.toLowerCase()} events.` } : undefined,
+}));
+const chipCity = ref<string | null>(null);
+const chipCityOptions = [
+  { value: 'tashkent', label: 'Tashkent', count: 4 },
+  { value: 'samarkand', label: 'Samarkand', count: 0 },
+  { value: 'bukhara', label: 'Bukhara', count: 2 },
 ];
-const demoFacetKeys = ['stage', 'format', 'city'] as const;
-const demoToggleKeys = ['isPriority', 'isOnline'] as const;
-const facetSelection = ref<FacetSelection>({});
-const facetSearch = ref('');
-function demoMatches(event: DemoEvent, skip?: string): boolean {
-  const query = facetSearch.value.trim().toLowerCase();
-  if (query && !event.title.toLowerCase().includes(query)) return false;
-  if (!demoToggleKeys.every((key) => key === skip || facetSelection.value[key] !== true || event[key])) return false;
-  return demoFacetKeys.every((key) => {
-    if (key === skip) return true;
-    const chosen = facetSelection.value[key];
-    const values = chosen == null || typeof chosen === 'boolean' ? [] : typeof chosen === 'string' ? [chosen] : chosen;
-    return values.length === 0 || values.includes(event[key]);
-  });
-}
-function demoOptions(key: (typeof demoFacetKeys)[number], labels: ReadonlyArray<readonly [string, string]>) {
-  return labels.map(([value, label]) => ({
-    value,
-    label,
-    count: demoEvents.filter((event) => demoMatches(event, key) && event[key] === value).length,
-  }));
-}
-function demoToggleCount(key: (typeof demoToggleKeys)[number]): number {
-  return demoEvents.filter((event) => demoMatches(event, key) && event[key]).length;
-}
-const demoFacets = computed<FacetDefinition[]>(() => [
-  {
-    key: 'stage',
-    label: 'Stage',
-    kind: 'single',
-    placement: 'inline',
-    options: demoOptions('stage', [
-      ['open', 'Open'],
-      ['closed', 'Closed'],
-    ]).map((option) => ({
-      ...option,
-      hint: { description: option.value === 'open' ? 'Still taking applications.' : 'Applications have ended.' },
-    })),
-  },
-  {
-    key: 'isPriority',
-    label: 'High priority',
-    kind: 'toggle',
-    placement: 'inline',
-    count: demoToggleCount('isPriority'),
-  },
-  {
-    key: 'format',
-    label: 'Format',
-    kind: 'single',
-    placement: 'popover',
-    options: demoOptions('format', [
-      ['fair', 'Fair'],
-      ['conference', 'Conference'],
-      ['expo', 'Expo'],
-    ]),
-  },
-  {
-    key: 'city',
-    label: 'City',
-    kind: 'multi',
-    placement: 'popover',
-    options: demoOptions('city', [
-      ['tashkent', 'Tashkent'],
-      ['samarkand', 'Samarkand'],
-      ['bukhara', 'Bukhara'],
-    ]),
-  },
-  { key: 'isOnline', label: 'Online only', kind: 'toggle', placement: 'popover', count: demoToggleCount('isOnline') },
-]);
-const demoMatched = computed(() => demoEvents.filter((event) => demoMatches(event)).length);
 
 /* ToggleGroup items with counts and icons, and CountryPicker. */
 const stageChip = ref<string | null>('open');
@@ -1107,27 +1007,20 @@ const stamp = ref<Temporal.PlainDateTime | null>(
 
     <h3 class="border-t border-border pt-4 font-mono text-xs uppercase text-subtle-foreground">auto-mounted tail</h3>
     <Demo
-      name="FacetBar"
-      note="one row · counts follow the other choices · hover a Stage chip for its hint card · empty chips grey out · toggle chip and switch · Filters popover chips · polite match pill · Clear all"
+      name="ChipSelect"
+      note="one field: chosen options as icon chips, +N when they overflow · panel with icon, label, count and a check · empty options grey out but stay selectable · hover or arrow to an option for its hint · single picks and closes with an Any row"
     >
-      <div class="space-y-3">
-        <forms.FacetBar
-          v-model="facetSelection"
-          v-model:search="facetSearch"
-          :facets="demoFacets"
-          :match-count="demoMatched"
-          :total-count="demoEvents.length"
+      <div class="flex flex-wrap items-start gap-3">
+        <forms.ChipSelect
+          v-model="chipKinds"
+          :options="chipKindOptions"
+          is-multiple
+          label="Kind"
           :hint-open-delay="400"
           :hint-fade-duration="150"
-        >
-          <template #trailing><Button size="sm">Add</Button></template>
-        </forms.FacetBar>
-        <ul class="text-sm">
-          <li v-for="event in demoEvents.filter((e) => demoMatches(e))" :key="event.title">
-            {{ event.title }} · {{ event.format }} · {{ event.city }}
-          </li>
-        </ul>
-        <p class="text-xs text-subtle-foreground">selection = {{ facetSelection }}</p>
+        />
+        <forms.ChipSelect v-model="chipCity" :options="chipCityOptions" label="City" placeholder="Any city" />
+        <p class="w-full text-xs text-subtle-foreground">kinds = {{ chipKinds }} · city = {{ chipCity }}</p>
       </div>
     </Demo>
     <Demo name="ToggleGroup items" note="count after the label (tabular, in the accessible name) and an icon">
@@ -1192,7 +1085,7 @@ const stamp = ref<Temporal.PlainDateTime | null>(
         'SortableGroupItem',
         'SortableGroupHandle',
         'SortableGroupMoveButton',
-        'FacetBar',
+        'ChipSelect',
         'CountryPicker',
         'ToggleGroupItem',
       ]"
