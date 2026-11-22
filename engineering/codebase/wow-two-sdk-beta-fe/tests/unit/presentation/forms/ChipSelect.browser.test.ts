@@ -125,18 +125,21 @@ describe('ChipSelect field', () => {
   it('follows its container as it narrows and widens, with no fixed count', async () => {
     const { frame } = mountSelect(1440);
     await expect.poll(() => chipsIn(frame).length).toBe(8);
-    const countAt = async (width: number): Promise<number> => {
-      frame.style.width = `${width}px`;
-      await new Promise((resolve) => setTimeout(resolve, 80));
-      return chipsIn(frame).filter((chip) => chip.hasAttribute('data-chip-select-chip')).length;
-    };
-    const wide = await countAt(300);
-    const mid = await countAt(240);
-    const narrow = await countAt(200);
-    expect(narrow).toBeLessThanOrEqual(mid);
-    expect(mid).toBeLessThanOrEqual(wide);
-    expect(narrow).toBeLessThan(8);
-    expect(await countAt(1440)).toBe(8);
+    const shown = (): number => chipsIn(frame).filter((chip) => chip.hasAttribute('data-chip-select-chip')).length;
+    // Each resize reaches the field through its observer, which a loaded host can delay, so each step polls.
+    const patient = { timeout: 5000 };
+
+    frame.style.width = '200px';
+    await expect.poll(shown, patient).toBeLessThan(8);
+    const atNarrow = shown();
+    expect(atNarrow).toBeGreaterThan(0);
+
+    frame.style.width = '150px';
+    await expect.poll(shown, patient).toBeLessThan(atNarrow);
+    expect(moreChip(frame)).not.toBeNull();
+
+    frame.style.width = '1440px';
+    await expect.poll(shown, patient).toBe(8);
     expect(moreChip(frame)).toBeNull();
   });
 
