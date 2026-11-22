@@ -14,6 +14,12 @@ export interface TooltipProps {
   /** The delay before closing on leave, in ms. Default 0. */
   readonly closeDelay?: number;
 
+  /**
+   * The time the body takes to fade in on opening and to fade out on closing, in ms. Default `undefined`: the body
+   * mounts and unmounts with no animation. No fade runs under `prefers-reduced-motion: reduce`.
+   */
+  readonly fadeDuration?: number;
+
   /** Controlled axes use their canonical Vue model names; each update event requests caller state. */
   readonly open?: boolean;
 
@@ -36,6 +42,7 @@ import {
   watch,
   type VNode,
 } from 'vue';
+import { useReducedMotion } from '../../../foundation/device';
 import { AriaAttribute, resolveElement } from '../../../foundation/dom';
 import { useControlled } from '../../../foundation/state';
 import { useEscape } from '../../../foundation/shortcuts';
@@ -47,7 +54,7 @@ import { AnchoredPositioner, Portal, renderableChildren } from '../../../foundat
  *
  * Wraps a single default-slot child as the trigger. Default delays mirror the OS pattern (700ms in, 0 out). Escape
  * dismisses without moving focus (WCAG 1.4.13); the trigger is described by the tooltip via `aria-describedby` while
- * open.
+ * open. With `fadeDuration` the body fades in and out instead of appearing and vanishing at once.
  *
  * `inheritAttrs: false` because the component renders a fragment (trigger + portal) — there is no single root for
  * attrs to land on, exactly as in React.
@@ -66,6 +73,7 @@ const props = withDefaults(defineProps<TooltipProps>(), {
   placement: 'top',
   openDelay: 700,
   closeDelay: 0,
+  fadeDuration: undefined,
   open: undefined,
   defaultOpen: false,
   isDisabled: undefined,
@@ -163,6 +171,58 @@ const hasContent = computed(() => !!props.content || !!slots.content);
 
 const visible = computed(() => !props.isDisabled && open.value && hasContent.value);
 
+/**
+ * The fade is opt-in: no `fadeDuration`, or a reader who asked for reduced motion, keeps the body mounting and
+ * unmounting at once, with no style of its own. With it the body mounts transparent, turns opaque once the browser
+ * has laid it out (so the opacity transition has a start value), turns transparent again on closing, and unmounts on
+ * a timer of the same length — `transitionend` is never awaited, since it does not fire in a hidden tab.
+ */
+const reducedMotion = useReducedMotion();
+const fadeMs = computed(() => (reducedMotion.value ? 0 : Math.max(0, props.fadeDuration ?? 0)));
+const fades = computed(() => fadeMs.value > 0);
+
+/** Whether the body is opaque, the target of the opacity transition. */
+const isOpaque = shallowRef(false);
+
+/** Whether the closed body is still on screen, fading out; it stays mounted until `fadeTimer` fires. */
+const isFadingOut = shallowRef(false);
+let fadeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function cancelFade(): void {
+  if (fadeTimer !== null) clearTimeout(fadeTimer);
+  fadeTimer = null;
+}
+
+watch(visible, (now) => {
+  cancelFade();
+  /* Reopening during a fade-out finds the body mounted, so it turns opaque at once; a fresh body does so from
+     `startFadeIn`. */
+  isOpaque.value = now && isFadingOut.value;
+  isFadingOut.value = false;
+  if (now || !fades.value) return;
+  isFadingOut.value = true;
+  fadeTimer = setTimeout(() => {
+    fadeTimer = null;
+    isFadingOut.value = false;
+  }, fadeMs.value);
+});
+
+onBeforeUnmount(cancelFade);
+
+const mounted = computed(() => visible.value || isFadingOut.value);
+
+const bodyStyle = computed(() =>
+  fades.value ? { opacity: isOpaque.value ? 1 : 0, transition: `opacity ${fadeMs.value}ms ease-out` } : undefined,
+);
+
+/** Turns a freshly mounted body opaque after reading its layout, which commits the transparent start of the fade. */
+function startFadeIn(vnode: VNode): void {
+  const body = vnode.el as HTMLElement | null;
+  if (!fades.value || !body) return;
+  void body.offsetHeight;
+  isOpaque.value = true;
+}
+
 /** A function ref may receive a component's public instance; the positioner needs the DOM node. */
 function setAnchor(value: unknown): void {
   anchor.value = resolveElement(value);
@@ -203,13 +263,15 @@ function renderTrigger(): VNode {
 
 <template>
   <component :is="renderTrigger()" />
-  <Portal v-if="visible">
+  <Portal v-if="mounted">
     <!-- Put the layer on the positioned root because its transform creates a stacking context. -->
     <AnchoredPositioner :anchor="anchor" :placement="props.placement" :offset="6" class="z-tooltip">
       <div
         :id="tooltipId"
         role="tooltip"
+        :style="bodyStyle"
         class="rounded-md border border-border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-md"
+        @vue:mounted="startFadeIn"
       >
         <slot name="content">{{ props.content }}</slot>
       </div>

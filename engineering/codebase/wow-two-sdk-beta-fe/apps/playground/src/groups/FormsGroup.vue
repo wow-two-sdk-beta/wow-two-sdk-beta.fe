@@ -350,7 +350,10 @@ const demoFacets = computed<FacetDefinition[]>(() => [
     options: demoOptions('stage', [
       ['open', 'Open'],
       ['closed', 'Closed'],
-    ]),
+    ]).map((option) => ({
+      ...option,
+      hint: { description: option.value === 'open' ? 'Still taking applications.' : 'Applications have ended.' },
+    })),
   },
   {
     key: 'isPriority',
@@ -1105,7 +1108,7 @@ const stamp = ref<Temporal.PlainDateTime | null>(
     <h3 class="border-t border-border pt-4 font-mono text-xs uppercase text-subtle-foreground">auto-mounted tail</h3>
     <Demo
       name="FacetBar"
-      note="one row · counts follow the other choices · toggle chip and switch · Filters popover chips · polite match pill · Clear all"
+      note="one row · counts follow the other choices · hover a Stage chip for its hint card · empty chips grey out · toggle chip and switch · Filters popover chips · polite match pill · Clear all"
     >
       <div class="space-y-3">
         <forms.FacetBar
@@ -1114,6 +1117,8 @@ const stamp = ref<Temporal.PlainDateTime | null>(
           :facets="demoFacets"
           :match-count="demoMatched"
           :total-count="demoEvents.length"
+          :hint-open-delay="400"
+          :hint-fade-duration="150"
         >
           <template #trailing><Button size="sm">Add</Button></template>
         </forms.FacetBar>

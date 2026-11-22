@@ -1,8 +1,9 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h, nextTick } from 'vue';
-import { page } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { FacetBar, type FacetDefinition, type FacetSelection } from '@src/presentation/forms';
+import { nativeTab } from '../../../BrowserKeyboard';
 import '@src/index.css';
 
 /* `sm:` answers to the viewport, so each test sets the one it needs; the suite restores the default phone size. */
@@ -200,5 +201,129 @@ describe('FacetBar layout on a phone', () => {
       expect(control.getBoundingClientRect().top).toBeGreaterThanOrEqual(search.bottom - 1);
     }
     expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
+  });
+});
+
+/** An inline `single` facet with a hinted, an empty and a plain chip, in a frame low enough for a card above it. */
+function mountHinted(width: number | string, selection?: FacetSelection): HTMLElement {
+  wrapper = mount(
+    {
+      render: () =>
+        h(
+          'div',
+          { 'data-frame': '', style: { width: typeof width === 'number' ? `${width}px` : width, marginTop: '320px' } },
+          [
+            h(FacetBar, {
+              facets: [
+                {
+                  key: 'kind',
+                  label: 'Format',
+                  kind: 'single',
+                  placement: 'inline',
+                  options: [
+                    {
+                      value: 'conference',
+                      label: 'Conference',
+                      count: 22,
+                      hint: { description: 'Talks and panels over one or more days, with a programme and speakers.' },
+                    },
+                    { value: 'fair', label: 'Fair', count: 0, hint: { description: 'Stalls where makers sell.' } },
+                    { value: 'expo', label: 'Exhibition', count: 18 },
+                  ],
+                },
+              ] satisfies FacetDefinition[],
+              modelValue: selection,
+              hintOpenDelay: 0,
+            }),
+          ],
+        ),
+    },
+    { attachTo: document.body },
+  );
+  return document.querySelector<HTMLElement>('[data-frame]')!;
+}
+
+function chip(root: HTMLElement, name: string): HTMLElement {
+  return root.querySelector<HTMLElement>(`[data-facet-inline] button[aria-label^="${name}"]`)!;
+}
+
+function hintBody(): HTMLElement | null {
+  return document.querySelector<HTMLElement>('[role=tooltip]');
+}
+
+describe('FacetBar empty chips and hint cards', () => {
+  beforeAll(async () => {
+    await page.viewport(1440, 900);
+  });
+
+  it('draws an empty chip muted at reduced opacity, and a chosen one in its chosen style', async () => {
+    const root = mountHinted(900);
+    await nextTick();
+    expect(Number(getComputedStyle(chip(root, 'Fair')).opacity)).toBeCloseTo(0.6, 2);
+    expect(Number(getComputedStyle(chip(root, 'Conference')).opacity)).toBe(1);
+    expect(Number(getComputedStyle(chip(root, 'Exhibition')).opacity)).toBe(1);
+    // Forced colors replace every text color, so the token check belongs to the normal palette.
+    if (!window.matchMedia('(forced-colors: active)').matches) {
+      const probe = document.createElement('span');
+      probe.className = 'text-muted-foreground';
+      document.body.append(probe);
+      expect(getComputedStyle(chip(root, 'Fair')).color).toBe(getComputedStyle(probe).color);
+      probe.remove();
+    }
+    // Pressable: a click chooses it, and its chosen state is full strength.
+    await userEvent.click(chip(root, 'Fair'));
+    expect(chip(root, 'Fair').getAttribute('aria-pressed')).toBe('true');
+    expect(chip(root, 'Fair').hasAttribute('data-empty')).toBe(false);
+    expect(Number(getComputedStyle(chip(root, 'Fair')).opacity)).toBe(1);
+  });
+
+  it('opens a 16rem card beside the hovered chip without covering it, and the click still toggles', async () => {
+    const root = mountHinted(900);
+    await nextTick();
+    const target = chip(root, 'Conference');
+    await userEvent.hover(target);
+    await expect.poll(() => hintBody() !== null).toBe(true);
+    const card = hintBody()!.querySelector<HTMLElement>('[data-facet-hint]')!;
+    expect(card.getBoundingClientRect().width).toBeCloseTo(256, 0);
+    expect(card.textContent).toContain('Conference');
+    expect(card.textContent).toContain('22 events');
+
+    const body = hintBody()!.getBoundingClientRect();
+    const rect = target.getBoundingClientRect();
+    expect(body.bottom <= rect.top || body.top >= rect.bottom).toBe(true);
+    if (!window.matchMedia('(forced-colors: active)').matches) {
+      const probe = document.createElement('div');
+      probe.className = 'bg-popover';
+      document.body.append(probe);
+      expect(getComputedStyle(hintBody()!).backgroundColor).toBe(getComputedStyle(probe).backgroundColor);
+      probe.remove();
+    }
+
+    await userEvent.click(target);
+    expect(target.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it("opens a chip's card when keyboard focus reaches it, and Escape closes it", async () => {
+    const root = mountHinted(900);
+    await nextTick();
+    for (let step = 0; step < 6 && document.activeElement !== chip(root, 'Conference'); step += 1) await nativeTab();
+    expect(document.activeElement).toBe(chip(root, 'Conference'));
+    await expect.poll(() => hintBody() !== null).toBe(true);
+
+    await userEvent.keyboard('{Escape}');
+    await expect.poll(() => hintBody()).toBeNull();
+  });
+
+  it('keeps the card inside a phone screen and leaves a tap on another chip working', async () => {
+    await page.viewport(375, 800);
+    const root = mountHinted('100%');
+    await nextTick();
+    await userEvent.hover(chip(root, 'Conference'));
+    await expect.poll(() => hintBody() !== null).toBe(true);
+    const body = hintBody()!.getBoundingClientRect();
+    expect(body.left).toBeGreaterThanOrEqual(0);
+    expect(body.right).toBeLessThanOrEqual(375);
+    await userEvent.click(chip(root, 'Exhibition'));
+    expect(chip(root, 'Exhibition').getAttribute('aria-pressed')).toBe('true');
   });
 });

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { defineComponent, h, nextTick, ref, type Ref } from 'vue';
 import { Star } from 'lucide-vue-next';
+import { LocaleProvider } from '@src/foundation/i18n';
 import { FacetBar, type FacetDefinition, type FacetSelection } from '@src/presentation/forms';
 
 const wrappers: VueWrapper[] = [];
@@ -76,8 +77,16 @@ interface Harness {
   readonly cleared: { count: number };
 }
 
+interface BarOptions {
+  /** The facets to mount instead of the default set. */
+  readonly facets?: ReadonlyArray<FacetDefinition>;
+
+  /** Extra props, such as the hint delay and fade. */
+  readonly props?: Readonly<Record<string, unknown>>;
+}
+
 /** Mounts the bar behind real `v-model` state, as a consumer binds it. */
-function mountBar(initial: FacetSelection = {}): Harness {
+function mountBar(initial: FacetSelection = {}, options: BarOptions = {}): Harness {
   const selection = ref<FacetSelection>(initial);
   const search = ref('');
   const matched = ref<number | undefined>(12);
@@ -88,7 +97,7 @@ function mountBar(initial: FacetSelection = {}): Harness {
         h(
           FacetBar,
           {
-            facets: facets(),
+            facets: options.facets ?? facets(),
             modelValue: selection.value,
             'onUpdate:modelValue': (next: FacetSelection) => (selection.value = next),
             search: search.value,
@@ -96,6 +105,7 @@ function mountBar(initial: FacetSelection = {}): Harness {
             matchCount: matched.value,
             totalCount: 72,
             onClear: () => (cleared.count += 1),
+            ...options.props,
           },
           { trailing: () => h('button', { type: 'button', 'data-add': '' }, 'Add') },
         ),
@@ -329,5 +339,271 @@ describe('FacetBar search and clear all', () => {
   it('shows the trailing slot after the facets', () => {
     const { wrapper } = mountBar();
     expect(wrapper.get('[data-add]').text()).toBe('Add');
+  });
+});
+
+/** An inline `single` facet of hinted and unhinted options, an empty one among them, and an inline `multi` facet. */
+const hintedFacets = (): FacetDefinition[] => [
+  {
+    key: 'format',
+    label: 'Format',
+    kind: 'single',
+    placement: 'inline',
+    options: [
+      {
+        value: 'conference',
+        label: 'Conference',
+        count: 9,
+        icon: Star,
+        hint: { description: 'Talks and panels over one or more days.' },
+      },
+      {
+        value: 'fair',
+        label: 'Fair',
+        count: 0,
+        hint: { description: 'Stalls where makers sell to visitors.', imageSrc: '/fair.png', imageAlt: 'A fair stall' },
+      },
+      { value: 'expo', label: 'Expo', count: 3 },
+      { value: 'online', label: 'Online', count: 0 },
+      { value: 'other', label: 'Other' },
+      { value: 'forum', label: 'Forum', hint: { description: 'Open discussions with no ticket.' } },
+    ],
+  },
+  {
+    key: 'city',
+    label: 'City',
+    kind: 'multi',
+    placement: 'inline',
+    options: [
+      { value: 'tashkent', label: 'Tashkent', count: 0 },
+      { value: 'samarkand', label: 'Samarkand', count: 4 },
+    ],
+  },
+];
+
+function pill(wrapper: VueWrapper, group: string, name: string): ReturnType<VueWrapper['get']> {
+  return wrapper.get(`[aria-label="${group}"] button[aria-label^="${name}"]`);
+}
+
+function hintCard(): HTMLElement | null {
+  return document.querySelector<HTMLElement>('[role=tooltip] [data-facet-hint]');
+}
+
+describe('FacetBar option hints', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('opens a mini card with the icon, label, description and count line after the open delay', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 200 } });
+    const conference = pill(wrapper, 'Format', 'Conference');
+
+    await conference.trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(199);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+    await vi.advanceTimersByTimeAsync(1);
+
+    const card = hintCard()!;
+    expect(card).not.toBeNull();
+    expect(card.querySelector('[data-facet-hint-label]')!.textContent).toBe('Conference');
+    expect(card.querySelector('[data-facet-hint-description]')!.textContent).toBe(
+      'Talks and panels over one or more days.',
+    );
+    expect(card.querySelector('[data-facet-hint-count]')!.textContent!.trim()).toBe('9 events');
+    expect(card.querySelector('[data-facet-hint-icon]')).not.toBeNull();
+    expect(card.querySelector('img')).toBeNull();
+    expect(conference.attributes('aria-describedby')).toBe(document.querySelector('[role=tooltip]')!.id);
+
+    await conference.trigger('pointerleave');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+  });
+
+  it('shows the image instead of the icon, with its alt text, and the count of an empty option', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 0 } });
+    await pill(wrapper, 'Format', 'Fair').trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(0);
+
+    const card = hintCard()!;
+    const image = card.querySelector('img')!;
+    expect(image.getAttribute('src')).toBe('/fair.png');
+    expect(image.getAttribute('alt')).toBe('A fair stall');
+    expect(card.querySelector('[data-facet-hint-icon]')).toBeNull();
+    expect(card.querySelector('[data-facet-hint-count]')!.textContent!.trim()).toBe('0 events');
+  });
+
+  it('leaves the count line out when the option has no count', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 0 } });
+    await pill(wrapper, 'Format', 'Forum').trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(hintCard()!.querySelector('[data-facet-hint-description]')!.textContent).toBe(
+      'Open discussions with no ticket.',
+    );
+    expect(hintCard()!.querySelector('[data-facet-hint-count]')).toBeNull();
+  });
+
+  it('writes the count line from hintCountLabel, or from the locale when the prop is omitted', async () => {
+    const { wrapper } = mountBar(
+      {},
+      { facets: hintedFacets(), props: { hintOpenDelay: 0, hintCountLabel: '{count} shows' } },
+    );
+    await pill(wrapper, 'Format', 'Conference').trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(hintCard()!.querySelector('[data-facet-hint-count]')!.textContent!.trim()).toBe('9 shows');
+    wrapper.unmount();
+    wrappers.pop();
+    document.body.innerHTML = '';
+
+    const localized = mount(
+      defineComponent({
+        render: () =>
+          h(LocaleProvider, { messages: { 'FacetBar.hintCountLabel': '{count} ta tadbir' } }, () =>
+            h(FacetBar, { facets: hintedFacets(), hintOpenDelay: 0 }),
+          ),
+      }),
+      { attachTo: document.body },
+    );
+    wrappers.push(localized);
+    await pill(localized, 'Format', 'Conference').trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(hintCard()!.querySelector('[data-facet-hint-count]')!.textContent!.trim()).toBe('9 ta tadbir');
+  });
+
+  it('gives an option without a hint no tooltip and no extra DOM', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 0 } });
+    const expo = pill(wrapper, 'Format', 'Expo');
+    await expo.trigger('pointerenter');
+    await expo.trigger('focus');
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+    expect(expo.attributes('aria-describedby')).toBeUndefined();
+
+    // The whole second facet has no hints: its group holds only each chip's button and form-reset anchor, then its own.
+    const group = wrapper.get('[aria-label="City"]').element;
+    expect([...group.children].map((child) => child.tagName)).toEqual(['BUTTON', 'INPUT', 'BUTTON', 'INPUT', 'INPUT']);
+    expect(document.querySelector('[data-portal-name]')).toBeNull();
+  });
+
+  it('opens by keyboard focus and closes on blur', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 100 } });
+    const conference = pill(wrapper, 'Format', 'Conference');
+    await conference.trigger('focus');
+    await vi.advanceTimersByTimeAsync(100);
+    expect(hintCard()).not.toBeNull();
+
+    await conference.trigger('blur');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+  });
+
+  it('never blocks the tap that toggles the pill, before or after the card opens', async () => {
+    const { wrapper, selection } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 100 } });
+    const conference = pill(wrapper, 'Format', 'Conference');
+
+    // A touch tap: the pointer enters, the finger lifts and the pointer leaves before the card opens.
+    await conference.trigger('pointerenter');
+    await conference.trigger('pointerdown');
+    await conference.trigger('click');
+    await conference.trigger('pointerleave');
+    await vi.advanceTimersByTimeAsync(500);
+    expect(selection.value).toEqual({ format: 'conference' });
+    expect(conference.attributes('aria-pressed')).toBe('true');
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+
+    // A tap on a pill whose card is open still toggles it.
+    const forum = pill(wrapper, 'Format', 'Forum');
+    await forum.trigger('focus');
+    await vi.advanceTimersByTimeAsync(100);
+    expect(hintCard()).not.toBeNull();
+    await forum.trigger('click');
+    expect(selection.value).toEqual({ format: 'forum' });
+  });
+
+  it('opens at the tooltip default of 700 ms without hintOpenDelay and shows no fade without hintFadeDuration', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets() });
+    const conference = pill(wrapper, 'Format', 'Conference');
+    await conference.trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(699);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+    await vi.advanceTimersByTimeAsync(1);
+    const body = document.querySelector<HTMLElement>('[role=tooltip]')!;
+    expect(body).not.toBeNull();
+    expect(body.hasAttribute('style')).toBe(false);
+
+    await conference.trigger('pointerleave');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+  });
+
+  it('forwards hintOpenDelay to the tooltip', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 5000 } });
+    await pill(wrapper, 'Format', 'Conference').trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(4999);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(hintCard()).not.toBeNull();
+  });
+
+  it('forwards hintFadeDuration to the tooltip, which keeps the card mounted while it fades out', async () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets(), props: { hintOpenDelay: 0, hintFadeDuration: 250 } });
+    const conference = pill(wrapper, 'Format', 'Conference');
+    await conference.trigger('pointerenter');
+    await vi.advanceTimersByTimeAsync(0);
+    const body = document.querySelector<HTMLElement>('[role=tooltip]')!;
+    expect(body.style.transition).toBe('opacity 250ms ease-out');
+    expect(body.style.opacity).toBe('1');
+
+    await conference.trigger('pointerleave');
+    await vi.advanceTimersByTimeAsync(100);
+    expect(document.querySelector('[role=tooltip]')).toBe(body);
+    expect(body.style.opacity).toBe('0');
+    await vi.advanceTimersByTimeAsync(200);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+  });
+});
+
+describe('FacetBar empty chips', () => {
+  it('mutes an unchosen chip whose count is exactly 0, in single and multi facets', () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets() });
+    expect(pill(wrapper, 'Format', 'Fair').attributes('data-empty')).toBeDefined();
+    expect(pill(wrapper, 'Format', 'Online').attributes('data-empty')).toBeDefined();
+    expect(pill(wrapper, 'City', 'Tashkent').attributes('data-empty')).toBeDefined();
+    expect(pill(wrapper, 'Format', 'Fair').classes()).toEqual(
+      expect.arrayContaining(['data-[empty]:text-muted-foreground', 'data-[empty]:opacity-60']),
+    );
+  });
+
+  it('never mutes a chip with a positive count or no count', () => {
+    const { wrapper } = mountBar({}, { facets: hintedFacets() });
+    expect(pill(wrapper, 'Format', 'Conference').attributes('data-empty')).toBeUndefined();
+    expect(pill(wrapper, 'Format', 'Expo').attributes('data-empty')).toBeUndefined();
+    expect(pill(wrapper, 'Format', 'Other').attributes('data-empty')).toBeUndefined();
+    expect(pill(wrapper, 'City', 'Samarkand').attributes('data-empty')).toBeUndefined();
+  });
+
+  it('keeps an empty chip pressable, and keeps its chosen style once chosen', async () => {
+    const { wrapper, selection } = mountBar({}, { facets: hintedFacets() });
+    await pill(wrapper, 'Format', 'Fair').trigger('click');
+    expect(selection.value).toEqual({ format: 'fair' });
+    expect(pill(wrapper, 'Format', 'Fair').attributes('aria-pressed')).toBe('true');
+    expect(pill(wrapper, 'Format', 'Fair').attributes('data-empty')).toBeUndefined();
+
+    await pill(wrapper, 'City', 'Tashkent').trigger('click');
+    expect(selection.value).toEqual({ format: 'fair', city: ['tashkent'] });
+    expect(pill(wrapper, 'City', 'Tashkent').attributes('data-empty')).toBeUndefined();
+
+    // Releasing a chip mutes it again.
+    await pill(wrapper, 'Format', 'Fair').trigger('click');
+    expect(selection.value).toEqual({ city: ['tashkent'] });
+    expect(pill(wrapper, 'Format', 'Fair').attributes('data-empty')).toBeDefined();
+  });
+
+  it('shows a chosen empty chip from a bound selection in its chosen style', () => {
+    const { wrapper } = mountBar({ format: 'online', city: ['tashkent'] }, { facets: hintedFacets() });
+    expect(pill(wrapper, 'Format', 'Online').attributes('data-empty')).toBeUndefined();
+    expect(pill(wrapper, 'City', 'Tashkent').attributes('data-empty')).toBeUndefined();
   });
 });

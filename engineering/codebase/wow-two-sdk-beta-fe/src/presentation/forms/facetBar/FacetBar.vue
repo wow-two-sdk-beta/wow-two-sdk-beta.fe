@@ -2,6 +2,18 @@
 import type { IconAdapter } from '../../../foundation/icons';
 import type { FacetKind, FacetPlacement } from './FacetBar.variants';
 
+/** Defines the hint card an inline chip opens after a pause on hover or focus. */
+export interface FacetOptionHint {
+  /** The one-line definition under the label. */
+  readonly description: string;
+
+  /** The image on top of the card, larger than the chip's `icon`, which it replaces there. */
+  readonly imageSrc?: string;
+
+  /** The image's alternative text. Default empty — the label under it already names the option. */
+  readonly imageAlt?: string;
+}
+
 /** Defines one choice of a facet. */
 export interface FacetOption {
   /** The value stored in the selection. */
@@ -15,6 +27,9 @@ export interface FacetOption {
 
   /** The icon before the label of an inline chip. */
   readonly icon?: IconAdapter;
+
+  /** The hint card an inline chip opens on hover or focus. Omit it and the chip has no tooltip. */
+  readonly hint?: FacetOptionHint;
 }
 
 /** Defines what every facet carries, whatever its kind. */
@@ -105,6 +120,15 @@ export interface FacetBarProps {
 
   /** The pill's text with a total; `{matched}` and `{total}` mark the counts. Default `"{matched} of {total}"`. */
   readonly matchLabel?: string;
+
+  /** The count line of a hint card; `{count}` marks the number. Default `"{count} events"`, localized. */
+  readonly hintCountLabel?: string;
+
+  /** How long a chip waits before its hint card opens, in ms. Default: the tooltip's own, 700. */
+  readonly hintOpenDelay?: number;
+
+  /** How long a hint card takes to fade in and out, in ms. Default: none — it appears and vanishes at once. */
+  readonly hintFadeDuration?: number;
 }
 </script>
 
@@ -125,6 +149,7 @@ import SwitchInput from '../switchInput/SwitchInput.vue';
 import ToggleGroup from '../toggleGroup/ToggleGroup.vue';
 import ToggleGroupItem from '../toggleGroup/ToggleGroupItem.vue';
 import FacetBarPicker from './FacetBarPicker.vue';
+import FacetBarPill from './FacetBarPill.vue';
 import { FacetKind as FacetKindValue, FacetPlacement as FacetPlacementValue } from './FacetBar.variants';
 
 /**
@@ -145,6 +170,8 @@ const componentProps = withDefaults(defineProps<FacetBarProps>(), {
   matchCount: undefined,
   totalCount: undefined,
   isSearchable: true,
+  hintOpenDelay: undefined,
+  hintFadeDuration: undefined,
 });
 const props = useLocaleDefaults(componentProps, 'FacetBar', {
   searchLabel: 'Search',
@@ -156,6 +183,7 @@ const props = useLocaleDefaults(componentProps, 'FacetBar', {
   removeLabel: 'Remove {facet}: {value}',
   removeToggleLabel: 'Remove {facet}',
   matchLabel: '{matched} of {total}',
+  hintCountLabel: '{count} events',
 });
 
 const emit = defineEmits<{
@@ -221,6 +249,14 @@ const popoverFacets = computed(() => props.facets.filter((facet) => facet.placem
 /** Whether a facet takes several values. */
 function isMulti(facet: FacetDefinition): boolean {
   return facet.kind === FacetKindValue.Multi;
+}
+
+/**
+ * Whether an inline chip reads muted: its count is exactly `0` and it is not chosen. A chip with no count is never
+ * empty.
+ */
+function isEmpty(facet: FacetChoiceDefinition, option: FacetOption): boolean {
+  return option.count === 0 && !valuesOf(facet.key).includes(option.value);
 }
 
 /** Whether a facet is an on-off switch with no options. */
@@ -351,14 +387,21 @@ const rest = computed(() => {
             v-else
             :type="facet.kind"
             variant="pill"
-            item-variant="solid"
-            item-tone="neutral"
-            :options="facet.options"
             :model-value="isMulti(facet) ? valuesOf(facet.key) : singleOf(facet.key)"
             :aria-label="facet.label"
             class="min-w-0 flex-wrap gap-1.5"
             @update:model-value="setFacet(facet.key, $event)"
-          />
+          >
+            <FacetBarPill
+              v-for="option in facet.options"
+              :key="option.value"
+              :option="option"
+              :is-empty="isEmpty(facet, option)"
+              :hint-count-label="props.hintCountLabel"
+              :hint-open-delay="props.hintOpenDelay"
+              :hint-fade-duration="props.hintFadeDuration"
+            />
+          </ToggleGroup>
         </template>
       </div>
       <div

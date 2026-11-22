@@ -459,8 +459,9 @@ export const formsExamples: readonly SmokeCase[] = [
         kind: 'single',
         placement: 'inline',
         options: [
-          { value: 'open', label: 'Open', count: 5 },
+          { value: 'open', label: 'Open', count: 5, hint: { description: 'Still taking applications.' } },
           { value: 'closed', label: 'Closed', count: 2 },
+          { value: 'draft', label: 'Draft', count: 0, hint: { description: 'Announced, not yet open.' } },
         ],
       },
       {
@@ -473,6 +474,8 @@ export const formsExamples: readonly SmokeCase[] = [
     ],
     matchCount: 7,
     totalCount: 72,
+    hintOpenDelay: 400,
+    hintFadeDuration: 150,
   }),
 
   smokeCase('CountryPicker', CountryPicker, { defaultValue: 'UZ', preferred: ['UZ', 'KZ', 'KG'] }),

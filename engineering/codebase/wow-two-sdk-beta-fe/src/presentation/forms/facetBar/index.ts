@@ -4,6 +4,7 @@ export {
   type FacetChoiceDefinition,
   type FacetDefinition,
   type FacetOption,
+  type FacetOptionHint,
   type FacetSelection,
   type FacetToggleDefinition,
 } from './FacetBar.vue';
