@@ -239,7 +239,10 @@ function openDrawer(side: 'left' | 'right' | 'top' | 'bottom') {
         </div>
       </Demo>
 
-      <Demo name="LightboxModal" note="click a thumbnail · arrows, Home/End and touch swipes step · Escape closes">
+      <Demo
+        name="LightboxModal"
+        note="full-screen previews · click a preview to switch · arrows or swipe · Escape closes"
+      >
         <LightboxModal v-slot="{ openAt }" :images="GALLERY">
           <div class="grid grid-cols-4 gap-1.5">
             <button

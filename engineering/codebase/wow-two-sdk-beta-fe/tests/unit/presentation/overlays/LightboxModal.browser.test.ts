@@ -34,15 +34,29 @@ it('fills the viewport on a dark stage and returns focus to the thumbnail on Esc
   await userEvent.keyboard('{Enter}');
   const panel = (): HTMLElement | null => document.querySelector<HTMLElement>('[role=dialog]');
   await expect.poll(() => panel() !== null).toBe(true);
-  const box = panel()!.getBoundingClientRect();
-  expect(box.width).toBeGreaterThan(Math.min(window.innerWidth * 0.9, 1000));
-  // Forced colors repaint the stage with the system canvas; elsewhere it is 90% black.
+  await expect
+    .poll(() => {
+      const { x, y, width, height } = panel()!.getBoundingClientRect();
+      return [x, y, width, height].map(Math.round);
+    })
+    .toEqual([0, 0, window.innerWidth, window.innerHeight]);
+  // Forced colors repaint the stage with the system canvas.
   if (!window.matchMedia('(forced-colors: active)').matches) {
-    expect(getComputedStyle(panel()!).backgroundColor).toMatch(/^(oklab\(0 0 0|rgba?\(0, 0, 0)/);
+    expect(getComputedStyle(panel()!).backgroundColor).toMatch(/^(oklab\(0 0 0\)|rgb\(0, 0, 0\))$/);
   }
+  expect(getComputedStyle(panel()!.querySelector('figure img')!).objectFit).toBe('contain');
   await expect.poll(() => panel()!.contains(document.activeElement)).toBe(true);
-  await userEvent.keyboard('{ArrowRight}');
+  const previews = panel()!.querySelector('[aria-label="Image previews"]')!;
+  const selected = () => previews.querySelector<HTMLButtonElement>('button[aria-current="true"]')!;
+  expect(previews.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+    panel()!.querySelector('figure')!.getBoundingClientRect().bottom,
+  );
+  await userEvent.click(previews.querySelector('button[aria-label="Show image 2"]')!);
   await expect.poll(() => panel()!.querySelector('figure img')?.getAttribute('alt')).toBe('Bridge');
+  selected().focus();
+  await userEvent.keyboard('{ArrowLeft}');
+  await expect.poll(() => panel()!.querySelector('figure img')?.getAttribute('alt')).toBe('Harbour');
+  await expect.poll(() => document.activeElement).toBe(selected());
   await userEvent.keyboard('{Escape}');
   await expect.poll(() => panel()).toBeNull();
   expect(document.activeElement).toBe(thumb);

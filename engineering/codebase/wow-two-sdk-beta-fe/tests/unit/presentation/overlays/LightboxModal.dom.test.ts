@@ -12,7 +12,12 @@ afterEach(() => {
 
 const pixel = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
 const photos: ReadonlyArray<LightboxImage> = [
-  { src: `${pixel}#harbour`, alt: 'Harbour at dawn', caption: 'Dawn over the harbour' },
+  {
+    src: `${pixel}#harbour`,
+    alt: 'Harbour at dawn',
+    caption: 'Dawn over the harbour',
+    thumbnailSrc: `${pixel}#preview`,
+  },
   { src: `${pixel}#market`, alt: 'Market street' },
   { src: `${pixel}#bridge`, alt: 'Old bridge' },
 ];
@@ -73,6 +78,23 @@ describe('LightboxModal', () => {
     expect(dialog()!.querySelector('[aria-live]')?.textContent?.trim()).toBe('2 of 3: Market street');
     expect(wrapper.emitted('update:open')).toEqual([[true]]);
     expect(wrapper.emitted('update:index')).toEqual([[1]]);
+
+    const previews = Array.from(dialog()!.querySelectorAll<HTMLButtonElement>('[aria-label="Image previews"] button'));
+    expect(previews.map((item) => item.getAttribute('aria-label'))).toEqual([
+      'Show image 1',
+      'Show image 2',
+      'Show image 3',
+    ]);
+    expect(previews[0]!.querySelector('img')?.getAttribute('src')).toBe(photos[0]!.thumbnailSrc);
+    expect(previews[1]!.querySelector('img')?.getAttribute('src')).toBe(photos[1]!.src);
+    expect(previews.map((item) => item.tabIndex)).toEqual([-1, 0, -1]);
+    expect(previews[1]!.getAttribute('aria-current')).toBe('true');
+    previews[2]!.click();
+    await settle();
+    expect(shownAlt()).toBe('Old bridge');
+    expect(previews.map((item) => item.tabIndex)).toEqual([-1, -1, 0]);
+    expect(previews[2]!.getAttribute('aria-current')).toBe('true');
+    expect(wrapper.emitted('update:index')).toEqual([[1], [2]]);
   });
 
   it('steps by buttons, arrows, Home and End, wrapping while looping', async () => {
@@ -114,6 +136,7 @@ describe('LightboxModal', () => {
     await settle();
     expect(dialog()!.querySelector('[data-counter]')).toBeNull();
     expect(dialog()!.querySelectorAll('figure button')).toHaveLength(0);
+    expect(dialog()!.querySelector('[aria-label="Image previews"]')).toBeNull();
     expect(dialog()!.querySelector('[aria-live]')?.textContent?.trim()).toBe('Harbour at dawn');
     await press('Escape');
     expect(wrapper.emitted('update:open')).toEqual([[false]]);

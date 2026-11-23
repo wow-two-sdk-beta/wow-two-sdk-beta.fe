@@ -1,6 +1,6 @@
 # LightboxModal
 
-Renders a full-screen viewer that steps through images by button, arrow key or swipe, with captions and a position counter.
+Renders uncropped photos on a black viewport-sized stage. A thumbnail strip below the photo selects any image in the set.
 
 Source: [LightboxModal.vue](LightboxModal.vue) · built on [Modal](../modal/Modal.spec.md).
 
@@ -9,9 +9,10 @@ Public import: `import { LightboxModal, type LightboxImage } from '@wow-two-beta
 ## Contract
 
 - The default slot holds the triggers and receives `openAt(index)`, which opens the viewer on that image. `open` / `update:open` and `index` / `update:index` (with `defaultOpen` / `defaultIndex`) follow the shared controlled-state helper; out-of-range positions clamp.
-- The viewer is a modal dialog (focus trap, scroll lock, Escape and outside-click dismissal, focus return), named by `label` (localized `LightboxModal.label`, `'Image viewer'`). It shows on a dark stage in both themes.
+- The viewer is a modal dialog with a focus trap and scroll lock, named by `label` (localized `LightboxModal.label`, `'Image viewer'`). The close button and Escape dismiss it and return focus to the trigger.
 - Stepping: the previous / next buttons, ArrowLeft / ArrowRight (mirrored in right-to-left layouts), Home / End, and a horizontal touch or pen swipe of 48px or more. Mouse drags never step. With `isLooping` (default) the ends wrap; without it they hold and the matching button disables.
-- Each change is announced politely as `2 of 12: <alt>`; the visible counter is decorative. One image shows no counter and no step buttons.
+- Each change is announced politely as `2 of 12: <alt>`. The visible counter is decorative. One image uses the stage without a counter, navigation or thumbnails.
+- The preview strip scrolls horizontally when needed. The current preview has a visible selected border and `aria-current`. Arrow keys move focus with the selection when the strip has focus.
 - The neighbouring images are fetched ahead while open. Captions render under the image in a `figure`.
 - Attributes and `class` reach the dialog panel.
 
@@ -19,7 +20,7 @@ Public import: `import { LightboxModal, type LightboxImage } from '@wow-two-beta
 
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
-| `images` | `ReadonlyArray<LightboxImage>` | yes | — | The images, in viewing order: `{ src, alt, caption?, srcset? }`. |
+| `images` | `ReadonlyArray<LightboxImage>` | yes | — | The images, in viewing order. Each has `src`, `alt` and optional `caption`, `srcset` and `thumbnailSrc`. The preview uses `src` when `thumbnailSrc` is absent. |
 | `open` | `boolean` | no | `undefined` | The open state, controlled — the `v-model:open` target. |
 | `defaultOpen` | `boolean` | no | `false` | The initial open state when uncontrolled. |
 | `index` | `number` | no | `undefined` | The shown position, controlled — the `v-model:index` target. |

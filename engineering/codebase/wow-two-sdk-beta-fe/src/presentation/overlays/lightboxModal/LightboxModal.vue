@@ -12,6 +12,9 @@ export interface LightboxImage {
 
   /** The responsive image candidates. */
   readonly srcset?: string;
+
+  /** A smaller image for the preview strip. Falls back to `src`. */
+  readonly thumbnailSrc?: string;
 }
 
 /** Defines props for the full-screen image viewer. */
@@ -49,7 +52,7 @@ const StepButtonClass =
 </script>
 
 <script setup lang="ts">
-import { computed, useAttrs, watch } from 'vue';
+import { computed, nextTick, useAttrs, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { useLocale, useLocaleDefaults } from '../../../foundation/i18n';
@@ -58,8 +61,7 @@ import { cn } from '../../../foundation/styles';
 import { Modal, ModalClose, ModalContent, ModalTitle } from '../modal';
 
 /**
- * Renders a full-screen viewer that steps through images by button, arrow key or swipe, with captions and a
- * position counter.
+ * Renders uncropped images on a black full-screen stage, with captions and a strip of selectable previews.
  */
 defineOptions({ name: 'LightboxModal', inheritAttrs: false });
 
@@ -115,6 +117,19 @@ const image = computed<LightboxImage | undefined>(() => props.images[current.val
 const hasMany = computed(() => count.value > 1);
 const canGoBack = computed(() => hasMany.value && (props.isLooping || current.value > 0));
 const canGoForward = computed(() => hasMany.value && (props.isLooping || current.value < lastIndex.value));
+const thumbnails = useTemplateRef<HTMLElement>('thumbnails');
+
+function selectedThumbnail(): HTMLButtonElement | undefined | null {
+  return thumbnails.value?.querySelector<HTMLButtonElement>('button[aria-current="true"]');
+}
+
+watch(
+  [isOpen, current, thumbnails],
+  () => {
+    if (isOpen.value) selectedThumbnail()?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  },
+  { flush: 'post' },
+);
 
 /** Shows the image at a position — wrapped when looping, clamped otherwise. */
 function show(next: number): void {
@@ -141,6 +156,8 @@ function forward(element: Element): 1 | -1 {
 }
 
 function onKeydown(event: KeyboardEvent): void {
+  if (event.defaultPrevented) return;
+  const onThumbnail = event.target instanceof Node && thumbnails.value?.contains(event.target);
   const step = forward(event.currentTarget as Element);
   if (event.key === 'ArrowRight') show(current.value + step);
   else if (event.key === 'ArrowLeft') show(current.value - step);
@@ -148,6 +165,7 @@ function onKeydown(event: KeyboardEvent): void {
   else if (event.key === 'End') show(lastIndex.value);
   else return;
   event.preventDefault();
+  if (onThumbnail) void nextTick(() => selectedThumbnail()?.focus({ preventScroll: true }));
 }
 
 let swipe: { readonly x: number; readonly y: number; readonly pointerId: number } | null = null;
@@ -193,7 +211,9 @@ const rest = computed(() => {
 
 const contentClass = computed(() =>
   cn(
-    'flex h-[min(90vh,60rem)] w-[min(96vw,80rem)] max-w-none flex-col gap-2 bg-black/90 p-3 text-white shadow-none',
+    'fixed inset-0 h-dvh max-h-dvh max-w-none gap-1 overflow-hidden bg-black text-white',
+    'px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+    'motion-safe:group-data-[state=open]:animate-none motion-safe:group-data-[state=closed]:animate-none',
     attrs.class as ClassValue,
   ),
 );
@@ -202,11 +222,20 @@ const contentClass = computed(() =>
 <template>
   <Modal :open="isOpen" @update:open="setOpen">
     <slot :open-at="openAt" />
-    <ModalContent v-bind="rest" is-blurred :class="contentClass" @keydown="onKeydown">
+    <ModalContent
+      v-bind="rest"
+      phone-layout="card"
+      variant="flat"
+      radius="none"
+      padding="none"
+      :show-backdrop="false"
+      :class="contentClass"
+      @keydown="onKeydown"
+    >
       <ModalTitle class="sr-only">{{ props.label }}</ModalTitle>
-      <div class="flex min-h-10 items-center gap-2 text-sm text-white/80">
+      <div class="flex min-h-11 shrink-0 items-center gap-2 text-sm text-white/80">
         <span v-if="hasMany" aria-hidden="true" data-counter>{{ counterText }}</span>
-        <ModalClose class="ms-auto text-white hover:bg-white/10" />
+        <ModalClose class="ms-auto size-11 text-white hover:bg-white/10" />
       </div>
       <figure
         class="relative flex min-h-0 flex-1 touch-pan-y touch-pinch-zoom flex-col items-center justify-center gap-2"
@@ -221,7 +250,7 @@ const contentClass = computed(() =>
           :srcset="image.srcset"
           :alt="image.alt"
           draggable="false"
-          class="min-h-0 max-w-full flex-1 rounded-md object-contain select-none"
+          class="min-h-0 max-w-full flex-1 object-contain select-none"
         />
         <figcaption v-if="image?.caption" class="text-center text-sm text-white/90">{{ image.caption }}</figcaption>
         <button
@@ -245,6 +274,35 @@ const contentClass = computed(() =>
           <ChevronRight class="size-5 rtl:-scale-x-100" />
         </button>
       </figure>
+      <div
+        v-if="hasMany"
+        ref="thumbnails"
+        role="group"
+        :aria-label="locale.t('LightboxModal.previews', undefined, 'Image previews')"
+        class="shrink-0 overflow-x-auto overscroll-x-contain p-1.5"
+      >
+        <div class="flex w-max min-w-full justify-center gap-2">
+          <button
+            v-for="(photo, index) in props.images"
+            :key="index"
+            type="button"
+            :aria-label="locale.t('LightboxModal.showImage', { number: index + 1 }, 'Show image {number}')"
+            :aria-current="index === current ? 'true' : undefined"
+            :tabindex="index === current ? 0 : -1"
+            class="size-14 shrink-0 overflow-hidden rounded-lg border-2 border-transparent bg-white/10 p-0.5 opacity-70 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-[current=true]:border-white aria-[current=true]:opacity-100 sm:size-16"
+            @click="show(index)"
+          >
+            <img
+              :src="photo.thumbnailSrc ?? photo.src"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+              class="size-full object-contain"
+            />
+          </button>
+        </div>
+      </div>
       <p class="sr-only" aria-live="polite">{{ announcement }}</p>
     </ModalContent>
   </Modal>
