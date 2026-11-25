@@ -45,9 +45,8 @@ const rest = computed(() => {
   <Primitive
     :as="HtmlElement.Anchor"
     :as-child="props.asChild"
-    :href="props.asChild ? undefined : props.href"
     data-card-link
-    v-bind="rest"
+    v-bind="props.asChild ? rest : { ...rest, href: props.href }"
     :class="classes"
     ><slot
   /></Primitive>

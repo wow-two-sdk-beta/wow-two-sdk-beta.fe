@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { h } from 'vue';
+import { defineComponent, h } from 'vue';
 import { Card, CardLink } from '@src/presentation/display';
 
 describe('Card ambient treatments', () => {
@@ -36,5 +36,15 @@ describe('CardLink', () => {
     expect(wrapper.attributes('data-card-link')).toBe('');
     expect(wrapper.attributes('href')).toBe('/x');
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['font-semibold', 'after:absolute']));
+  });
+
+  it('keeps the destination of a slotted link component', () => {
+    const RouteLink = defineComponent({ setup: () => () => h('a', { href: '/review/post' }, 'Review post') });
+    const wrapper = mount(CardLink, {
+      props: { asChild: true },
+      slots: { default: () => h(RouteLink) },
+    });
+    expect(wrapper.attributes('data-card-link')).toBe('');
+    expect(wrapper.attributes('href')).toBe('/review/post');
   });
 });
