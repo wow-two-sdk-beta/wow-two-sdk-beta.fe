@@ -9,6 +9,8 @@ Public import: `import { CollapsibleGroupContent } from '@wow-two-beta/fe/presen
 ## Contract
 
 - Mount within the owner supplying `useCollapsibleContext`; a compound part is not an independent root.
+- The pane animates its height and fades its contents in both directions. Closed content becomes inert immediately.
+  It unmounts after exit unless `isForceMounted` is set. Reduced motion resolves the height and visibility immediately.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

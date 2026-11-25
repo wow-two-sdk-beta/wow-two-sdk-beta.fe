@@ -13,9 +13,7 @@ Internal implementation: compose through the family’s public exports in [index
 
 ## Props
 
-| Prop | Type | Required | Default | Meaning |
-|---|---|---|---|---|
-| `isForceMounted` | `boolean` | no | `undefined` | The force-mounted mode — keeps the pane in the DOM while closed. |
+None declared. `CollapsibleGroupContent` owns the mount policy.
 
 ## Emits
 

@@ -1,15 +1,3 @@
-<script lang="ts">
-/**
- * Internal — not exported from `index.ts`. The element `<Presence>` mounts and clones
- * `data-state` + its tracking ref onto, split out because `Presence` needs a single
- * element it can hand `data-state` to.
- */
-export interface CollapsibleGroupContentInnerProps {
-  /** The force-mounted mode — keeps the pane in the DOM while closed. */
-  readonly isForceMounted?: boolean;
-}
-</script>
-
 <script setup lang="ts">
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { cn } from '../../../foundation/styles';
@@ -26,32 +14,22 @@ defineOptions({ name: 'CollapsibleGroupContentInner', inheritAttrs: false });
 /** The pane content. */
 defineSlots<{ default(): unknown }>();
 
-/* Not bound to a `props` const: with every reference now in the template — where the bare
-   name compiles to `$props`, which survives a setup throw — the binding would be unused. */
-withDefaults(defineProps<CollapsibleGroupContentInnerProps>(), {
-  isForceMounted: undefined,
-});
-
 const attrs = useAttrs();
 const context = useCollapsibleContext();
 const el = useTemplateRef<HTMLDivElement>('el');
 
-const classes = computed(() =>
-  cn(
-    'grid grid-rows-[0fr] motion-safe:transition-[grid-template-rows]',
-    'motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)',
-    'data-[state=open]:grid-rows-[1fr]',
-    attrs.class as string | undefined,
-  ),
-);
-
-/**
- * Everything but `class`, which is re-applied through `cn` above. `data-state` rides in here —
- * `Presence` clones it onto this vnode.
- */
-const rest = computed(() => {
-  const { class: _class, ...others } = attrs;
-  return others;
+/* Presence forwards its data-state through attrs. Merge custom classes into the pane's defaults. */
+const paneAttrs = computed(() => {
+  const { class: customClass, ...rest } = attrs;
+  return {
+    ...rest,
+    class: cn(
+      'grid grid-rows-[0fr] motion-safe:transition-[grid-template-rows]',
+      'motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)',
+      'data-[state=open]:grid-rows-[1fr] [&[data-state=open]>div]:opacity-100',
+      customClass as string | undefined,
+    ),
+  };
 });
 
 defineExpose({ el });
@@ -63,13 +41,12 @@ defineExpose({ el });
     :id="context.contentId"
     role="region"
     :aria-labelledby="context.triggerId"
-    :hidden="!context.open && !isForceMounted"
-    v-bind="rest"
-    :class="classes"
+    :inert="!context.open"
+    :aria-hidden="!context.open"
+    v-bind="paneAttrs"
   >
     <div
-      class="min-h-0 overflow-hidden motion-safe:data-[state=open]:animate-(--animate-fade-in) motion-safe:data-[state=closed]:animate-(--animate-fade-out) motion-reduce:animate-none"
-      :data-state="context.open ? 'open' : 'closed'"
+      class="min-h-0 overflow-hidden opacity-0 motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
     >
       <slot />
     </div>

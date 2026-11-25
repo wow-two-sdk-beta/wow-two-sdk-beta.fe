@@ -41,14 +41,13 @@ defineExpose({ el });
   <CollapsibleGroupContentInner
     v-if="isForceMounted"
     ref="inner"
-    :is-force-mounted="isForceMounted"
     :data-state="context.open ? 'open' : 'closed'"
     v-bind="$attrs"
   >
     <slot />
   </CollapsibleGroupContentInner>
   <Presence v-else :is-present="context.open">
-    <CollapsibleGroupContentInner ref="inner" :is-force-mounted="isForceMounted" v-bind="$attrs">
+    <CollapsibleGroupContentInner ref="inner" v-bind="$attrs">
       <slot />
     </CollapsibleGroupContentInner>
   </Presence>
