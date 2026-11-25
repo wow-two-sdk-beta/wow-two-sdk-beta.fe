@@ -1,4 +1,4 @@
-import { cloneVNode, defineComponent, shallowRef, watch, type VNode } from 'vue';
+import { cloneVNode, defineComponent, onMounted, shallowRef, watch, type VNode } from 'vue';
 import { renderableChildren } from '../slot/Slot';
 import { resolveElement } from '../../dom/ResolveElement';
 
@@ -24,6 +24,14 @@ function getTotalDurationMs(node: HTMLElement): number {
     maxOf(parseTimes(cs.transitionDuration), parseTimes(cs.transitionDelay)),
     maxOf(parseTimes(cs.animationDuration), parseTimes(cs.animationDelay)),
   );
+}
+
+/**
+ * Forces the browser to compute the node's current styles — and its subtree's, since a layout read
+ * flushes the whole document — so a change made right after starts a transition from them.
+ */
+function commitStyles(node: HTMLElement): void {
+  void node.getBoundingClientRect();
 }
 
 /** A function ref may receive a component's public instance; the DOM node is what the timing logic needs. */
@@ -90,8 +98,9 @@ function afterTwoFrames(cb: () => void): () => void {
  * `data-state="closed"` until its own `animationend`/`transitionend` fires
  * (or a computed-duration timeout as a fallback). If no exit animation
  * actually starts, the child unmounts immediately. On enter, the child
- * mounts with `data-state="closed"` and flips to `"open"` on the next
- * frame so enter transitions play.
+ * mounts with `data-state="closed"`, its styles are flushed, and it flips to
+ * `"open"` in the same task — before any paint — so an enter transition has
+ * its from-state and a `closed` exit animation is never painted.
  *
  * Deliberately not Vue's `<Transition>`: this primitive drives unmount off the
  * child's *own* computed timing rather than off CSS class hooks, which is what
@@ -100,8 +109,8 @@ function afterTwoFrames(cb: () => void): () => void {
  * Both effects use `flush: 'post'`, the analogue of React's `useEffect` here —
  * the DOM node must exist before the timing window opens.
  *
- * Neither effect depends on `requestAnimationFrame` firing. Both go through
- * {@link afterTwoFrames}, and the exit additionally arms its unmount timer up front, so a
+ * Neither effect depends on `requestAnimationFrame` firing. The enter is synchronous; the
+ * exit goes through {@link afterTwoFrames} and arms its unmount timer up front, so a
  * document that is never painted still enters and — the part that matters — still unmounts.
  */
 export const Presence = defineComponent({
@@ -118,11 +127,22 @@ export const Presence = defineComponent({
       node.value = toElement(value);
     };
 
-    // Enter — mount closed, then flip to open on the next frame (double rAF
-    // so the closed styles are committed and painted first) to run transitions.
+    /* Enter — mount closed, flush its styles, flip to open in the same task.
+       The flush is a style change event, so a transition consumer (`data-[state=closed]:opacity-0`
+       plus `transition-opacity`) sees the closed values as its from-state. No frame is painted in
+       between, and that is the point: `closed` is also the EXIT state, so a keyframe consumer
+       (`data-[state=closed]:animate-pop-out`) painted while entering ran its exit animation from
+       opacity 1 first — the open overlay flashed fully drawn, faded, then faded in again. The
+       former double-rAF flip painted that closed state for two frames on every open, longer
+       whenever the main thread was busy, since the compositor keeps playing the exit meanwhile. */
+    const isMounted = shallowRef(false);
+    onMounted(() => {
+      isMounted.value = true;
+    });
+
     watch(
-      [() => props.isPresent, rendered, dataState],
-      ([isPresent], _previous, onCleanup) => {
+      [() => props.isPresent, rendered, dataState, node, isMounted],
+      ([isPresent]) => {
         if (!isPresent) return;
         if (!rendered.value) {
           rendered.value = true;
@@ -130,18 +150,23 @@ export const Presence = defineComponent({
         }
         if (dataState.value === 'open') return;
         /* `immediate: true` makes this watcher run during SSR too (Vue skips only the
-           non-immediate post-flush ones), and there is neither `requestAnimationFrame` nor a
-           useful `setTimeout` on the server. Bail rather than throw: the server emits
-           `data-state="closed"`, which is exactly what the client's first render produces, so
-           hydration still matches and this same watcher runs the enter on the client. */
+           non-immediate post-flush ones). Bail: the server emits `data-state="closed"`, which is
+           exactly what the client's first render produces, so hydration still matches and this
+           same watcher runs the enter on the client. */
         if (typeof window === 'undefined') {
           return;
         }
-        onCleanup(
-          afterTwoFrames(() => {
-            dataState.value = 'open';
-          }),
-        );
+        const el = node.value;
+        /* The immediate run is synchronous in setup, before the child exists: the child must
+           first render closed, so wait for its node (the function ref sets it during the patch,
+           re-running this in the same post flush). A child that never resolves to an element
+           opens once mounted. */
+        if (!el && !isMounted.value) return;
+        if (el) {
+          commitStyles(el);
+          el.setAttribute('data-state', 'open');
+        }
+        dataState.value = 'open';
       },
       { immediate: true, flush: 'post' },
     );

@@ -29,7 +29,10 @@ async function openPanel(contentProps: Record<string, unknown>): Promise<HTMLEle
   });
   await nextTick();
   await expect.poll(() => document.querySelector('[role=dialog]') !== null).toBe(true);
-  return document.querySelector<HTMLElement>('[role=dialog]')!;
+  const panel = document.querySelector<HTMLElement>('[role=dialog]')!;
+  /* Measured at rest: the enter's `pop-in` starts at `scale(0.96)`, which the box includes. */
+  for (const animation of panel.getAnimations()) animation.finish();
+  return panel;
 }
 
 it('widens the panel to its max width even when the content is short', async () => {

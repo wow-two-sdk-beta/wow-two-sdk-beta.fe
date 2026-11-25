@@ -42,6 +42,8 @@ async function openStreaming(contentProps: Record<string, unknown>) {
   await expect.poll(() => document.querySelector('[role=dialog]') !== null).toBe(true);
   const panel = document.querySelector<HTMLElement>('[role=dialog]')!;
   const body = document.querySelector<HTMLElement>('.body')!;
+  /* Measured at rest: the enter's `pop-in` starts at `scale(0.96)`, which the box includes. */
+  for (const animation of panel.getAnimations()) animation.finish();
   return { rows, panel, body };
 }
 

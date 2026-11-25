@@ -49,12 +49,11 @@ function harness() {
 }
 
 describe('foundation/primitives — Presence without requestAnimationFrame', () => {
-  it('enters: flips to data-state="open" on the timer fallback', async () => {
+  it('enters: flips to data-state="open" within the mount task, no frame needed', async () => {
     suspendAnimationFrames();
     const { wrapper } = harness();
 
-    // The enter deliberately starts closed so the consumer's enter transition has a from-state.
-    expect(wrapper.find('#child').attributes('data-state')).toBe('closed');
+    expect(wrapper.find('#child').attributes('data-state')).toBe('open');
 
     await wait(SETTLE_MS);
     await wrapper.vm.$nextTick();
@@ -101,6 +100,53 @@ describe('foundation/primitives — Presence without requestAnimationFrame', () 
     } finally {
       Element.prototype.getAnimations = originalGetAnimations;
     }
+  });
+});
+
+describe('foundation/primitives — Presence enter', () => {
+  /*
+   * `closed` is the exit state too: a keyframe consumer (`data-[state=closed]:animate-pop-out`) painted
+   * `closed` while entering plays its exit animation from opacity 1, so the overlay flashed fully drawn,
+   * faded out and faded in again. The enter commits the closed styles — the transition from-state — and
+   * flips to `open` before the task ends, so no closed frame is ever painted.
+   */
+  it('commits the closed styles, then opens before the mount task ends', async () => {
+    const states: Array<string | null> = [];
+    /* happy-dom binds its element classes per window, so the global `Element.prototype` is not on a div's
+       chain; patch the prototype that actually owns the method. */
+    let owner: object | null = document.createElement('div');
+    while (owner && !Object.prototype.hasOwnProperty.call(owner, 'getBoundingClientRect')) {
+      owner = Object.getPrototypeOf(owner) as object | null;
+    }
+    const target = owner as Element;
+    const original = target.getBoundingClientRect;
+    target.getBoundingClientRect = function (this: Element) {
+      if (this.id === 'child') states.push(this.getAttribute('data-state'));
+      return original.call(this);
+    };
+    try {
+      const { wrapper } = harness();
+      expect(states, 'the closed styles were never flushed before the flip').toEqual(['closed']);
+      expect(wrapper.get('#child').attributes('data-state')).toBe('open');
+      wrapper.unmount();
+    } finally {
+      target.getBoundingClientRect = original;
+    }
+  });
+
+  it('reopens at once when shown again during its exit', async () => {
+    const { isPresent, wrapper } = harness();
+    const element = wrapper.get('#child').element;
+    Object.defineProperty(element, 'getAnimations', { value: () => [{ playState: 'running' }] });
+
+    isPresent.value = false;
+    await wrapper.vm.$nextTick();
+    expect(element.getAttribute('data-state')).toBe('closed');
+
+    isPresent.value = true;
+    await wrapper.vm.$nextTick();
+    expect(element.getAttribute('data-state')).toBe('open');
+    wrapper.unmount();
   });
 });
 
