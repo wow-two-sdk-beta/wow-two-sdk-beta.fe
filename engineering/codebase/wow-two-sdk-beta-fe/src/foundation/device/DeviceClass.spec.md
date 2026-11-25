@@ -65,6 +65,38 @@ corrects on hydration, the way `usePointerType` reads `'none'`. Every media quer
 otherwise read as a phone. The attribute is absent until mount, so write attribute selectors as overrides of an
 unattributed base layout.
 
+## Class-keyed CSS
+
+`src/index.css`, the stylesheet an app imports, ships three Tailwind variants over that attribute:
+
+| Variant    | Matches                                                                    |
+| ---------- | -------------------------------------------------------------------------- |
+| `phone:`   | an element below `<html data-device-class="phone">`, e.g. `phone:hidden`   |
+| `tablet:`  | an element below `<html data-device-class="tablet">`, e.g. `tablet:flex`   |
+| `desktop:` | an element below `<html data-device-class="desktop">`, e.g. `desktop:grid` |
+
+- Each compiles to `&:where([data-device-class='…'] *)`: `html` itself never matches, and the utility keeps its own
+  specificity. `not-phone:`, `not-tablet:` and `not-desktop:` work through Tailwind's `not-*`.
+- The attribute is the **effective** class, so a variant follows the layout the shell serves: under
+  `[phone, desktop]` targets a landscape phone (844x390, finger) matches `phone:` though `md:` reads its width as a
+  tablet.
+- **Unattributed base.** The attribute is absent on the server, before mount, and in an app that never calls
+  `provideDeviceTargets`. There `phone:`, `tablet:` and `desktop:` are all off and every `not-*` is on. Write the
+  unprefixed utility as the desktop layout, the one the server renders, and correct it with `phone:` or `tablet:` after
+  mount. A phone paints that base for a frame first.
+- **Width or class.** A decision about room (columns, text size, a sidebar that needs the width) keeps `sm:`..`2xl:`.
+  A decision about which layout is served (a bottom bar on the phone layout, a hidden side nav) uses the class
+  variants, so CSS agrees with `useDeviceClass().effective`. `max-md:hidden` or `md:hidden` on a part of the shell
+  follows width while the shell may be forced to the phone layout.
+- With `desktop` as the only target every device is `desktop:`; `phone:` never matches, though `detected` can still
+  read a phone.
+
+```html
+<!-- the unprefixed utilities are the desktop layout; the variants override after mount -->
+<nav class="flex phone:hidden">…</nav>
+<footer class="hidden phone:flex">…</footer>
+```
+
 ## Examples
 
 A phone-first consumer product declares a phone layout and a desktop layout. A tablet gets the phone layout:
@@ -117,5 +149,7 @@ CSS will disagree about where a phone ends.
 
 [Pure rule](../../../tests/unit/foundation/device/DeviceClass.test.ts),
 [composable and provider](../../../tests/unit/foundation/device/DeviceClass.dom.test.ts),
-[server render](../../../tests/unit/foundation/device/DeviceClass.ssr.test.ts) and
-[real viewports](../../../tests/unit/foundation/device/DeviceClass.browser.test.ts).
+[server render](../../../tests/unit/foundation/device/DeviceClass.ssr.test.ts),
+[real viewports](../../../tests/unit/foundation/device/DeviceClass.browser.test.ts) and
+[class-keyed variants](../../../tests/unit/foundation/device/DeviceVariants.test.ts), compiled by the Tailwind the SDK
+builds with.

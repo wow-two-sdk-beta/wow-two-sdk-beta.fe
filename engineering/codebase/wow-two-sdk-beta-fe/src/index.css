@@ -11,6 +11,16 @@
    `:read-only` pseudo-class matches every element that is not editable. */
 @custom-variant readonly (&:is([readonly], [aria-readonly='true'], [data-readonly]));
 
+/* The served device class, for CSS that follows the class (a landscape phone is a `phone` at any width) and not only
+   the viewport width. Each matches an element under `<html data-device-class="…">`, the attribute
+   `provideDeviceTargets` keeps on `<html>`, so `html` itself never matches. The attribute is absent on the server,
+   before mount, and in an app that never calls `provideDeviceTargets`: `phone:` / `tablet:` / `desktop:` are all off
+   then and `not-phone:` etc. (Tailwind's `not-*`) are on, so write them as overrides of an unattributed base layout.
+   Width-only decisions keep using `sm:`..`2xl:`. */
+@custom-variant phone (&:where([data-device-class='phone'] *));
+@custom-variant tablet (&:where([data-device-class='tablet'] *));
+@custom-variant desktop (&:where([data-device-class='desktop'] *));
+
 /* A `Table` part below its table's stack breakpoint. Every part of a stacking table carries `data-stack` with the
    breakpoint key, so one variant serves every breakpoint and follows the app's own `@theme` breakpoints. */
 @custom-variant table-stacked {
