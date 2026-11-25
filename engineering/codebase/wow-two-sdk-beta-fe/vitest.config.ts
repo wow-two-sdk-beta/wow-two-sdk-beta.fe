@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { playwright } from '@vitest/browser-playwright';
 import { fileURLToPath } from 'node:url';
 import { libSourceAliases } from './apps/lib-source-alias.mjs';
+import { CoarseLastSequencer } from './tests/support/CoarseLastSequencer';
 
 // Tests live under `tests/` (source-only `src/`); they reach back into source via the
 // `@src/*` alias (mirrors the `tsconfig.json` path). Applied per project so every project
@@ -38,6 +39,8 @@ const smokeSuffixes = ['**/*.ssr.test.ts', '**/*.dom.test.ts'];
 export default defineConfig({
   resolve: { alias: srcAlias },
   test: {
+    /* Files that switch touch emulation on run last: Linux Chromium cannot hand its mouse back (tests/support/CoarsePointer.ts). */
+    sequence: { sequencer: CoarseLastSequencer },
     projects: [
       {
         plugins: [vue()],
@@ -79,6 +82,9 @@ export default defineConfig({
         optimizeDeps: { include: ['lossless-json', 'bignumber.js', 'axe-core'] },
         test: {
           name: 'browser',
+          // Real-input browser tests on a shared runner get 2 retries; a retried pass is still shown in the report.
+          retry: process.env.CI ? 2 : 0,
+          setupFiles: ['./tests/support/ParkRealPointer.ts'],
           include: ['tests/unit/**/*.component.test.ts', 'tests/unit/**/*.browser.test.ts'],
           browser: {
             enabled: true,

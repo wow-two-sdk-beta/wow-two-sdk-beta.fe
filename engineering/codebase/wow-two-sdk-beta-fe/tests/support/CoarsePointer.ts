@@ -13,7 +13,15 @@ export async function useCoarsePointer(): Promise<void> {
   await cdp().send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 }
 
-/** Hands the primary pointer back to the machine's own. */
+/**
+ * Switches the finger off, so `(pointer: coarse)` stops matching.
+ *
+ * It cannot give the page its mouse back on Linux: headless Chromium there lands on `(hover: none)` and
+ * `(pointer: none)` after this call (even on a page that never used a finger) and keeps them until the page closes;
+ * no other protocol call undoes it. macOS returns to `(hover: hover)` and `(pointer: fine)`. A file that imports this
+ * module therefore poisons the page for any later file that relies on `hover:`, and `CoarseLastSequencer` runs these
+ * files last for that reason. Do not call this from a shared setup file.
+ */
 export async function useFinePointer(): Promise<void> {
   await cdp().send('Emulation.setTouchEmulationEnabled', { enabled: false });
 }
