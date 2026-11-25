@@ -66,7 +66,10 @@ const ctx = useMultiSelectContext();
 const query = shallowRef('');
 const activeOption = shallowRef<string | undefined>();
 const listbox = useTemplateRef<InstanceType<typeof ListboxPicker>>('listbox');
-provide(multiSelectSearchKey, computed(() => (props.isSearchable ? query.value.trim().toLowerCase() : '')));
+provide(
+  multiSelectSearchKey,
+  computed(() => (props.isSearchable ? query.value.trim().toLowerCase() : '')),
+);
 
 watch(
   () => ctx.open,

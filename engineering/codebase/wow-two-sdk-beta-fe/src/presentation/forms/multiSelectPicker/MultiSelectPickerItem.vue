@@ -40,7 +40,11 @@ const isCollected = useOptionCollection();
 
 const registeredLabel = computed<string | number>(() => props.label ?? props.value);
 const query = inject(multiSelectSearchKey, undefined);
-const matchesSearch = computed(() => String(registeredLabel.value).toLowerCase().includes(query?.value ?? ''));
+const matchesSearch = computed(() =>
+  String(registeredLabel.value)
+    .toLowerCase()
+    .includes(query?.value ?? ''),
+);
 
 /* Registers only — never unregisters; a removed row's label keeps labelling its value. `immediate`
    because the first registration has to happen on mount, and nothing in this watcher touches the DOM. */
