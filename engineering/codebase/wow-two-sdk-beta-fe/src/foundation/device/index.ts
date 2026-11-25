@@ -18,5 +18,23 @@ export {
 export { useBreakpoint } from './hooks/UseBreakpoint';
 export { useBreakpointUp, useBreakpointBelow } from './hooks/UseBreakpointRange';
 
+export { DeviceClass, DeviceClassOrder } from './enums/DeviceClass';
+export {
+  type DeviceScale,
+  type DeviceMeasure,
+  ShortHeightPx,
+  ShortHeightQuery,
+  detectDeviceClass,
+  resolveDeviceClass,
+} from './DeviceClass';
+export {
+  type DeviceClassOptions,
+  type DeviceClassState,
+  DeviceClassAttribute,
+  DeviceClassKey,
+  useDeviceClass,
+  provideDeviceTargets,
+} from './hooks/UseDeviceClass';
+
 export { useMediaQuery } from './hooks/UseMediaQuery';
 export * from './hooks/UseReducedMotion';
