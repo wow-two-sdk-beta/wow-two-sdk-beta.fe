@@ -22,10 +22,9 @@ Public import: `import { Badge } from '@wow-two-beta/fe/presentation/display';`.
 - The detail (`data-detail`) follows the label in a normal weight with tabular figures — muted on neutral variants,
   the tint's colour on tinted ones.
 - `isSpinning` turns the leading icon slowly for a state still in progress and holds it still under reduced motion.
-- `glass` and `glassSuccess` are for a pill laid over imagery: a fixed dark wash (`bg-black/45`, as `Button`'s neutral
-  glass) or a success-tinted one, with light text and `backdrop-blur-md`. Neither flips with the theme, so the pill
-  reads over a picture in light and dark alike; `isOutlined` adds a hairline (`white/20`, `success/50`), and the detail
-  keeps the pill's light text.
+- Glass pills over images use a dark tint under the pill. The neutral `glass` variant uses `bg-black/60`, white text
+  and `backdrop-blur-md` in both themes. `glassSuccess` uses a dark success tint with light text.
+  `isOutlined` adds a hairline in the variant's colour. The detail keeps the light text.
 - `isShrinkable` lets the pill shrink below its copy in a flex row (`min-w-0 shrink`): the label (`data-badge-label`)
   keeps one line and cuts with an ellipsis, and the leading icon stays at its full size. A row of pills that never
   wraps is `flex flex-nowrap` with the long pills shrinkable. Without it a plain badge keeps its content width.

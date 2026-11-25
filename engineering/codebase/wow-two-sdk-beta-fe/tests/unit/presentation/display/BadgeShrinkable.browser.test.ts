@@ -104,6 +104,12 @@ describe.skipIf(isForcedColors)('glass badges over imagery', () => {
       const [glass, success] = [...row.children] as HTMLElement[];
       expect(getComputedStyle(glass!).color).toBe('rgb(255, 255, 255)');
       expect(getComputedStyle(success!).color).toBe('rgb(240, 253, 244)');
+      const sample = document.createElement('canvas').getContext('2d')!;
+      sample.fillStyle = '#fff';
+      sample.fillRect(0, 0, 1, 1);
+      sample.fillStyle = getComputedStyle(glass!).backgroundColor;
+      sample.fillRect(0, 0, 1, 1);
+      expect(Math.max(...sample.getImageData(0, 0, 1, 1).data.slice(0, 3))).toBeLessThanOrEqual(118);
       for (const pillElement of [glass!, success!]) {
         const style = getComputedStyle(pillElement);
         expect(style.backdropFilter || style.getPropertyValue('-webkit-backdrop-filter')).toContain('blur');

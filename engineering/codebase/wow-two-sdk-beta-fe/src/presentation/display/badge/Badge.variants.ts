@@ -53,8 +53,8 @@ export const badgeVariants = tv({
       outline: 'border border-border text-foreground',
       surface: 'bg-card text-foreground',
       quiet: 'bg-transparent text-muted-foreground',
-      /* Glass reads over any imagery in either theme: a fixed dark wash and light text, as `Button`'s neutral glass. */
-      glass: 'bg-black/45 text-white backdrop-blur-md',
+      /* A 60% black tint keeps small white labels readable even over a white image. */
+      glass: 'bg-black/60 text-white backdrop-blur-md',
       glassSuccess: 'bg-success-900/60 text-success-50 backdrop-blur-md',
     },
     size: {
