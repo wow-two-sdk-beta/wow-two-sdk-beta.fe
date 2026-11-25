@@ -2,6 +2,8 @@
 
 Renders the week / day time grid of an `EventCalendarViewer`.
 
+When the week grid's hour gutter and seven day columns exceed the available width, the week becomes a vertical day list. A single day keeps its hour grid.
+
 Source: [TimeGridView.vue](TimeGridView.vue).
 
 Internal implementation: compose through the family’s public exports in [index.ts](index.ts).

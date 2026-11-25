@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
 import { Temporal } from 'temporal-polyfill';
@@ -14,6 +14,7 @@ import {
 const wrappers: Array<VueWrapper> = [];
 afterEach(() => {
   for (const wrapper of wrappers.splice(0)) wrapper.unmount();
+  vi.useRealTimers();
 });
 
 const at = (text: string): Temporal.ZonedDateTime => Temporal.ZonedDateTime.from(text + '[UTC]');
@@ -61,6 +62,50 @@ function monthSections(wrapper: VueWrapper) {
 function emittedDates(wrapper: VueWrapper, name: string): Array<string> {
   return (wrapper.emitted(name) ?? []).map(([value]) => String((value as Temporal.ZonedDateTime).toPlainDate()));
 }
+
+describe('EventCalendarViewer Today action', () => {
+  const anchor = Temporal.ZonedDateTime.from('2026-12-01T08:00:00+05:00[Asia/Tashkent]');
+
+  function todayButton(wrapper: VueWrapper) {
+    return wrapper.findAll('button').find((button) => button.text() === 'Today')!;
+  }
+
+  it('disables Today in the current period in the display zone', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-30T20:00:00Z'));
+    const yesterday = anchor.subtract({ days: 1 });
+    const cases = [
+      ['day', anchor, true],
+      ['day', yesterday, false],
+      ['week', yesterday, true],
+      ['week', yesterday.subtract({ weeks: 1 }), false],
+      ['month', anchor.add({ days: 7 }), true],
+      ['month', yesterday, false],
+      ['year', yesterday, true],
+      ['year', anchor.subtract({ years: 1 }), false],
+      ['agenda', anchor, true],
+      ['agenda', yesterday, false],
+    ] as const;
+    const wrapper = mountViewer({ view: 'day', date: anchor, weekStart: 1 });
+    for (const [view, date, disabled] of cases) {
+      await wrapper.setProps({ view, date });
+      expect(todayButton(wrapper).element.disabled, `${view} ${date.toPlainDate()}`).toBe(disabled);
+    }
+  });
+
+  it('enables Today again at midnight in the display zone', async () => {
+    vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'] });
+    vi.setSystemTime(new Date('2026-12-01T18:59:59Z'));
+    const wrapper = mountViewer({ view: 'day', date: anchor });
+    const button = todayButton(wrapper);
+    expect(button.element.disabled).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(button.element.disabled).toBe(false);
+    await button.trigger('click');
+    expect(emittedDates(wrapper, 'update:date')).toEqual(['2026-12-02']);
+  });
+});
 
 describe('EventCalendarViewer year view', () => {
   it('renders twelve mini months in calendar order with every day of the year', () => {
@@ -374,13 +419,17 @@ describe('EventCalendarViewer views prop', () => {
   it('keeps a two-view switcher and switches between them', async () => {
     const wrapper = mountViewer({ date: undefined, defaultDate: focus, views: ['month', 'year'] });
     expect(pressedLabel(wrapper)).toBe('month');
-    await wrapper
+    const year = wrapper
       .get('[aria-label="View"]')
       .findAll('button')
-      .find((button) => button.text() === 'year')!
-      .trigger('click');
+      .find((button) => button.text() === 'year')!;
+    await year.trigger('click');
     expect(pressedLabel(wrapper)).toBe('year');
     expect(monthSections(wrapper)).toHaveLength(12);
+
+    await year.trigger('click');
+    expect(pressedLabel(wrapper)).toBe('year');
+    expect(wrapper.emitted('update:view')).toEqual([['year']]);
   });
 
   it('reports the switcher choice through update:view', async () => {

@@ -342,7 +342,7 @@ describe('MonthView overflow', () => {
       event('S3', '2026-09-16T10:00Z', '2026-09-16T10:30Z'),
     ]);
     const day = dayColumn(wrapper, '2026-09-16');
-    expect(day.findAll('button').map((chip) => chip.text())).toEqual(['S1', 'S2']);
+    expect(day.findAll('button:not([aria-haspopup="dialog"])').map((chip) => chip.text())).toEqual(['S1', 'S2']);
     expect(day.text()).toContain('+1 more');
     // Other days of that row have room: the lanes are the same, but no extra events.
     expect(dayColumn(wrapper, '2026-09-15').text()).not.toContain('more');
@@ -359,7 +359,7 @@ describe('MonthView overflow', () => {
     ).toEqual(['A', 'B', 'C', 'D']);
     expect(Math.max(...bars(wrapper).map((bar) => placement(bar).lane))).toBe(3);
     const middle = dayColumn(wrapper, '2026-09-16');
-    expect(middle.findAll('button')).toHaveLength(0);
+    expect(middle.findAll('button:not([aria-haspopup="dialog"])')).toHaveLength(0);
     expect(middle.text()).toContain('+2 more');
     expect(dayColumn(wrapper, '2026-09-14').text()).toContain('+1 more');
     expect(dayColumn(wrapper, '2026-09-19').text()).not.toContain('more');
@@ -385,7 +385,12 @@ describe('MonthView overflow', () => {
     );
     const wrapper = mountMonth(singles);
     const day = dayColumn(wrapper, '2026-09-16');
-    expect(day.findAll('button').map((chip) => chip.text())).toEqual(['S1', 'S2', 'S3', 'S4']);
+    expect(day.findAll('button:not([aria-haspopup="dialog"])').map((chip) => chip.text())).toEqual([
+      'S1',
+      'S2',
+      'S3',
+      'S4',
+    ]);
     expect(day.text()).toContain('+2 more');
   });
 

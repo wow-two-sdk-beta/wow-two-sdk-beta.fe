@@ -19,6 +19,18 @@ export function intersectsCalendarDay(event: EventCalendarViewerEvent, day: Temp
   return compare(event.start, end) < 0 && compare(event.end, start) > 0;
 }
 
+/** The first and last dates touched by a valid interval in the display zone. */
+export function calendarEventDays(
+  event: EventCalendarViewerEvent,
+  zone: string,
+): { first: Temporal.PlainDate; last: Temporal.PlainDate } | null {
+  if (Temporal.ZonedDateTime.compare(event.end, event.start) < 0) return null;
+  const first = event.start.withTimeZone(zone).toPlainDate();
+  const endDay = event.end.withTimeZone(zone).toPlainDate();
+  const last = intersectsCalendarDay(event, endDay, zone) ? endDay : endDay.subtract({ days: 1 });
+  return { first, last: Temporal.PlainDate.compare(last, first) < 0 ? first : last };
+}
+
 /** Invalid visual options fall back to a complete day; data values remain unrestricted. */
 export function calendarHourRange(range: readonly [number, number]): readonly [number, number] {
   const [start, end] = range;

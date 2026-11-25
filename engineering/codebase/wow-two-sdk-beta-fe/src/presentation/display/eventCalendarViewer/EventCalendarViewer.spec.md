@@ -34,7 +34,10 @@ views in that canonical order, whatever order `views` is passed in; `month` is t
 - A current view that is not offered — the controlled `view`, or the `defaultView` — shows the first offered
   view instead. The viewer does not emit `update:view` for that fallback, since the reader changed nothing.
 - Only one offered view hides the switcher and shows that view.
+- The segmented toggle highlights the active view and dims the other choices. Pressing the active view keeps it selected.
 - Prev, Next and the title follow the shown view: a year, month, week or day per step, and the agenda steps a day.
+- Previous and Next flank the period title. Below `sm`, the view switcher uses its own row.
+- Today is disabled in the current day, week, month or year in the display zone. In Agenda it is disabled when the list starts today.
 
 ### Year view
 
@@ -86,8 +89,8 @@ Regression: `tests/unit/presentation/display/CalendarAndTable.dom.test.ts` and
 
 ## Slots
 
-| Slot            | Meaning                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Slot            | Meaning                                                                                                                                                                                                                                                                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `toolbar-extra` | Extra controls shown in the header between the title and the view switcher. Renders only when the consumer fills it. At `lg` (1024px) and up it shares the row and control height with Today and the switcher; below `lg` it is its own full-width row, between the title row and the switcher row. Unfilled, the header is byte-for-byte unchanged (the wrap breakpoint stays `sm`). |
 
 ## Exposed handle

@@ -26,8 +26,8 @@ import { useLocale } from '../../../foundation/i18n';
 import { computed, type StyleValue } from 'vue';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
-import { formatDay } from './EventCalendarViewerDates';
-import { calendarHour } from './EventCalendarViewerLayout';
+import { formatDay, formatDaySpan } from './EventCalendarViewerDates';
+import { calendarEventDays, calendarHour } from './EventCalendarViewerLayout';
 import { formatZonedTime, isToday } from '../../forms/DateExtensions';
 
 const locale = useLocale();
@@ -93,8 +93,9 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
   return { background: e.color || 'var(--color-primary)' };
 }
 
-/** All day → "All day"; a zero-length event → its start only, never a start–start range; else the full range. */
 function timeLabel(e: EventCalendarViewerEvent): string {
+  const span = calendarEventDays(e, props.timeZone);
+  if (span && !span.first.equals(span.last)) return formatDaySpan(span.first, span.last, locale.locale.value);
   if (e.isAllDay) return locale.t('EventCalendarViewer.allDay', undefined, 'All day');
   const start = formatZonedTime(e.start.withTimeZone(props.timeZone), locale.locale.value);
   if (TemporalValue.ZonedDateTime.compare(e.end, e.start) === 0) return start;
@@ -114,6 +115,7 @@ function timeLabel(e: EventCalendarViewerEvent): string {
           <button
             type="button"
             class="flex w-full items-start gap-3 rounded-md p-2 text-left transition-colors hover:bg-muted"
+            :title="String(entry.event.title ?? entry.event.id)"
             @click="emit('event-click', entry.event)"
           >
             <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(entry.event)" />
@@ -127,7 +129,7 @@ function timeLabel(e: EventCalendarViewerEvent): string {
                   data-agenda-ongoing=""
                   class="mr-1 rounded-sm bg-primary-soft px-1 py-0.5 text-[10px] font-semibold uppercase text-primary-soft-foreground"
                   >{{ locale.t('AgendaView.ongoing', undefined, 'Ongoing') }}</span
-                >{{ timeLabel(entry.event) }}
+                >{{ ' ' + timeLabel(entry.event) }}
               </span>
             </span>
           </button>

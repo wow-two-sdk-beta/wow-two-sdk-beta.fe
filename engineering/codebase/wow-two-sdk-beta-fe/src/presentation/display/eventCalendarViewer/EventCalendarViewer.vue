@@ -40,7 +40,7 @@ export interface EventCalendarViewerProps {
 
 <script setup lang="ts">
 import { formatMonthYear, useLocale } from '../../../foundation/i18n';
-import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
+import { computed, onMounted, shallowRef, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
@@ -48,6 +48,8 @@ import { cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { Icon } from '../../../foundation/icons';
 import { addDays, nowZoned } from '../../forms/DateExtensions';
+import ToggleGroup from '../../forms/toggleGroup/ToggleGroup.vue';
+import ToggleInput from '../../forms/toggleInput/ToggleInput.vue';
 import {
   EventCalendarViewerViews,
   EventCalendarViewerView as EventCalendarViewerViewValue,
@@ -142,6 +144,41 @@ const activeView = computed(() =>
 const focusDay = computed(() => currentDate.value.toPlainDate());
 
 const timeZone = computed(() => currentDate.value.timeZoneId);
+const weekFirstDay = computed(() => startOfWeek(focusDay.value, props.weekStart));
+const today = shallowRef(TemporalValue.Now.plainDateISO(timeZone.value));
+
+onMounted(() => {
+  watch(
+    timeZone,
+    (zone, _, onCleanup) => {
+      let timer: ReturnType<typeof setTimeout>;
+      function refreshToday(): void {
+        const now = TemporalValue.Now.zonedDateTimeISO(zone);
+        today.value = now.toPlainDate();
+        const nextDay = now.add({ days: 1 }).startOfDay();
+        timer = setTimeout(refreshToday, nextDay.epochMilliseconds - now.epochMilliseconds);
+      }
+      refreshToday();
+      onCleanup(() => clearTimeout(timer));
+    },
+    { immediate: true },
+  );
+});
+
+const isShowingCurrentPeriod = computed(() => {
+  const day = focusDay.value;
+  const current = today.value.withCalendar(day.calendarId);
+  switch (activeView.value) {
+    case EventCalendarViewerViewValue.Year:
+      return day.year === current.year;
+    case EventCalendarViewerViewValue.Month:
+      return day.year === current.year && day.monthCode === current.monthCode;
+    case EventCalendarViewerViewValue.Week:
+      return weekFirstDay.value.equals(startOfWeek(current, props.weekStart));
+    default:
+      return day.equals(current);
+  }
+});
 
 const sortedEvents = computed(() =>
   [...props.events].sort((a, b) => TemporalValue.ZonedDateTime.compare(a.start, b.start)),
@@ -187,8 +224,8 @@ function goToday(): void {
   dateControlled.setValue(nowZoned().withTimeZone(timeZone.value));
 }
 
-function setView(next: EventCalendarViewerView): void {
-  viewControlled.setValue(next);
+function setView(next: EventCalendarViewerView | readonly string[] | null): void {
+  if (typeof next === 'string') viewControlled.setValue(next);
 }
 
 /* A year-view month opens the month grid on that month; a year-view day opens the day grid on that day. The
@@ -242,17 +279,6 @@ const title = computed(() => {
   return '';
 });
 
-const weekFirstDay = computed(() => startOfWeek(focusDay.value, props.weekStart));
-
-/* `h-10`/`flex-1` below `sm` give the phone row its 40px-tall, equal-width segments (fix: tap targets, never
-   clipped); `sm:h-6 sm:flex-none` restores today's compact desktop sizing unchanged. */
-function viewButtonClass(v: EventCalendarViewerView): string {
-  return cn(
-    'inline-flex h-10 min-w-0 flex-1 items-center justify-center rounded px-2 text-xs font-medium transition-colors sm:h-6 sm:flex-none',
-    activeView.value === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
-  );
-}
-
 const isMonth = computed(() => activeView.value === EventCalendarViewerViewValue.Month);
 const isWeek = computed(() => activeView.value === EventCalendarViewerViewValue.Week);
 const isDay = computed(() => activeView.value === EventCalendarViewerViewValue.Day);
@@ -276,7 +302,7 @@ const rootClass = computed(() =>
    instead of `sm`; unfilled, the breakpoint stays `sm` and the header is byte-for-byte what it always rendered. */
 const headerClass = computed(() =>
   cn(
-    'flex flex-wrap items-center gap-2 border-b border-border bg-muted/30 px-3 py-2',
+    'flex flex-wrap items-center gap-1 border-b border-border bg-muted/30 px-2 py-2 min-[360px]:gap-2 min-[360px]:px-3',
     hasToolbarExtra.value ? 'lg:flex-nowrap' : 'sm:flex-nowrap',
   ),
 );
@@ -284,7 +310,7 @@ const headerClass = computed(() =>
 /* The switcher only needs to push itself to the row's right edge once that same breakpoint stops wrapping. */
 const switcherClass = computed(() =>
   cn(
-    'flex w-full items-center gap-0.5 rounded-md bg-card p-0.5 ring-1 ring-border',
+    'flex w-full flex-nowrap items-center gap-0.5 p-0.5',
     hasToolbarExtra.value ? 'lg:ml-auto lg:w-auto' : 'sm:ml-auto sm:w-auto',
   ),
 );
@@ -302,51 +328,61 @@ defineExpose({ el: root });
     <div :class="headerClass">
       <button
         type="button"
-        class="inline-flex h-10 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium hover:bg-muted sm:h-7"
+        :disabled="isShowingCurrentPeriod"
+        class="inline-flex h-11 shrink-0 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium enabled:hover:bg-muted disabled:opacity-50 sm:h-7"
         @click="goToday"
       >
         {{ locale.t('EventCalendarViewer.today', undefined, 'Today') }}
       </button>
-      <button
-        type="button"
-        :aria-label="locale.t('EventCalendarViewer.previous', undefined, 'Previous')"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:h-7 sm:w-7"
-        @click="goPrev"
+      <div
+        data-calendar-period=""
+        class="flex min-w-0 flex-1 items-center min-[360px]:gap-1 max-sm:rounded-md max-sm:bg-card sm:flex-[0_1_auto]"
       >
-        <Icon :icon="ChevronLeft" :size="14" />
-      </button>
-      <button
-        type="button"
-        :aria-label="locale.t('EventCalendarViewer.next', undefined, 'Next')"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:h-7 sm:w-7"
-        @click="goNext"
-      >
-        <Icon :icon="ChevronRight" :size="14" />
-      </button>
-      <h3 class="ml-1 min-w-32 flex-1 truncate text-base font-semibold">{{ title }}</h3>
+        <button
+          type="button"
+          :aria-label="locale.t('EventCalendarViewer.previous', undefined, 'Previous')"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7"
+          @click="goPrev"
+        >
+          <Icon :icon="ChevronLeft" :size="16" />
+        </button>
+        <h3 class="min-w-0 flex-1 truncate text-center text-sm font-semibold sm:text-base" :title="title">
+          {{ title }}
+        </h3>
+        <button
+          type="button"
+          :aria-label="locale.t('EventCalendarViewer.next', undefined, 'Next')"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7"
+          @click="goNext"
+        >
+          <Icon :icon="ChevronRight" :size="16" />
+        </button>
+      </div>
       <!-- `lg:contents` drops this wrapper's own box at `lg` and up, so the slotted controls become flex items of
            the header row itself — sharing its row and control height with Today and the switcher; below `lg` the
            wrapper is a normal full-width block, its own row between the title row and the switcher. -->
       <div v-if="hasToolbarExtra" class="flex w-full items-center gap-2 lg:contents">
         <slot name="toolbar-extra" />
       </div>
-      <div
+      <ToggleGroup
         v-if="switcherViews.length > 1"
-        role="group"
+        variant="segmented"
+        :model-value="activeView"
         :aria-label="locale.t('EventCalendarViewer.view', undefined, 'View')"
         :class="switcherClass"
+        @update:model-value="setView"
       >
-        <button
+        <ToggleInput
           v-for="v in switcherViews"
           :key="v"
-          type="button"
-          :aria-pressed="activeView === v"
-          :class="viewButtonClass(v)"
-          @click="setView(v)"
+          :value="v"
+          size="sm"
+          tone="neutral"
+          class="h-11 min-w-0 flex-1 px-0.5 text-xs min-[360px]:px-1 sm:h-6 sm:flex-none sm:px-2 data-[pressed=false]:hover:text-foreground data-[pressed=false]:focus-visible:text-foreground"
         >
           <span class="truncate">{{ locale.t('EventCalendarViewer.' + v, undefined, v) }}</span>
-        </button>
-      </div>
+        </ToggleInput>
+      </ToggleGroup>
     </div>
     <!-- Body -->
     <div class="flex-1 overflow-auto" style="min-height: 0">

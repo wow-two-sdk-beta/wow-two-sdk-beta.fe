@@ -61,6 +61,19 @@ function hasHorizontalOverflow(): boolean {
   return document.documentElement.scrollWidth > window.innerWidth;
 }
 
+it('uses the week list in a narrow panel and returns to the time grid when it grows', async () => {
+  await page.viewport(Desktop.width, Desktop.height);
+  const viewer = mountViewer({ view: 'week' });
+  const element = viewer.element as HTMLElement;
+  element.style.width = '588px';
+  await expect.poll(() => document.querySelector('[data-time-grid-daylist]')?.children.length).toBe(7);
+  expect(document.querySelector('[data-time-grid]')).toBeNull();
+
+  element.style.width = '960px';
+  await expect.poll(() => document.querySelector('[data-time-grid]') !== null).toBe(true);
+  expect(document.querySelector('[data-time-grid-daylist]')).toBeNull();
+});
+
 describe('EventCalendarViewer on a phone (390×800)', () => {
   beforeAll(async () => {
     await page.viewport(Phone.width, Phone.height);
@@ -157,13 +170,31 @@ describe('EventCalendarViewer on a phone (390×800)', () => {
     expect(chip.scrollHeight).toBeLessThanOrEqual(chip.clientHeight);
   });
 
-  it('makes the whole month-view day cell the tap target, at least 40px high, and tapping it selects the day', async () => {
-    mountViewer({ view: 'month', events });
+  it('opens all events for a month date from the full cell and returns focus on close', async () => {
+    const viewer = mountViewer({ view: 'month', events });
     await expect.poll(() => document.querySelector('button[aria-label^="Sep 25"]') !== null).toBe(true);
     const dayButton = document.querySelector<HTMLButtonElement>('button[aria-label^="Sep 25"]')!;
-    expect(dayButton.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
-    dayButton.click();
-    await expect.poll(() => document.querySelector('[data-month-day-panel]') !== null).toBe(true);
+    const cell = dayButton.getBoundingClientRect();
+    expect(cell.height).toBeGreaterThanOrEqual(44);
+    expect(dayButton.getAttribute('aria-label')).toContain('3 events');
+    const bar = dayButton.parentElement!.querySelector('[data-event-bar]')!;
+    const line = bar.getBoundingClientRect();
+    expect(line.top).toBeGreaterThanOrEqual(dayButton.lastElementChild!.getBoundingClientRect().bottom);
+    expect(document.elementFromPoint(cell.left + cell.width / 2, line.top + line.height / 2)).toBe(dayButton);
+
+    const day = page.getByRole('button', { name: 'Sep 25, 2026, 3 events' });
+    const sheet = page.getByRole('dialog', { name: 'Friday, September 25' });
+    await day.click();
+    await expect.element(sheet.getByText('3 events')).toBeVisible();
+    await expect.element(sheet.getByText('Sep 23 – Sep 26')).toBeVisible();
+    await sheet.getByRole('button', { name: 'Close' }).click();
+    await expect.element(sheet).not.toBeInTheDocument();
+    await expect.element(day).toHaveFocus();
+
+    await day.click();
+    await sheet.getByRole('button', { name: /^Standup/ }).click();
+    expect(viewer.emitted('event-click')).toEqual([[events[0]]]);
+    await expect.element(sheet).not.toBeInTheDocument();
   });
 
   it('makes year-view month buttons at least 40px high', async () => {
@@ -228,6 +259,22 @@ describe('EventCalendarViewer all-day strip and zero-length events (1440×900)',
     const timeMatches = chip.textContent?.match(/\d{1,2}:\d{2}/g) ?? [];
     expect(timeMatches).toHaveLength(1);
   });
+});
+
+it('opens hidden month events through the desktop overflow button', async () => {
+  await page.viewport(Desktop.width, Desktop.height);
+  const dense = Array.from({ length: 5 }, (_, index) =>
+    event(`Event ${index + 1}`, '2026-09-25T09:00Z', '2026-09-25T10:00Z'),
+  );
+  const viewer = mountViewer({ view: 'month', events: dense, timeZone: 'UTC' });
+  const more = page.getByRole('button', { name: 'Sep 25, 2026, 5 events' });
+  await expect.element(more).toHaveTextContent('+1 more');
+  await more.click();
+  const dialog = page.getByRole('dialog', { name: 'Friday, September 25' });
+  await dialog.getByRole('button', { name: /^Event 5/ }).click();
+  expect(viewer.emitted('event-click')).toEqual([[dense[4]]]);
+  await expect.element(dialog).not.toBeInTheDocument();
+  await expect.element(more).toHaveFocus();
 });
 
 describe('EventCalendarViewer toolbar-extra slot', () => {

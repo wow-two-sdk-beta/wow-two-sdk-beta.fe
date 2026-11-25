@@ -36,3 +36,13 @@ export function formatDay(day: Temporal.PlainDate, locale: string, options: Intl
   if (isSwappable(weekday)) text = swapName(text, date({ weekday }), weekdayName(day.dayOfWeek, locale, weekday));
   return text;
 }
+
+/** A compact date range, with years shown on both dates when the span crosses a year boundary. */
+export function formatDaySpan(first: Temporal.PlainDate, last: Temporal.PlainDate, locale: string): string {
+  const options: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+    year: first.year !== last.year ? 'numeric' : undefined,
+  };
+  return `${formatDay(first, locale, options)} – ${formatDay(last, locale, options)}`;
+}

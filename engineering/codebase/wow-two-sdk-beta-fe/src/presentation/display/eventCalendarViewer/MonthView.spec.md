@@ -20,7 +20,7 @@ An event that touches more than one calendar day in `timeZone` is multi-day; eve
 - A multi-day event draws as one bar per week row it touches, clipped to the visible grid. A bar covers the columns of its days, starting at column `data-bar-column` (1-based) for `data-bar-span` columns, and carries its text once per row segment, truncated.
 - Only the event's own first day starts a bar rounded (`data-bar-start`) and only its own last day ends one rounded (`data-bar-end`). An edge that continues past the row stays square and flush with the cell border; the corners are logical (`rounded-s` / `rounded-e`), so right-to-left grids round the right end.
 - Lanes stack from the top of the row. Bars go in order of first day, longer first, and each takes the lowest lane whose bars end before it starts, so no two bars in one row and lane overlap. Lane numbers are per row (`data-bar-lane`, 0-based).
-- Each bar segment is a `button` named by `MonthView.eventRange`: the title, then the event's whole date range, `Expo, Sep 9, 2026 – Sep 24, 2026`. Clicking one fires `event-click`, never `slot-click`.
+- From `sm` up, each bar segment is a `button` named by `MonthView.eventRange`: the title, then the event's whole date range, `Expo, Sep 9, 2026 – Sep 24, 2026`. Clicking one fires `event-click`, never `slot-click`.
 - A bar uses the event's `color` with a readable text color, else the theme's soft primary tokens.
 
 ## Overflow
@@ -28,8 +28,13 @@ An event that touches more than one calendar day in `timeZone` is multi-day; eve
 A day cell draws at most 4 items — bar lanes and single-day chips together. The drawn lanes are the row's lane count up to 4, in every column of the row, so the chips share what the lanes leave: with two lanes, two chips per day.
 
 - A bar that needs a lane past the fourth is not drawn.
-- `+N more` (`MonthView.more`) counts, for that day, every event touching it that is not drawn: the hidden bars covering the day plus the chips beyond the free slots.
+- `+N more` (`MonthView.more`) counts the hidden bars and chips. Activating it opens every event touching that day in a dialog.
 - A row with no bars draws four chips, and the rest count into `+N more`.
+
+## Phone layout
+
+- Below `sm`, compact weeks reserve space for the dates and single-day event dots above the decorative multi-day bars. The whole date cell opens a bottom sheet. Its accessible name includes the event count.
+- The sheet shows the date and matching event count, including ongoing multi-day events and items beyond the grid's display limit. Each event opens through `event-click`. Dismissing returns focus to the date.
 
 ## Props
 
@@ -42,10 +47,10 @@ A day cell draws at most 4 items — bar lanes and single-day chips together. Th
 
 ## Emits
 
-| Event         | Signature                                                 | Meaning                                                |
-| ------------- | --------------------------------------------------------- | ------------------------------------------------------ |
-| `event-click` | `'event-click': [event: EventCalendarViewerEvent];`       | Fires when an event block is clicked.                  |
-| `slot-click`  | `'slot-click': [day: Temporal.PlainDate, hour?: number];` | Fires when an empty day cell's date button is clicked. |
+| Event         | Signature                                                 | Meaning                               |
+| ------------- | --------------------------------------------------------- | ------------------------------------- |
+| `event-click` | `'event-click': [event: EventCalendarViewerEvent];`       | Fires when an event block is clicked. |
+| `slot-click`  | `'slot-click': [day: Temporal.PlainDate, hour?: number];` | Fires when a date button is clicked.  |
 
 ## Messages
 

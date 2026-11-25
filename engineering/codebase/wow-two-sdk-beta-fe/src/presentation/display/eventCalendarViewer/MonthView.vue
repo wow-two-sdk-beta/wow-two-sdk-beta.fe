@@ -39,6 +39,8 @@ interface DayColumn {
   moreCount: number;
   /** Every single-day event for the day, unsliced — the phone dot view's own, smaller cap. */
   allEvents: ReadonlyArray<EventCalendarViewerEvent>;
+  /** All events touching this day, including multi-day bars. */
+  eventCount: number;
 }
 
 /** The most dots a phone day cell draws before folding the rest into "+N". */
@@ -62,18 +64,28 @@ const WeekCount = 6;
 </script>
 
 <script setup lang="ts">
-import { useLocale, weekdayName } from '../../../foundation/i18n';
+import { useLocale, useLocaleFormatters, weekdayName } from '../../../foundation/i18n';
 import { computed, ref, watch, type StyleValue } from 'vue';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { cn } from '../../../foundation/styles';
 import { readableForeground } from '../../../foundation/themes';
 import { daysBetween, formatZonedTime, isToday } from '../../forms/DateExtensions';
-import { formatDay } from './EventCalendarViewerDates';
+import {
+  Modal,
+  ModalBody,
+  ModalClose,
+  ModalContent,
+  ModalDescription,
+  ModalHeader,
+  ModalTitle,
+} from '../../overlays/modal';
+import { formatDay, formatDaySpan } from './EventCalendarViewerDates';
 import { startOfWeek } from './EventCalendarViewerTypes';
-import { intersectsCalendarDay } from './EventCalendarViewerLayout';
+import { calendarEventDays, intersectsCalendarDay } from './EventCalendarViewerLayout';
 import { useIsPhone } from './EventCalendarViewerHelpers';
 
 const locale = useLocale();
+const formatters = useLocaleFormatters();
 const isPhone = useIsPhone();
 
 /** Renders the month grid of an `EventCalendarViewer`. Internal — never exported from the folder. */
@@ -88,18 +100,22 @@ const emit = defineEmits<{
   'slot-click': [day: Temporal.PlainDate, hour?: number];
 }>();
 
-/** The day tapped below `sm`, whose events draw as an agenda-style list beneath the grid. Desktop-only, so a
-    switch back to `sm` and up leaves nothing selected to clear. */
+/** The date and event list stay mounted during the sheet's closing animation. */
 const selectedDay = ref<Temporal.PlainDate | null>(null);
-watch(
-  () => props.focusDay,
-  () => {
-    selectedDay.value = null;
-  },
-);
+const daySheetOpen = ref(false);
+watch([() => props.focusDay, isPhone], () => {
+  daySheetOpen.value = false;
+});
 
-function onDateClick(day: Temporal.PlainDate): void {
-  if (isPhone.value) selectedDay.value = day;
+function openDay(event: MouseEvent, day: Temporal.PlainDate): void {
+  // Safari need not focus tapped buttons. Capture this control as the dialog's return target.
+  (event.currentTarget as HTMLButtonElement).focus({ preventScroll: true });
+  selectedDay.value = day;
+  daySheetOpen.value = true;
+}
+
+function onDateClick(event: MouseEvent, day: Temporal.PlainDate): void {
+  if (isPhone.value) openDay(event, day);
   emit('slot-click', day);
 }
 
@@ -109,7 +125,6 @@ const selectedDayEvents = computed<ReadonlyArray<EventCalendarViewerEvent>>(() =
   if (!day) return [];
   return props.events
     .filter((event) => intersectsCalendarDay(event, day, props.timeZone))
-    .slice()
     .sort((a, b) => TemporalValue.ZonedDateTime.compare(a.start, b.start));
 });
 
@@ -119,8 +134,16 @@ const selectedDayLabel = computed(() =>
     : '',
 );
 
-/** All day → "All day"; a zero-length event → its start only, never a start–start range; else the full range. */
+function eventCountLabel(count: number): string {
+  const values = { count: formatters.value.number(count) };
+  return formatters.value.plural(count) === 'one'
+    ? locale.t('MonthView.eventsOne', values, '{count} event')
+    : locale.t('MonthView.events', values, '{count} events');
+}
+
 function selectedDayTimeLabel(e: EventCalendarViewerEvent): string {
+  const span = calendarEventDays(e, props.timeZone);
+  if (span && !span.first.equals(span.last)) return formatDaySpan(span.first, span.last, locale.locale.value);
   if (e.isAllDay) return locale.t('EventCalendarViewer.allDay', undefined, 'All day');
   const start = formatZonedTime(e.start.withTimeZone(props.timeZone), locale.locale.value);
   if (TemporalValue.ZonedDateTime.compare(e.end, e.start) === 0) return start;
@@ -146,16 +169,6 @@ const cells = computed<Array<MonthCell>>(() => {
   });
 });
 
-/* The first and last calendar day an event touches in the displayed zone, by the shared boundary rule: the end
-   instant is exclusive, so an event ending at midnight leaves that day. A reversed interval touches nothing. */
-function spanOf(event: EventCalendarViewerEvent): { first: Temporal.PlainDate; last: Temporal.PlainDate } | null {
-  if (TemporalValue.ZonedDateTime.compare(event.end, event.start) < 0) return null;
-  const first = event.start.withTimeZone(props.timeZone).toPlainDate();
-  const endDay = event.end.withTimeZone(props.timeZone).toPlainDate();
-  const last = intersectsCalendarDay(event, endDay, props.timeZone) ? endDay : endDay.subtract({ days: 1 });
-  return { first, last: TemporalValue.PlainDate.compare(last, first) < 0 ? first : last };
-}
-
 function dateLabel(day: Temporal.PlainDate): string {
   return formatDay(day, locale.locale.value, { year: 'numeric', month: 'short', day: 'numeric' });
 }
@@ -177,7 +190,7 @@ const weeks = computed<ReadonlyArray<WeekRow>>(() => {
   const bars: Array<{ event: EventCalendarViewerEvent; first: Temporal.PlainDate; last: Temporal.PlainDate }> = [];
   const singles = new Map<string, Array<EventCalendarViewerEvent>>();
   for (const event of props.events) {
-    const span = spanOf(event);
+    const span = calendarEventDays(event, props.timeZone);
     if (!span) continue;
     if (compare(span.first, span.last) < 0) {
       bars.push({ event, ...span });
@@ -223,7 +236,8 @@ const weeks = computed<ReadonlyArray<WeekRow>>(() => {
       const events = day.slice(0, MaxSlots - laneCount);
       const covering = segments.filter((segment) => segment.column <= index && index < segment.column + segment.span);
       const shown = events.length + covering.filter((segment) => segment.lane < laneCount).length;
-      return { day: cell.day, events, moreCount: day.length + covering.length - shown, allEvents: day };
+      const eventCount = day.length + covering.length;
+      return { day: cell.day, events, moreCount: eventCount - shown, allEvents: day, eventCount };
     });
     return { key: rowStart.toString(), cells: rowCells, bars: drawn, laneCount, columns };
   });
@@ -239,18 +253,16 @@ function cellClass(cell: MonthCell): string {
 
 function dateButtonClass(cell: MonthCell): string {
   return cn(
-    'mx-1 mb-1 mt-1 self-start justify-self-start rounded-sm px-1 text-xs tabular-nums transition-colors',
+    'mx-1 mb-1 mt-1 self-start justify-self-start rounded-sm px-1 text-xs tabular-nums transition-colors sm:max-lg:min-h-10 sm:max-lg:min-w-10',
     cell.outOfMonth ? 'text-muted-foreground' : 'text-foreground',
     isToday(cell.day) && 'bg-primary text-primary-foreground',
     'hover:bg-muted',
   );
 }
 
-/* Below `sm` the date button grows to the whole cell (fix: the cell body did nothing on tap) — one
-   tap target at least 40px high, `gridRow: '1 / -1'` so it covers the dot row below the date number
-   too. `sm` and up keep the small desktop button unchanged. */
+/* The phone's entire cell opens the sheet for that date. */
 function phoneCellButtonClass(): string {
-  return 'flex min-h-10 w-full flex-col items-center gap-0.5 pt-1 pb-0.5 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+  return 'flex min-h-11 w-full flex-col items-center gap-0.5 pt-1 pb-0.5 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
 }
 
 /* The date number keeps its own small today-highlight, now inside the full-cell phone button rather
@@ -265,7 +277,7 @@ function phoneDateNumberClass(cell: MonthCell): string {
 
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
+    'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10',
     !e.color && 'bg-primary-soft text-primary-soft-foreground',
   );
 }
@@ -281,14 +293,14 @@ function eventStyle(e: EventCalendarViewerEvent): StyleValue {
 function barClass(bar: BarSegment): string {
   if (isPhone.value) {
     return cn(
-      'mb-0.5 h-1.5 min-w-0 rounded-full transition-colors hover:brightness-95',
+      'pointer-events-none mb-0.5 h-1 min-w-0 rounded-full',
       !bar.event.color && 'bg-primary-soft',
       bar.isStart ? 'ms-0.5 rounded-s-full' : 'rounded-s-none',
       bar.isEnd ? 'me-0.5 rounded-e-full' : 'rounded-e-none',
     );
   }
   return cn(
-    'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
+    'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10',
     'px-1.5',
     !bar.event.color && 'bg-primary-soft text-primary-soft-foreground',
     bar.isStart ? 'ms-0.5 rounded-s-sm' : 'rounded-s-none',
@@ -308,9 +320,11 @@ function barStyle(bar: BarSegment): StyleValue {
 /* One explicit row for the date numbers, one per lane, and a last one that takes the rest for the chips — so the
    bars line up across the week and the cell backgrounds can span every row. */
 function rowStyle(week: WeekRow): StyleValue {
+  // On a phone the button spans every track, so reserve room for its date and dots above the bars.
+  const dateTrack = isPhone.value ? '2.5rem' : 'auto';
   return {
-    minHeight: '96px',
-    gridTemplateRows: `auto${' auto'.repeat(week.laneCount)} 1fr`,
+    minHeight: isPhone.value ? '3.25rem' : '96px',
+    gridTemplateRows: `${dateTrack}${' auto'.repeat(week.laneCount)} 1fr`,
   };
 }
 
@@ -328,6 +342,7 @@ function eventLabel(e: EventCalendarViewerEvent): string {
 
 function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
   ev.stopPropagation();
+  daySheetOpen.value = false;
   emit('event-click', e);
 }
 
@@ -343,7 +358,7 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
       <div
         v-for="wd in weekdayHeaders"
         :key="wd"
-        class="border-b border-r border-border bg-muted/40 px-2 py-1 text-xs font-medium uppercase text-muted-foreground"
+        class="border-b border-r border-border bg-muted/40 py-1.5 text-center text-xs font-medium uppercase text-muted-foreground sm:px-2 sm:py-1 sm:text-start"
       >
         {{ wd }}
       </div>
@@ -365,8 +380,11 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
         type="button"
         :class="isPhone ? phoneCellButtonClass() : dateButtonClass(cell)"
         :style="{ gridColumn: String(index + 1), gridRow: isPhone ? '1 / -1' : '1' }"
-        :aria-label="isPhone ? dateLabel(cell.day) : undefined"
-        @click="onDateClick(cell.day)"
+        :aria-label="
+          isPhone ? `${dateLabel(cell.day)}, ${eventCountLabel(week.columns[index]!.eventCount)}` : undefined
+        "
+        :aria-haspopup="isPhone ? 'dialog' : undefined"
+        @click="onDateClick($event, cell.day)"
       >
         <template v-if="isPhone">
           <span :class="phoneDateNumberClass(cell)">{{ cell.day.day }}</span>
@@ -378,7 +396,11 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
               class="h-1.5 w-1.5 shrink-0 rounded-full"
               :style="dotStyle(e)"
             />
-            <span v-if="week.columns[index]!.allEvents.length > MaxPhoneDots" class="text-[9px] text-muted-foreground">
+            <span
+              v-if="week.columns[index]!.allEvents.length > MaxPhoneDots"
+              aria-hidden="true"
+              class="text-[9px] leading-3 text-muted-foreground"
+            >
               +{{ week.columns[index]!.allEvents.length - MaxPhoneDots }}
             </span>
           </span>
@@ -386,10 +408,11 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
         <template v-else>{{ cell.day.day }}</template>
       </button>
       <!-- Multi-day bars: one per row, in lanes under the dates. Below `sm` the bar carries no label text. -->
-      <button
+      <component
+        :is="isPhone ? 'span' : 'button'"
         v-for="bar in week.bars"
         :key="bar.key"
-        type="button"
+        :type="isPhone ? undefined : 'button'"
         data-event-bar=""
         :data-bar-lane="bar.lane"
         :data-bar-column="bar.column + 1"
@@ -398,13 +421,15 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
         :data-bar-end="bar.isEnd ? '' : undefined"
         :style="barStyle(bar)"
         :class="barClass(bar)"
-        :aria-label="bar.label"
-        @click="onEvent($event, bar.event)"
+        :aria-label="isPhone ? undefined : bar.label"
+        :title="isPhone ? undefined : bar.label"
+        :aria-hidden="isPhone || undefined"
+        @click="!isPhone && onEvent($event, bar.event)"
       >
         <template v-if="!isPhone">{{
           bar.event.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
         }}</template>
-      </button>
+      </component>
       <!-- Single-day events, under the lanes, `sm` and up only — below `sm` the dots live in the date
            button above instead, since it is now the whole cell's tap target. -->
       <template v-if="!isPhone">
@@ -422,40 +447,55 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
             :style="eventStyle(e)"
             :class="eventClass(e)"
             :aria-label="eventLabel(e)"
+            :title="eventLabel(e)"
             @click="onEvent($event, e)"
           >
             {{ e.isAllDay ? '• ' : ''
             }}{{ e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)') }}
           </button>
-          <span v-if="column.moreCount > 0" class="px-1 text-[10px] text-muted-foreground">{{
-            locale.t('MonthView.more', { count: column.moreCount }, '+{count} more')
-          }}</span>
+          <button
+            v-if="column.moreCount > 0"
+            type="button"
+            aria-haspopup="dialog"
+            :aria-label="`${dateLabel(column.day)}, ${eventCountLabel(column.eventCount)}`"
+            class="min-h-6 rounded-sm px-1 text-start text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:max-lg:min-h-10"
+            @click="openDay($event, column.day)"
+          >
+            {{ locale.t('MonthView.more', { count: column.moreCount }, '+{count} more') }}
+          </button>
         </div>
       </template>
     </div>
-    <!-- Below `sm`, a tapped day's events as an agenda-style list beneath the grid. -->
-    <div v-if="isPhone && selectedDay" class="border-t border-border p-2" data-month-day-panel="">
-      <div class="mb-1 text-xs font-semibold uppercase text-muted-foreground">{{ selectedDayLabel }}</div>
-      <div v-if="selectedDayEvents.length === 0" class="px-2 py-3 text-xs text-muted-foreground">
-        {{ locale.t('AgendaView.noUpcomingEvents', undefined, 'No upcoming events.') }}
-      </div>
-      <ul v-else class="space-y-1">
-        <li v-for="e in selectedDayEvents" :key="e.id">
-          <button
-            type="button"
-            class="flex w-full items-start gap-2 rounded-md p-2 text-left text-xs transition-colors hover:bg-muted"
-            @click="onEvent($event, e)"
-          >
-            <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(e)" />
-            <span class="min-w-0 flex-1">
-              <span class="block truncate font-medium">{{
-                e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
-              }}</span>
-              <span class="block text-muted-foreground tabular-nums">{{ selectedDayTimeLabel(e) }}</span>
-            </span>
-          </button>
-        </li>
-      </ul>
-    </div>
+    <Modal v-if="selectedDay" v-model:open="daySheetOpen">
+      <ModalContent phone-layout="sheet" show-handle class="max-sm:pt-7" data-month-day-panel="">
+        <ModalClose class="h-11 w-11" />
+        <ModalHeader class="pr-11">
+          <ModalTitle>{{ selectedDayLabel }}</ModalTitle>
+          <ModalDescription>{{ eventCountLabel(selectedDayEvents.length) }}</ModalDescription>
+        </ModalHeader>
+        <ModalBody>
+          <p v-if="selectedDayEvents.length === 0" class="py-3 text-muted-foreground">
+            {{ locale.t('MonthView.noEvents', undefined, 'No events on this day.') }}
+          </p>
+          <ul v-else class="divide-y divide-border">
+            <li v-for="e in selectedDayEvents" :key="e.id">
+              <button
+                type="button"
+                class="flex min-h-11 w-full items-start gap-2.5 rounded-md px-2 py-3 text-start transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                @click="onEvent($event, e)"
+              >
+                <span aria-hidden="true" class="mt-1.5 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(e)" />
+                <span class="min-w-0 flex-1">
+                  <span class="block font-medium">{{
+                    e.title ?? locale.t('EventCalendarViewer.untitled', undefined, '(no title)')
+                  }}</span>
+                  <span class="block text-xs tabular-nums text-muted-foreground">{{ selectedDayTimeLabel(e) }}</span>
+                </span>
+              </button>
+            </li>
+          </ul>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   </div>
 </template>
