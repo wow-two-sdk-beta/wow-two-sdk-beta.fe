@@ -216,9 +216,8 @@ function select(item: AppSwitcherItem, event: MouseEvent): void {
 
 const triggerClasses = computed(() =>
   cn(
-    'group/app-switcher inline-flex min-h-11 min-w-0 max-w-full shrink-0 items-center gap-2.5 rounded-xl border',
-    'border-transparent text-start text-foreground transition-colors motion-reduce:transition-none',
-    props.isCompact ? 'p-1' : 'py-1 ps-1 pe-2',
+    'group/app-switcher inline-flex min-h-11 min-w-0 max-w-full shrink-0 items-center rounded-xl border p-1',
+    'border-transparent text-start text-foreground motion-safe:transition-colors motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)',
     'hover:border-primary/15 hover:bg-primary-soft data-[state=open]:border-primary/15 data-[state=open]:bg-primary-soft',
     'outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as ClassValue,
@@ -263,17 +262,32 @@ defineExpose({ el });
             </span>
           </slot>
         </span>
-        <span v-if="!props.isCompact" class="min-w-0">
-          <span class="block truncate text-sm font-semibold leading-tight">{{ appName }}</span>
-          <span v-if="props.subtitle" :class="subtitleClasses" data-app-switcher-subtitle>{{ props.subtitle }}</span>
+        <span
+          aria-hidden="true"
+          class="grid min-w-0 motion-safe:transition-[grid-template-columns,opacity] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+          :class="props.isCompact ? 'grid-cols-[0fr] opacity-0' : 'grid-cols-[1fr]'"
+        >
+          <span class="min-w-0 overflow-hidden">
+            <span class="flex items-center gap-2.5 ps-2.5 pe-1">
+              <span class="min-w-0">
+                <span class="block truncate text-sm font-semibold leading-tight">{{ appName }}</span>
+                <span
+                  v-if="props.subtitle"
+                  :class="subtitleClasses"
+                  :title="props.subtitle"
+                  data-app-switcher-subtitle
+                  >{{ props.subtitle }}</span
+                >
+              </span>
+              <Icon
+                :icon="ChevronDown"
+                :size="16"
+                class="shrink-0 text-muted-foreground group-data-[state=open]/app-switcher:rotate-180 motion-safe:transition-transform motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+                data-app-switcher-chevron
+              />
+            </span>
+          </span>
         </span>
-        <Icon
-          v-if="!props.isCompact"
-          :icon="ChevronDown"
-          :size="16"
-          class="shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]/app-switcher:rotate-180 motion-reduce:transition-none"
-          data-app-switcher-chevron
-        />
       </button>
     </PopoverTrigger>
     <PopoverContent

@@ -4,6 +4,7 @@ import { h } from 'vue';
 import { page } from 'vitest/browser';
 import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppFrame } from '@src/presentation/layout';
+import { SidebarMenu, SidebarMenuItem } from '@src/presentation/nav';
 import '@src/index.css';
 
 const Cases = [
@@ -42,8 +43,18 @@ function mountFrame(): void {
   wrapper = mount(AppFrame, {
     props: { version: '0.4.2', crumbs: [{ label: 'Operations', href: '/ops' }, { label: 'Release 42' }] },
     slots: {
-      brand: () => h('a', { href: '/' }, 'W'),
-      nav: () => h('a', { href: '#/one' }, 'One'),
+      brand: () => h('a', { href: '/', 'data-test': 'brand-mark' }, 'W'),
+      nav: ({ isRail }) =>
+        h(SidebarMenu, { isCollapsed: isRail }, () =>
+          h(
+            SidebarMenuItem,
+            { href: '#/one' },
+            {
+              default: () => 'One',
+              icon: () => h('span', { 'data-test': 'nav-mark' }, '1'),
+            },
+          ),
+        ),
       default: () => 'Page',
     },
     attachTo: document.body,
@@ -74,6 +85,29 @@ describe('AppFrame dimensions', () => {
       expect(getComputedStyle(bar()).height).toBe('56px');
     });
   }
+
+  it('moves the header and sidebar together while their marks stay anchored', { timeout: 30_000 }, async () => {
+    await page.viewport(1280, 800);
+    mountFrame();
+    const shell = document.querySelector<HTMLElement>('[data-app-frame]')!;
+    const toggle = document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!;
+    const marks = Array.from(shell.querySelectorAll<HTMLElement>('[data-test="brand-mark"], [data-test="nav-mark"]'));
+    shell.style.setProperty('--duration-base', '800ms');
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    const lefts = marks.map((mark) => mark.getBoundingClientRect().left);
+
+    for (const settledWidth of [64, 248]) {
+      toggle.click();
+      await expect
+        .poll(() => {
+          const current = width(sidebar());
+          return current > 70 && current < 240 && current === width(brand());
+        }, Settled)
+        .toBe(true);
+      expect(marks.map((mark) => mark.getBoundingClientRect().left)).toEqual(lefts);
+      await expect.poll(() => width(sidebar()), Settled).toBe(settledWidth);
+    }
+  });
 
   it('holds the bar and the rail on a tablet', { timeout: 30_000 }, async () => {
     await page.viewport(800, 800);

@@ -20,6 +20,9 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   bar adds the device's top inset above its 56px.
 - From `md` up, with a sidebar, the brand sits in a cell above it, as wide as it and divided from the bar by a
   hairline. On a phone, and in a frame without a sidebar, the brand sits inline at the bar's start.
+- The header cell and sidebar share `--frame-sidebar-size`. It interpolates on desktop and settles immediately
+  with reduced motion. Content that needs the current width can read this property. Use `isRail` for the target
+  state and keep marks in fixed leading slots in custom brand and navigation content.
 - The brand is the `brand` slot, which receives `isRail`: true where only the mark fits (above the rail, in a phone's
   bar). With `apps` the brand is an `AppSwitcherMenu` whose mark is the `brand` slot; it turns compact where `isRail`.
 - `version` shows as a `VersionBadge` beside the brand, hidden where `isRail`. With `runningVersion` the badge follows

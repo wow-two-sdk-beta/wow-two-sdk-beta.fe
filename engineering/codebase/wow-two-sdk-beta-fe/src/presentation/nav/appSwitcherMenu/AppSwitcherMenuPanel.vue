@@ -29,7 +29,7 @@ const TileClass = `flex min-h-14 w-full items-center gap-3 rounded-xl px-2.5 py-
 const TileIconClass =
   'grid size-9 shrink-0 place-items-center rounded-lg border text-sm font-semibold forced-colors:border-[CanvasText]';
 
-const SiteClass = `inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors motion-reduce:transition-none ${FocusClass}`;
+const SiteClass = `inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors motion-reduce:transition-none max-lg:min-h-10 ${FocusClass}`;
 </script>
 
 <script setup lang="ts">
@@ -89,9 +89,12 @@ function close(): void {
           </span>
           <span class="min-w-0">
             <span class="block truncate text-sm font-semibold text-primary-soft-foreground">{{ app.label }}</span>
-            <span v-if="app.description" class="block truncate text-xs text-muted-foreground">{{
-              app.description
-            }}</span>
+            <span
+              v-if="app.description"
+              class="block truncate text-xs text-muted-foreground"
+              :title="app.description"
+              >{{ app.description }}</span
+            >
           </span>
         </button>
         <a v-else :href="app.href" :class="cn(TileClass, 'hover:bg-muted')" @click="pick(app, $event)">
@@ -105,9 +108,12 @@ function close(): void {
           </span>
           <span class="min-w-0">
             <span class="block truncate text-sm font-semibold text-foreground">{{ app.label }}</span>
-            <span v-if="app.description" class="block truncate text-xs text-muted-foreground">{{
-              app.description
-            }}</span>
+            <span
+              v-if="app.description"
+              class="block truncate text-xs text-muted-foreground"
+              :title="app.description"
+              >{{ app.description }}</span
+            >
           </span>
         </a>
       </li>

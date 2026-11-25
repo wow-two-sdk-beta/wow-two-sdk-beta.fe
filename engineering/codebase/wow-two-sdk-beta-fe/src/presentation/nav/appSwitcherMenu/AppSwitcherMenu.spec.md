@@ -12,7 +12,8 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 - The trigger is one button: the `mark` slot, the app name (`label`, else the current item's label, else `title`),
   `subtitle` from `breakpoint` up, and a chevron that turns while the menu is open. It carries `aria-haspopup="dialog"`,
   `aria-expanded`, `data-state` (`open` · `closed`) and the `triggerLabel` name. `isCompact` leaves the mark alone
-  on the trigger, marked `data-compact`; the accessible name still names the app.
+  on the trigger, marked `data-compact`. The mark holds its position as the label and chevron collapse and fade.
+  The accessible name still names the app.
 - From `breakpoint` up the menu is a `Popover` under the trigger (`bottom-start`), labelled by its heading. Below it the
   menu is a `Modal` with the full-screen phone layout below `sm` and the centred card from `sm`, headed by its title and
   a close button.

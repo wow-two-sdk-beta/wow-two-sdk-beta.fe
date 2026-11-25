@@ -19,6 +19,8 @@ import { ChevronRight } from 'lucide-vue-next';
 import { useId } from '../../../foundation/identifiers';
 import { useControlled } from '../../../foundation/state';
 import { cn } from '../../../foundation/styles';
+import CollapsibleGroup from '../../display/collapsibleGroup/CollapsibleGroup.vue';
+import CollapsibleGroupContent from '../../display/collapsibleGroup/CollapsibleGroupContent.vue';
 import { useSidebarMenuContext } from './SidebarMenuContext';
 
 /** Renders a disclosure of nested sidebar destinations under one toggle row. */
@@ -68,36 +70,47 @@ const rest = computed(() => {
   return others;
 });
 
-const rootClasses = computed(() => cn('flex flex-col', attrs.class as ClassValue));
-
-const toggleClasses = computed(() =>
-  cn(
-    'flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-foreground',
-    'transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-    context.isCollapsed && 'justify-center px-0',
-  ),
-);
-
-const listClasses = computed(() =>
-  cn('flex flex-col gap-0.5 pt-0.5', !context.isCollapsed && 'ms-4 border-s border-border ps-2'),
-);
+const rootClasses = computed(() => cn('flex min-w-0 flex-col', attrs.class as ClassValue));
 </script>
 
 <template>
   <li v-bind="rest" :class="rootClasses" :data-state="isOpen ? 'open' : 'closed'">
-    <button type="button" :aria-expanded="isShown" :aria-controls="listId" :class="toggleClasses" @click="toggle">
-      <span v-if="$slots.icon" class="inline-flex shrink-0 text-muted-foreground" aria-hidden="true">
-        <slot name="icon" />
-      </span>
-      <span :class="context.isCollapsed ? 'sr-only' : 'flex-1 truncate text-start'">{{ props.label }}</span>
-      <ChevronRight
-        v-if="!context.isCollapsed"
-        :class="cn('size-4 shrink-0 text-muted-foreground transition-transform', isOpen && 'rotate-90')"
-        aria-hidden="true"
-      />
-    </button>
-    <ul v-show="isShown" :id="listId" role="list" :aria-label="props.label" :class="listClasses">
-      <slot />
-    </ul>
+    <CollapsibleGroup :open="isShown">
+      <button
+        type="button"
+        :aria-expanded="isShown"
+        :aria-controls="listId"
+        class="flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        @click="toggle"
+      >
+        <span
+          v-if="$slots.icon"
+          class="inline-flex size-5 shrink-0 items-center justify-center text-muted-foreground"
+          aria-hidden="true"
+        >
+          <slot name="icon" />
+        </span>
+        <span
+          class="min-w-0 flex-1 truncate text-start motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+          :class="{ 'opacity-0': context.isCollapsed }"
+          >{{ props.label }}</span
+        >
+        <ChevronRight
+          class="size-4 shrink-0 text-muted-foreground motion-safe:transition-[rotate,opacity] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+          :class="{ 'rotate-90': isShown, 'opacity-0': context.isCollapsed }"
+          aria-hidden="true"
+        />
+      </button>
+      <CollapsibleGroupContent is-force-mounted :role="undefined" :aria-labelledby="undefined">
+        <ul
+          :id="listId"
+          role="list"
+          :aria-label="props.label"
+          class="ms-4 flex flex-col gap-0.5 border-s border-border pt-0.5 ps-2"
+        >
+          <slot />
+        </ul>
+      </CollapsibleGroupContent>
+    </CollapsibleGroup>
   </li>
 </template>

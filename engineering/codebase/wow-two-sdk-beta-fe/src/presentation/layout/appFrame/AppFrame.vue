@@ -395,7 +395,7 @@ const switcherProps = computed(() => ({ variant: menuVariant.value, ...props.app
 
 const shellClasses = computed(() =>
   cn(
-    'surface-ambient transition-[grid-template-columns] duration-200 ease-out motion-reduce:transition-none',
+    'surface-ambient motion-safe:transition-[--frame-sidebar-size] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)',
     'print:block print:h-auto print:overflow-visible',
     attrs.class as ClassValue,
   ),
@@ -409,12 +409,7 @@ const headerClasses =
 const edgeClass = computed(() => (isGlass.value ? 'border-glass-edge' : 'border-border'));
 
 const brandCellClasses = computed(() =>
-  cn(
-    'flex shrink-0 items-center gap-2 overflow-hidden border-e',
-    edgeClass.value,
-    'transition-[width] duration-200 ease-out motion-reduce:transition-none',
-    isRail.value ? 'justify-center' : 'px-3',
-  ),
+  cn('flex w-(--frame-sidebar-size) shrink-0 items-center overflow-hidden border-e ps-2.5 pe-1.5', edgeClass.value),
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */
@@ -450,10 +445,11 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
     ref="shell"
     data-app-frame
     :data-rail="dataAttr(isRail)"
+    :style="{ '--frame-sidebar-size': sidebarWidth }"
     v-bind="rest"
     :class="shellClasses"
     sidebar-breakpoint="md"
-    :sidebar-width="sidebarWidth"
+    sidebar-width="var(--frame-sidebar-size)"
     :navigation="navigation"
     :sidebar-open="isPhone && isDrawerOpen"
     :skip-to-content-label="props.skipToContentLabel"
@@ -462,12 +458,7 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
     <AppShellHeader height="md" :variant="props.variant" :class="[headerClasses, props.barClass]" data-app-frame-bar>
       <div class="flex h-full w-full min-w-0 items-stretch">
         <!-- From tablets up the brand sits above the sidebar, as wide as it, divided from the bar by a hairline. -->
-        <div
-          v-if="hasSidebar && !isPhone"
-          :class="brandCellClasses"
-          :style="{ width: sidebarWidth }"
-          data-app-frame-brand
-        >
+        <div v-if="hasSidebar && !isPhone" :class="brandCellClasses" data-app-frame-brand>
           <AppSwitcherMenu
             v-if="props.apps"
             :items="props.apps"
@@ -481,14 +472,23 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
             <template v-if="slots.brand" #mark><slot name="brand" :is-rail="true" /></template>
           </AppSwitcherMenu>
           <slot v-else name="brand" :is-rail="isRail" />
-          <VersionBadge
-            v-if="props.version && !isRail"
-            :version="props.version"
-            :running-version="props.runningVersion"
-            :label="props.versionLabel"
-            :update-label="props.versionUpdateLabel"
-            @reload="reload"
-          />
+          <div
+            v-if="props.version"
+            :inert="isRail"
+            class="grid shrink-0 motion-safe:transition-[grid-template-columns,opacity] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+            :class="isRail ? 'grid-cols-[0fr] opacity-0' : 'grid-cols-[1fr]'"
+          >
+            <div class="min-w-0 overflow-hidden">
+              <VersionBadge
+                class="ms-2 w-max"
+                :version="props.version"
+                :running-version="props.runningVersion"
+                :label="props.versionLabel"
+                :update-label="props.versionUpdateLabel"
+                @reload="reload"
+              />
+            </div>
+          </div>
         </div>
         <div class="flex min-w-0 flex-1 items-center gap-2 px-3 sm:gap-3 sm:px-4 lg:px-6" data-app-frame-row>
           <!-- A phone's bar, and a frame without a sidebar, carry the brand inline. -->

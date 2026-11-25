@@ -31,22 +31,26 @@ const rest = computed(() => {
 });
 
 const classes = computed(() =>
-  cn(
-    'flex flex-col gap-0.5 pt-3 first:pt-0',
-    context.isCollapsed && 'mt-3 border-t border-border first:mt-0 first:border-t-0',
-    attrs.class as ClassValue,
-  ),
+  cn('group/sidebar-section flex min-w-0 flex-col gap-0.5 pt-3 first:pt-0', attrs.class as ClassValue),
 );
 </script>
 
 <template>
   <li v-bind="rest" :class="classes">
-    <span
-      :id="labelId"
-      :class="context.isCollapsed ? 'sr-only' : 'px-2.5 pb-1 text-xs font-medium text-muted-foreground'"
-    >
-      {{ props.label }}
-    </span>
+    <div class="relative h-5">
+      <span
+        :id="labelId"
+        class="block truncate px-2.5 pb-1 text-xs font-medium text-muted-foreground motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+        :class="{ 'opacity-0': context.isCollapsed }"
+      >
+        {{ props.label }}
+      </span>
+      <span
+        aria-hidden="true"
+        class="absolute inset-x-0 top-1/2 border-t border-border group-first/sidebar-section:hidden motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+        :class="{ 'opacity-0': !context.isCollapsed }"
+      />
+    </div>
     <ul role="list" :aria-labelledby="labelId" class="flex flex-col gap-0.5">
       <slot />
     </ul>

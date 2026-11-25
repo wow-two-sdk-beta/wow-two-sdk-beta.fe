@@ -10,18 +10,22 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 
 - The menu is a `<nav>` landmark over a `role="list"` list. Its name is the caller's `aria-label`, else the localized `SidebarMenu.label` (`'Sidebar'`).
 - The menu holds links, not a menu widget: no roving focus; every destination and group toggle is one Tab stop.
-- `isCollapsed` turns the menu into an icon rail: labels become assistive-only text, trailing counts and group chevrons drop, and sections become dividers. Size the rail's width on the caller's container. Parts outside a `SidebarMenu` render expanded.
+- `isCollapsed` turns the menu into an icon rail. Icons stay in their leading slots, labels fade while keeping their
+  accessible names, trailing content becomes inert, and section headings fade into dividers. Size the rail's width
+  on the caller's container. Parts outside a `SidebarMenu` render expanded.
 - Width, placement and scrolling belong to the caller (for example `AppShellSidebar`).
 
 ### SidebarMenuItem
 
 - Renders `<li><a>` with an icon, a truncated label and a trailing slot. `isActive` sets `aria-current="page"` and `data-active` (tinted).
-- `asChild` merges the row's classes and state onto the slotted router link. The link owns its label, so the rail cannot hide it; make it assistive-only yourself.
+- `asChild` merges the row's classes and state onto the slotted router link. Mark the link's direct label child with
+  `data-sidebar-menu-label` to use the same clipping and fade as the built-in label.
 - The icon is `aria-hidden`; fallthrough attributes and `class` reach the link; the exposed `el` is the link element.
 
 ### SidebarMenuGroup
 
-- A disclosure: the toggle row carries `aria-expanded` and `aria-controls`, and the nested list is named by `label`. Closed lists stay in the DOM, hidden.
+- A disclosure: the toggle row carries `aria-expanded` and `aria-controls`, and the nested list is named by `label`.
+  The list animates in and out through `CollapsibleGroupContent` and stays mounted and inert when closed.
 - `open` / `update:open` and `defaultOpen` follow the shared controlled-state helper. Open the group that holds the active route through `defaultOpen`.
 - In the rail a group shows only its toggle: the nested list stays hidden (`aria-expanded="false"`), and its open state applies once the menu expands.
 

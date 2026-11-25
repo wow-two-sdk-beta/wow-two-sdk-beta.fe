@@ -432,8 +432,15 @@ body {
  *   --frame-bar-height     the top bar, its hairline included; 56px
  *   --frame-sidebar-width  the open sidebar and the brand cell above it; 248px
  *   --frame-rail-width     the sidebar as an icon rail; 64px
+ *   --frame-sidebar-size   the frame's current track width, including while it moves
  *   --frame-content-max    the cap on the page column; 1536px
  */
+@property --frame-sidebar-size {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 :root {
   --frame-bar-height: 3.5rem;
   --frame-sidebar-width: 15.5rem;

@@ -6,6 +6,9 @@ export interface SidebarMenuItemProps {
 
   /** The escape hatch to render the slotted router link instead of an `<a>`. */
   readonly asChild?: boolean;
+
+  /** Label and state to show on hover or focus when the menu is collapsed. */
+  readonly tooltip?: string;
 }
 </script>
 
@@ -15,6 +18,7 @@ import type { ClassValue } from 'clsx';
 import { dataAttr, resolveElement } from '../../../foundation/dom';
 import { Primitive, Slottable } from '../../../foundation/primitives';
 import { cn } from '../../../foundation/styles';
+import Tooltip from '../../overlays/tooltip/Tooltip.vue';
 import { useSidebarMenuContext } from './SidebarMenuContext';
 
 /** Renders one sidebar destination — icon, label and a trailing count; icon-only in the rail. */
@@ -47,10 +51,12 @@ const rest = computed(() => {
 
 const classes = computed(() =>
   cn(
-    'group flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-foreground',
+    'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground',
     'transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[active]:bg-primary-soft data-[active]:text-primary-soft-foreground',
-    context.isCollapsed && 'justify-center px-0',
+    '*:data-[sidebar-menu-label]:min-w-0 *:data-[sidebar-menu-label]:flex-1 *:data-[sidebar-menu-label]:truncate *:data-[sidebar-menu-label]:text-start',
+    '*:data-[sidebar-menu-label]:motion-safe:transition-opacity *:data-[sidebar-menu-label]:motion-safe:duration-(--duration-base) *:data-[sidebar-menu-label]:motion-safe:ease-(--ease-out)',
+    context.isCollapsed && '*:data-[sidebar-menu-label]:opacity-0',
     attrs.class as ClassValue,
   ),
 );
@@ -63,25 +69,34 @@ defineExpose({ el });
 
 <template>
   <li class="flex">
-    <Primitive
-      ref="inner"
-      as="a"
-      :as-child="props.asChild"
-      :aria-current="props.isActive ? 'page' : undefined"
-      :data-active="dataAttr(props.isActive)"
-      v-bind="rest"
-      :class="classes"
-    >
-      <span
-        v-if="$slots.icon"
-        class="inline-flex shrink-0 text-muted-foreground group-data-[active]:text-current"
-        aria-hidden="true"
+    <Tooltip :content="props.tooltip" :is-disabled="!context.isCollapsed || !props.tooltip" placement="right">
+      <Primitive
+        ref="inner"
+        as="a"
+        :as-child="props.asChild"
+        :aria-current="props.isActive ? 'page' : undefined"
+        :data-active="dataAttr(props.isActive)"
+        v-bind="rest"
+        :class="classes"
       >
-        <slot name="icon" />
-      </span>
-      <Slottable v-if="props.asChild"><slot /></Slottable>
-      <span v-else :class="context.isCollapsed ? 'sr-only' : 'flex-1 truncate text-start'"><slot /></span>
-      <span v-if="$slots.trailing && !context.isCollapsed" class="ms-auto shrink-0"><slot name="trailing" /></span>
-    </Primitive>
+        <span
+          v-if="$slots.icon"
+          class="inline-flex size-5 shrink-0 items-center justify-center text-muted-foreground group-data-[active]:text-current"
+          aria-hidden="true"
+        >
+          <slot name="icon" />
+        </span>
+        <Slottable v-if="props.asChild"><slot /></Slottable>
+        <span v-else data-sidebar-menu-label><slot /></span>
+        <span
+          v-if="$slots.trailing"
+          :inert="context.isCollapsed"
+          class="ms-auto shrink-0 motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+          :class="{ 'opacity-0': context.isCollapsed }"
+        >
+          <slot name="trailing" />
+        </span>
+      </Primitive>
+    </Tooltip>
   </li>
 </template>

@@ -371,8 +371,8 @@ describe('AppSwitcherMenu compact', () => {
     await settle();
     const button = trigger();
     expect(button.hasAttribute('data-compact')).toBe(true);
-    expect(button.textContent?.trim()).toBe('');
-    expect(button.querySelector('[data-app-switcher-chevron]')).toBeNull();
+    const details = button.querySelector('[data-app-switcher-chevron]')?.closest('[aria-hidden="true"].opacity-0');
+    expect(details?.textContent).toContain('Desk');
     expect(button.querySelector('[data-app-switcher-mark]')).not.toBeNull();
     expect(button.getAttribute('aria-label')).toBe('Desk — switch app');
   });

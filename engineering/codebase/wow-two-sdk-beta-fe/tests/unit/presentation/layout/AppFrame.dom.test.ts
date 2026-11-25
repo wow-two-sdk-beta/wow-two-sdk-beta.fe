@@ -103,7 +103,7 @@ describe('AppFrame desktop', () => {
   it('renders the brand cell, toggle, trail and account trigger', async () => {
     viewport(Desktop);
     await frame({ crumbs: [{ label: 'Operations', href: '/ops' }, { label: 'Release' }], account: { name: 'Dana' } });
-    expect(brandCell().style.width).toBe('var(--frame-sidebar-width)');
+    expect(root().style.getPropertyValue('--frame-sidebar-size')).toBe('var(--frame-sidebar-width)');
     expect(toggle()).not.toBeNull();
     expect(document.querySelector('nav[aria-label=Breadcrumb]')).not.toBeNull();
     expect(document.querySelector('button[aria-haspopup=menu]')).not.toBeNull();
@@ -118,7 +118,7 @@ describe('AppFrame desktop', () => {
     toggle().click();
     await settle();
     expect(root().hasAttribute('data-rail')).toBe(true);
-    expect(brandCell().style.width).toBe('var(--frame-rail-width)');
+    expect(root().style.getPropertyValue('--frame-sidebar-size')).toBe('var(--frame-rail-width)');
     expect(nav.at(-1)?.isRail).toBe(true);
     expect(toggle().getAttribute('aria-expanded')).toBe('false');
     expect(wrapper.emitted('collapse')).toEqual([[true]]);
@@ -141,7 +141,7 @@ describe('AppFrame desktop', () => {
     viewport(Desktop);
     await frame({ isCollapsedByDefault: true });
     expect(root().hasAttribute('data-rail')).toBe(true);
-    expect(brandCell().style.width).toBe('var(--frame-rail-width)');
+    expect(root().style.getPropertyValue('--frame-sidebar-size')).toBe('var(--frame-rail-width)');
     expect(localStorage.length).toBe(0);
   });
 

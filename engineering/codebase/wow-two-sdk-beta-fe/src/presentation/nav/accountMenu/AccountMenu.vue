@@ -41,6 +41,9 @@ export interface AccountMenuProps {
   /** The signed-in person's display name. Omitted, the trigger shows a person glyph and the header hides. */
   readonly name?: string;
 
+  /** Shows the signed-in name beside the avatar when there is desktop space. */
+  readonly showName?: boolean;
+
   /** The header's second line — the email or the role. */
   readonly description?: string;
 
@@ -179,6 +182,7 @@ const slots = defineSlots<{
 
 const componentProps = withDefaults(defineProps<AccountMenuProps>(), {
   name: undefined,
+  showName: false,
   description: undefined,
   avatarSrc: undefined,
   open: undefined,
@@ -357,6 +361,7 @@ const panelClasses = computed(() =>
   cn(
     '-mx-1 flex w-[min(18.5rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-5rem)] flex-col gap-0.5 px-1',
     'overflow-y-auto overscroll-contain',
+    'max-lg:[&_[role^=menuitem]]:min-h-10',
     props.panelClass as ClassValue,
   ),
 );
@@ -405,6 +410,13 @@ defineExpose({ el });
         >
           <Icon :icon="UserRound" :size="18" />
         </span>
+        <span
+          v-if="props.showName && hasName"
+          :title="props.name"
+          aria-hidden="true"
+          class="hidden max-w-40 truncate text-sm font-medium lg:block"
+          >{{ props.name }}</span
+        >
         <Icon
           :icon="ChevronDown"
           :size="14"

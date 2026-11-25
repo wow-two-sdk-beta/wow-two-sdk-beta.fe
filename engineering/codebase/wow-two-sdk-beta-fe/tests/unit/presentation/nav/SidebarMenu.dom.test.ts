@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import { LocaleProvider } from '@src/foundation/i18n';
@@ -7,6 +7,7 @@ import { SidebarMenu, SidebarMenuGroup, SidebarMenuItem, SidebarMenuSection } fr
 const wrappers: VueWrapper[] = [];
 afterEach(() => {
   for (const wrapper of wrappers.splice(0)) wrapper.unmount();
+  vi.useRealTimers();
 });
 
 /** A sidebar with a section, a collapsible group and a router-link item. */
@@ -25,7 +26,9 @@ function mountSidebar(props: Record<string, unknown> = {}, groupProps: Record<st
             h(SidebarMenuItem, { href: '/projects/atlas' }, () => 'Atlas'),
           ]),
         ]),
-        h(SidebarMenuItem, { asChild: true }, () => h('a', { href: '/settings', 'data-router': '' }, 'Settings')),
+        h(SidebarMenuItem, { asChild: true, tooltip: 'Settings' }, () =>
+          h('a', { href: '/settings', 'data-router': '' }, 'Settings'),
+        ),
       ],
     },
     attachTo: document.body,
@@ -51,11 +54,11 @@ describe('SidebarMenu', () => {
     const toggle = wrapper.get('button[aria-expanded]');
     const list = wrapper.get(`#${toggle.attributes('aria-controls')}`);
     expect(toggle.attributes('aria-expanded')).toBe('false');
-    expect((list.element as HTMLElement).style.display).toBe('none');
+    expect(list.element.closest('[inert]')).not.toBeNull();
     expect(list.attributes('aria-label')).toBe('Projects');
     await toggle.trigger('click');
     expect(toggle.attributes('aria-expanded')).toBe('true');
-    expect((list.element as HTMLElement).style.display).toBe('');
+    expect(list.element.closest('[inert]')).toBeNull();
     expect(wrapper.findComponent(SidebarMenuGroup).emitted('update:open')).toEqual([[true]]);
   });
 
@@ -67,22 +70,20 @@ describe('SidebarMenu', () => {
     expect(toggle.attributes('aria-expanded')).toBe('true');
   });
 
-  it('turns labels into assistive-only text in the rail and drops trailing counts', async () => {
+  it('keeps the labels mounted in the rail and hides its extra controls from assistive technology', async () => {
     const wrapper = mountSidebar({ isCollapsed: true });
     expect(wrapper.get('nav').attributes('data-collapsed')).toBe('');
     const inbox = wrapper.get('a[href="/inbox"]');
-    expect(inbox.get('span.sr-only').text()).toBe('Inbox');
-    expect(inbox.text()).toBe('Inbox');
-    expect(wrapper.get('button[aria-expanded] span.sr-only').text()).toBe('Projects');
-    expect(wrapper.get('button[aria-expanded]').find('svg').exists()).toBe(false);
+    expect(inbox.get('[data-sidebar-menu-label]').text()).toBe('Inbox');
+    expect(inbox.get('[inert]').text()).toBe('4');
     const railToggle = wrapper.get('button[aria-expanded]');
+    expect(railToggle.text()).toBe('Projects');
+    expect(railToggle.get('svg').classes()).toContain('opacity-0');
     await railToggle.trigger('click');
     expect(railToggle.attributes('aria-expanded')).toBe('false');
-    expect((wrapper.get(`#${railToggle.attributes('aria-controls')}`).element as HTMLElement).style.display).toBe(
-      'none',
-    );
+    expect(wrapper.get(`#${railToggle.attributes('aria-controls')}`).element.closest('[inert]')).not.toBeNull();
     const sectionLabelId = wrapper.get('ul[aria-labelledby]').attributes('aria-labelledby');
-    expect(wrapper.get(`#${sectionLabelId}`).classes()).toContain('sr-only');
+    expect(wrapper.get(`#${sectionLabelId}`).classes()).toContain('opacity-0');
   });
 
   it('localizes the default landmark name', () => {
@@ -96,5 +97,22 @@ describe('SidebarMenu', () => {
     );
     wrappers.push(wrapper);
     expect(wrapper.get('nav').attributes('aria-label')).toBe('Seitenleiste');
+  });
+
+  it('shows a destination tooltip on focus only in the collapsed rail', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const wrapper = mountSidebar();
+    const settings = wrapper.get('[data-router]');
+    await settings.trigger('focus');
+    await vi.advanceTimersByTimeAsync(350);
+    expect(document.querySelector('[role=tooltip]')).toBeNull();
+
+    await settings.trigger('blur');
+    await wrapper.setProps({ isCollapsed: true });
+    await settings.trigger('focus');
+    await vi.advanceTimersByTimeAsync(350);
+    const tooltip = document.querySelector('[role=tooltip]');
+    expect(tooltip?.textContent?.trim()).toBe('Settings');
+    expect(settings.attributes('aria-describedby')).toBe(tooltip?.id);
   });
 });
