@@ -51,6 +51,7 @@ export * from './pdfViewer';
 export * from './scheduleView';
 export * from './ganttTimeline';
 export * from './eventCalendarViewer';
+export * from './photoPreviewGrid';
 export * from './gradientText';
 export * from './countUpText';
 export * from './animatedNumberText';
