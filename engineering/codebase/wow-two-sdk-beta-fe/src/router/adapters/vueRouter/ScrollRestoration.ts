@@ -1,4 +1,4 @@
-import type { Router, RouterScrollBehavior } from 'vue-router';
+import type { RouteLocationNormalized, Router, RouterScrollBehavior } from 'vue-router';
 
 import { findScrollRegions } from '../../../foundation/dom';
 
@@ -26,6 +26,14 @@ function isAt(region: HTMLElement, offset: ScrollOffset): boolean {
   return Math.abs(region.scrollTop - offset.top) <= 1 && Math.abs(region.scrollLeft - offset.left) <= 1;
 }
 
+/**
+ * Whether a navigation stays on the page it leaves: the same path, only its query or hash changed, as a filter, a tab
+ * or a scroll offset written to the address does. The start location matches nothing and is never the same page.
+ */
+function isSamePage(to: RouteLocationNormalized, from: RouteLocationNormalized): boolean {
+  return from.matched.length > 0 && to.path === from.path;
+}
+
 function scrollRegion(region: HTMLElement, offset: ScrollOffset): void {
   if (typeof region.scrollTo === 'function') region.scrollTo({ ...offset, behavior: 'instant' });
   else {
@@ -36,9 +44,11 @@ function scrollRegion(region: HTMLElement, offset: ScrollOffset): void {
 
 /**
  * Builds the router's scroll policy. The window restores its saved position on back/forward, honours a hash
- * target, and returns to the top otherwise. Every element marked with `ScrollRegionAttribute` (the main region
- * of a `region` AppShell) follows the same policy: its offset is saved when a history entry is left, restored
- * when back/forward revisits the entry, and reset to the top on any other navigation.
+ * target, and returns to the top when the path changes. Every element marked with `ScrollRegionAttribute` (the main
+ * region of a `region` AppShell) follows the same policy: its offset is saved when a history entry is left, restored
+ * when back/forward revisits the entry, and reset to the top on a navigation to another path. A navigation that keeps
+ * the path — only the query or hash changes, as a page writing its filters or scroll offset to the address does —
+ * leaves every offset where it is, and scrolls only to a newly named hash target.
  */
 export function createScrollRestoration(): ScrollRestoration {
   const offsets = new Map<string, ReadonlyArray<ScrollOffset>>();
@@ -60,10 +70,16 @@ export function createScrollRestoration(): ScrollRestoration {
     });
   }
 
-  const scrollBehavior: RouterScrollBehavior = (to, _from, savedPosition) => {
+  const scrollBehavior: RouterScrollBehavior = (to, from, savedPosition) => {
     const restoring = isRestoring;
     isRestoring = false;
     const regions = findScrollRegions();
+    if (!restoring && isSamePage(to, from)) {
+      if (!to.hash || to.hash === from.hash) return false;
+      const target = document.getElementById(decodeURIComponent(to.hash.slice(1)));
+      if (target && regions.some((region) => region.contains(target))) target.scrollIntoView({ block: 'start' });
+      return { el: to.hash };
+    }
     if (regions.length > 0) {
       const run = ++generation;
       const saved = restoring ? offsets.get(`${current}|${to.fullPath}`) : undefined;

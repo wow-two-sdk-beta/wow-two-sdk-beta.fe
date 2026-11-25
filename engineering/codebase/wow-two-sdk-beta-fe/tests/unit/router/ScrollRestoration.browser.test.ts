@@ -16,8 +16,15 @@ afterEach(() => {
 const Tall = (name: string) =>
   defineComponent({
     name,
-    setup: () => () => h('div', { style: 'height: 4000px; flex-shrink: 0', 'data-page': name }, name),
+    setup: () => () =>
+      h('div', { style: 'height: 4000px; flex-shrink: 0', 'data-page': name }, [
+        name,
+        h('h2', { id: `${name}-deep`, style: 'margin-top: 2000px' }, 'Deep'),
+      ]),
   });
+
+/** Lets vue-router run its scroll behavior, which it calls a tick after the navigation settles. */
+const frames = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
 async function mountShell(scroll: 'region' | 'document') {
   const router = createAppRouter(
@@ -37,7 +44,36 @@ async function mountShell(scroll: 'region' | 'document') {
   return router;
 }
 
-it('resets the region scroller on a new navigation and restores it on back', async () => {
+it('keeps the region scroller when a navigation changes only the query or hash', async () => {
+  const router = await mountShell('region');
+  const main = document.querySelector<HTMLElement>('[data-scroll-region]')!;
+  main.scrollTop = 900;
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(900);
+
+  // A page writing its scroll offset or filters to the address must not lose its place.
+  await router.replace({ path: '/a', query: { scroll: '900' } });
+  await router.push({ path: '/a', query: { scroll: '900', q: 'shoes' } });
+  await frames();
+  expect(Math.round(main.scrollTop)).toBe(900);
+
+  // A newly named hash still scrolls to its target; the same hash with a new query stays put.
+  const deep = document.getElementById('A-deep')!;
+  await router.push({ path: '/a', query: { q: 'shoes' }, hash: '#A-deep' });
+  await expect
+    .poll(() => Math.abs(Math.round(deep.getBoundingClientRect().top - main.getBoundingClientRect().top)))
+    .toBeLessThanOrEqual(1);
+  main.scrollTop = 500;
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(500);
+  await router.replace({ path: '/a', query: { q: 'boots' }, hash: '#A-deep' });
+  await frames();
+  expect(Math.round(main.scrollTop)).toBe(500);
+
+  await router.push('/b');
+  await expect.poll(() => document.querySelector('[data-page=B]') !== null).toBe(true);
+  await expect.poll(() => Math.round(main.scrollTop)).toBe(0);
+});
+
+it('resets the region scroller on a navigation to another path and restores it on back', async () => {
   const router = await mountShell('region');
   const main = document.querySelector<HTMLElement>('[data-scroll-region]')!;
   expect(main.tagName).toBe('MAIN');

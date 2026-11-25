@@ -61,7 +61,7 @@ export interface CreateAppRouterOptions {
   /**
    * Whether to restore scroll position across navigations. Default `true`. Covers the window and every
    * `ScrollRegionAttribute` element, such as the main region of a `region` AppShell: back/forward restores
-   * their offsets, a new navigation returns them to the top.
+   * their offsets, a navigation to another path returns them to the top, and a query- or hash-only change keeps them.
    */
   readonly scrollRestoration?: boolean;
 
