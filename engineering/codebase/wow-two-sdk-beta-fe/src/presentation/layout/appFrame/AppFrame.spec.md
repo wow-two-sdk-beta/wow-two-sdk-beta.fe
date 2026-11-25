@@ -66,6 +66,7 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   `inject` and never throws without one.
 - Attributes and `class` land on the frame root. Automatic attribute inheritance is disabled; the source explicitly
   forwards and merges supported fallthrough attributes.
+- Under a coarse pointer a link in the brand slot is at least 44 x 44px (`pointer-coarse:[&_a]:min-h-11`, `min-w-11`) while its mark keeps its size; the slotted link must be block-level or a flex item, as a link in a flex brand cell is. The app switcher's trigger already reaches 44px.
 
 ## Props
 

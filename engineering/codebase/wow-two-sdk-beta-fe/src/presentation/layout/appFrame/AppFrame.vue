@@ -435,8 +435,16 @@ const headerClasses =
 /* A glass frame draws its lines in the theme's glass edge; a solid one in the border colour its bar already uses. */
 const edgeClass = computed(() => (isGlass.value ? 'border-glass-edge' : 'border-border'));
 
+/* The brand link is the app's own, often a small mark: under a coarse pointer it reaches a 44 x 44px hit area while
+   the mark inside keeps its size. */
+const brandLinkClasses = 'pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_a]:min-w-11';
+
 const brandCellClasses = computed(() =>
-  cn('flex w-(--frame-sidebar-size) shrink-0 items-center overflow-hidden border-e ps-2.5 pe-1.5', edgeClass.value),
+  cn(
+    'flex w-(--frame-sidebar-size) shrink-0 items-center overflow-hidden border-e ps-2.5 pe-1.5',
+    brandLinkClasses,
+    edgeClass.value,
+  ),
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */
@@ -520,7 +528,11 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
         </div>
         <div class="flex min-w-0 flex-1 items-center gap-2 px-3 sm:gap-3 sm:px-4 lg:px-6" data-app-frame-row>
           <!-- A phone's bar, and a frame without a sidebar, carry the brand inline. -->
-          <div v-if="!hasSidebar || isPhoneLayout" class="flex shrink-0 items-center gap-2" data-app-frame-brand>
+          <div
+            v-if="!hasSidebar || isPhoneLayout"
+            :class="['flex shrink-0 items-center gap-2', brandLinkClasses]"
+            data-app-frame-brand
+          >
             <AppSwitcherMenu
               v-if="props.apps"
               :items="props.apps"

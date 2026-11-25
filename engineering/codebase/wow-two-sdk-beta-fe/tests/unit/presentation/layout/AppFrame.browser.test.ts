@@ -16,6 +16,10 @@ const Cases = [
   { name: 'ocharo dark', theme: true, dark: true },
 ] as const;
 
+/** A 28px square mark, inlined so the test loads no file. */
+const LogoMark =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect width="28" height="28" fill="teal"/></svg>';
+
 let wrapper: VueWrapper | null = null;
 let style: HTMLStyleElement | null = null;
 
@@ -58,6 +62,8 @@ function mountFrame(
     version?: string;
     runningVersion?: string;
     brand?: string;
+    /** Brands the frame as SCFD does: a flex link around a 28px mark, named by its label alone. */
+    logo?: boolean;
   } = {},
 ): void {
   wrapper = mount(AppFrame, {
@@ -69,11 +75,17 @@ function mountFrame(
     global: options.effective ? { provide: { [DeviceClassKey as symbol]: deviceState(options.effective) } } : {},
     slots: {
       brand: () =>
-        h(
-          'a',
-          { href: '/', 'data-test': 'brand-mark', class: 'whitespace-nowrap font-semibold' },
-          options.brand ?? 'W',
-        ),
+        options.logo
+          ? h(
+              'a',
+              { href: '/', 'data-test': 'brand-mark', class: 'flex shrink-0 items-center', 'aria-label': 'SCFD home' },
+              [h('img', { src: LogoMark, alt: '', width: 28, height: 28, class: 'size-7 rounded-md' })],
+            )
+          : h(
+              'a',
+              { href: '/', 'data-test': 'brand-mark', class: 'whitespace-nowrap font-semibold' },
+              options.brand ?? 'W',
+            ),
       nav: ({ isRail }) =>
         h(SidebarMenu, { isCollapsed: isRail }, () =>
           h(
@@ -252,6 +264,45 @@ describe.skipIf(!canEmulateCoarsePointer)('AppFrame under a coarse pointer', () 
     expect(toggle.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
     expect(bar().getBoundingClientRect().height).toBe(56);
   });
+
+  describe('brand link', () => {
+    const brandLink = (): HTMLElement =>
+      document.querySelector<HTMLElement>('[data-app-frame-brand] a[aria-label="SCFD home"]')!;
+
+    afterAll(async () => {
+      await page.viewport(414, 896);
+    });
+
+    it('gives the brand link a 44 x 44px hit area on a phone at 320px', { timeout: 30_000 }, async () => {
+      await page.viewport(320, 640);
+      mountFrame({ logo: true });
+      await expect.poll(() => document.querySelector('[data-app-frame-brand] a'), Settled).not.toBeNull();
+      const rect = brandLink().getBoundingClientRect();
+      expect(rect.height).toBeGreaterThanOrEqual(44);
+      expect(rect.width).toBeGreaterThanOrEqual(44);
+      expect(bar().getBoundingClientRect().height).toBe(56);
+      expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
+    });
+
+    it('gives the brand link a 44 x 44px hit area in the rail of a tablet', { timeout: 30_000 }, async () => {
+      await page.viewport(800, 800);
+      mountFrame({ logo: true });
+      await expect.poll(() => width(brand()), Settled).toBe(64);
+      const rect = brandLink().getBoundingClientRect();
+      expect(rect.height).toBeGreaterThanOrEqual(44);
+      expect(rect.width).toBeGreaterThanOrEqual(44);
+      expect(brand().scrollWidth).toBeLessThanOrEqual(brand().clientWidth);
+    });
+
+    it('keeps the mark itself at 28 x 28px', { timeout: 30_000 }, async () => {
+      await page.viewport(320, 640);
+      mountFrame({ logo: true });
+      await expect.poll(() => document.querySelector('[data-app-frame-brand] a'), Settled).not.toBeNull();
+      const mark = brandLink().querySelector('img')!.getBoundingClientRect();
+      expect(Math.round(mark.width)).toBe(28);
+      expect(Math.round(mark.height)).toBe(28);
+    });
+  });
 });
 
 describe('AppFrame under a fine pointer', () => {
@@ -261,5 +312,15 @@ describe('AppFrame under a fine pointer', () => {
     const toggle = document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!;
     await expect.poll(() => Math.round(toggle.getBoundingClientRect().height), Settled).toBe(40);
     expect(Math.round(toggle.getBoundingClientRect().width)).toBe(40);
+  });
+
+  it('keeps the brand link at the size of its mark on a phone', { timeout: 30_000 }, async () => {
+    await page.viewport(320, 640);
+    mountFrame({ logo: true });
+    await expect.poll(() => document.querySelector('[data-app-frame-brand] a'), Settled).not.toBeNull();
+    const rect = document.querySelector<HTMLElement>('[data-app-frame-brand] a')!.getBoundingClientRect();
+    expect(Math.round(rect.width)).toBe(28);
+    expect(Math.round(rect.height)).toBe(28);
+    await page.viewport(414, 896);
   });
 });
