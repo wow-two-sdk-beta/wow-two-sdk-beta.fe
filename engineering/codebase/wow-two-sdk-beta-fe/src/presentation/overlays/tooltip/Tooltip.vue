@@ -1,6 +1,12 @@
 <script lang="ts">
 import type { Placement } from '@floating-ui/vue';
 
+/**
+ * Tracks pending, visible, or fading tooltips across every Vue root in a document. An owner's callback removes its
+ * body at once and reports whether that body was still on screen.
+ */
+const tooltipOwners = new WeakMap<Document, () => boolean>();
+
 export interface TooltipProps {
   /** The tooltip body. Rich content goes through the `content` slot. */
   readonly content?: string | number;
@@ -8,15 +14,15 @@ export interface TooltipProps {
   /** The Floating UI placement. Default `top`. */
   readonly placement?: Placement;
 
-  /** The delay before opening on hover, in ms. Default 700. */
+  /** The delay before opening on hover, in ms. Default 350. */
   readonly openDelay?: number;
 
   /** The delay before closing on leave, in ms. Default 0. */
   readonly closeDelay?: number;
 
   /**
-   * The time the body takes to fade in on opening and to fade out on closing, in ms. Default `undefined`: the body
-   * mounts and unmounts with no animation. No fade runs under `prefers-reduced-motion: reduce`.
+   * The time the body takes to fade in and out, in ms. Defaults to 200. Use 0 for an immediate transition.
+   * Reduced motion always uses an immediate transition.
    */
   readonly fadeDuration?: number;
 
@@ -52,7 +58,7 @@ import { AnchoredPositioner, Portal, renderableChildren } from '../../../foundat
 /**
  * Renders a hover- or focus-triggered tooltip into a Portal, positioned by Floating UI.
  *
- * Wraps a single default-slot child as the trigger. Default delays mirror the OS pattern (700ms in, 0 out). Escape
+ * Wraps a single default-slot child as the trigger. Opens after 350 ms and closes without a delay. Escape
  * dismisses without moving focus (WCAG 1.4.13); the trigger is described by the tooltip via `aria-describedby` while
  * open. With `fadeDuration` the body fades in and out instead of appearing and vanishing at once.
  *
@@ -71,9 +77,9 @@ defineSlots<{
 const props = withDefaults(defineProps<TooltipProps>(), {
   content: undefined,
   placement: 'top',
-  openDelay: 700,
+  openDelay: 350,
   closeDelay: 0,
-  fadeDuration: undefined,
+  fadeDuration: 200,
   open: undefined,
   defaultOpen: false,
   isDisabled: undefined,
@@ -98,6 +104,13 @@ const { value: open, setValue: setOpen } = useControlled<boolean>({
 
 const anchor = shallowRef<HTMLElement | null>(null);
 const tooltipId = useId('tooltip');
+const eligibleDocument = computed(() =>
+  !props.isDisabled && (props.content || slots.content) ? (anchor.value?.ownerDocument ?? null) : null,
+);
+const ownedDocument = shallowRef<Document | null>(null);
+const visible = computed(
+  () => ownedDocument.value !== null && ownedDocument.value === eligibleDocument.value && open.value,
+);
 
 let openTimer: ReturnType<typeof setTimeout> | null = null;
 let closeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -126,24 +139,65 @@ function dismiss(): void {
   clearTimers();
   trigger.pointer = false;
   trigger.focus = false;
+  if (!open.value && !isFadingOut.value) releasePage();
   setOpen(false);
 }
 
+/** Whether this claim took the page from a tooltip still on screen, so its first body appears opaque at once. */
+let inherited = false;
+
+function releasePage(): void {
+  const page = ownedDocument.value;
+  if (page && tooltipOwners.get(page) === yieldPage) tooltipOwners.delete(page);
+  ownedDocument.value = null;
+  inherited = false;
+}
+
+/** A replacement must take the old body out immediately, including a close fade in progress. */
+function yieldPage(): boolean {
+  const wasOnScreen = mounted.value;
+  releasePage();
+  cancelFade();
+  isFadingOut.value = false;
+  dismiss();
+  return wasOnScreen;
+}
+
+function claimPage(page: Document): boolean {
+  if (ownedDocument.value === page) return true;
+  releasePage();
+  const previous = tooltipOwners.get(page);
+  tooltipOwners.set(page, yieldPage);
+  const wasOnScreen = previous?.() ?? false;
+  // Dismissing a controlled tooltip can synchronously trigger another claim.
+  if (tooltipOwners.get(page) !== yieldPage) return false;
+  ownedDocument.value = page;
+  inherited = wasOnScreen;
+  return true;
+}
+
 function updateTrigger(channel: keyof typeof trigger, active: boolean): void {
-  if (props.isDisabled) return;
+  const page = eligibleDocument.value;
+  if (!page) return;
   trigger[channel] = active;
   if (trigger.pointer || trigger.focus) {
     cancelClose();
-    if (open.value || openTimer !== null) return;
+    if (visible.value || openTimer !== null || !claimPage(page) || open.value) return;
     openTimer = setTimeout(() => {
       openTimer = null;
-      if (!props.isDisabled) setOpen(true);
+      if (ownedDocument.value === eligibleDocument.value && ownedDocument.value !== null) setOpen(true);
+      else releasePage();
     }, props.openDelay);
     return;
   }
 
+  if (ownedDocument.value === null) return;
   cancelOpen();
-  if (!open.value || closeTimer !== null) return;
+  if (!open.value) {
+    if (!isFadingOut.value) releasePage();
+    return;
+  }
+  if (closeTimer !== null) return;
   closeTimer = setTimeout(() => {
     closeTimer = null;
     setOpen(false);
@@ -157,22 +211,20 @@ watch(
   },
 );
 
-/* Clear pending timers on unmount. */
-onBeforeUnmount(clearTimers);
+/* Controlled and initially open hints claim once their trigger is mounted. */
+watch(
+  () => (open.value ? eligibleDocument.value : null),
+  (page) => {
+    if (page) claimPage(page);
+  },
+  { flush: 'sync' },
+);
 
-/* WCAG 1.4.13 — Escape dismisses immediately, without moving focus, and stays dismissed. */
-useEscape(dismiss, open);
-
-/**
- * React gated on `!!content`; a Vue consumer can supply the body through the `content` slot
- * instead, so either source counts. An empty tooltip still never opens.
- */
-const hasContent = computed(() => !!props.content || !!slots.content);
-
-const visible = computed(() => !props.isDisabled && open.value && hasContent.value);
+/* Escape dismisses the visible hint without moving focus. */
+useEscape(dismiss, visible);
 
 /**
- * The fade is opt-in: no `fadeDuration`, or a reader who asked for reduced motion, keeps the body mounting and
+ * A zero fade duration, or a reader who asked for reduced motion, keeps the body mounting and
  * unmounting at once, with no style of its own. With it the body mounts transparent, turns opaque once the browser
  * has laid it out (so the opacity transition has a start value), turns transparent again on closing, and unmounts on
  * a timer of the same length — `transitionend` is never awaited, since it does not fire in a hidden tab.
@@ -195,21 +247,31 @@ function cancelFade(): void {
 
 watch(visible, (now) => {
   cancelFade();
-  /* Reopening during a fade-out finds the body mounted, so it turns opaque at once; a fresh body does so from
-     `startFadeIn`. */
-  isOpaque.value = now && isFadingOut.value;
+  /* Reopening during a fade-out finds the body mounted, so it turns opaque at once, as does a body that took the
+     page over from a tooltip still on screen; any other fresh body does so from `startFadeIn`. */
+  isOpaque.value = now && (isFadingOut.value || inherited);
+  if (now) inherited = false;
   isFadingOut.value = false;
-  if (now || !fades.value) return;
+  if (now) return;
+  if (!ownedDocument.value || !fades.value) {
+    releasePage();
+    return;
+  }
   isFadingOut.value = true;
   fadeTimer = setTimeout(() => {
     fadeTimer = null;
     isFadingOut.value = false;
+    if (openTimer === null) releasePage();
   }, fadeMs.value);
 });
 
-onBeforeUnmount(cancelFade);
+onBeforeUnmount(() => {
+  clearTimers();
+  cancelFade();
+  releasePage();
+});
 
-const mounted = computed(() => visible.value || isFadingOut.value);
+const mounted = computed(() => ownedDocument.value !== null && (visible.value || isFadingOut.value));
 
 const bodyStyle = computed(() =>
   fades.value ? { opacity: isOpaque.value ? 1 : 0, transition: `opacity ${fadeMs.value}ms ease-out` } : undefined,

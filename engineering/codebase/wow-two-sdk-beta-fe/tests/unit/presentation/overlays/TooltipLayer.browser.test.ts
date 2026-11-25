@@ -1,6 +1,7 @@
 import { afterEach, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
+import { userEvent } from 'vitest/browser';
 import { Layer, layerStyle } from '@src/foundation/styles';
 import { Tooltip } from '@src/presentation/overlays';
 import '@src/index.css';
@@ -89,6 +90,35 @@ it('switches between neighbouring tooltips without replaying a fade or leaving t
     const activeHint = document.querySelector<HTMLElement>('[role=tooltip]')!;
     expect(getComputedStyle(activeHint).animationName).toBe('none');
     expect(getComputedStyle(activeHint).opacity).toBe('1');
+  } finally {
+    observer.disconnect();
+  }
+});
+
+it('replaces a focused tooltip when another trigger is hovered, with one visible body throughout', async () => {
+  wrapper = mount(
+    {
+      render: () =>
+        h('div', { style: { padding: '80px' } }, [
+          h(Tooltip, { content: 'Focused hint', openDelay: 0, fadeDuration: 200 }, () => h('button', 'Focused')),
+          h(Tooltip, { content: 'Hover hint', openDelay: 0, fadeDuration: 200 }, () => h('button', 'Hovered')),
+        ]),
+    },
+    { attachTo: document.body },
+  );
+  const first = wrapper.get<HTMLButtonElement>('button:first-child').element;
+  const second = wrapper.get<HTMLButtonElement>('button:last-child').element;
+  first.focus();
+  await expect.poll(() => document.querySelector('[role=tooltip]')?.textContent).toBe('Focused hint');
+
+  const counts: number[] = [];
+  const observer = new MutationObserver(() => counts.push(document.querySelectorAll('[role=tooltip]').length));
+  observer.observe(document.body, { childList: true, subtree: true });
+  try {
+    await userEvent.hover(second);
+    await expect.poll(() => document.querySelector('[role=tooltip]')?.textContent).toBe('Hover hint');
+    expect(document.activeElement).toBe(first);
+    expect(Math.max(...counts)).toBe(1);
   } finally {
     observer.disconnect();
   }

@@ -49,8 +49,8 @@ it('fades the body in from transparent and out again before it unmounts', async 
   expect(document.querySelector('[data-portal-name]')).toBeNull();
 });
 
-it('shows and removes the body at once without a fadeDuration', async () => {
-  const trigger = mountTooltip().get('button');
+it('shows and removes the body at once with a zero fade duration', async () => {
+  const trigger = mountTooltip(0).get('button');
   await trigger.trigger('pointerenter');
   await expect.poll(() => body() !== null).toBe(true);
   expect(opacity()).toBe(1);

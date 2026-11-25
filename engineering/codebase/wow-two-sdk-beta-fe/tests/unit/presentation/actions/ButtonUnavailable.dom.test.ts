@@ -103,7 +103,7 @@ describe('unavailable button', () => {
     expect(description(button.element)).toBe(Reason);
 
     await button.trigger('pointerleave');
-    await vi.advanceTimersByTimeAsync(1);
+    await vi.advanceTimersByTimeAsync(201);
     expect(document.querySelector('[role=tooltip]')).toBeNull();
     expect(description(button.element)).toBe(Reason);
   });
