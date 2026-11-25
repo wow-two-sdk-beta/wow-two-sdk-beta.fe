@@ -94,10 +94,10 @@ const NarrowHiddenClass: Record<Breakpoint, string> = {
 </script>
 
 <script setup lang="ts" generic="T extends AppSwitcherItem">
-import { computed, onMounted, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, inject, nextTick, onMounted, shallowRef, useAttrs, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { ChevronDown, LayoutGrid } from 'lucide-vue-next';
-import { TailwindBreakpoints, useMediaQuery } from '../../../foundation/device';
+import { DeviceClass, DeviceClassKey, TailwindBreakpoints, useMediaQuery } from '../../../foundation/device';
 import { Icon } from '../../../foundation/icons';
 import { useLocale, useLocaleDefaults } from '../../../foundation/i18n';
 import { useId } from '../../../foundation/identifiers';
@@ -174,15 +174,38 @@ function close(): void {
   controlled.setValue(false);
 }
 
-/** Whether the viewport reaches `breakpoint` — `false` on the server and in the first render. */
-const isWide = useMediaQuery(() => `(min-width: ${TailwindBreakpoints[props.breakpoint]}px)`);
+/* Read with a `null` default, as `AppFrame` does: `useDeviceClass()` throws below no `provideDeviceTargets`, and this
+   menu renders in apps that never provide one. */
+const providedClass = inject(DeviceClassKey, null);
+const isViewportWide = useMediaQuery(() => `(min-width: ${TailwindBreakpoints[props.breakpoint]}px)`);
+const isMounted = shallowRef(false);
 
-/* An open menu closes when the viewport crosses the breakpoint, since its surface changes kind. Registered after
-   mount, so the first media-query reading never closes a menu opened by `defaultOpen`. */
+/* Whether the menu is the popover: the served device class when an app root provided one, else the viewport — `false`
+   on the server and in the first render. The class decides only at the two steps it is made of: `md` (a phone is
+   below it) and `lg` (only a desktop reaches it); any other `breakpoint` follows the viewport. A phone-class layout
+   is a dialog at any width, and a desktop-class layout a popover at any width. */
+const isWide = computed(() => {
+  if (!isMounted.value) return false;
+  const served = providedClass?.effective.value;
+  if (served !== undefined) {
+    if (props.breakpoint === 'md') return served !== DeviceClass.Phone;
+    if (props.breakpoint === 'lg') return served === DeviceClass.Desktop;
+  }
+  return isViewportWide.value;
+});
+
+/* An open menu closes when its surface changes kind. Armed once the mount settles — a provided class reads `desktop`
+   until its root mounts, a moment after this menu does — so the first reading never closes a menu opened by
+   `defaultOpen`. */
+const isArmed = shallowRef(false);
 onMounted(() => {
-  watch(isWide, () => {
-    if (isOpen.value) close();
+  isMounted.value = true;
+  void nextTick(() => {
+    isArmed.value = true;
   });
+});
+watch(isWide, () => {
+  if (isArmed.value && isOpen.value) close();
 });
 
 const currentItem = computed(() => props.items.find((item) => item.key === props.current));

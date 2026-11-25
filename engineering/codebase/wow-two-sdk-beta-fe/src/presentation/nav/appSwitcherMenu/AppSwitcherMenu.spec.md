@@ -17,6 +17,13 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 - From `breakpoint` up the menu is a `Popover` under the trigger (`bottom-start`), labelled by its heading. Below it the
   menu is a `Modal` with the full-screen phone layout below `sm` and the centred card from `sm`, headed by its title and
   a close button.
+- Which side of `breakpoint` the menu is on follows the device class an app root provided with `provideDeviceTargets`,
+  else the viewport. The class decides at the two steps it is made of: `md` is the dialog for a phone class and the
+  popover for a tablet or desktop class, `lg` the popover for a desktop class alone — at any viewport width, so a
+  landscape phone served the phone class gets the dialog. Any other `breakpoint`, and an app with no provider,
+  follow the viewport. The menu reads the class with `inject` and never throws without one.
+- Tiles and site links are at least 44px tall under a coarse pointer (sites are 36px, and 40px below `lg`, under a fine
+  one).
 - `kind: 'app'` items render as tiles — icon, label and a one-line `description` — in one column, two from `sm`. The
   icon is `icon`, else the label's first character.
 - `kind: 'site'` items render after a divider under the `sitesLabel` heading, as links that open a new tab
@@ -28,8 +35,10 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
   navigation proceeds unless a listener calls `preventDefault()` — the hook for routing a same-origin app.
 - Escape, an outside press and the dialog's close button close the menu; focus returns to the trigger. Opening moves
   focus into the panel — the first tile in the popover, the close button in the dialog.
-- The menu closes when the viewport crosses `breakpoint`. The server and the first client render use the dialog, so
-  hydration matches; the subtitle hides through CSS, so the first paint is already right.
+- The menu closes when the viewport — or the provided class — crosses `breakpoint`. The server and the first client
+  render use the dialog, so hydration matches; the subtitle hides through CSS, so the first paint is already right.
+  The close is armed once the mount settles, so a menu opened by `defaultOpen` stays open while a root's class reads
+  its first real value.
 - Strings resolve through the nearest `LocaleProvider` when their prop is omitted: `AppSwitcherMenu.title` (`Apps`),
   `.sitesLabel` (`Sites`), `.closeLabel` (`Close`), `.newTabLabel` (`(opens in a new tab)`) and `.triggerLabel`
   (`{app} — switch app`, with the `app` variable).
@@ -51,7 +60,7 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
 | `isCompact` | `boolean` | no | `false` | The trigger shows the mark alone, as above an icon rail. |
 | `open` | `boolean` | no | — | The open state, controlled. The `v-model:open` binding target. |
 | `defaultOpen` | `boolean` | no | `false` | The initial open state when uncontrolled. |
-| `breakpoint` | `Breakpoint` | no | `md` | The popover shows from this breakpoint; the dialog below it. |
+| `breakpoint` | `Breakpoint` | no | `md` | The popover shows from this breakpoint; the dialog below it. The provided device class decides at `md` and `lg`; the viewport elsewhere. |
 | `title` | `string` | no | locale `Apps` | The menu heading. |
 | `sitesLabel` | `string` | no | locale `Sites` | The sites group heading. |
 | `closeLabel` | `string` | no | locale `Close` | The dialog close button's name. |

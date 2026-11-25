@@ -1,8 +1,9 @@
-import { afterAll, afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
 import { page, userEvent } from 'vitest/browser';
 import { AppSwitcherKind, AppSwitcherMenu, type AppSwitcherItem } from '@src/presentation/nav';
+import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
 import '@src/index.css';
 
 const Phone = { width: 375, height: 812 } as const;
@@ -158,4 +159,49 @@ describe('AppSwitcherMenu on a phone', () => {
     await expect.poll(() => panel()).toBeNull();
     expect(document.activeElement).toBe(trigger());
   });
+});
+
+/** Every tile and site link in the open panel — the `a` and `button` the reader taps. */
+function targets(): HTMLElement[] {
+  return [...document.querySelectorAll<HTMLElement>('[role=dialog] :is(li > :is(a, button))')];
+}
+
+/* The panel opens with a zoom-in; layout sizes (`offsetHeight`) ignore the scale a bounding box would carry. */
+describe('AppSwitcherMenu panel under a fine pointer', () => {
+  it('keeps a site link at 36px in the popover and 40px in the phone dialog', async () => {
+    await render(Desktop);
+    await openWithKeyboard();
+    const site = targets().find((node) => node.textContent?.includes('Blog'))!;
+    expect(site.offsetHeight).toBe(36);
+    await userEvent.keyboard('{Escape}');
+    await expect.poll(() => panel()).toBeNull();
+    wrapper?.unmount();
+
+    await render(Phone);
+    await openWithKeyboard();
+    expect(targets().find((node) => node.textContent?.includes('Blog'))!.offsetHeight).toBe(40);
+  });
+});
+
+describe.skipIf(!canEmulateCoarsePointer)('AppSwitcherMenu panel under a coarse pointer', () => {
+  beforeEach(async () => {
+    await useCoarsePointer();
+  });
+  afterEach(async () => {
+    await useFinePointer();
+  });
+
+  for (const size of [Desktop, Phone]) {
+    it(`gives every tile and site link a 44px hit area at ${size.width}px`, async () => {
+      await render(size);
+      await openWithKeyboard();
+      const found = targets();
+      // The current app's button, two app links and the site link.
+      expect(found).toHaveLength(4);
+      for (const node of found) {
+        expect(node.offsetHeight).toBeGreaterThanOrEqual(44);
+        expect(node.offsetWidth).toBeGreaterThanOrEqual(44);
+      }
+    });
+  }
 });

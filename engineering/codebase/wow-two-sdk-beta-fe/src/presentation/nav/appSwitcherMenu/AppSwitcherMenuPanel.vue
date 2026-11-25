@@ -29,7 +29,7 @@ const TileClass = `flex min-h-14 w-full items-center gap-3 rounded-xl px-2.5 py-
 const TileIconClass =
   'grid size-9 shrink-0 place-items-center rounded-lg border text-sm font-semibold forced-colors:border-[CanvasText]';
 
-const SiteClass = `inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors motion-reduce:transition-none max-lg:min-h-10 ${FocusClass}`;
+const SiteClass = `inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors motion-reduce:transition-none max-lg:min-h-10 pointer-coarse:min-h-11 ${FocusClass}`;
 </script>
 
 <script setup lang="ts">

@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { defineComponent, h, nextTick, toRaw } from 'vue';
+import { computed, defineComponent, h, nextTick, onMounted, provide, ref, toRaw, type Ref } from 'vue';
 import { Package } from 'lucide-vue-next';
+import { DeviceClass, DeviceClassKey, type DeviceClassState } from '@src/foundation/device';
 import { LocaleProvider } from '@src/foundation/i18n';
 import { AppSwitcherKind, AppSwitcherMenu, type AppSwitcherItem } from '@src/presentation/nav';
 import { AppSwitcherMenuExtensions } from '@src/presentation/nav/appSwitcherMenu/AppSwitcherMenuExtensions';
@@ -274,6 +275,109 @@ describe('AppSwitcherMenu below md', () => {
     await settle();
     expect(toRaw(wrapper.emitted('select')?.[0]?.[0])).toBe(Items[1]);
     await closed();
+  });
+});
+
+/** What an app root's `provideDeviceTargets` would provide, with the effective class held in the given ref. */
+function deviceState(effective: Ref<DeviceClass>): DeviceClassState {
+  return {
+    detected: computed(() => effective.value),
+    effective: computed(() => effective.value),
+    isShortHeight: computed(() => false),
+    isCoarsePointer: computed(() => false),
+  };
+}
+
+/** Mounts the menu below an app root that provides `effective`. */
+function menuUnder(effective: Ref<DeviceClass>, props: Record<string, unknown> = {}): VueWrapper {
+  return track(
+    mount(AppSwitcherMenu, {
+      props: { items: Items, current: 'desk', subtitle: 'Northwind', ...props },
+      global: { provide: { [DeviceClassKey as symbol]: deviceState(effective) } },
+      attachTo: document.body,
+    }),
+  );
+}
+
+/* `viewport(true)` makes every media query match, a viewport at or above every breakpoint; `viewport(false)` one
+   below them all. */
+describe('AppSwitcherMenu under a provided device class', () => {
+  it('opens the phone dialog for a phone class on a wide viewport', async () => {
+    viewport(true);
+    menuUnder(ref(DeviceClass.Phone));
+    const panel = await open();
+    expect(panel.getAttribute('aria-modal')).toBe('true');
+    expect(panel.querySelector('button[aria-label="Close"]')).not.toBeNull();
+  });
+
+  it('opens the popover for a desktop class on a narrow viewport', async () => {
+    viewport(false);
+    menuUnder(ref(DeviceClass.Desktop));
+    const panel = await open();
+    expect(panel.getAttribute('aria-modal')).toBeNull();
+    expect(panel.querySelector('button[aria-label="Close"]')).toBeNull();
+  });
+
+  it('opens the popover for a tablet class from md up, whatever the viewport', async () => {
+    viewport(false);
+    menuUnder(ref(DeviceClass.Tablet));
+    expect((await open()).getAttribute('aria-modal')).toBeNull();
+  });
+
+  it('splits at lg by class: a tablet class takes the dialog, a desktop class the popover', async () => {
+    viewport(true);
+    menuUnder(ref(DeviceClass.Tablet), { breakpoint: 'lg' });
+    expect((await open()).getAttribute('aria-modal')).toBe('true');
+    wrappers.splice(0).forEach((wrapper) => wrapper.unmount());
+    await closed();
+
+    viewport(false);
+    menuUnder(ref(DeviceClass.Desktop), { breakpoint: 'lg' });
+    expect((await open()).getAttribute('aria-modal')).toBeNull();
+  });
+
+  it('leaves a step the classes are not made of to the viewport', async () => {
+    viewport(false);
+    menuUnder(ref(DeviceClass.Desktop), { breakpoint: 'xl' });
+    expect((await open()).getAttribute('aria-modal')).toBe('true');
+  });
+
+  it('closes an open menu when the class turns its surface from popover to dialog', async () => {
+    viewport(true);
+    const effective = ref<DeviceClass>(DeviceClass.Desktop);
+    const wrapper = menuUnder(effective);
+    expect((await open()).getAttribute('aria-modal')).toBeNull();
+
+    effective.value = DeviceClass.Phone;
+    await settle();
+    await closed();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    expect(wrapper.emitted('update:open')).toEqual([[true], [false]]);
+  });
+
+  it('keeps a menu opened by defaultOpen while the root settles on its real class', async () => {
+    viewport(true);
+    // A root's `provideDeviceTargets` reads the wide base until it mounts, a moment after its children do.
+    const Root = defineComponent({
+      setup() {
+        const effective = ref<DeviceClass>(DeviceClass.Desktop);
+        provide(DeviceClassKey, deviceState(effective));
+        onMounted(() => {
+          effective.value = DeviceClass.Phone;
+        });
+        return () => h(AppSwitcherMenu, { items: Items, current: 'desk', defaultOpen: true });
+      },
+    });
+    track(mount(Root, { attachTo: document.body }));
+    await settle();
+    expect(dialog()?.getAttribute('aria-modal')).toBe('true');
+    expect(trigger().getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('still follows the viewport when no class is provided', async () => {
+    viewport(true);
+    menu();
+    expect((await open()).getAttribute('aria-modal')).toBeNull();
   });
 });
 
