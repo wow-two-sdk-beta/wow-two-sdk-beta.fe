@@ -1,4 +1,4 @@
-import { afterEach, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
 import { userEvent } from 'vitest/browser';
@@ -6,12 +6,29 @@ import { Layer, layerStyle } from '@src/foundation/styles';
 import { Tooltip } from '@src/presentation/overlays';
 import '@src/index.css';
 
+/*
+ * The browser keeps one real pointer per page, and it outlives a test and, when a page is reused, a test file. If it
+ * rests where a trigger mounts, the browser fires a trusted `pointerenter` on that trigger after the first layout,
+ * and that takes the tooltip over mid-test. The tests below drive a trigger with synthetic events, so the file starts
+ * with the real pointer parked in a corner nothing mounts into. Only the last test moves it, so the file parks it
+ * again at the end rather than leave it over that test's triggers for the next file.
+ */
+async function parkPointer(): Promise<void> {
+  const corner = document.createElement('div');
+  corner.style.cssText = 'position: fixed; left: 0; bottom: 0; width: 8px; height: 8px';
+  document.body.append(corner);
+  await userEvent.hover(corner);
+  corner.remove();
+}
+
 let wrapper: VueWrapper | null = null;
+beforeAll(parkPointer);
 afterEach(() => {
   wrapper?.unmount();
   wrapper = null;
   document.body.innerHTML = '';
 });
+afterAll(parkPointer);
 
 /* A tooltip opened from a sticky filter bar overlaps the bar itself; the bar must not paint over it. */
 it('paints a tooltip opened from a sticky bar above that bar', async () => {

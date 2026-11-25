@@ -1,10 +1,26 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
+import { userEvent } from 'vitest/browser';
 import { Tooltip } from '@src/presentation/overlays';
 import '@src/index.css';
 
+/*
+ * The browser keeps one real pointer per page, and it outlives a test and, when a page is reused, a test file. If it
+ * rests where the trigger mounts, the browser fires a trusted `pointerenter` on it after the first layout, which can
+ * land after the test's synthetic `pointerleave` and reopen the body. The file starts with the real pointer parked in
+ * a corner nothing mounts into; no test here moves it.
+ */
+async function parkPointer(): Promise<void> {
+  const corner = document.createElement('div');
+  corner.style.cssText = 'position: fixed; left: 0; bottom: 0; width: 8px; height: 8px';
+  document.body.append(corner);
+  await userEvent.hover(corner);
+  corner.remove();
+}
+
 let wrapper: VueWrapper | null = null;
+beforeAll(parkPointer);
 afterEach(() => {
   wrapper?.unmount();
   wrapper = null;
