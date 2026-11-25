@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { h, nextTick } from 'vue';
+import { defineComponent, h, nextTick } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import {
   AppShell,
@@ -8,6 +8,8 @@ import {
   AppShellMain,
   AppShellSidebar,
   Navbar,
+  useAppShell,
+  type AppShellContextValue,
 } from '@src/presentation/layout';
 import { NavItem } from '@src/presentation/nav';
 
@@ -96,6 +98,82 @@ describe('app shell scrolling', () => {
     const wrapper = mount(AppShellMain, { attrs: { class: 'loose' }, slots: { default: () => 'Body' } });
     wrappers.push(wrapper);
     expect(wrapper.get('main').classes()).not.toContain('overflow-y-auto');
+  });
+});
+
+describe('app shell sidebar collapse', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** Answers every media query alike, so the viewport is wide past every breakpoint or narrow under all of them. */
+  function viewport(isWide: boolean): void {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: isWide,
+          media: query,
+          onchange: null,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          dispatchEvent: () => false,
+        }) as MediaQueryList,
+    );
+  }
+
+  /** Mounts a shell with a sidebar and a probe that reads the context the sidebar reads. */
+  async function sidebarShell(props: Record<string, unknown>) {
+    let context!: AppShellContextValue;
+    const Probe = defineComponent({
+      setup() {
+        context = useAppShell();
+        return () => h('i', { 'data-probe': '' });
+      },
+    });
+    const wrapper = shell(props, () => [
+      h(AppShellHeader, null, () => 'Top'),
+      h(AppShellSidebar, null, () => 'Nav'),
+      h(AppShellMain, null, () => h(Probe)),
+    ]);
+    await nextTick();
+    return { wrapper, context };
+  }
+
+  it('renders the sidebar beside the page at a wide viewport when the prop is omitted', async () => {
+    viewport(true);
+    const { wrapper, context } = await sidebarShell({});
+    expect(context.isSidebarCollapsed.value).toBe(false);
+    expect(document.querySelector('aside')).not.toBeNull();
+    expect(root(wrapper).style.gridTemplate).toContain('sidebar');
+  });
+
+  it('collapses the sidebar to a drawer at a wide viewport when isSidebarCollapsed is true', async () => {
+    viewport(true);
+    const { wrapper, context } = await sidebarShell({ isSidebarCollapsed: true });
+    expect(context.isSidebarCollapsed.value).toBe(true);
+    expect(document.querySelector('aside')).toBeNull();
+    expect(root(wrapper).style.gridTemplate).not.toContain('sidebar');
+  });
+
+  it('still collapses below the breakpoint when the prop is omitted', async () => {
+    viewport(false);
+    const { wrapper, context } = await sidebarShell({});
+    expect(context.isSidebarCollapsed.value).toBe(true);
+    expect(document.querySelector('aside')).toBeNull();
+    expect(root(wrapper).style.gridTemplate).not.toContain('sidebar');
+  });
+
+  it('follows the prop as it changes', async () => {
+    viewport(true);
+    const { wrapper, context } = await sidebarShell({});
+    await wrapper.setProps({ isSidebarCollapsed: true });
+    expect(context.isSidebarCollapsed.value).toBe(true);
+    expect(document.querySelector('aside')).toBeNull();
+    await wrapper.setProps({ isSidebarCollapsed: undefined });
+    expect(context.isSidebarCollapsed.value).toBe(false);
+    expect(document.querySelector('aside')).not.toBeNull();
   });
 });
 

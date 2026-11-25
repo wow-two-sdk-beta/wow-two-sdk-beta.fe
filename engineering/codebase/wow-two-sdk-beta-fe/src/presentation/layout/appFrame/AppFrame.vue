@@ -110,6 +110,13 @@ export interface AppFrameProps {
   /** Whether the desktop sidebar starts as the icon rail until the reader chooses. Default `false`. */
   readonly isCollapsedByDefault?: boolean;
 
+  /**
+   * Serves the phone layout. Omitted, the frame follows the device class an app root provided with
+   * `provideDeviceTargets` (phone when the effective class is phone), else the viewport (phone below `md`). `true`
+   * forces the phone layout at any width; `false` forces it off.
+   */
+  readonly isPhone?: boolean;
+
   /** How wide the page runs. Default `default`. */
   readonly contentWidth?: AppFrameContentWidth;
 
@@ -181,10 +188,16 @@ function decodeCollapsed(stored: unknown): boolean | undefined {
 </script>
 
 <script setup lang="ts">
-import { computed, onBeforeUpdate, shallowRef, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, inject, onBeforeUpdate, shallowRef, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { PanelLeft } from 'lucide-vue-next';
-import { TailwindBreakpoints, useBreakpointBelow, useBreakpointUp } from '../../../foundation/device';
+import {
+  DeviceClass,
+  DeviceClassKey,
+  TailwindBreakpoints,
+  useBreakpointBelow,
+  useBreakpointUp,
+} from '../../../foundation/device';
 import { dataAttr } from '../../../foundation/dom';
 import { Icon } from '../../../foundation/icons';
 import { useLocaleDefaults } from '../../../foundation/i18n';
@@ -266,6 +279,7 @@ const componentProps = withDefaults(defineProps<AppFrameProps>(), {
   hasNavigation: undefined,
   collapseStorageKey: DefaultCollapseStorageKey,
   isCollapsedByDefault: false,
+  isPhone: undefined,
   contentWidth: AppFrameContentWidth.Default,
   contentMaxWidth: undefined,
   barClass: undefined,
@@ -306,8 +320,21 @@ const shell = useTemplateRef<InstanceType<typeof AppShell>>('shell');
 const main = useTemplateRef<InstanceType<typeof AppShellMain>>('main');
 
 /* Mobile-first on the server and in the first render: a phone until mounted, then the real viewport. */
-const isPhone = useBreakpointBelow(TailwindBreakpoints, 'md');
-const isDesktop = useBreakpointUp(TailwindBreakpoints, 'lg');
+const isViewportPhone = useBreakpointBelow(TailwindBreakpoints, 'md');
+const isViewportDesktop = useBreakpointUp(TailwindBreakpoints, 'lg');
+
+/* Read with a `null` default: `useDeviceClass()` throws below no `provideDeviceTargets`, and this frame must not. */
+const providedClass = inject(DeviceClassKey, null);
+
+/* The layout the frame serves: the app's `isPhone`, else a provided phone class or a phone-width viewport. Named
+   apart from the `isPhone` prop: a setup const sharing a prop's name shadows it in the template and trips
+   `vue/no-dupe-keys`. */
+const isPhoneLayout = computed(
+  () => props.isPhone ?? (isViewportPhone.value || providedClass?.effective.value === DeviceClass.Phone),
+);
+
+/** A forced phone is never also a desktop, however wide the viewport. */
+const isDesktop = computed(() => isViewportDesktop.value && !isPhoneLayout.value);
 
 /* The stored choice is read as the ref is created, so a collapsed sidebar never animates in from the open one. */
 const isCollapsed = createPersistentRef<boolean>(props.collapseStorageKey, props.isCollapsedByDefault, {
@@ -327,13 +354,13 @@ onBeforeUpdate(() => {
 const hasSidebar = computed(() => props.hasNavigation ?? hasNavSlot.value);
 
 /** Between `md` and `lg`: the rail beside the page, the full navigation in a drawer. */
-const isTablet = computed(() => !isPhone.value && !isDesktop.value);
+const isTablet = computed(() => !isPhoneLayout.value && !isDesktop.value);
 
 /** The sidebar shows as the icon rail: always on tablets, by choice on desktops. */
-const isRail = computed(() => hasSidebar.value && !isPhone.value && (!isDesktop.value || isCollapsed.value));
+const isRail = computed(() => hasSidebar.value && !isPhoneLayout.value && (!isDesktop.value || isCollapsed.value));
 
 /** A phone with a bottom bar already holds its navigation, so the toggle has nothing to open there. */
-const hasToggle = computed(() => hasSidebar.value && !(isPhone.value && hasPhoneNav.value));
+const hasToggle = computed(() => hasSidebar.value && !(isPhoneLayout.value && hasPhoneNav.value));
 
 const sidebarWidth = computed(() => (isRail.value ? 'var(--frame-rail-width)' : 'var(--frame-sidebar-width)'));
 const navigation = computed(() => (hasSidebar.value ? AppShellNavigation.Vertical : AppShellNavigation.Horizontal));
@@ -449,16 +476,17 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
     v-bind="rest"
     :class="shellClasses"
     sidebar-breakpoint="md"
+    :is-sidebar-collapsed="isPhoneLayout"
     sidebar-width="var(--frame-sidebar-size)"
     :navigation="navigation"
-    :sidebar-open="isPhone && isDrawerOpen"
+    :sidebar-open="isPhoneLayout && isDrawerOpen"
     :skip-to-content-label="props.skipToContentLabel"
     @update:sidebar-open="setDrawerOpen"
   >
     <AppShellHeader height="md" :variant="props.variant" :class="[headerClasses, props.barClass]" data-app-frame-bar>
       <div class="flex h-full w-full min-w-0 items-stretch">
         <!-- From tablets up the brand sits above the sidebar, as wide as it, divided from the bar by a hairline. -->
-        <div v-if="hasSidebar && !isPhone" :class="brandCellClasses" data-app-frame-brand>
+        <div v-if="hasSidebar && !isPhoneLayout" :class="brandCellClasses" data-app-frame-brand>
           <AppSwitcherMenu
             v-if="props.apps"
             :items="props.apps"
@@ -492,21 +520,21 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
         </div>
         <div class="flex min-w-0 flex-1 items-center gap-2 px-3 sm:gap-3 sm:px-4 lg:px-6" data-app-frame-row>
           <!-- A phone's bar, and a frame without a sidebar, carry the brand inline. -->
-          <div v-if="!hasSidebar || isPhone" class="flex shrink-0 items-center gap-2" data-app-frame-brand>
+          <div v-if="!hasSidebar || isPhoneLayout" class="flex shrink-0 items-center gap-2" data-app-frame-brand>
             <AppSwitcherMenu
               v-if="props.apps"
               :items="props.apps"
               :current="props.currentApp ?? ''"
               :label="props.appLabel"
               :subtitle="props.appSubtitle"
-              :is-compact="isPhone"
+              :is-compact="isPhoneLayout"
               v-bind="switcherProps"
             >
               <template v-if="slots.brand" #mark><slot name="brand" :is-rail="true" /></template>
             </AppSwitcherMenu>
-            <slot v-else name="brand" :is-rail="isPhone" />
+            <slot v-else name="brand" :is-rail="isPhoneLayout" />
             <VersionBadge
-              v-if="props.version && !isPhone"
+              v-if="props.version && !isPhoneLayout"
               :version="props.version"
               :running-version="props.runningVersion"
               :label="props.versionLabel"
@@ -592,7 +620,7 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
         <slot />
       </template>
     </AppShellMain>
-    <div v-if="hasPhoneNav && isPhone" class="z-sticky [grid-area:footer] print:hidden" data-app-frame-phone-nav>
+    <div v-if="hasPhoneNav && isPhoneLayout" class="z-sticky [grid-area:footer] print:hidden" data-app-frame-phone-nav>
       <slot name="phone-nav" />
     </div>
   </AppShell>

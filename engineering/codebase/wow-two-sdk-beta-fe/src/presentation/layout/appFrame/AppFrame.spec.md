@@ -55,6 +55,12 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   override the badge's, the breadcrumb's and the skip link's own localized strings, so an app without a
   `LocaleProvider` passes every string as a prop.
 - The server and the first client render use the phone layout, then the frame adopts the viewport on mount.
+- The phone layout follows `isPhone` when given, else the device class an app root provided with
+  `provideDeviceTargets` (phone when its effective class is phone, so a landscape phone or a product that declares no
+  tablet is served the phone layout at `md` and wider), else the viewport (phone below `md`). `true` forces the phone
+  layout at any width, with the sidebar collapsed to its drawer and never a desktop; `false` forces it off, so the
+  sidebar stays beside the page as the rail even in a narrow viewport. The frame reads the provided class with
+  `inject` and never throws without one.
 - Attributes and `class` land on the frame root. Automatic attribute inheritance is disabled; the source explicitly
   forwards and merges supported fallthrough attributes.
 
@@ -80,6 +86,7 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 | `hasNavigation` | `boolean` | no | `nav` slot present | Whether the frame has a sidebar. |
 | `collapseStorageKey` | `string` | no | `wow-two.app-frame.sidebar-collapsed` | Where the collapse persists; read once. |
 | `isCollapsedByDefault` | `boolean` | no | `false` | Whether the desktop sidebar starts as the rail. |
+| `isPhone` | `boolean` | no | provided device class, else viewport | Serves the phone layout; `true` forces it at any width, `false` forces it off. |
 | `contentWidth` | `AppFrameContentWidth` | no | `default` | `default` for the shared column, `full` for edge to edge. |
 | `contentMaxWidth` | `ContainerLayoutSize \| SizeValue` | no | `--frame-content-max` | The page column's cap. |
 | `barClass` | `HTMLAttributes['class']` | no | — | Extra classes on the bar. |

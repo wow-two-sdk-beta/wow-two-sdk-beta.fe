@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { h } from 'vue';
+import { computed, h } from 'vue';
 import { page } from 'vitest/browser';
+import { DeviceClass, DeviceClassKey, type DeviceClassState } from '@src/foundation/device';
 import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppFrame } from '@src/presentation/layout';
 import { SidebarMenu, SidebarMenuItem } from '@src/presentation/nav';
@@ -39,9 +40,20 @@ function setup(options: { theme: boolean; dark: boolean }): void {
   document.documentElement.classList.toggle('dark', options.dark);
 }
 
-function mountFrame(): void {
+/** What an app root's `provideDeviceTargets` would provide, with the effective class fixed. */
+function deviceState(effective: DeviceClass): DeviceClassState {
+  return {
+    detected: computed(() => effective),
+    effective: computed(() => effective),
+    isShortHeight: computed(() => false),
+    isCoarsePointer: computed(() => false),
+  };
+}
+
+function mountFrame(options: { effective?: DeviceClass; hasPhoneNav?: boolean } = {}): void {
   wrapper = mount(AppFrame, {
     props: { version: '0.4.2', crumbs: [{ label: 'Operations', href: '/ops' }, { label: 'Release 42' }] },
+    global: options.effective ? { provide: { [DeviceClassKey as symbol]: deviceState(options.effective) } } : {},
     slots: {
       brand: () => h('a', { href: '/', 'data-test': 'brand-mark' }, 'W'),
       nav: ({ isRail }) =>
@@ -56,6 +68,9 @@ function mountFrame(): void {
           ),
         ),
       default: () => 'Page',
+      ...(options.hasPhoneNav
+        ? { 'phone-nav': () => h('nav', { 'data-test': 'bottom-nav', class: 'flex h-14 items-center' }, 'Bottom') }
+        : {}),
     },
     attachTo: document.body,
   });
@@ -116,5 +131,41 @@ describe('AppFrame dimensions', () => {
     await expect.poll(() => getComputedStyle(bar()).height, Settled).toBe('56px');
     await expect.poll(() => width(sidebar()), Settled).toBe(64);
     await expect.poll(() => width(brand()), Settled).toBe(64);
+  });
+});
+
+describe('AppFrame on a landscape phone', () => {
+  afterAll(async () => {
+    await page.viewport(414, 896);
+  });
+
+  /** Two animation frames: the frame adopts the viewport on mount, one render after it. */
+  const frames = (): Promise<void> =>
+    new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+  it('serves the phone layout at 844 x 390 when the provided class is phone', { timeout: 30_000 }, async () => {
+    await page.viewport(844, 390);
+    mountFrame({ effective: DeviceClass.Phone, hasPhoneNav: true });
+    await expect.poll(() => matchMedia('(min-width: 768px)').matches, Settled).toBe(true);
+    await frames();
+
+    const shell = document.querySelector<HTMLElement>('[data-app-frame]')!;
+    const bottom = document.querySelector<HTMLElement>('[data-app-frame-phone-nav] [data-test="bottom-nav"]');
+    expect(bottom).not.toBeNull();
+    expect(sidebar()).toBeNull();
+    expect(document.querySelector('[data-app-frame-toggle]')).toBeNull();
+    expect(brand().closest('[data-app-frame-row]')).not.toBeNull();
+    expect(shell.hasAttribute('data-rail')).toBe(false);
+    expect(shell.scrollWidth).toBeLessThanOrEqual(shell.clientWidth);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
+    expect(Math.round(bottom!.getBoundingClientRect().bottom)).toBe(document.documentElement.clientHeight);
+  });
+
+  it('keeps the tablet rail at 844 x 390 when no class is provided', { timeout: 30_000 }, async () => {
+    await page.viewport(844, 390);
+    mountFrame({ hasPhoneNav: true });
+    await expect.poll(() => width(sidebar()), Settled).toBe(64);
+    expect(document.querySelector('[data-app-frame-phone-nav]')).toBeNull();
+    expect(brand().closest('[data-app-frame-row]')).toBeNull();
   });
 });

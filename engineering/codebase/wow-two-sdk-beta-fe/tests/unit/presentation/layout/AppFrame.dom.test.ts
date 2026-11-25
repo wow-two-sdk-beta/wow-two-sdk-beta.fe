@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { h, nextTick, type VNode } from 'vue';
+import { computed, h, nextTick, ref, type Ref, type VNode } from 'vue';
+import { DeviceClass, DeviceClassKey, type DeviceClassState } from '@src/foundation/device';
 import { AppFrame, type AppFrameNavSlotProps } from '@src/presentation/layout';
 import { AccountMenu, type AppSwitcherItem } from '@src/presentation/nav';
 
@@ -62,15 +63,26 @@ interface Mounted {
   readonly brand: boolean[];
 }
 
+/** What an app root's `provideDeviceTargets` would provide, with the effective class held in the given ref. */
+function deviceState(effective: Ref<DeviceClass>): DeviceClassState {
+  return {
+    detected: computed(() => effective.value),
+    effective: computed(() => effective.value),
+    isShortHeight: computed(() => false),
+    isCoarsePointer: computed(() => false),
+  };
+}
+
 async function frame(
   props: Record<string, unknown> = {},
   slots: Record<string, (() => VNode | VNode[] | string) | undefined> = {},
-  options: { nav?: boolean } = {},
+  options: { nav?: boolean; deviceClass?: Ref<DeviceClass> } = {},
 ): Promise<Mounted> {
   const nav: AppFrameNavSlotProps[] = [];
   const brand: boolean[] = [];
   const wrapper = mount(AppFrame, {
     props,
+    global: options.deviceClass ? { provide: { [DeviceClassKey as symbol]: deviceState(options.deviceClass) } } : {},
     slots: {
       brand: (slot: { isRail: boolean }) => {
         brand.push(slot.isRail);
@@ -215,6 +227,133 @@ describe('AppFrame phone', () => {
     await frame({}, { 'phone-nav': () => h('nav', { 'data-bottom': '' }) });
     expect(toggle()).toBeNull();
     expect(document.querySelector('[data-app-frame-phone-nav] [data-bottom]')).not.toBeNull();
+  });
+});
+
+describe('AppFrame isPhone', () => {
+  const bottomNav = { 'phone-nav': () => h('nav', { 'data-bottom': '' }) };
+
+  it('serves the phone layout at a desktop width when true', async () => {
+    viewport(Desktop);
+    const { brand } = await frame({ isPhone: true, version: '0.4.2' }, bottomNav);
+    expect(document.querySelector('[data-app-frame-phone-nav] [data-bottom]')).not.toBeNull();
+    expect(toggle()).toBeNull();
+    expect(brandCell().closest('[data-app-frame-row]')).not.toBeNull();
+    expect(brand.at(-1)).toBe(true);
+    expect(document.querySelector('[data-version-badge]')).toBeNull();
+    expect(document.querySelector('aside')).toBeNull();
+    expect(root().hasAttribute('data-rail')).toBe(false);
+  });
+
+  it('leaves the desktop layout alone when omitted', async () => {
+    viewport(Desktop);
+    const { brand } = await frame({ version: '0.4.2' }, bottomNav);
+    expect(document.querySelector('[data-app-frame-phone-nav]')).toBeNull();
+    expect(toggle()).not.toBeNull();
+    expect(brandCell().closest('[data-app-frame-row]')).toBeNull();
+    expect(brand.at(-1)).toBe(false);
+    expect(document.querySelector('[data-version-badge]')).not.toBeNull();
+    expect(document.querySelector('aside')).not.toBeNull();
+  });
+
+  it('is never also a desktop: the toggle opens the drawer and does not collapse the sidebar', async () => {
+    viewport(Desktop);
+    const { wrapper } = await frame({ isPhone: true });
+    expect(toggle().getAttribute('aria-label')).toBe('Open navigation');
+    expect(toggle().getAttribute('aria-expanded')).toBe('false');
+    toggle().click();
+    await settle();
+    expect(dialog()!.querySelector('[data-nav-link]')).not.toBeNull();
+    expect(toggle().getAttribute('aria-expanded')).toBe('true');
+    expect(wrapper.emitted('collapse')).toBeUndefined();
+    expect(localStorage.length).toBe(0);
+  });
+
+  it('lifts a phone-width viewport off the phone layout when false', async () => {
+    viewport(Phone);
+    const { brand } = await frame({ isPhone: false }, bottomNav);
+    expect(document.querySelector('[data-app-frame-phone-nav]')).toBeNull();
+    expect(toggle().getAttribute('aria-label')).toBe('Open navigation');
+    expect(brandCell().closest('[data-app-frame-row]')).toBeNull();
+    expect(brand.at(-1)).toBe(true);
+    expect(root().hasAttribute('data-rail')).toBe(true);
+    expect(document.querySelector('aside')).not.toBeNull();
+  });
+
+  it('renders the sidebar from md up when nothing is passed and no class is provided', async () => {
+    viewport(Tablet);
+    await frame({}, bottomNav);
+    expect(document.querySelector('aside')).not.toBeNull();
+    expect(document.querySelector('[data-app-frame-phone-nav]')).toBeNull();
+  });
+
+  it('collapses the sidebar below md when nothing is passed and no class is provided', async () => {
+    viewport(Phone);
+    await frame({}, bottomNav);
+    expect(document.querySelector('aside')).toBeNull();
+    expect(document.querySelector('[data-app-frame-phone-nav]')).not.toBeNull();
+  });
+});
+
+describe('AppFrame provided device class', () => {
+  const bottomNav = { 'phone-nav': () => h('nav', { 'data-bottom': '' }) };
+  const isPhoneLayout = (): boolean => document.querySelector('[data-app-frame-phone-nav]') !== null;
+
+  it('serves the phone layout at a desktop width when the effective class is phone', async () => {
+    viewport(Desktop);
+    const { brand } = await frame({}, bottomNav, { deviceClass: ref(DeviceClass.Phone) });
+    expect(isPhoneLayout()).toBe(true);
+    expect(toggle()).toBeNull();
+    expect(brandCell().closest('[data-app-frame-row]')).not.toBeNull();
+    expect(brand.at(-1)).toBe(true);
+    expect(document.querySelector('aside')).toBeNull();
+  });
+
+  it('leaves the desktop layout alone when the effective class is desktop', async () => {
+    viewport(Desktop);
+    await frame({}, bottomNav, { deviceClass: ref(DeviceClass.Desktop) });
+    expect(isPhoneLayout()).toBe(false);
+    expect(toggle()).not.toBeNull();
+    expect(brandCell().closest('[data-app-frame-row]')).toBeNull();
+    expect(document.querySelector('aside')).not.toBeNull();
+  });
+
+  it('leaves the viewport in charge when the effective class is tablet', async () => {
+    viewport(Desktop);
+    await frame({}, bottomNav, { deviceClass: ref(DeviceClass.Tablet) });
+    expect(isPhoneLayout()).toBe(false);
+    expect(root().hasAttribute('data-rail')).toBe(false);
+  });
+
+  it('keeps a phone-width viewport on the phone layout whatever class is provided', async () => {
+    viewport(Phone);
+    await frame({}, bottomNav, { deviceClass: ref(DeviceClass.Desktop) });
+    expect(isPhoneLayout()).toBe(true);
+  });
+
+  it('lets isPhone override the provided class in both directions', async () => {
+    viewport(Desktop);
+    await frame({ isPhone: false }, bottomNav, { deviceClass: ref(DeviceClass.Phone) });
+    expect(isPhoneLayout()).toBe(false);
+    expect(document.querySelector('aside')).not.toBeNull();
+    document.body.innerHTML = '';
+    await frame({ isPhone: true }, bottomNav, { deviceClass: ref(DeviceClass.Desktop) });
+    expect(isPhoneLayout()).toBe(true);
+  });
+
+  it('follows the class as it changes', async () => {
+    viewport(Desktop);
+    const effective = ref<DeviceClass>(DeviceClass.Desktop);
+    await frame({}, bottomNav, { deviceClass: effective });
+    expect(isPhoneLayout()).toBe(false);
+    effective.value = DeviceClass.Phone;
+    await settle();
+    expect(isPhoneLayout()).toBe(true);
+    expect(document.querySelector('aside')).toBeNull();
+    effective.value = DeviceClass.Desktop;
+    await settle();
+    expect(isPhoneLayout()).toBe(false);
+    expect(document.querySelector('aside')).not.toBeNull();
   });
 });
 

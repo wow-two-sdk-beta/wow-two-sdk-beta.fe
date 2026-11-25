@@ -12,6 +12,7 @@ Public import: `import { AppShell } from '@wow-two-beta/fe/presentation/layout';
 - Mount within the owner supplying `useAppShellContext`; a compound part is not an independent root.
 - By default the shell fills the viewport (`h-dvh`) and `AppShellMain` is the one scroll container with a stable gutter; the header, sidebar and footer hold still and span the full window. The sidebar and aside scroll on their own.
 - The content column is `minmax(0, 1fr)`: a wide header nav or wide page content overflows inside its region and never widens the shell.
+- The sidebar collapses to a `Drawer` below `sidebarBreakpoint`. `isSidebarCollapsed` set to `true` collapses it at any width, and `useAppShell().isSidebarCollapsed` reports it; omitted, the viewport decides.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
@@ -23,6 +24,7 @@ Public import: `import { AppShell } from '@wow-two-beta/fe/presentation/layout';
 | `asideWidth` | `string` | no | `'280px'` | The aside rail width, any CSS length. Default `280px`. |
 | `sidebarBreakpoint` | `Breakpoint` | no | `'lg'` | The sidebar collapses below this breakpoint. Default `lg`. |
 | `asideBreakpoint` | `Breakpoint` | no | `'xl'` | The aside hides below this breakpoint. Default `xl`. |
+| `isSidebarCollapsed` | `boolean` | no | `undefined` | Whether the sidebar renders as a Drawer. Omitted, it follows `sidebarBreakpoint`; `true` collapses it at any width. |
 | `sidebarOpen` | `boolean` | no | `undefined` | The mobile-sidebar open state, controlled. The `v-model:sidebarOpen` binding target. |
 | `defaultSidebarOpen` | `boolean` | no | `false` | The initial mobile-sidebar state when uncontrolled. Default `false`. |
 | `scroll` | `AppShellScroll` | no | `region` | What scrolls: `region` scrolls only `AppShellMain`, so the header spans the full window beside a classic scrollbar; `document` scrolls the page. |

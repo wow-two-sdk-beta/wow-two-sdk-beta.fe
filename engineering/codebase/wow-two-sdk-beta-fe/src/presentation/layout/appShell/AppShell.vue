@@ -59,7 +59,7 @@ export interface AppShellContextValue {
   /** The resolved mobile-sidebar open state. Writable — an assignment routes through `setSidebarOpen`. */
   isSidebarOpen: Ref<boolean>;
   setSidebarOpen: (open: boolean) => void;
-  /** True below `sidebarBreakpoint` — the sidebar renders as a `Drawer`. */
+  /** True below `sidebarBreakpoint`, or at any width when the `isSidebarCollapsed` prop says so — a `Drawer`. */
   isSidebarCollapsed: ComputedRef<boolean>;
   /** True below `asideBreakpoint` — the aside renders nothing. */
   isAsideHidden: ComputedRef<boolean>;
@@ -93,6 +93,12 @@ export interface AppShellProps {
 
   /** The aside hides below this breakpoint. Default `xl`. */
   readonly asideBreakpoint?: Breakpoint;
+
+  /**
+   * Whether the sidebar renders as a Drawer. Omitted, it follows `sidebarBreakpoint`; `true` collapses it at any
+   * width.
+   */
+  readonly isSidebarCollapsed?: boolean;
 
   /** The mobile-sidebar open state, controlled. The `v-model:sidebarOpen` binding target. */
   readonly sidebarOpen?: boolean;
@@ -137,16 +143,17 @@ defineOptions({ name: 'AppShell', inheritAttrs: false });
 defineSlots<{ default(): unknown }>();
 
 /**
- * `sidebarOpen: undefined` / `sidebarOpen: undefined` are load-bearing: Vue
+ * `sidebarOpen: undefined` / `isSidebarCollapsed: undefined` are load-bearing: Vue
  * coerces an absent `Boolean` prop to `false` unless the declaration *owns* a
  * `default` key, which would strand the uncontrolled path behind a
- * permanently-closed controlled one.
+ * permanently-closed controlled one (and pin the sidebar open past its breakpoint).
  */
 const props = withDefaults(defineProps<AppShellProps>(), {
   sidebarWidth: '240px',
   asideWidth: '280px',
   sidebarBreakpoint: 'lg',
   asideBreakpoint: 'xl',
+  isSidebarCollapsed: undefined,
   sidebarOpen: undefined,
   defaultSidebarOpen: false,
   scroll: AppShellScroll.Region,
@@ -173,7 +180,7 @@ const controlled = useControlled<boolean>({
 const isSidebarWide = useMediaQuery(() => `(min-width: ${BreakpointPx[props.sidebarBreakpoint]}px)`);
 const isAsideWide = useMediaQuery(() => `(min-width: ${BreakpointPx[props.asideBreakpoint]}px)`);
 
-const isSidebarCollapsed = computed(() => !isSidebarWide.value);
+const isSidebarCollapsed = computed(() => props.isSidebarCollapsed ?? !isSidebarWide.value);
 const isAsideHidden = computed(() => !isAsideWide.value);
 
 provide(appShellContextKey, {
