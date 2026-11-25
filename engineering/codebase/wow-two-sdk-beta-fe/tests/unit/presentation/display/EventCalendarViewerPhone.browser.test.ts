@@ -61,16 +61,32 @@ function hasHorizontalOverflow(): boolean {
   return document.documentElement.scrollWidth > window.innerWidth;
 }
 
+/*
+ * Waits, one rendering update at a time, until `settled()` holds — for at most `maxFrames` updates.
+ *
+ * The viewer follows its panel width through a ResizeObserver delivery and then a `requestAnimationFrame` that
+ * commits it, so a switch costs frames, not milliseconds. `expect.poll` counts the clock, and its 1 s default gave
+ * up on a loaded WebKit runner (CI run 45574221347); a wait that advances only when the engine renders counts what
+ * the switch costs, so it cannot give up before the engine has rendered.
+ */
+async function untilFrames(settled: () => boolean, maxFrames = 60): Promise<void> {
+  for (let frame = 0; frame < maxFrames && !settled(); frame += 1) {
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  }
+}
+
 it('uses the week list in a narrow panel and returns to the time grid when it grows', async () => {
   await page.viewport(Desktop.width, Desktop.height);
   const viewer = mountViewer({ view: 'week' });
   const element = viewer.element as HTMLElement;
   element.style.width = '588px';
-  await expect.poll(() => document.querySelector('[data-time-grid-daylist]')?.children.length).toBe(7);
+  await untilFrames(() => document.querySelector('[data-time-grid-daylist]') !== null);
+  expect(document.querySelector('[data-time-grid-daylist]')?.children.length).toBe(7);
   expect(document.querySelector('[data-time-grid]')).toBeNull();
 
   element.style.width = '960px';
-  await expect.poll(() => document.querySelector('[data-time-grid]') !== null).toBe(true);
+  await untilFrames(() => document.querySelector('[data-time-grid]') !== null);
+  expect(document.querySelector('[data-time-grid]')).not.toBeNull();
   expect(document.querySelector('[data-time-grid-daylist]')).toBeNull();
 });
 
