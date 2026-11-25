@@ -1,4 +1,4 @@
-import { afterAll, afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { computed, h } from 'vue';
 import { page } from 'vitest/browser';
@@ -6,6 +6,7 @@ import { DeviceClass, DeviceClassKey, type DeviceClassState } from '@src/foundat
 import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppFrame } from '@src/presentation/layout';
 import { SidebarMenu, SidebarMenuItem } from '@src/presentation/nav';
+import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
 import '@src/index.css';
 
 const Cases = [
@@ -50,12 +51,29 @@ function deviceState(effective: DeviceClass): DeviceClassState {
   };
 }
 
-function mountFrame(options: { effective?: DeviceClass; hasPhoneNav?: boolean } = {}): void {
+function mountFrame(
+  options: {
+    effective?: DeviceClass;
+    hasPhoneNav?: boolean;
+    version?: string;
+    runningVersion?: string;
+    brand?: string;
+  } = {},
+): void {
   wrapper = mount(AppFrame, {
-    props: { version: '0.4.2', crumbs: [{ label: 'Operations', href: '/ops' }, { label: 'Release 42' }] },
+    props: {
+      version: options.version ?? '0.4.2',
+      ...(options.runningVersion === undefined ? {} : { runningVersion: options.runningVersion }),
+      crumbs: [{ label: 'Operations', href: '/ops' }, { label: 'Release 42' }],
+    },
     global: options.effective ? { provide: { [DeviceClassKey as symbol]: deviceState(options.effective) } } : {},
     slots: {
-      brand: () => h('a', { href: '/', 'data-test': 'brand-mark' }, 'W'),
+      brand: () =>
+        h(
+          'a',
+          { href: '/', 'data-test': 'brand-mark', class: 'whitespace-nowrap font-semibold' },
+          options.brand ?? 'W',
+        ),
       nav: ({ isRail }) =>
         h(SidebarMenu, { isCollapsed: isRail }, () =>
           h(
@@ -167,5 +185,81 @@ describe('AppFrame on a landscape phone', () => {
     await expect.poll(() => width(sidebar()), Settled).toBe(64);
     expect(document.querySelector('[data-app-frame-phone-nav]')).toBeNull();
     expect(brand().closest('[data-app-frame-row]')).toBeNull();
+  });
+});
+
+describe('AppFrame brand cell', () => {
+  /* A dev build that is also stale: the longest badge the frame shows, beside a brand that cannot shrink. */
+  const LoadedVersion = 'v0.2-local.47e6c6a';
+  const RunningVersion = 'v0.3-local.1234567';
+  const Widths = [1024, 1280, 1440] as const;
+
+  const badge = (): HTMLElement => brand().querySelector<HTMLElement>('[data-version-badge]')!;
+
+  /** Whether the badge's box lies inside the cell's box, edge to edge. */
+  function badgeInsideCell(): boolean {
+    const cell = brand().getBoundingClientRect();
+    const box = badge().getBoundingClientRect();
+    return box.left >= cell.left - 0.5 && box.right <= cell.right + 0.5;
+  }
+
+  for (const viewportWidth of Widths) {
+    it(
+      `clips nothing of a long stale version beside a fixed brand at ${viewportWidth}px`,
+      { timeout: 30_000 },
+      async () => {
+        await page.viewport(viewportWidth, 800);
+        mountFrame({ version: LoadedVersion, runningVersion: RunningVersion, brand: 'SCFD Console' });
+        await expect.poll(() => width(brand()), Settled).toBe(248);
+
+        expect(brand().scrollWidth).toBeLessThanOrEqual(brand().clientWidth);
+        expect(badgeInsideCell()).toBe(true);
+        // Shown in full, or cut by an ellipsis whose full text stays on the badge's title.
+        const text = badge().querySelector<HTMLElement>('.truncate')!;
+        expect(text.scrollWidth <= text.clientWidth || badge().getAttribute('title')?.includes('0.3-local')).toBe(true);
+        expect(text.textContent).toBe(RunningVersion);
+      },
+    );
+  }
+
+  it('shows an ordinary version in full beside the brand at 1280px', { timeout: 30_000 }, async () => {
+    await page.viewport(1280, 800);
+    mountFrame({ version: '0.4.2', brand: 'SCFD Console' });
+    await expect.poll(() => width(brand()), Settled).toBe(248);
+
+    const text = badge().querySelector<HTMLElement>('.truncate')!;
+    expect(brand().scrollWidth).toBeLessThanOrEqual(brand().clientWidth);
+    expect(badgeInsideCell()).toBe(true);
+    expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth);
+    expect(text.textContent).toBe('v0.4.2');
+  });
+});
+
+describe.skipIf(!canEmulateCoarsePointer)('AppFrame under a coarse pointer', () => {
+  beforeEach(async () => {
+    await useCoarsePointer();
+  });
+  afterEach(async () => {
+    await useFinePointer();
+  });
+
+  it('gives the collapse control a 44 x 44px hit area at 1280px', { timeout: 30_000 }, async () => {
+    await page.viewport(1280, 800);
+    mountFrame();
+    const toggle = document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!;
+    await expect.poll(() => toggle.getBoundingClientRect().height, Settled).toBeGreaterThanOrEqual(44);
+    expect(toggle.getAttribute('aria-label')).toBe('Collapse sidebar');
+    expect(toggle.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
+    expect(bar().getBoundingClientRect().height).toBe(56);
+  });
+});
+
+describe('AppFrame under a fine pointer', () => {
+  it('keeps the collapse control at 40 x 40px at 1280px', { timeout: 30_000 }, async () => {
+    await page.viewport(1280, 800);
+    mountFrame();
+    const toggle = document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!;
+    await expect.poll(() => Math.round(toggle.getBoundingClientRect().height), Settled).toBe(40);
+    expect(Math.round(toggle.getBoundingClientRect().width)).toBe(40);
   });
 });

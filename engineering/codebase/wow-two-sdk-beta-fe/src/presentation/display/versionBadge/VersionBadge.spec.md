@@ -15,6 +15,8 @@ Public import: `import { VersionBadge } from '@wow-two-beta/fe/presentation/disp
   `button` named by `updateLabel` that emits `reload`. The caller reloads the page.
 - `runningVersion` comes from `useRunningVersion` (`@wow-two-beta/fe/foundation/net`): the bundle's own version is a
   build-time constant and cannot learn of a later deployment.
+- The badge never grows past its container: the version text is its own `truncate` element, so a version wider than
+  the room ends in an ellipsis, and the full text stays on the badge's `title` (and the stale badge's accessible name).
 - Strings resolve through the nearest `LocaleProvider` when their prop is omitted: `VersionBadge.label`
   (`Version {version}`) and `VersionBadge.updateLabel`
   (`Version {running} is live; this tab runs {version}. Reload to update.`).

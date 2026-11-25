@@ -503,12 +503,12 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
           <div
             v-if="props.version"
             :inert="isRail"
-            class="grid shrink-0 motion-safe:transition-[grid-template-columns,opacity] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
+            class="grid min-w-0 motion-safe:transition-[grid-template-columns,opacity] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
             :class="isRail ? 'grid-cols-[0fr] opacity-0' : 'grid-cols-[1fr]'"
           >
             <div class="min-w-0 overflow-hidden">
               <VersionBadge
-                class="ms-2 w-max"
+                class="ms-2 w-max max-w-[calc(100%-0.5rem)]"
                 :version="props.version"
                 :running-version="props.runningVersion"
                 :label="props.versionLabel"

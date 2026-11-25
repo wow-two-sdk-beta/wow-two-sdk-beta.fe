@@ -27,6 +27,8 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   bar). With `apps` the brand is an `AppSwitcherMenu` whose mark is the `brand` slot; it turns compact where `isRail`.
 - `version` shows as a `VersionBadge` beside the brand, hidden where `isRail`. With `runningVersion` the badge follows
   the release the host serves and offers a reload when the tab is behind; `onReload` replaces the page reload.
+  The brand keeps its own width and the badge takes what the cell has left: a version too long for it ends in an
+  ellipsis with the full text on the badge's title, so the cell never clips the badge.
 - The sidebar holds the `nav` slot. At `lg` and wider the reader collapses it to the icon rail with the toggle, and
   the choice persists in `localStorage` under `collapseStorageKey`. Between `md` and `lg` it is always the rail and
   the toggle opens the full navigation in a drawer. Below `md` there is no sidebar: the toggle opens the drawer,
@@ -34,7 +36,8 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 - The `nav` slot receives `isRail` and `close`. A click on any link inside it closes the drawer. Growing to `lg`
   closes it too.
 - The toggle is a button named `collapseLabel`, `expandLabel` or `openNavigationLabel` by what it does, with
-  `aria-expanded` for the sidebar or the drawer.
+  `aria-expanded` for the sidebar or the drawer. It is a 40 x 40px `Button` that reaches 44 x 44px under a coarse
+  pointer, the bar staying 56px.
 - `crumbs` render as a single-line `Breadcrumb` named `trailLabel`; a plain string is an item without a link. With
   `onNavigate`, a plain left click on a link whose `href` starts
   with one `/` is handed to the app's router; modified clicks and other origins keep the browser's behaviour. The
