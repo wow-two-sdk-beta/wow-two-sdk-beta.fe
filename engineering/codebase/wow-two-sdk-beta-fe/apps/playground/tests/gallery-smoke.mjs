@@ -444,9 +444,18 @@ try {
   try {
     await touchPage.goto(`${origin}/?g=toast-lab`);
     await touchPage.getByRole('button', { name: 'Priority stack' }).tap();
+    // The preview sits below the scenario controls, past the first screen: a person scrolls down to it. Playwright
+    // cannot scroll a node of the preview's fixed toast layer into view on its own, so the frame goes first.
+    await touchPage.locator('iframe[title="Toast notification preview"]').scrollIntoViewIfNeeded();
     const touchPreview = touchPage.frameLocator('iframe[title="Toast notification preview"]');
     const touchTask = touchPreview.locator('.toast-preview-viewport > [data-state="open"]').filter({ hasText: 'Harvest running.' });
     const touchPin = touchTask.getByRole('button', { name: 'Pin notification' });
+    const pinBox = await touchPin.boundingBox();
+    const screen = touchPage.viewportSize();
+    assert.ok(
+      pinBox && pinBox.y >= 0 && pinBox.y + pinBox.height <= screen.height,
+      'The pin of a touch card is on the screen when tapped',
+    );
     await touchPin.tap();
     const refresh = touchPreview.getByText('Source list refreshed.', { exact: true });
     await refresh.waitFor();
