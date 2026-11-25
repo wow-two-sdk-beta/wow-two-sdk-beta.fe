@@ -74,11 +74,16 @@ const GlassClasses = [
 /** @internal The glass hairline, taken only by the neutral card — a severity's own border keeps its accent. */
 const GlassEdgeClass = 'data-[toast-surface=glass]:border-glass-edge';
 
-/** @internal The classes shared by the card's icon-only controls. */
+/**
+ * @internal The classes shared by the card's icon-only controls: 24px under a fine pointer, 36px under a coarse one,
+ * with an invisible 44px square centred on the button taking the tap, so the card keeps its height.
+ */
 const IconControlClass =
   'grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors ' +
   'hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 ' +
-  'focus-visible:ring-ring pointer-coarse:size-9';
+  'focus-visible:ring-ring pointer-coarse:relative pointer-coarse:size-9 pointer-coarse:after:absolute ' +
+  'pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-11 ' +
+  'pointer-coarse:after:-translate-1/2';
 </script>
 
 <script setup lang="ts">
@@ -318,6 +323,7 @@ function fitGroupDetails(): void {
             v-if="slots.details"
             size="xs"
             variant="ghost"
+            class="pointer-coarse:min-h-11"
             :aria-expanded="isDetailsOpen"
             :aria-controls="detailsId"
             @click="toggleDetails"
