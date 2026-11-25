@@ -18,6 +18,7 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 ### SidebarMenuItem
 
 - Renders `<li><a>` with an icon, a truncated label and a trailing slot. `isActive` sets `aria-current="page"` and `data-active` (tinted).
+- The row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`).
 - `asChild` merges the row's classes and state onto the slotted router link. Mark the link's direct label child with
   `data-sidebar-menu-label` to use the same clipping and fade as the built-in label.
 - The icon is `aria-hidden`; fallthrough attributes and `class` reach the link; the exposed `el` is the link element.
@@ -27,6 +28,7 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 - A disclosure: the toggle row carries `aria-expanded` and `aria-controls`, and the nested list is named by `label`.
   The list animates in and out through `CollapsibleGroupContent` and stays mounted and inert when closed.
 - `open` / `update:open` and `defaultOpen` follow the shared controlled-state helper. Open the group that holds the active route through `defaultOpen`.
+- The toggle row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`), as a destination row is.
 - In the rail a group shows only its toggle: the nested list stays hidden (`aria-expanded="false"`), and its open state applies once the menu expands.
 
 ### SidebarMenuSection

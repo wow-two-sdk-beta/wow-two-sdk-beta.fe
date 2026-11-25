@@ -7,7 +7,7 @@ export const menuVariants = tv({
 });
 
 export const menuItemVariants = tv({
-  base: 'relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-hidden transition-colors focus:bg-muted focus:text-foreground hover:bg-muted hover:text-foreground',
+  base: 'relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-hidden transition-colors pointer-coarse:min-h-11 focus:bg-muted focus:text-foreground hover:bg-muted hover:text-foreground',
   variants: {
     state: {
       default: 'text-popover-foreground',

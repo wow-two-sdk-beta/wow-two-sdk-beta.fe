@@ -23,6 +23,8 @@ Public import: `import { MenuItem } from '@wow-two-beta/fe/presentation/nav';`.
   `@wow-two-beta/fe/router` as the child. `role`, the disabled state, `class` and the handlers merge onto it; its own
   handlers run first.
 - A disabled link keeps the anchor without its `href`, sets `aria-disabled` and `data-disabled`, and never activates.
+- The row is its compact height (32px) under a fine pointer and at least 44px under a coarse one
+  (`pointer-coarse:min-h-11`); every row kind of the menu shares that recipe.
 
 ## Props
 

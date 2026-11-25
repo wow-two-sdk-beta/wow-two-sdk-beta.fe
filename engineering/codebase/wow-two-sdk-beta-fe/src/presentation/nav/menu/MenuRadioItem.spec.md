@@ -11,6 +11,7 @@ Public import: `import { MenuRadioItem } from '@wow-two-beta/fe/presentation/nav
 - Mount within `MenuRadioGroup` inside a `Menu`; the group owns the selected value.
 - A row's own `isDisabled` wins; when omitted the group's `isDisabled` applies.
 - Unmount disposes the menu registration.
+- The row is at least 44px tall under a coarse pointer, as every menu row is (see [MenuItem](MenuItem.spec.md)).
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
 ## Props

@@ -51,7 +51,7 @@ const rest = computed(() => {
 
 const classes = computed(() =>
   cn(
-    'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground',
+    'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground pointer-coarse:h-11',
     'transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[active]:bg-primary-soft data-[active]:text-primary-soft-foreground',
     '*:data-[sidebar-menu-label]:min-w-0 *:data-[sidebar-menu-label]:flex-1 *:data-[sidebar-menu-label]:truncate *:data-[sidebar-menu-label]:text-start',

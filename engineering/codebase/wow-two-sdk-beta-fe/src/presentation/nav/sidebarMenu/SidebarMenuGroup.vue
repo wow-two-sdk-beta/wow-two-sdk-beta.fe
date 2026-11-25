@@ -80,7 +80,7 @@ const rootClasses = computed(() => cn('flex min-w-0 flex-col', attrs.class as Cl
         type="button"
         :aria-expanded="isShown"
         :aria-controls="listId"
-        class="flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        class="flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground transition-colors pointer-coarse:h-11 hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         @click="toggle"
       >
         <span

@@ -16,6 +16,9 @@ Public import: `import { Button } from '@wow-two-beta/fe/presentation/actions';`
 - Unavailable keeps the tab stop and sets `aria-disabled`; the activation guard swallows clicks, Enter, Space and
   presses, and an unavailable link does not navigate. Disabled, loading and skeleton states take precedence.
 - Unavailable draws a dashed border at reduced opacity; `square` and `circle` shapes add a diagonal slash.
+- Sizes `sm` and `md` (32px and 40px) keep their box under a fine pointer and reach a 44 x 44px hit area under a coarse
+  pointer (`pointer-coarse:`), a short label and the `square` and `circle` shapes included; `lg` and `xl` already
+  exceed it, `xs` stays the dense step, and the `link` variant keeps its text height.
 - `unavailableLabel` shows through `Tooltip` and is the accessible description: a hidden copy inside the element,
   referenced by `aria-describedby` and merged with the caller's ids, holds it without hovering.
 
