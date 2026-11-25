@@ -1,24 +1,24 @@
-import { onMounted, onScopeDispose, ref, type Ref } from 'vue';
+import { computed, inject, type ComputedRef } from 'vue';
+import { DeviceClass, DeviceClassKey, TailwindBreakpoints, useMediaQuery } from '../../../foundation/device';
 
 /**
- * Whether the viewport is narrower than `minWidth` (Tailwind's `sm`, 640px, by default).
+ * Whether the calendar serves its phone layout — dots instead of chips, a day list instead of a time grid.
  *
- * Reads `window.innerWidth` directly rather than subscribing to a media query
- * (`foundation/device`'s `useBreakpointBelow`): below this folder's breakpoint several views render a
- * structurally different DOM (dots instead of chips, a day list instead of a time grid), so the very first
- * render must already carry the right answer. A media-query subscription only resolves the real value from
- * `onMounted`, one reactive tick after the initial render — correct for SSR, but it would flash the desktop
- * layout for exactly one frame on every mount, failing a synchronous test assertion taken right after `mount()`.
+ * Follows the device class an app root provided with `provideDeviceTargets`: the phone layout when the effective class
+ * is phone, whatever the viewport — a landscape phone, or a product that declares no tablet, is served the phone class
+ * at a width the viewport alone would call wide. Without a provider it follows the viewport: narrower than Tailwind's
+ * `sm` (640px). Both read through `foundation/device`, so rotating the device or resizing the window re-evaluates
+ * without a reload.
  *
- * SSR-safe: `true` (mobile-first) when there is no `window`.
+ * Reads `false` — the wide layout — on the server and in the first render, as the device class itself does, so a
+ * narrow screen is corrected on mount, in the same flush and before the first paint. The first render therefore never
+ * depends on `window`, and hydration matches the server.
+ *
+ * The class is read through the optional `inject` AppFrame uses: `useDeviceClass()` throws without a provider, and this
+ * calendar renders in apps that never provide one.
  */
-export function useIsPhone(minWidth = 640): Ref<boolean> {
-  const isPhone = ref(typeof window === 'undefined' || window.innerWidth < minWidth);
-  if (typeof window === 'undefined') return isPhone;
-  function update(): void {
-    isPhone.value = window.innerWidth < minWidth;
-  }
-  onMounted(() => window.addEventListener('resize', update));
-  onScopeDispose(() => window.removeEventListener('resize', update));
-  return isPhone;
+export function useIsPhone(): ComputedRef<boolean> {
+  const provided = inject(DeviceClassKey, null);
+  const isViewportPhone = useMediaQuery(`(width < ${TailwindBreakpoints.sm}px)`);
+  return computed(() => (provided ? provided.effective.value === DeviceClass.Phone : isViewportPhone.value));
 }

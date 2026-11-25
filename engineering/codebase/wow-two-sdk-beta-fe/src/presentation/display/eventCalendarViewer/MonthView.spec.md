@@ -33,6 +33,11 @@ A day cell draws at most 4 items — bar lanes and single-day chips together. Th
 
 ## Phone layout
 
+- The phone layout follows the device class an app root provided with `provideDeviceTargets` (phone when its effective
+  class is phone, at any width), else the viewport (below `sm`); see `useIsPhone` in `EventCalendarViewerHelpers.ts`.
+  A desktop or tablet class keeps the wide layout in a narrow viewport.
+- Under a coarse pointer the wide layout's date buttons are at least 44 x 44px and its chips, bars and `+N more`
+  buttons at least 44px tall; a fine pointer keeps the dense cells.
 - Below `sm`, compact weeks reserve space for the dates and single-day event dots above the decorative multi-day bars. The whole date cell opens a bottom sheet. Its accessible name includes the event count.
 - The sheet shows the date and matching event count, including ongoing multi-day events and items beyond the grid's display limit. Each event opens through `event-click`. Dismissing returns focus to the date.
 

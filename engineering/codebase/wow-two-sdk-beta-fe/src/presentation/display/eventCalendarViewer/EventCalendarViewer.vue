@@ -329,7 +329,7 @@ defineExpose({ el: root });
       <button
         type="button"
         :disabled="isShowingCurrentPeriod"
-        class="inline-flex h-11 shrink-0 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium enabled:hover:bg-muted disabled:opacity-50 sm:h-7"
+        class="inline-flex h-11 shrink-0 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium enabled:hover:bg-muted disabled:opacity-50 sm:h-7 pointer-coarse:h-11"
         @click="goToday"
       >
         {{ locale.t('EventCalendarViewer.today', undefined, 'Today') }}
@@ -341,7 +341,7 @@ defineExpose({ el: root });
         <button
           type="button"
           :aria-label="locale.t('EventCalendarViewer.previous', undefined, 'Previous')"
-          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:size-11"
           @click="goPrev"
         >
           <Icon :icon="ChevronLeft" :size="16" />
@@ -352,7 +352,7 @@ defineExpose({ el: root });
         <button
           type="button"
           :aria-label="locale.t('EventCalendarViewer.next', undefined, 'Next')"
-          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:size-11"
           @click="goNext"
         >
           <Icon :icon="ChevronRight" :size="16" />

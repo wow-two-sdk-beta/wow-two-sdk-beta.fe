@@ -253,7 +253,7 @@ function cellClass(cell: MonthCell): string {
 
 function dateButtonClass(cell: MonthCell): string {
   return cn(
-    'mx-1 mb-1 mt-1 self-start justify-self-start rounded-sm px-1 text-xs tabular-nums transition-colors sm:max-lg:min-h-10 sm:max-lg:min-w-10',
+    'mx-1 mb-1 mt-1 self-start justify-self-start rounded-sm px-1 text-xs tabular-nums transition-colors sm:max-lg:min-h-10 sm:max-lg:min-w-10 pointer-coarse:min-h-11 pointer-coarse:min-w-11',
     cell.outOfMonth ? 'text-muted-foreground' : 'text-foreground',
     isToday(cell.day) && 'bg-primary text-primary-foreground',
     'hover:bg-muted',
@@ -277,7 +277,7 @@ function phoneDateNumberClass(cell: MonthCell): string {
 
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10',
+    'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10 pointer-coarse:min-h-11',
     !e.color && 'bg-primary-soft text-primary-soft-foreground',
   );
 }
@@ -300,7 +300,7 @@ function barClass(bar: BarSegment): string {
     );
   }
   return cn(
-    'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10',
+    'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10 pointer-coarse:min-h-11',
     'px-1.5',
     !bar.event.color && 'bg-primary-soft text-primary-soft-foreground',
     bar.isStart ? 'ms-0.5 rounded-s-sm' : 'rounded-s-none',
@@ -458,7 +458,7 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
             type="button"
             aria-haspopup="dialog"
             :aria-label="`${dateLabel(column.day)}, ${eventCountLabel(column.eventCount)}`"
-            class="min-h-6 rounded-sm px-1 text-start text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:max-lg:min-h-10"
+            class="min-h-6 rounded-sm px-1 text-start text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:max-lg:min-h-10 pointer-coarse:min-h-11"
             @click="openDay($event, column.day)"
           >
             {{ locale.t('MonthView.more', { count: column.moreCount }, '+{count} more') }}
