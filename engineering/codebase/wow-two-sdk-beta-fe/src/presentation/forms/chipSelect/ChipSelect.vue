@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { IconAdapter } from '../../../foundation/icons';
 
-/** Defines the hint card an option's row opens after a pause on hover or focus. */
+/** Defines the hint card for an option. */
 export interface ChipSelectOptionHint {
   /** The one-line definition under the label. */
   readonly description: string;
@@ -18,7 +18,7 @@ export interface ChipSelectOption {
   /** The value stored in the selection. */
   readonly value: string;
 
-  /** The text of the row, and the accessible name and `title` of the option's chip. */
+  /** The text of the row and the accessible name of the option's chip. */
   readonly label: string;
 
   /** How many rows this value would match. The consumer counts; the control only renders it. */
@@ -27,7 +27,7 @@ export interface ChipSelectOption {
   /** The icon of the row and, alone, of the option's chip. An option without one shows its label on the chip. */
   readonly icon?: IconAdapter;
 
-  /** The hint card the row opens on hover or focus. Omit it and the row has no tooltip. */
+  /** The hint card for the row and its chip. Without it, the chip uses the label as its native title. */
   readonly hint?: ChipSelectOptionHint;
 }
 
@@ -78,7 +78,10 @@ export interface ChipSelectProps {
   /** The count line of a hint card; `{count}` marks the number. Default `"{count}"`, localized. */
   readonly hintCountLabel?: string;
 
-  /** How long a row waits before its hint card opens, in ms. Default: the tooltip's own, 700. */
+  /** Whether dropdown rows show option hints. Default `true`. */
+  readonly showRowHints?: boolean;
+
+  /** How long a chip or row waits before its hint card opens, in ms. Default: the tooltip's own, 700. */
   readonly hintOpenDelay?: number;
 
   /** How long a hint card takes to fade in and out, in ms. Default: none — it appears and vanishes at once. */
@@ -129,8 +132,8 @@ import ChipSelectHint from './ChipSelectHint.vue';
  * Renders a choice as a single field — a combobox button holding the chosen options as chips, and a panel that lists
  * every option with its icon, label, count and a check. The chips are icons only; the ones the field has no room for
  * collapse into one `+N` chip, measured against the field's width. A multiple select toggles an option per click and
- * keeps the panel open; a single one picks one and closes, its "Any" row clearing the choice. An option's hint card
- * opens on hover and on the keyboard-active row. The field is 12rem to 18rem wide and never wider than its container.
+ * keeps the panel open; a single one picks one and closes, its "Any" row clearing the choice. An option's hint opens
+ * when its chip is hovered. Rows show hints on hover and keyboard navigation when enabled.
  */
 defineOptions({ name: 'ChipSelect', inheritAttrs: false });
 
@@ -141,6 +144,7 @@ const componentProps = withDefaults(defineProps<ChipSelectProps>(), {
   placeholder: undefined,
   label: undefined,
   isDisabled: false,
+  showRowHints: true,
   hintOpenDelay: undefined,
   hintFadeDuration: undefined,
 });
@@ -154,6 +158,11 @@ const props = useLocaleDefaults(componentProps, 'ChipSelect', {
 const emit = defineEmits<{
   /** Fires when the reader changes the choice — a value or `null` for a single select, the set when `isMultiple`. */
   'update:modelValue': [value: string | ReadonlyArray<string> | null];
+}>();
+
+defineSlots<{
+  /** Custom content for an option's hint. The surface identifies the tooltip's anchor. */
+  hint?(props: { option: ChipSelectOption; surface: 'chip' | 'row' }): unknown;
 }>();
 
 const attrs = useAttrs();
@@ -265,7 +274,10 @@ function setVirtualFocus(next: HTMLElement | null): void {
 
 /** Gives the hint tooltip of the row the keyboard moved to the focus it would have on a button. */
 function onActiveChange(id: string | null): void {
-  const row = id !== null && isKeyboardDriven ? (field.value?.ownerDocument.getElementById(id) ?? null) : null;
+  const row =
+    props.showRowHints && id !== null && isKeyboardDriven
+      ? (field.value?.ownerDocument.getElementById(id) ?? null)
+      : null;
   setVirtualFocus(row);
 }
 
@@ -366,12 +378,20 @@ const chevronClass = computed(() =>
             {{ placeholderText }}
           </span>
           <template v-else>
-            <ChipSelectChip
+            <ChipSelectHint
               v-for="option in shownOptions"
               :key="option.value"
               :option="option"
-              :is-empty="option.count === 0"
-            />
+              :hint-count-label="props.hintCountLabel"
+              :hint-open-delay="hintOpenDelay"
+              :hint-fade-duration="hintFadeDuration"
+              :is-disabled="isOpen || isDisabled"
+            >
+              <ChipSelectChip :option="option" :is-empty="option.count === 0" />
+              <template v-if="$slots.hint" #content>
+                <slot name="hint" :option="option" surface="chip" />
+              </template>
+            </ChipSelectHint>
             <ChipSelectChip v-if="hiddenCount > 0" :more-count="hiddenCount" :more-label="moreName" />
             <span
               ref="probe"
@@ -406,7 +426,7 @@ const chevronClass = computed(() =>
         @keydown="onListKeydown"
         @pointermove="onListPointerMove"
       >
-        <ListboxPickerItem v-if="!isMultiple" value="" data-chip-select-any @click="onRowClick">
+        <ListboxPickerItem v-if="!isMultiple" value="" class="max-lg:min-h-10" data-chip-select-any @click="onRowClick">
           <span class="min-w-0 flex-1 truncate">{{ props.anyLabel }}</span>
           <span class="size-4 shrink-0">
             <Check v-if="chosenOptions.length === 0" class="size-4" data-chip-select-check />
@@ -415,7 +435,7 @@ const chevronClass = computed(() =>
         <ChipSelectHint
           v-for="option in options"
           :key="option.value"
-          :option="option"
+          :option="showRowHints ? option : undefined"
           :hint-count-label="props.hintCountLabel"
           :hint-open-delay="hintOpenDelay"
           :hint-fade-duration="hintFadeDuration"
@@ -424,7 +444,7 @@ const chevronClass = computed(() =>
           <ListboxPickerItem
             :value="option.value"
             :data-empty="isEmpty(option) ? '' : undefined"
-            class="data-[empty]:text-muted-foreground data-[empty]:opacity-60"
+            class="data-[empty]:text-muted-foreground data-[empty]:opacity-60 max-lg:min-h-10"
             @click="onRowClick"
           >
             <Icon v-if="option.icon" :icon="option.icon" :size="16" class="text-muted-foreground" />
@@ -440,6 +460,9 @@ const chevronClass = computed(() =>
               <Check v-if="isChosen(option.value)" class="size-4" data-chip-select-check />
             </span>
           </ListboxPickerItem>
+          <template v-if="$slots.hint" #content>
+            <slot name="hint" :option="option" surface="row" />
+          </template>
         </ChipSelectHint>
       </ListboxPicker>
     </PopoverContent>

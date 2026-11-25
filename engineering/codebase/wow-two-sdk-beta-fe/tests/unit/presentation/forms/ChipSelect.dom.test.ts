@@ -157,11 +157,11 @@ describe('ChipSelect field', () => {
     expect(labelled.get('[data-chip-select-placeholder]').text()).toBe('Format');
   });
 
-  it('shows each chosen option as an icon-only chip named and titled by its label, in option order', () => {
+  it('names each icon-only chip and gives a chip without a hint a native title', () => {
     const { wrapper } = mountSelect(['expo', 'conference']);
     const chips = chipsOf(fieldOf(wrapper));
     expect(chips.map((chip) => chip.getAttribute('aria-label'))).toEqual(['Conference', 'Expo']);
-    expect(chips.map((chip) => chip.getAttribute('title'))).toEqual(['Conference', 'Expo']);
+    expect(chips.map((chip) => chip.getAttribute('title'))).toEqual([null, 'Expo']);
     for (const chip of chips) {
       expect(chip.getAttribute('role')).toBe('img');
       expect(chip.querySelector('svg')).not.toBeNull();
@@ -615,7 +615,7 @@ describe('ChipSelect option hints', () => {
     expect(conference.getAttribute('aria-describedby')).toBe(document.querySelector('[role=tooltip]')!.id);
 
     conference.dispatchEvent(new PointerEvent('pointerleave'));
-    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(200);
     expect(document.querySelector('[role=tooltip]')).toBeNull();
   });
 
@@ -660,6 +660,7 @@ describe('ChipSelect option hints', () => {
     listbox()!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
     await vi.advanceTimersByTimeAsync(0);
     await settle();
+    await vi.advanceTimersByTimeAsync(200);
     expect(document.querySelector('[role=tooltip]')).toBeNull();
     await vi.advanceTimersByTimeAsync(5000);
     expect(document.querySelector('[role=tooltip]')).toBeNull();
@@ -676,15 +677,15 @@ describe('ChipSelect option hints', () => {
     expect(expo.parentElement).toBe(listbox());
   });
 
-  it('opens at the tooltip default of 700 ms and writes the count line from hintCountLabel', async () => {
+  it('opens at the tooltip default of 350 ms and writes the count line from hintCountLabel', async () => {
     const { wrapper } = mountSelect([], { hintCountLabel: '{count} shows' });
     await openPanel(wrapper);
     row('Conference').dispatchEvent(new PointerEvent('pointerenter'));
-    await vi.advanceTimersByTimeAsync(699);
+    await vi.advanceTimersByTimeAsync(349);
     expect(document.querySelector('[role=tooltip]')).toBeNull();
     await vi.advanceTimersByTimeAsync(1);
     expect(hintCard()!.querySelector('[data-chip-select-hint-count]')!.textContent!.trim()).toBe('9 shows');
-    expect(document.querySelector<HTMLElement>('[role=tooltip]')!.hasAttribute('style')).toBe(false);
+    expect(document.querySelector<HTMLElement>('[role=tooltip]')!.style.transition).toBe('opacity 200ms ease-out');
   });
 
   it('fades the card over hintFadeDuration, keeping it mounted while it fades out', async () => {
@@ -703,11 +704,54 @@ describe('ChipSelect option hints', () => {
     expect(document.querySelector('[role=tooltip]')).toBeNull();
   });
 
-  it('puts no hint on the field or its chips', async () => {
-    const { wrapper } = mountSelect(['conference'], { hintOpenDelay: 0 });
-    fieldOf(wrapper).dispatchEvent(new PointerEvent('pointerenter'));
-    fieldOf(wrapper).dispatchEvent(new FocusEvent('focus'));
-    await vi.advanceTimersByTimeAsync(5000);
-    expect(document.querySelector('[role=tooltip]')).toBeNull();
+  it('opens the selected chip’s hint after the delay and dismisses it when the panel opens', async () => {
+    const { wrapper } = mountSelect(['conference'], { hintOpenDelay: 200 });
+    const field = fieldOf(wrapper);
+    field.dispatchEvent(new PointerEvent('pointerenter'));
+    field.dispatchEvent(new FocusEvent('focus'));
+    await vi.advanceTimersByTimeAsync(200);
+    expect(hintCard()).toBeNull();
+
+    const [chip] = chipsOf(field);
+    chip!.dispatchEvent(new PointerEvent('pointerenter'));
+    await vi.advanceTimersByTimeAsync(199);
+    expect(hintCard()).toBeNull();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(hintCard()!.querySelector('[data-chip-select-hint-label]')!.textContent).toBe('Conference');
+
+    await openPanel(wrapper);
+    expect(listbox()).not.toBeNull();
+    await vi.advanceTimersByTimeAsync(200);
+    expect(hintCard()).toBeNull();
+  });
+
+  it('lets a parent replace just the chip hint while the row uses the default card', async () => {
+    const wrapper = mount(ChipSelect, {
+      attachTo: document.body,
+      props: {
+        options: formatOptions(),
+        defaultValue: ['conference'],
+        isMultiple: true,
+        hintOpenDelay: 0,
+      },
+      slots: {
+        hint: ({ option, surface }: { option: ChipSelectOption; surface: 'chip' | 'row' }) =>
+          surface === 'chip' ? h('span', `${option.label} chip hint`) : [],
+      },
+    });
+    wrappers.push(wrapper);
+    await settle();
+
+    const [chip] = chipsOf(fieldOf(wrapper));
+    chip!.dispatchEvent(new PointerEvent('pointerenter'));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(document.querySelector('[role=tooltip]')?.textContent).toBe('Conference chip hint');
+
+    await openPanel(wrapper);
+    row('Conference').dispatchEvent(new PointerEvent('pointerenter'));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(hintCard()?.querySelector('[data-chip-select-hint-description]')?.textContent).toBe(
+      'Talks and panels over one or more days.',
+    );
   });
 });

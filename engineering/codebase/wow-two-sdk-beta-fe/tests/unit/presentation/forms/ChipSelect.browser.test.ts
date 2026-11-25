@@ -95,6 +95,7 @@ describe('ChipSelect field', () => {
     const strip = stripOf(frame).getBoundingClientRect();
     for (const chip of chipsIn(frame)) {
       const rect = chip.getBoundingClientRect();
+      expect(rect.width).toBeCloseTo(rect.height);
       expect(rect.left).toBeGreaterThanOrEqual(strip.left - 0.5);
       expect(rect.right).toBeLessThanOrEqual(strip.right + 0.5);
       expect(chip.querySelector('svg')).not.toBeNull();
@@ -266,6 +267,18 @@ describe('ChipSelect panel', () => {
     await expect.poll(() => document.querySelector('[role=tooltip]')?.textContent ?? '').toContain('Conference');
     await userEvent.keyboard('{ArrowDown}{ArrowDown}');
     await expect.poll(() => document.querySelector('[role=tooltip]')).toBeNull();
+  });
+
+  it('opens the selected chip’s rich hover card outside the clipped strip', async () => {
+    const { frame } = mountSelect(1440, ['conference']);
+    const [chip] = chipsIn(frame);
+    await userEvent.hover(chip!);
+    const tooltip = () => document.querySelector<HTMLElement>('[role=tooltip]');
+    await expect.poll(() => tooltip()?.textContent ?? '').toContain('About conference events.');
+    expect(fieldOf(frame).contains(tooltip())).toBe(false);
+    await userEvent.click(chip!);
+    await expect.poll(() => panelRows().length).toBe(8);
+    await expect.poll(tooltip).toBeNull();
   });
 
   it('stays inside a 375px screen', async () => {
