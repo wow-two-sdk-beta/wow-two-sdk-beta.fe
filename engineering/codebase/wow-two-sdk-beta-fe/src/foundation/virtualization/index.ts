@@ -82,6 +82,7 @@ export {
 } from './Windowing';
 
 export { useVirtualList, type UseVirtualListOptions, type VirtualItem, type VirtualList } from './UseVirtualList';
+export { continuationSize, useAdaptiveWindow, type UseAdaptiveWindowOptions } from './UseAdaptiveWindow';
 
 export {
   useAdaptiveList,
