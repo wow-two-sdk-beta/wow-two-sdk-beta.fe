@@ -12,6 +12,7 @@ Public import: `import { TabsGroupTab } from '@wow-two-beta/fe/presentation/disp
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - Inside a skeleton `TabsGroup` or a `DataRegion` first load, the tab keeps its box, draws its label as a bar, hides
   the active underline and is `inert`.
+- A tab is 38px high (36px in a vertical list) under a fine pointer and at least 44 x 44px under a coarse one (`pointer-coarse:min-h-11`, `min-w-11`).
 
 ## Props
 

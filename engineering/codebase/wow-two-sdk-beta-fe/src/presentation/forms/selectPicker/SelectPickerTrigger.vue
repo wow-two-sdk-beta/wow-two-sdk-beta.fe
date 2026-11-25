@@ -38,6 +38,23 @@ const TriggerClearBoxClasses = {
   lg: 'h-6 w-6',
 } as const;
 
+/** Contains the clear slot's extra width under a coarse pointer, so the slot holds the 44px button laid over it.
+ *  `xs` is the dense step: its trigger and its clear button keep their own size. */
+const TriggerClearSlotClasses = {
+  xs: '',
+  sm: 'pointer-coarse:w-11',
+  md: 'pointer-coarse:w-11',
+  lg: 'pointer-coarse:w-11',
+} as const;
+
+/** Contains the clear button's 44 x 44px floor under a coarse pointer, filling the trigger's own 44px minimum. */
+const TriggerClearTouchClasses = {
+  xs: '',
+  sm: 'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+  md: 'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+  lg: 'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+} as const;
+
 /** Contains the vertical-divider height Tailwind classes per trigger size. */
 const TriggerDividerClasses = {
   xs: 'h-3',
@@ -156,6 +173,7 @@ const showClear = computed(
 const sizeKey = computed<SelectPickerSize>(() => props.size ?? 'md');
 const iconClass = computed(() => TriggerIconClasses[sizeKey.value]);
 const clearBoxClass = computed(() => TriggerClearBoxClasses[sizeKey.value]);
+const clearSlotClass = computed(() => cn(clearBoxClass.value, TriggerClearSlotClasses[sizeKey.value]));
 const dividerClass = computed(() => TriggerDividerClasses[sizeKey.value]);
 const clearOffsetClass = computed(() => TriggerClearOffsetClasses[sizeKey.value]);
 
@@ -180,6 +198,7 @@ const clearButtonClass = computed(() =>
        (`clearBoxClass`) stays visually small. */
     'absolute top-1/2 grid min-h-6 min-w-6 -translate-y-1/2 place-items-center rounded-full text-subtle-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     clearBoxClass.value,
+    TriggerClearTouchClasses[sizeKey.value],
     clearOffsetClass.value,
   ),
 );
@@ -247,7 +266,7 @@ defineExpose({ el: root });
         <span class="ml-auto flex shrink-0 items-center gap-1.5">
           <template v-if="showClear">
             <!-- Reserves the slot the overlaid clear button sits on. -->
-            <span aria-hidden="true" :class="clearBoxClass" />
+            <span aria-hidden="true" :class="clearSlotClass" />
             <!-- Separates the clear button from the chevron — `foreground/20` always contrasts. -->
             <span aria-hidden="true" :class="cn('w-px bg-foreground/20', dividerClass)" />
           </template>

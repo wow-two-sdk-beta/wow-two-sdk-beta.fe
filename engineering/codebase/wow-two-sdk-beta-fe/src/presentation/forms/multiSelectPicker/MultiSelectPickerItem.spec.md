@@ -11,6 +11,7 @@ Public import: `import { MultiSelectPickerItem } from '@wow-two-beta/fe/presenta
 - Mount within the owner supplying `useMultiSelectContext`; a compound part is not an independent root.
 - Inside a closed panel's off-document collection the row registers its label and renders nothing.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the row is at least 44px high, as every listbox row is.
 
 ## Props
 

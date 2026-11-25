@@ -290,7 +290,7 @@ defineExpose({ el: input });
       :aria-checked="ariaChecked"
       :aria-invalid="isInvalid"
       :aria-describedby="describedBy"
-      class="peer absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+      class="peer absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed pointer-coarse:top-1/2 pointer-coarse:left-1/2 pointer-coarse:size-11 pointer-coarse:-translate-1/2"
       v-bind="passthroughAttrs"
       @change="onChange"
       @click="finalReadOnly && $event.preventDefault()"

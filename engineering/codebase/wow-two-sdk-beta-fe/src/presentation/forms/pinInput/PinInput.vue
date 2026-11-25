@@ -36,7 +36,8 @@ export interface PinInputProps {
 
 /* Sizes not listed fall back to the `md` row at the call site. */
 const SizeClass: Partial<Record<Size, string>> = {
-  sm: 'h-9 w-9 text-base',
+  /* `sm` takes the `md` cell under a coarse pointer, so a cell keeps its square and reaches 44 x 44px. */
+  sm: 'h-9 w-9 text-base pointer-coarse:size-11',
   md: 'h-11 w-11 text-lg',
   lg: 'h-14 w-14 text-xl',
 };

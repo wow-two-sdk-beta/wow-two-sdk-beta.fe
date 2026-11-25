@@ -31,8 +31,9 @@ function buildPages(total: number, page: number, siblings: number): ReadonlyArra
   return pages;
 }
 
+/* 32px under a fine pointer, 44px under a coarse one (a finger). */
 const BaseButton =
-  'inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-transparent px-2 text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50';
+  'inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-transparent px-2 text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 pointer-coarse:h-11 pointer-coarse:min-w-11';
 </script>
 
 <script setup lang="ts">
@@ -82,7 +83,10 @@ function go(target: number): void {
   emit('update:page', next);
 }
 
-const classes = computed(() => cn('inline-flex items-center gap-1', attrs.class as string | undefined));
+/* The taller, wider buttons of a coarse pointer wrap onto the next line rather than run past a phone's edge. */
+const classes = computed(() =>
+  cn('inline-flex items-center gap-1 pointer-coarse:flex-wrap', attrs.class as string | undefined),
+);
 
 /** Everything but `class`, which is re-applied through `cn` above. */
 const rest = computed(() => {

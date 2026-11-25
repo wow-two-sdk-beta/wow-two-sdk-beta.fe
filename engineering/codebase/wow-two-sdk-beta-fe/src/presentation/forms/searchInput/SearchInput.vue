@@ -144,6 +144,10 @@ const passthroughAttrs = computed(() =>
 
 const wrapperClass = computed(() => cn('relative', attrs.class as ClassValue));
 
+/* Under a coarse pointer the clear button grows to the field's 44px floor and the text clears it; the dense `xs` field
+   keeps its own height, so its button stays as it is. */
+const touchClearClass = computed(() => (props.size === 'xs' ? '' : 'pointer-coarse:right-0 pointer-coarse:size-11'));
+
 const inputClass = computed(() =>
   cn(
     inputBaseVariants({
@@ -154,6 +158,7 @@ const inputClass = computed(() =>
     }),
     'pl-9',
     showClear.value && 'pr-9',
+    showClear.value && props.size !== 'xs' && 'pointer-coarse:pr-11',
     '[&::-webkit-search-cancel-button]:appearance-none',
   ),
 );
@@ -191,6 +196,7 @@ const locale = useLocale();
       type="button"
       :disabled="finalDisabled"
       :aria-label="locale.t('SearchInput.clearSearch', undefined, 'Clear search')"
+      :class="touchClearClass"
       class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-subtle-foreground hover:bg-muted hover:text-muted-foreground"
       @click="handleClear"
     >

@@ -10,6 +10,7 @@ Public import: `import { ComboboxPickerInput } from '@wow-two-beta/fe/presentati
 
 - Mount within the owner supplying `useComboboxContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the input is at least 44px high (the shared input floor).
 
 ## Props
 

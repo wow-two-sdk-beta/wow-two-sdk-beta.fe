@@ -104,7 +104,9 @@ const checkboxProps = computed(() => {
   return rest;
 });
 
-const wrapperClass = computed(() => cn('flex items-start gap-2.5 cursor-pointer', props.wrapperClassName));
+const wrapperClass = computed(() =>
+  cn('flex items-start gap-2.5 cursor-pointer pointer-coarse:py-3', props.wrapperClassName),
+);
 
 const checkboxClass = computed(() => attrs.class as ClassValue);
 

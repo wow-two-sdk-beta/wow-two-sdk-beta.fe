@@ -12,6 +12,7 @@ Public import: `import { TextAreaInput } from '@wow-two-beta/fe/presentation/for
 - Native form reset requests the original seed through the state owner and restores the resulting DOM representation; a cancelled reset changes nothing.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Takes the shared input floor under a coarse pointer (at least 44px high, `pointer-coarse:min-h-11`); its row height already exceeds it.
 
 ## Props
 

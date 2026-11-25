@@ -51,6 +51,7 @@ Public import: `import { PhoneInput } from '@wow-two-beta/fe/presentation/forms'
 - Regression: `tests/unit/presentation/forms/PhoneInput.dom.test.ts`; the edit and caret rules in
   `tests/unit/foundation/phone/PhoneNumbers.test.ts`; the rule in `tests/unit/foundation/validators/Phone.test.ts`.
 - `PhoneCountries` and `PhoneCountry` live in `foundation/phone`; this component's barrel re-exports them.
+- Under a coarse pointer the frame is 44px high (`pointer-coarse:h-11`) and its parts fill it; a fine pointer keeps the 40px frame.
 
 ## Props
 

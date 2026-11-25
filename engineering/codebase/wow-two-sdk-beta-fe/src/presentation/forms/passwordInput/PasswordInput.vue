@@ -142,6 +142,10 @@ const passthroughAttrs = computed(() =>
 
 const wrapperClass = computed(() => cn('relative', attrs.class as ClassValue));
 
+/* Under a coarse pointer the reveal button grows to the field's 44px floor and the text clears it; the dense `xs`
+   field keeps its own height, so its button stays as it is. */
+const touchToggleClass = computed(() => (props.size === 'xs' ? '' : 'pointer-coarse:right-0 pointer-coarse:size-11'));
+
 const inputClass = computed(() =>
   cn(
     inputBaseVariants({
@@ -149,6 +153,7 @@ const inputClass = computed(() =>
       state: props.state ?? (ctx?.isInvalid ? InputStateValue.Invalid : InputStateValue.Default),
     }),
     props.hasToggle && 'pr-10',
+    props.hasToggle && props.size !== 'xs' && 'pointer-coarse:pr-11',
   ),
 );
 
@@ -187,6 +192,7 @@ defineExpose({ el: input });
       :disabled="finalDisabled"
       :aria-label="toggleLabel"
       :aria-pressed="visible"
+      :class="touchToggleClass"
       class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-muted-foreground hover:bg-muted disabled:opacity-50"
       @click="toggle"
     >

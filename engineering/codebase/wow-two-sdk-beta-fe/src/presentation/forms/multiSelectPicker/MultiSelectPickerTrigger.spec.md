@@ -10,6 +10,7 @@ Public import: `import { MultiSelectPickerTrigger } from '@wow-two-beta/fe/prese
 
 - Mount within the owner supplying `useMultiSelectContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the trigger is at least 44px high (the shared input floor); a fine pointer keeps the 40px minimum. The chip remove marks inside it stay small: each value also has a panel row of at least 44px, and Backspace drops the last chip.
 
 ## Props
 

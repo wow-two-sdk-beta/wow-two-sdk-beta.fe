@@ -24,7 +24,8 @@ const CloseIcon = X;
  * Renders a pill with an optional close button, shown only when the consumer binds `@close`.
  *
  * The close button is a raw `<button>` to keep the strict atom rule — `Tag` is L3, so importing `Button` would make
- * this an atom-on-atom composition.
+ * this an atom-on-atom composition. It stays 16px: under a coarse pointer an invisible 44px square centred on it
+ * (`pointer-coarse:after:`) takes the tap, so the dense chip keeps its height.
  */
 defineOptions({ name: 'Tag', inheritAttrs: false });
 
@@ -69,7 +70,7 @@ defineExpose({ el });
       v-if="hasClose()"
       type="button"
       :aria-label="props.closeLabel"
-      class="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+      class="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-11 pointer-coarse:after:-translate-1/2"
       @click="emit('close')"
     >
       <Icon :icon="CloseIcon" :size="12" />

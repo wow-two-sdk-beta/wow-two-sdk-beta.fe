@@ -10,6 +10,7 @@ Public import: `import { Tag } from '@wow-two-beta/fe/presentation/display';`.
 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- The close button stays a 16px box in the dense chip; under a coarse pointer an invisible 44px square centred on it (`pointer-coarse:after:`) takes the tap, so the chip keeps its height.
 
 ## Props
 

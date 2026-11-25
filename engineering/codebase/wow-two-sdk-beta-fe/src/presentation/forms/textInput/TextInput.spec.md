@@ -12,6 +12,7 @@ Public import: `import { TextInput } from '@wow-two-beta/fe/presentation/forms';
 - Native form reset requests the original seed through the state owner and restores the resulting DOM representation; a cancelled reset changes nothing.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer (a finger) the field is at least 44px high at the `sm` and `md` sizes (`pointer-coarse:min-h-11` in the shared input recipe); a fine pointer keeps the compact box (32px, 40px). `lg` is already taller and `xs` stays the dense step. Every field built on that recipe — the select, combobox and tag triggers, the number, email, date and the other text fields — takes the same floor.
 
 ## Props
 

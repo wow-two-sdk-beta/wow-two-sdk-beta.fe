@@ -20,8 +20,9 @@ export const listboxVariants = tv({
   base: 'flex max-h-72 flex-col gap-0.5 overflow-y-auto text-sm outline-hidden',
 });
 
+/* The row is 32px under a fine pointer and at least 44px under a coarse one, as a menu row is. */
 export const listboxItemVariants = tv({
-  base: 'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden',
+  base: 'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden pointer-coarse:min-h-11',
   variants: {
     state: {
       default: 'text-popover-foreground',

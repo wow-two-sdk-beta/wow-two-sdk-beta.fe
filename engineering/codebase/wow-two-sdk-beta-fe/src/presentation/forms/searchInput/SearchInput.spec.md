@@ -12,6 +12,7 @@ Public import: `import { SearchInput } from '@wow-two-beta/fe/presentation/forms
 - Native form reset requests the original seed through the state owner and restores the resulting DOM representation; a cancelled reset changes nothing.
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the field is at least 44px high, and the clear button grows to a 44 x 44px square at the field's end (the text keeps clear of it); a fine pointer keeps the 40px field and 32px button. The `xs` step stays dense.
 
 ## Props
 

@@ -80,7 +80,7 @@ const switchProps = computed(() => {
 
 const wrapperClass = computed(() =>
   cn(
-    'flex cursor-pointer items-start gap-3',
+    'flex cursor-pointer items-start gap-3 pointer-coarse:py-3',
     props.side === SideValue.Right && 'flex-row-reverse justify-between',
     props.wrapperClassName,
   ),

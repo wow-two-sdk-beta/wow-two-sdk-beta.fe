@@ -62,7 +62,7 @@ function onFocus(): void {
 
 const classes = computed(() =>
   cn(
-    'inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors',
+    'inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors pointer-coarse:min-h-11 pointer-coarse:min-w-11',
     'hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[state=active]:text-foreground data-[state=active]:border-primary',
     tabs.orientation === Orientation.Vertical

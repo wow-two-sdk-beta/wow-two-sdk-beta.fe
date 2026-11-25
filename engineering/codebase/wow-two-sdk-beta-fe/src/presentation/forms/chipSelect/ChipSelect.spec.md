@@ -25,6 +25,7 @@ Built on the SDK `Popover` (a modal one, so focus stays in the panel) and `Listb
 - The card opens after `hintOpenDelay` of hover (unset, the `Tooltip`'s own 700 ms) and after the same wait on the row the keyboard moved to. A row never takes DOM focus, so the keyboard-active row gets a virtual `focus` and the row it leaves a virtual `blur` — the events the tooltip already listens for on a button — and only while the last input was the keyboard; a pointer over another row ends it. It closes when the pointer and the keyboard both leave, and on Escape. `hintFadeDuration` (unset, no fade) fades it in and out over that many ms; `prefers-reduced-motion: reduce` turns the fade off.
 - The default texts (`anyLabel`, `selectedLabel`, `moreLabel`, `hintCountLabel`) follow the nearest `LocaleProvider` under `ChipSelect.*` keys; explicit caller text wins.
 - `isDisabled` disables the field button: it neither focuses nor opens.
+- Under a coarse pointer the pill field is at least 44px high (the shared input floor) and the panel rows at least 44px; a fine pointer keeps the 36px pill.
 
 ## Props
 

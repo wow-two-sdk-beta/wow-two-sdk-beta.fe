@@ -251,7 +251,7 @@ const passthroughAttrs = computed(() =>
 
 const rootClass = computed(() =>
   cn(
-    'inline-flex h-10 items-stretch overflow-hidden rounded-md border bg-background',
+    'inline-flex h-10 items-stretch overflow-hidden rounded-md border bg-background pointer-coarse:h-11',
     invalid.value ? 'border-destructive' : 'border-input',
     disabled.value && 'opacity-60',
     readOnly.value && 'bg-muted text-muted-foreground',
@@ -259,9 +259,10 @@ const rootClass = computed(() =>
   ),
 );
 
-/* The frame is the medium input step (`h-10`, border included); its parts fill it rather than add their own height
-   to the border. The country select is a native `<select>`, which has no `readonly`: a read-only phone input
-   disables it, so it takes the frame's muted surface and the default cursor rather than the pointer. */
+/* The frame is the medium input step (`h-10`, border included, `h-11` under a coarse pointer); its parts fill it
+   rather than add their own height to the border. The country select is a native `<select>`, which has no
+   `readonly`: a read-only phone input disables it, so it takes the frame's muted surface and the default cursor
+   rather than the pointer. */
 const selectClass = computed(() =>
   cn(
     'h-full cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
@@ -279,7 +280,7 @@ const prefixClass = computed(() =>
 
 const inputClass = cn(
   inputBaseVariants({ size: InputSize.Md }),
-  'h-full rounded-none border-0 focus-visible:ring-0 readonly:focus-visible:ring-0',
+  'h-full rounded-none border-0 focus-visible:ring-0 readonly:focus-visible:ring-0 pointer-coarse:min-h-0',
 );
 
 const formResetAnchor = useTemplateRef<HTMLInputElement>('formResetAnchor');

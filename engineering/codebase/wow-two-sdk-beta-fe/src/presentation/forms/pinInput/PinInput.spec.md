@@ -13,6 +13,7 @@ Public import: `import { PinInput } from '@wow-two-beta/fe/presentation/forms';`
 
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the `sm` cell takes the `md` size, a 44px square (`pointer-coarse:size-11`); the other sizes already reach it.
 
 ## Props
 

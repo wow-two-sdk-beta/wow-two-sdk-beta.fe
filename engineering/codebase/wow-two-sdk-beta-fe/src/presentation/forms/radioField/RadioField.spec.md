@@ -11,6 +11,7 @@ Public import: `import { RadioField } from '@wow-two-beta/fe/presentation/forms'
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the row takes 12px of vertical padding (`pointer-coarse:py-3`), so the label row is at least 44px high and the next row's tap area does not overlap this one's; a fine pointer keeps the compact row.
 
 ## Props
 

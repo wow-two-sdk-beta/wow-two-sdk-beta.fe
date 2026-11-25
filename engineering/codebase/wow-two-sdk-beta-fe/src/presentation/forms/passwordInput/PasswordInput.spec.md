@@ -14,6 +14,7 @@ Public import: `import { PasswordInput } from '@wow-two-beta/fe/presentation/for
 - The toggle is a pressed-state button named by `revealLabel` while hidden and `concealLabel` while visible; omitted
   names resolve through the nearest `LocaleProvider`.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the field is at least 44px high, and the reveal button grows to a 44 x 44px square at the field's end (the text keeps clear of it); a fine pointer keeps the 40px field and 32px button. The `xs` step stays dense.
 
 ## Props
 

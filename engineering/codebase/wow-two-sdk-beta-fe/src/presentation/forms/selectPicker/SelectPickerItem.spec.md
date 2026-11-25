@@ -12,6 +12,7 @@ Public import: `import { SelectPickerItem } from '@wow-two-beta/fe/presentation/
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
 - Inside a closed panel's off-document collection the item registers its entry and renders no row.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer the row is at least 44px high, as every listbox row is.
 
 ## Props
 

@@ -11,6 +11,7 @@ Public import: `import { ListboxPickerItem } from '@wow-two-beta/fe/presentation
 - Mount within the owner supplying `useListboxContext`; a compound part is not an independent root.
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- The row is its compact height (32px) under a fine pointer and at least 44px under a coarse one (`pointer-coarse:min-h-11`); the select, multi-select, combobox and chip-select rows share that recipe.
 
 ## Props
 

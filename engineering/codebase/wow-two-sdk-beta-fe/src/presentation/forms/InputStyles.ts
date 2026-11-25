@@ -13,10 +13,13 @@ import { tv, type VariantProps } from '../../foundation/styles';
 export const inputBaseVariants = tv({
   base: 'flex w-full rounded-md bg-field text-foreground placeholder:text-subtle-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 readonly:cursor-default readonly:bg-muted readonly:text-muted-foreground readonly:focus-visible:ring-1',
   variants: {
+    /* sm and md lift to a 44px floor under a coarse pointer (a finger), leaving the fine-pointer box as is; lg is
+       already taller and xs is the deliberately dense step. Every control built on this recipe (the select
+       trigger, the pickers' inputs) inherits the floor. */
     size: {
       xs: 'h-7 px-2 text-xs',
-      sm: 'h-8 px-2.5 text-sm',
-      md: 'h-10 px-3 text-sm',
+      sm: 'h-8 px-2.5 text-sm pointer-coarse:min-h-11',
+      md: 'h-10 px-3 text-sm pointer-coarse:min-h-11',
       lg: 'h-12 px-4 text-base',
     },
     state: {
