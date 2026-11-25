@@ -17,10 +17,10 @@ export interface MultiSelectPickerItemProps {
 </script>
 
 <script setup lang="ts">
-import { computed, useTemplateRef, watch } from 'vue';
+import { computed, inject, useTemplateRef, watch } from 'vue';
 import { ListboxPickerItem } from '../listboxPicker';
 import { useOptionCollection } from '../OptionCollection';
-import { useMultiSelectContext } from './MultiSelectPickerContext';
+import { multiSelectSearchKey, useMultiSelectContext } from './MultiSelectPickerContext';
 
 /** Renders one togglable row of the panel, and registers the chip text the trigger shows for it. */
 defineOptions({ name: 'MultiSelectPickerItem', inheritAttrs: false });
@@ -39,6 +39,8 @@ const ctx = useMultiSelectContext();
 const isCollected = useOptionCollection();
 
 const registeredLabel = computed<string | number>(() => props.label ?? props.value);
+const query = inject(multiSelectSearchKey, undefined);
+const matchesSearch = computed(() => String(registeredLabel.value).toLowerCase().includes(query?.value ?? ''));
 
 /* Registers only — never unregisters; a removed row's label keeps labelling its value. `immediate`
    because the first registration has to happen on mount, and nothing in this watcher touches the DOM. */
@@ -46,7 +48,7 @@ watch([() => props.value, registeredLabel], ([value, label]) => ctx.registerLabe
 </script>
 
 <template>
-  <ListboxPickerItem v-if="!isCollected" ref="el" :value="value" :is-disabled="isDisabled">
+  <ListboxPickerItem v-if="!isCollected && matchesSearch" ref="el" :value="value" :is-disabled="isDisabled">
     <slot />
   </ListboxPickerItem>
 </template>

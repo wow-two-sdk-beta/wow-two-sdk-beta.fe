@@ -21,6 +21,8 @@ Public import: `import { MultiSelectPickerContent } from '@wow-two-beta/fe/prese
 | `radius` | `SurfaceRadius` | no | — | The corner rounding. |
 | `padding` | `SurfacePadding` | no | — | The inner spacing step. Defaults to `none`. |
 | `elevation` | `SurfaceElevation` | no | — | The shadow depth. |
+| `isSearchable` | `boolean` | no | `false` | Shows a search field that filters option labels and preserves the selection. |
+| `searchPlaceholder` | `string` | no | `Search…` | The search field's placeholder and accessible name. |
 
 ## Emits
 

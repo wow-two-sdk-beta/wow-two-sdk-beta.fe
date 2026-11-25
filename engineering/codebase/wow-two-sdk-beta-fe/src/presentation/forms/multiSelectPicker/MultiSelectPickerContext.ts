@@ -1,4 +1,4 @@
-import { inject, type InjectionKey } from 'vue';
+import { inject, type InjectionKey, type Ref } from 'vue';
 
 /**
  * The seam between `MultiSelectPicker` and its `Trigger` / `Tags` / `Content` / `Item` children.
@@ -53,6 +53,7 @@ export interface MultiSelectPickerContextValue {
 }
 
 export const multiSelectContextKey: InjectionKey<MultiSelectPickerContextValue> = Symbol('wow-two.multiSelect');
+export const multiSelectSearchKey: InjectionKey<Readonly<Ref<string>>> = Symbol('wow-two.multiSelect.search');
 
 /** Reads the surrounding multi-select context; throws when used outside a `<MultiSelectPicker>`. */
 export function useMultiSelectContext(): MultiSelectPickerContextValue {
