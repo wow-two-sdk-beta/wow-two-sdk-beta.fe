@@ -19,6 +19,7 @@ Both remain intentionally pre-1.0. The active sweep is Vue; the legacy React-spe
 - The sweep includes specifications and behavior verification; deferring standardization does not apply to it.
 - Run commands from the Vue package directory; the repository root is not a pnpm package.
 - Validate typecheck, SFC compilation, lint, format, tests, build and the packed artifact before release.
+- Before a push touching the package, run `pnpm gate` once (CI's Linux checks in Docker): `engineering/development/rules.md` § Pre-push gate.
 - Existing staged/unstaged work belongs to the shared sweep; preserve it and record each implementation lane.
 - Versioning remains beta `0.0.y`; radical changes are permitted and there are no production consumers.
 

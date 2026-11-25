@@ -449,6 +449,7 @@
     "check:package": "node scripts/check-package.mjs",
     "check:capabilities": "node --test scripts/source-paths.test.mjs && node scripts/check-capabilities.mjs --all",
     "check:sfc": "node scripts/check-sfc.mjs",
+    "gate": "bash scripts/ci-gate.sh",
     "playground": "pnpm --filter playground dev"
   },
   "peerDependencies": {

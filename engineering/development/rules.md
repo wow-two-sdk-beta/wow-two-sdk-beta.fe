@@ -1,6 +1,6 @@
 # wow-two-sdk-beta.fe — Engineering Rules
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-11-25*
 
 > Working rules for agents in this repo — repo-specific deltas only. Shared rules: wow-two-ws/conventions/.
 > Planning: [`backlog.md`](../planning/backlog.md) and the newest [`version-track/`](../planning/version-track/) folder.
@@ -38,6 +38,24 @@
   `pnpm test`, `pnpm lint` at 0 errors.
 - `check-sfc` has no substitute: moving `/* @vue-ignore */` above a multi-entry `extends` breaks it while every
   other gate passes.
+
+## Pre-push gate
+
+- Before any push touching `engineering/codebase/wow-two-sdk-beta-fe/`, run `pnpm gate` in the package directory. It
+  runs the `release-fe` validation in Docker as CI does (Playwright image, linux/amd64, 4 CPUs, `CI=true`): install,
+  typecheck, lint, format, `pnpm test`, build, playground build, playground smoke (430x900) and the packed consumer.
+- It shows what the Mac cannot: Firefox, forced-colors Chromium, `hover: none` left behind by touch emulation, WebKit
+  timing. A full run takes about 10 minutes; `pnpm gate --help` lists the options.
+- A checker runs it once, at medium effort, on the tree to push; the chat pushes only on `GATE PASS step=all`. The
+  gate copies the working tree, uncommitted and untracked files included, so commit what the push needs first.
+- The summary line names the log: `${TMPDIR:-/tmp}/fe-gate/gate-<timestamp>.log`. A red run's whole log goes to ONE
+  agent, never a new agent per run.
+- Builders run targeted tests only (`pnpm vitest run --project <name> <path>`); they never wait on the full suite
+  or a CI watch.
+- `--steps install,typecheck,lint,format` is the cheap subset (about 5 minutes) and ends `partial=yes`, which is no
+  push signal. `--ref <git-ref>` reproduces an old red run from that commit. One gate runs per host at a time.
+- The image tag must equal the lockfile's playwright version; after a playwright bump, pull the new image and update
+  the default `GATE_IMAGE` in `scripts/ci-gate.sh`.
 
 ## Vue package
 
