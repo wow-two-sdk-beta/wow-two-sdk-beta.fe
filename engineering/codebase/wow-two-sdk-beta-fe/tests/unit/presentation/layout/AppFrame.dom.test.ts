@@ -542,3 +542,100 @@ describe('AppFrame per-app options', () => {
     expect(toggle()).not.toBeNull();
   });
 });
+
+describe('AppFrame hide on scroll', () => {
+  /** The window `useHideOnScroll` ignores scroll events for after the bar hides or shows. */
+  const SettleMs = 250;
+  const HiddenBarClass = '-mt-[calc(var(--frame-bar-height)+env(safe-area-inset-top,0px))]';
+
+  const bar = (): HTMLElement => document.querySelector<HTMLElement>('[data-app-frame-bar]')!;
+  const isBarHidden = (): boolean => bar().hasAttribute('data-bar-hidden');
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /**
+   * Gives the main region a page far taller than its view, which happy-dom does not lay out, and fakes the timers
+   * from here on so the settle window can be stepped. Returns a driver that scrolls the region to `top`.
+   */
+  function tallRegion(): (top: number) => Promise<void> {
+    const main = document.querySelector<HTMLElement>('main')!;
+    Object.defineProperty(main, 'scrollHeight', { configurable: true, value: 2000 });
+    Object.defineProperty(main, 'clientHeight', { configurable: true, value: 600 });
+    Object.defineProperty(main, 'scrollTop', { configurable: true, writable: true, value: 0 });
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    return async (top) => {
+      main.scrollTop = top;
+      main.dispatchEvent(new Event('scroll'));
+      await nextTick();
+    };
+  }
+
+  it('hides the phone bar past the threshold on the way down and reveals it on the way up', async () => {
+    viewport(Phone);
+    const { wrapper } = await frame();
+    const scrollTo = tallRegion();
+    expect(bar().classList.contains('relative')).toBe(true);
+    expect(bar().classList.contains('sticky')).toBe(false);
+    await scrollTo(40);
+    expect(isBarHidden()).toBe(false);
+    await scrollTo(200);
+    expect(isBarHidden()).toBe(true);
+    expect(bar().classList.contains(HiddenBarClass)).toBe(true);
+    expect((wrapper.vm as unknown as { isBarHidden: boolean }).isBarHidden).toBe(true);
+    vi.advanceTimersByTime(SettleMs);
+    await scrollTo(190);
+    expect(isBarHidden()).toBe(false);
+    expect(bar().classList.contains(HiddenBarClass)).toBe(false);
+  });
+
+  it('reveals the bar on scrollToTop and revealBar', async () => {
+    viewport(Phone);
+    const { wrapper } = await frame();
+    const scrollTo = tallRegion();
+    const main = document.querySelector('main')!;
+    main.scrollTo = vi.fn() as never;
+    const handle = wrapper.vm as unknown as { scrollToTop: () => void; revealBar: () => void };
+    await scrollTo(200);
+    expect(isBarHidden()).toBe(true);
+    handle.scrollToTop();
+    await nextTick();
+    expect(isBarHidden()).toBe(false);
+    vi.advanceTimersByTime(SettleMs);
+    await scrollTo(400);
+    expect(isBarHidden()).toBe(true);
+    handle.revealBar();
+    await nextTick();
+    expect(isBarHidden()).toBe(false);
+  });
+
+  it('lets the app’s barClass win over the hidden bar’s margin', async () => {
+    viewport(Phone);
+    await frame({ barClass: 'mt-0' });
+    const scrollTo = tallRegion();
+    await scrollTo(200);
+    expect(isBarHidden()).toBe(true);
+    expect(bar().classList.contains('mt-0')).toBe(true);
+    expect(bar().classList.contains(HiddenBarClass)).toBe(false);
+  });
+
+  it('never hides the bar with canHideBarOnScroll false', async () => {
+    viewport(Phone);
+    await frame({ canHideBarOnScroll: false });
+    const scrollTo = tallRegion();
+    expect(bar().classList.contains('relative')).toBe(false);
+    for (const top of [100, 200, 400]) await scrollTo(top);
+    expect(isBarHidden()).toBe(false);
+  });
+
+  it('never hides the bar in the desktop layout', async () => {
+    viewport(Desktop);
+    await frame();
+    const scrollTo = tallRegion();
+    expect(bar().classList.contains('sticky')).toBe(true);
+    expect(bar().classList.contains('relative')).toBe(false);
+    for (const top of [100, 200, 400]) await scrollTo(top);
+    expect(isBarHidden()).toBe(false);
+  });
+});

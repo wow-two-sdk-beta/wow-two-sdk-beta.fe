@@ -17,6 +17,7 @@ export * from './hooks/UseOutsideClick';
 export * from './hooks/UseFocusTrap';
 export * from './hooks/UseScrollLock';
 export * from './hooks/UseScrollActivity';
+export * from './hooks/UseHideOnScroll';
 
 export { DomOrderExtensions } from './DomOrderExtensions';
 export { resolveElement } from './ResolveElement';

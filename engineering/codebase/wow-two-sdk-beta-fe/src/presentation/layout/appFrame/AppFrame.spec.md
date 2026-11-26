@@ -65,6 +65,15 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   layout at any width, with the sidebar collapsed to its drawer and never a desktop; `false` forces it off, so the
   sidebar stays beside the page as the rail even in a narrow viewport. The frame reads the provided class with
   `inject` and never throws without one.
+- In the phone layout the bar hides while the reader scrolls the main region down and returns on any scroll up
+  (`useHideOnScroll` from `foundation/dom`): 8px of travel down more than 64px from the top hides it, 8px up or a
+  return within 64px of the top reveals it, and only a page taller than its view by more than the bar plus 64px, as
+  if the bar shows, hides it at all. Focus moving into the bar reveals it; `scrollToTop` and `revealBar` reveal it
+  too. `canHideBarOnScroll` false keeps it; outside the phone layout it never hides.
+- While the bar may hide it is `relative` instead of `sticky` (the region shell never scrolls, so `sticky` would pin a
+  hidden bar on screen) and eases its top margin over 200ms, instantly with reduced motion. Hidden, it carries
+  `data-bar-hidden` and a negative top margin of its own height plus the top inset, which collapses its auto grid row
+  so the page grows into the space. `barClass` merges last and wins over these classes.
 - Attributes and `class` land on the frame root. Automatic attribute inheritance is disabled; the source explicitly
   forwards and merges supported fallthrough attributes.
 - Under a coarse pointer a link in the brand slot is at least 44 x 44px (`pointer-coarse:[&_a]:min-h-11`, `min-w-11`) while its mark keeps its size; the slotted link must be block-level or a flex item, as a link in a flex brand cell is. The app switcher's trigger already reaches 44px.
@@ -92,6 +101,7 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 | `collapseStorageKey` | `string` | no | `wow-two.app-frame.sidebar-collapsed` | Where the collapse persists; read once. |
 | `isCollapsedByDefault` | `boolean` | no | `false` | Whether the desktop sidebar starts as the rail. |
 | `isPhone` | `boolean` | no | provided device class, else viewport | Serves the phone layout; `true` forces it at any width, `false` forces it off. |
+| `canHideBarOnScroll` | `boolean` | no | `true` | Whether the phone layout's bar hides while the page scrolls down. |
 | `contentWidth` | `AppFrameContentWidth` | no | `default` | `default` for the shared column, `full` for edge to edge. |
 | `contentMaxWidth` | `ContainerLayoutSize \| SizeValue` | no | `--frame-content-max` | The page column's cap. |
 | `barClass` | `HTMLAttributes['class']` | no | — | Extra classes on the bar. |
@@ -137,9 +147,10 @@ is `title`, `sitesLabel`, `closeLabel`, `newTabLabel`, `triggerLabel` and `break
 
 ## Exposed handle
 
-`{ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, scrollToTop }` — the frame root, the scrolling
-main region, the rail state, the persisted collapse and the three actions. Read this through a component template ref after mount; the
-referenced DOM nodes may be absent while unmounted.
+`{ el, mainEl, isRail, isCollapsed, isBarHidden, toggleSidebar, closeNavigation, scrollToTop, revealBar }` — the
+frame root, the scrolling main region, the rail state, the persisted collapse, whether the phone bar is hidden and
+the four actions; `scrollToTop` also reveals the bar, and `revealBar` reveals it alone (on a route change, say). Read
+this through a component template ref after mount; the referenced DOM nodes may be absent while unmounted.
 
 ## Verification
 

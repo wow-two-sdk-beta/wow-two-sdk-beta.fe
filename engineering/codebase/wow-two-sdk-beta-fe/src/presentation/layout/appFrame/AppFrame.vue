@@ -117,6 +117,12 @@ export interface AppFrameProps {
    */
   readonly isPhone?: boolean;
 
+  /**
+   * Whether the phone layout's bar hides while the reader scrolls a tall page down and returns on the way up
+   * (`useHideOnScroll`). Default `true`; it never hides outside the phone layout.
+   */
+  readonly canHideBarOnScroll?: boolean;
+
   /** How wide the page runs. Default `default`. */
   readonly contentWidth?: AppFrameContentWidth;
 
@@ -198,7 +204,7 @@ import {
   useBreakpointBelow,
   useBreakpointUp,
 } from '../../../foundation/device';
-import { dataAttr } from '../../../foundation/dom';
+import { dataAttr, useHideOnScroll } from '../../../foundation/dom';
 import { Icon } from '../../../foundation/icons';
 import { useLocaleDefaults } from '../../../foundation/i18n';
 import { createPersistentRef } from '../../../foundation/storage';
@@ -222,7 +228,8 @@ import AppShellSidebar from '../appShell/AppShellSidebar.vue';
  * the sidebar toggle, the trail, the app's own bar controls and the account menu; a sidebar that collapses to an
  * icon rail and is remembered; and the page column. The dimensions are the `--frame-*` tokens and the edges are the
  * theme's glass hairlines, so two apps on two themes hold the same frame. An app passes its brand, its navigation,
- * its app list and its slots.
+ * its app list and its slots. On a phone the bar slides away while the reader scrolls a tall page down and returns
+ * on the way up (`canHideBarOnScroll`).
  */
 defineOptions({ name: 'AppFrame', inheritAttrs: false });
 
@@ -280,6 +287,7 @@ const componentProps = withDefaults(defineProps<AppFrameProps>(), {
   collapseStorageKey: DefaultCollapseStorageKey,
   isCollapsedByDefault: false,
   isPhone: undefined,
+  canHideBarOnScroll: true,
   contentWidth: AppFrameContentWidth.Default,
   contentMaxWidth: undefined,
   barClass: undefined,
@@ -317,6 +325,7 @@ const emit = defineEmits<{
 const attrs = useAttrs();
 const liveSlots = useSlots();
 const shell = useTemplateRef<InstanceType<typeof AppShell>>('shell');
+const header = useTemplateRef<InstanceType<typeof AppShellHeader>>('header');
 const main = useTemplateRef<InstanceType<typeof AppShellMain>>('main');
 
 /* Mobile-first on the server and in the first render: a phone until mounted, then the real viewport. */
@@ -459,9 +468,33 @@ const el = computed(() => shell.value?.el ?? null);
 /** The scrolling main region. */
 const mainEl = computed(() => main.value?.el ?? null);
 
-/** Returns the main region to its top — for an app whose router does not reset a region's scroll. */
+/** The phone layout's bar hides while the reader scrolls a tall page down, unless the app opts out. */
+const isBarHideable = computed(() => props.canHideBarOnScroll && isPhoneLayout.value);
+
+const { isHidden, reveal: revealBar } = useHideOnScroll(mainEl, () => header.value?.el, {
+  isEnabled: isBarHideable,
+});
+
+/** Whether the phone bar is hidden now. */
+const isBarHidden = computed(() => isBarHideable.value && isHidden.value);
+
+/* `relative` replaces the bar's `sticky`: the region shell never scrolls, so `sticky` does nothing and would pin a
+   hidden bar on screen. The negative margin collapses the bar's auto grid row, so the page grows into its space. The
+   app's `barClass` comes last and wins. */
+const barClasses = computed(() => [
+  headerClasses,
+  isBarHideable.value && 'relative transition-[margin-top] duration-200 ease-out motion-reduce:transition-none',
+  isBarHidden.value && '-mt-[calc(var(--frame-bar-height)+env(safe-area-inset-top,0px))]',
+  props.barClass,
+]);
+
+/**
+ * Returns the main region to its top and brings the bar back — for an app whose router does not reset a region's
+ * scroll.
+ */
 function scrollToTop(): void {
   mainEl.value?.scrollTo?.({ top: 0 });
+  revealBar();
 }
 
 /** Plain labels become trail items, so an app without links passes its translated strings as they are. */
@@ -472,7 +505,7 @@ const trail = computed<BreadcrumbItem[]>(() =>
 /* Bound only when given: an `aria-label` of `undefined` would strip the breadcrumb's own localized name. */
 const trailAttrs = computed(() => (props.trailLabel === undefined ? {} : { 'aria-label': props.trailLabel }));
 
-defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, scrollToTop });
+defineExpose({ el, mainEl, isRail, isCollapsed, isBarHidden, toggleSidebar, closeNavigation, scrollToTop, revealBar });
 </script>
 
 <template>
@@ -491,7 +524,14 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
     :skip-to-content-label="props.skipToContentLabel"
     @update:sidebar-open="setDrawerOpen"
   >
-    <AppShellHeader height="md" :variant="props.variant" :class="[headerClasses, props.barClass]" data-app-frame-bar>
+    <AppShellHeader
+      ref="header"
+      height="md"
+      :variant="props.variant"
+      :class="barClasses"
+      :data-bar-hidden="dataAttr(isBarHidden)"
+      data-app-frame-bar
+    >
       <div class="flex h-full w-full min-w-0 items-stretch">
         <!-- From tablets up the brand sits above the sidebar, as wide as it, divided from the bar by a hairline. -->
         <div v-if="hasSidebar && !isPhoneLayout" :class="brandCellClasses" data-app-frame-brand>
