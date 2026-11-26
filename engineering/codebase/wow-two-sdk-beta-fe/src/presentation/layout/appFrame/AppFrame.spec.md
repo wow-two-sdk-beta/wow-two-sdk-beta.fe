@@ -44,7 +44,8 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   `trail` slot replaces the breadcrumb.
 - `account` renders the SDK `AccountMenu` at the bar's end, with the `account-items` slot as its destinations; the
   frame binds `accountOpen`, `locale` and `organization` as models. The `account` slot replaces the menu.
-- `contentWidth="default"` wraps the page in the shared column: the widening gutter, capped at
+- `contentWidth="default"` wraps the page in the shared column: the widening gutter, equal on all four sides
+  (12px, 24px from `sm`, 32px from `xl`), capped at
   `--frame-content-max` or at the app's own `contentMaxWidth`. `full` hands the page the whole main region: no
   gutter, no cap, a flex column that is the only scroller. `notice` renders above the page in both.
 - `nav-footer` renders at the sidebar's foot and the drawer's, under a hairline, and receives `isRail`.

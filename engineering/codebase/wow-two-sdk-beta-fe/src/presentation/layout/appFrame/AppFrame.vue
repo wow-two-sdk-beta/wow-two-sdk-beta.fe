@@ -622,7 +622,7 @@ defineExpose({ el, mainEl, isRail, isCollapsed, toggleSidebar, closeNavigation, 
         v-if="props.contentWidth === 'default'"
         gutter="lg"
         :max-width="props.contentMaxWidth ?? 'var(--frame-content-max)'"
-        :class="['lg:px-6 xl:px-8 print:p-0 print:*:max-w-none', props.contentClass]"
+        :class="['print:p-0 print:*:max-w-none', props.contentClass]"
       >
         <slot name="notice" />
         <slot />

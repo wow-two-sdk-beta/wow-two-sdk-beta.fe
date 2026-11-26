@@ -10,7 +10,7 @@ export const AppShellContentGutter = {
   Sm: 'sm',
   /** Refers to the default 1.5rem gutter. */
   Md: 'md',
-  /** Refers to a gutter that widens with the viewport, from 1rem to 2rem. */
+  /** Refers to a gutter equal on all four sides that widens with the viewport: 12px, 24px from sm, 32px from xl. */
   Lg: 'lg',
 } as const;
 
@@ -20,7 +20,7 @@ const GutterClass: Record<AppShellContentGutter, string> = {
   none: 'p-0',
   sm: 'p-4',
   md: 'p-6',
-  lg: 'px-4 py-6 sm:px-6 lg:px-8 lg:py-8',
+  lg: 'p-3 sm:p-6 xl:p-8',
 };
 
 const MaxWidthClass: Record<ContainerLayoutSize, string> = {
