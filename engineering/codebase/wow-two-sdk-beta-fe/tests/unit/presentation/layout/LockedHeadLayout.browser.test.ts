@@ -77,10 +77,11 @@ describe('LockedHeadLayout scrolling', () => {
       expect(Math.round(body.getBoundingClientRect().bottom)).toBe(Math.round(main.getBoundingClientRect().bottom));
 
       const headTop = query('[data-locked-head]').getBoundingClientRect().top;
+      /* Firefox scrolls to subpixel offsets (599.78), so the offsets compare within a pixel. */
       body.scrollTop = 600;
       await nextFrames();
-      expect(body.scrollTop).toBe(600);
-      expect(query('[data-locked-head]').getBoundingClientRect().top).toBe(headTop);
+      expect(Math.abs(body.scrollTop - 600)).toBeLessThanOrEqual(1);
+      expect(Math.abs(query('[data-locked-head]').getBoundingClientRect().top - headTop)).toBeLessThanOrEqual(0.5);
       expect(main.scrollTop).toBe(0);
     });
 
@@ -98,7 +99,7 @@ describe('LockedHeadLayout scrolling', () => {
       const headTop = query('[data-locked-head]').getBoundingClientRect().top;
       main.scrollTop = 600;
       await nextFrames();
-      expect(main.scrollTop).toBe(600);
+      expect(Math.abs(main.scrollTop - 600)).toBeLessThanOrEqual(1);
       /* The head scrolls away with main; the phone bar may slide away with it, so it moves 600px or more. */
       expect(query('[data-locked-head]').getBoundingClientRect().top).toBeLessThanOrEqual(headTop - 600 + 0.5);
     });
