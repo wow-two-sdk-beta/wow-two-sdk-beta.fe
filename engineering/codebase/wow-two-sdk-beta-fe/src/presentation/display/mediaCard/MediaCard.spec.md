@@ -104,8 +104,8 @@ open-original button top end, and a meta line on the panel:
       </a>
     </Button>
   </template>
-  <span class="line-clamp-2 text-[15px] font-semibold leading-snug">{{ post.title }}</span>
-  <MetaInlineText gap="3" class="text-[13px] text-white/75">
+  <span class="line-clamp-2 text-sm font-semibold leading-snug">{{ post.title }}</span>
+  <MetaInlineText gap="3" class="text-xs text-white/75">
     <MetaInlineItem tone="success" label="21 to 23 November, ongoing">
       <template #icon><Icon :icon="CalendarRange" :size="14" /></template>
       21–23 Nov

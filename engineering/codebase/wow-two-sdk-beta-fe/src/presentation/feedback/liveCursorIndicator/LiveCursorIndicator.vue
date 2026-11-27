@@ -96,7 +96,7 @@ defineExpose({ el });
     </svg>
     <span
       v-if="hasName && !props.isPointerOnly"
-      class="absolute whitespace-nowrap rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-none text-white shadow-sm"
+      class="absolute whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium leading-none text-white shadow-sm"
       :style="labelStyle"
     >
       <slot name="name">{{ props.name }}</slot>

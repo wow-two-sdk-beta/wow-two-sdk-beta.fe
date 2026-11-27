@@ -145,7 +145,7 @@ const months = computed<ReadonlyArray<YearMonth>>(() => {
 
 function dayClass(cell: YearDay): string {
   return cn(
-    'flex h-6 w-full items-center justify-center rounded-sm text-[11px] tabular-nums text-foreground transition-colors',
+    'flex h-6 w-full items-center justify-center rounded-sm text-xs tabular-nums text-foreground transition-colors',
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     cell.events.length > 0
       ? `${TintClass} font-semibold hover:brightness-95 active:brightness-95 forced-colors:border forced-colors:border-[Highlight]`

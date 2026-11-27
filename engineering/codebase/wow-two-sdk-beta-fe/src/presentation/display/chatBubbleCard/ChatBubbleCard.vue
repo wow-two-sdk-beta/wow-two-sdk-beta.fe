@@ -174,7 +174,7 @@ const bubbleClasses = computed(() =>
 );
 
 const metaClasses = computed(() =>
-  cn('flex items-center gap-1 text-[11px] text-muted-foreground', isEnd.value ? 'flex-row-reverse' : 'flex-row'),
+  cn('flex items-center gap-1 text-xs text-muted-foreground', isEnd.value ? 'flex-row-reverse' : 'flex-row'),
 );
 
 const footerClasses = computed(() => cn(isEnd.value && 'self-end'));

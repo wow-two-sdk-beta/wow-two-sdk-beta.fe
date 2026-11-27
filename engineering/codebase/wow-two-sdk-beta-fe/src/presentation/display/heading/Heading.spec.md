@@ -18,7 +18,7 @@ Public import: `import { Heading } from '@wow-two-beta/fe/presentation/display';
 | Prop | Type | Required | Default | Meaning |
 |---|---|---|---|---|
 | `level` | `HeadingLevel` | no | `2` | The semantic heading level (1–6). Default 2. Visual size is independent — set via `size`. |
-| `size` | `HeadingSize` | no | — | The visual size step. |
+| `size` | `HeadingSize` | no | — | The visual size step, on the type ramp: `xs` 14px · `sm` 16px · `md` and `lg` 18px · `xl` 24px · `2xl` and `3xl` 30px · `4xl` 48px. |
 | `weight` | `HeadingWeight` | no | — | The font weight. |
 | `align` | `HeadingAlign` | no | — | The text alignment. |
 | `isSkeleton` | `boolean` | no | `undefined` | Draws the heading as bars; defaults to the nearest `DataRegion` first load. |

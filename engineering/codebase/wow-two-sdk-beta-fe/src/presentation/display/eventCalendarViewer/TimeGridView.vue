@@ -249,7 +249,7 @@ function chipStyle(e: EventCalendarViewerEvent): StyleValue {
    `min-height` only raises a shorter box, never shrinks a taller one. */
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'absolute max-sm:min-h-7 overflow-hidden rounded-sm border border-border/60 px-1 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 active:brightness-95',
+    'absolute max-sm:min-h-7 overflow-hidden rounded-sm border border-border/60 px-1 py-0.5 text-left text-xs font-medium transition-colors hover:brightness-95 active:brightness-95',
     !e.color && 'bg-primary text-primary-foreground',
   );
 }
@@ -329,7 +329,7 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
             v-for="d in dayDates"
             :key="`ad-${d.toString()}`"
             data-all-day-cell=""
-            class="max-h-[68px] max-sm:max-h-[92px] overflow-hidden border-b border-r border-border bg-muted/10 p-0.5 text-[11px]"
+            class="max-h-[68px] max-sm:max-h-[92px] overflow-hidden border-b border-r border-border bg-muted/10 p-0.5 text-xs"
           >
             <div class="flex flex-wrap gap-0.5" :ref="(el) => setAllDayRef(d.toString(), el)">
               <button

@@ -37,7 +37,7 @@ defineExpose({ el });
 <template>
   <div ref="el" role="separator" v-bind="rest" :class="classes">
     <span class="h-px flex-1 bg-border" aria-hidden="true" />
-    <span class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+    <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
       <slot name="label">{{ props.label }}</slot>
     </span>
     <span class="h-px flex-1 bg-border" aria-hidden="true" />

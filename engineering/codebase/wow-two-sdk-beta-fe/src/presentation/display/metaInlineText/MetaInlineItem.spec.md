@@ -46,7 +46,7 @@ None declared.
 `{ el }`. Read this through a component template ref after mount; the referenced DOM node may be absent while unmounted.
 
 ```vue
-<MetaInlineText gap="3" class="text-[13px] text-muted-foreground">
+<MetaInlineText gap="3" class="text-xs text-muted-foreground">
   <MetaInlineItem :tone="MetaInlineItemTone.Success" label="21 to 23 November, ongoing">
     <template #icon><Icon :icon="CalendarRange" :size="14" /></template>
     21–23 Nov

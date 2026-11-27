@@ -58,7 +58,7 @@ export const textVariants = tv({
       sm: 'text-sm',
       md: 'text-base',
       lg: 'text-lg',
-      xl: 'text-xl',
+      xl: 'text-2xl',
     },
     weight: {
       normal: 'font-normal',

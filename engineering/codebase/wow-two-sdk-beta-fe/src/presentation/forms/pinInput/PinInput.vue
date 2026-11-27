@@ -39,7 +39,7 @@ const SizeClass: Partial<Record<Size, string>> = {
   /* `sm` takes the `md` cell under a coarse pointer, so a cell keeps its square and reaches 44 x 44px. */
   sm: 'h-9 w-9 text-base pointer-coarse:size-11',
   md: 'h-11 w-11 text-lg',
-  lg: 'h-14 w-14 text-xl',
+  lg: 'h-14 w-14 text-2xl',
 };
 </script>
 

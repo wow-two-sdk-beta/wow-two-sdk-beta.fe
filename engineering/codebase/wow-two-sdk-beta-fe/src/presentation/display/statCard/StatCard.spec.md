@@ -26,7 +26,7 @@ Public import: `import { StatCard } from '@wow-two-beta/fe/presentation/display'
 | `trend` | `StatCardTrend` | no | — | `{ value, text?, label? }` — the signed change, its readout and caption. |
 | `isLowerBetter` | `boolean` | no | `false` | A falling value is the good direction; the trend colours flip. |
 | `helper` | `string \| number` | no | — | The supporting text under the trend. Rich content goes through the `helper` slot. |
-| `size` | `StatCardSize` | no | `'md'` | The visual size. Default `md`. |
+| `size` | `StatCardSize` | no | `'md'` | The visual size. Default `md`. The value renders 30px at `sm` and `md`, 48px at `lg`. |
 | `href` | `string` | no | — | Makes the tile a link. |
 | `onClick` | `(event: MouseEvent) => void` | no | — | Makes the tile a button; a prop because its presence picks the element. |
 | `isSkeleton` | `boolean` | no | `undefined` | Keeps the tile's size and draws the label, value, trend and helper as bars; an empty value draws a short bar. Defaults to the nearest `DataRegion` first load. |
