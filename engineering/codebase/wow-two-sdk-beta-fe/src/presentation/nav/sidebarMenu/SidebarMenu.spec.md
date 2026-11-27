@@ -21,8 +21,8 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 
 - Renders `<li><a>` with an icon, a truncated label and a trailing slot. `isActive` sets `aria-current="page"` and `data-active` (tinted).
 - The row is 36px, its content centred. Under a coarse pointer a horizontal hit area at least 44px wide
-  (`CoarseHitArea.AfterX`) covers a rail row narrower than that, so its icon keeps its place, and the row stops
-  clipping its content. Inside a drawer (`data-sidebar-drawer`) the row is 44px tall under a coarse pointer.
+  (`CoarseHitArea.AfterX`) covers a rail row narrower than that, so its icon keeps its place. The row and the group
+  toggle never clip their own overflow, under either pointer; the label truncates in its own span. Inside a drawer (`data-sidebar-drawer`) the row is 44px tall under a coarse pointer.
 - `asChild` merges the row's classes and state onto the slotted router link. Mark the link's direct label child with
   `data-sidebar-menu-label` to use the same clipping and fade as the built-in label.
 - The icon is `aria-hidden`; fallthrough attributes and `class` reach the link; the exposed `el` is the link element.

@@ -93,8 +93,8 @@ export const buttonVariants = tv({
       // min-h/min-w floor keeps the hit-target ≥ 24×24 (WCAG 2.2 SC 2.5.8) even when
       // --ui-density-scale < 1 would otherwise shrink it below the floor. Applies to
       // square/circle xs too (the min-h sets the box height; min-w the width).
-      // sm and md reach 44×44 under a coarse pointer (a finger) through the hit area in compoundVariants below,
-      // leaving the fine-pointer box as is; lg and xl are already taller, xs is the deliberately dense step.
+      // Every size reaches 44×44 under a coarse pointer (a finger) through the hit area in compoundVariants below,
+      // leaving the fine-pointer box as is; lg and xl are already taller, so theirs matches the box.
       xs: 'h-[calc(1.5rem*var(--ui-density-scale,1))] min-h-6 min-w-6 px-[calc(0.5rem*var(--ui-density-scale,1))] text-xs rounded-sm gap-1',
       sm: 'h-[calc(2rem*var(--ui-density-scale,1))] px-[calc(0.75rem*var(--ui-density-scale,1))] text-sm rounded-md gap-1.5',
       md: 'h-[calc(2.5rem*var(--ui-density-scale,1))] px-[calc(1rem*var(--ui-density-scale,1))] text-sm rounded-md gap-2',
@@ -112,7 +112,9 @@ export const buttonVariants = tv({
     },
     wrap: {
       true: 'whitespace-normal text-left',
-      false: 'whitespace-nowrap text-ellipsis overflow-hidden',
+      // The root never clips, under either pointer, so the hit area below reaches past it; a single-line label
+      // clips inside its own span (Button.vue) instead.
+      false: 'whitespace-nowrap',
     },
     // Unavailable: still a tab stop, but dashed and dimmed. `relative` anchors the slash below and yields to a
     // consumer's own position class through `cn`.
@@ -338,14 +340,18 @@ export const buttonVariants = tv({
     { variant: 'glass-surface', tone: 'success', class: 'border-success/50' },
     { variant: 'glass-surface', tone: 'warning', class: 'border-warning/50' },
 
-    // === COARSE POINTER === sm and md reach 44 x 44px without moving what they show: an invisible `::before`
+    // A single-line button shrinks below its label in a tight row, as it did while the root clipped; xs keeps its
+    // 24px floor.
+    { wrap: false, size: ['sm', 'md', 'lg', 'xl'], class: 'min-w-0' },
+
+    // === COARSE POINTER === every size reaches 44 x 44px without moving what it shows: an invisible `::before`
     // (`::after` is the unavailable slash) centred on the box takes the tap, so the box and its icon keep their size
-    // and place. `relative` anchors it and yields to a caller's own position class through `cn`; the box stops
-    // clipping, which would cut the hit area. A text button keeps its box too: no shape changes size under touch.
+    // and place, and a container's `--coarse-hit-gap` caps it so neighbours never share a tap. `relative` anchors it
+    // and yields to a caller's own position class through `cn`. The root never clips (see `wrap`), so nothing cuts
+    // the hit area and no overflow differs between the pointers. No shape changes size under touch.
     {
       variant: ['solid', 'soft', 'surface', 'outline', 'ghost', 'reveal', 'glass', 'glass-surface'],
-      size: ['sm', 'md'],
-      class: `relative pointer-coarse:overflow-visible ${CoarseHitArea.Before}`,
+      class: `relative ${CoarseHitArea.Before}`,
     },
 
     // === UNAVAILABLE === last, so the dashed border's colour beats every tone's own border colour.

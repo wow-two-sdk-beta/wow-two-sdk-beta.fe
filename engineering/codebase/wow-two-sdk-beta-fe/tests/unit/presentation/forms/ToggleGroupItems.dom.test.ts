@@ -46,7 +46,9 @@ describe('ToggleGroup options with count and icon', () => {
     const talks = wrapper.get('button');
     const icon = talks.get('svg');
     expect(icon.attributes('aria-hidden')).toBe('true');
-    expect(talks.element.firstElementChild).toBe(icon.element);
+    const label = talks.get('[data-toggle-count]').element.parentElement!;
+    expect(label.previousElementSibling).toBe(icon.element);
+    expect(icon.element.previousElementSibling).toBeNull();
   });
 
   it('orders the name by the locale message', () => {

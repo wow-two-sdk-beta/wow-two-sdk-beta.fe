@@ -284,6 +284,13 @@ const tooltipOpen = shallowRef(false);
 
 /* The wrapper while no `unavailableLabel` asks for a `Tooltip`: it renders its single child as is, so the button
    keeps one template and its element root. */
+/* The span a single-line label clips in: it shrinks with the button and lays its children out as the root does,
+   so an icon and text in the label keep their gap and centring. */
+const LabelClass = 'flex min-w-0 overflow-clip [align-items:inherit] [justify-content:inherit] [gap:inherit]';
+
+/* The clip on the loading and hover wrappers, which already hold the label in a span of their own. */
+const labelClipClass = computed(() => (props.isMultiline ? undefined : 'min-w-0 overflow-clip'));
+
 const PassThrough: FunctionalComponent = (_props, { slots }) => renderableChildren(slots.default?.())[0] ?? null;
 
 const wrapperProps = computed(() =>
@@ -582,7 +589,8 @@ defineExpose({ el });
           <LoadingSlotProp v-if="loadingSlot !== undefined" />
           <Spinner v-else />
         </slot>
-        <span v-if="loadingText !== undefined">{{ loadingText }}</span>
+        <span v-if="loadingText !== undefined" :class="labelClipClass">{{ loadingText }}</span>
+        <span v-else-if="!isMultiline && $slots.default" :class="LabelClass"><slot /></span>
         <slot v-else />
         <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
       </template>
@@ -590,7 +598,7 @@ defineExpose({ el });
       <template v-else-if="loadingActive">
         <!-- No icon to swap: the label turns transparent, keeping the width and the accessible name, and the
            spinner centers over it. -->
-        <span class="relative inline-flex items-center justify-center">
+        <span :class="['relative inline-flex items-center justify-center', labelClipClass]">
           <span class="inline-flex items-center gap-2 opacity-0">
             <slot />
             <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
@@ -610,7 +618,7 @@ defineExpose({ el });
            the hover content overlays it centered. Toggle via `group-hover`/`group-focus-visible`
            on the root `group` — no JS hover state. `aria-hidden` on the hidden layer so AT
            reads one label. -->
-        <span class="relative inline-flex items-center justify-center">
+        <span :class="['relative inline-flex items-center justify-center', labelClipClass]">
           <span class="inline-flex items-center justify-center group-hover:invisible group-focus-visible:invisible">
             <slot />
           </span>
@@ -626,7 +634,10 @@ defineExpose({ el });
 
       <template v-else>
         <slot name="leading"><LeadingSlotProp v-if="leadingSlot !== undefined" /></slot>
-        <slot />
+        <!-- A single-line label clips in its own span, laid out as the root lays out its children, so the root never
+           clips and its touch hit area reaches past the box under either pointer. -->
+        <span v-if="!isMultiline && $slots.default" :class="LabelClass"><slot /></span>
+        <slot v-else />
         <slot name="trailing"><TrailingSlotProp v-if="trailingSlot !== undefined" /></slot>
       </template>
 

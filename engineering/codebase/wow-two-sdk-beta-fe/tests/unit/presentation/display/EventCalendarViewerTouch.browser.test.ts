@@ -90,10 +90,15 @@ describe.skipIf(!canEmulateCoarsePointer)('EventCalendarViewer under a coarse po
       // Read by tapping around each button: the arrows and the dates keep their box and take the tap on an
       // invisible hit area, so their marks stay where a mouse sees them. The month scrolls inside its body, so each
       // button is brought into view first.
+      // The view switcher's segments touch, so the group's gap cap stops each one's reach at its own box along the
+      // row (ToggleGroup.spec.md): dense, at least WCAG 2.5.8's 24px.
       for (const button of buttons) {
         button.scrollIntoView({ block: 'center', inline: 'center' });
         const { width, height } = reachOf(button);
-        expect(width, `${button.outerHTML.slice(0, 120)} takes ${width} x ${height}`).toBeGreaterThanOrEqual(43.5);
+        const widthFloor = button.hasAttribute('data-pressed') ? 24 : 43.5;
+        expect(width, `${button.outerHTML.slice(0, 120)} takes ${width} x ${height}`).toBeGreaterThanOrEqual(
+          widthFloor,
+        );
         expect(height, `${button.outerHTML.slice(0, 120)} takes ${width} x ${height}`).toBeGreaterThanOrEqual(43.5);
       }
     });

@@ -73,10 +73,10 @@ const rest = computed(() => {
 const rootClasses = computed(() => cn('flex min-w-0 flex-col', attrs.class as ClassValue));
 
 /* The toggle row takes a destination row's coarse-pointer recipe: 36px tall (44px in a drawer), a 44px-wide hit area,
-   no self-clipping. */
+   and no clipping under either pointer; the label truncates in its own span. */
 const toggleClasses = cn(
-  'flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-  'pointer-coarse:relative pointer-coarse:overflow-visible pointer-coarse:[[data-sidebar-drawer]_&]:h-11',
+  'relative flex h-9 w-full min-w-0 items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+  'pointer-coarse:[[data-sidebar-drawer]_&]:h-11',
   CoarseHitArea.AfterX,
 );
 </script>

@@ -11,6 +11,8 @@ import { TabsGroup, TabsGroupList, TabsGroupTab } from '@src/presentation/displa
 import EventCalendarViewer from '@src/presentation/display/eventCalendarViewer/EventCalendarViewer.vue';
 import Toast from '@src/presentation/feedback/toast/Toast.vue';
 import {
+  ChipSelect,
+  DateRangePicker,
   PasswordInput,
   SearchInput,
   SelectPicker,
@@ -18,6 +20,8 @@ import {
   SelectPickerItem,
   SelectPickerTrigger,
   SelectPickerValue,
+  ToggleGroup,
+  ToggleGroupItem,
 } from '@src/presentation/forms';
 import { AppFrame } from '@src/presentation/layout';
 import { Pagination } from '@src/presentation/nav/pagination';
@@ -77,9 +81,46 @@ interface PlaceOptions {
   readonly resized?: readonly string[];
 }
 
+/** Names an element in a failure: its tag and its first classes. */
+const nameOf = (element: Element): string =>
+  `${element.tagName.toLowerCase()}.${(element.getAttribute('class') ?? '').split(/\s+/).slice(0, 4).join('.')}`;
+
+/** Every element's computed overflow. No spec declares an overflow change, so none may differ between the pointers. */
+function overflowsIn(root: Element): Map<Element, string> {
+  return new Map(
+    [root, ...root.querySelectorAll('*')].map((element) => {
+      const style = getComputedStyle(element);
+      return [element, `${style.overflowX} ${style.overflowY}`];
+    }),
+  );
+}
+
+function overflowsChanged(fine: Map<Element, string>, coarse: Map<Element, string>): string[] {
+  return [...fine].flatMap(([element, before]) => {
+    const after = coarse.get(element);
+    return after === undefined || after === before ? [] : [`${nameOf(element)} overflow ${before} -> ${after}`];
+  });
+}
+
+/** The rect of a target's touch hit area (`CoarseHitArea.Before`): its `::before`, centred on the box. */
+function hitAreaOf(target: Element): DOMRect {
+  const box = target.getBoundingClientRect();
+  const style = getComputedStyle(target, '::before');
+  const width = Number.parseFloat(style.width);
+  const height = Number.parseFloat(style.height);
+  return new DOMRect(box.left + (box.width - width) / 2, box.top + (box.height - height) / 2, width, height);
+}
+
+/** The width of the text an element holds, clipped or not. */
+function textWidthOf(element: Element): number {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  return range.getBoundingClientRect().width;
+}
+
 /**
- * Mounts `render`, reads its boxes and placements under a fine and then a coarse pointer, and returns every box that
- * changed and every placement that moved, beyond the declared touch changes.
+ * Mounts `render`, reads its boxes, placements and overflows under a fine and then a coarse pointer, and returns every
+ * box that changed, every placement that moved beyond the declared touch changes, and every overflow that changed.
  */
 async function placeUnderBothPointers(render: () => VNode, options: PlaceOptions = {}): Promise<string[]> {
   wrapper = mount({ render }, { attachTo: document.body });
@@ -88,6 +129,7 @@ async function placeUnderBothPointers(render: () => VNode, options: PlaceOptions
   const root = document.body;
   const fine = placementsIn(root);
   const fineBoxes = boxesIn(root);
+  const fineOverflows = overflowsIn(root);
   expect(fine.length).toBeGreaterThan(0);
   await useCoarsePointer();
   expect(matchMedia('(pointer: coarse)').matches).toBe(true);
@@ -96,6 +138,7 @@ async function placeUnderBothPointers(render: () => VNode, options: PlaceOptions
   return [
     ...boxesChanged(fineBoxes, boxesIn(root), declared, options.resized),
     ...movedSideways(fine, placementsIn(root), 0.5, declared),
+    ...overflowsChanged(fineOverflows, overflowsIn(root)),
   ];
 }
 
@@ -217,24 +260,116 @@ describe.skipIf(!canEmulateCoarsePointer)('a coarse pointer moves nothing the re
     expectReach('the brand link', reachOf(query('[data-test="brand"]')));
   });
 
-  it('keeps the icons of sm and md square and circle buttons', async () => {
+  it('keeps the icons of xs, sm and md square and circle buttons', async () => {
     await page.viewport(414, 896);
-    const icon = (shape: 'square' | 'circle', size: 'sm' | 'md', glyph: Component): VNode =>
+    const icon = (shape: 'square' | 'circle', size: 'xs' | 'sm' | 'md', glyph: Component): VNode =>
       h(Button, { shape, size, variant: 'ghost', 'aria-label': `${shape} ${size}` }, () => h(Icon, { icon: glyph }));
     expect(
       await placeUnderBothPointers(() =>
         h('div', { class: 'flex items-center gap-2 p-6' }, [
+          icon('square', 'xs', Pencil),
           icon('square', 'sm', Pencil),
           icon('square', 'md', Trash2),
           icon('circle', 'sm', Bell),
           icon('circle', 'md', Settings),
           h(Button, { size: 'sm' }, () => 'Save'),
+          h(Button, { size: 'xs' }, () => 'Undo'),
         ]),
       ),
     ).toEqual([]);
     for (const button of document.querySelectorAll<HTMLElement>('button')) {
       expectReach(button.getAttribute('aria-label') ?? button.textContent!.trim(), reachOf(button));
       expect(getComputedStyle(button).touchAction).toBe('manipulation');
+    }
+  });
+
+  it('keeps buttons and sidebar rows unclipped and clips a long label in its own span', async () => {
+    await page.viewport(414, 896);
+    const label = 'Export every harvested record to the archive';
+    expect(
+      await placeUnderBothPointers(() =>
+        h('div', { class: 'flex w-48 flex-col items-start gap-6 p-6' }, [
+          ...(['xs', 'sm', 'md', 'lg'] as const).map((size) => h(Button, { size, class: 'w-32' }, () => label)),
+          h(SidebarMenu, { class: 'w-32' }, () => [
+            h(SidebarMenuItem, { href: '#/export' }, { default: () => label, icon: frameIcon(Bell) }),
+          ]),
+        ]),
+      ),
+    ).toEqual([]);
+    for (const button of document.querySelectorAll<HTMLElement>('button')) {
+      expect(getComputedStyle(button).overflow).toBe('visible');
+      const span = button.firstElementChild!;
+      expect(getComputedStyle(span).overflow).toBe('clip');
+      expect(textWidthOf(span)).toBeGreaterThan(span.getBoundingClientRect().width);
+      expect(span.getBoundingClientRect().right).toBeLessThanOrEqual(button.getBoundingClientRect().right);
+      expectReach(`the ${button.className.match(/h-\[calc\((\S+?)\*/)?.[1] ?? ''} button`, reachOf(button));
+    }
+    const row = query('a[href="#/export"]');
+    expect(getComputedStyle(row).overflow).toBe('visible');
+    const rowLabel = query('[data-sidebar-menu-label]');
+    expect(getComputedStyle(rowLabel).overflow).toBe('hidden');
+    expect(textWidthOf(rowLabel)).toBeGreaterThan(rowLabel.getBoundingClientRect().width);
+  });
+
+  it('caps the hit areas of toggle-group items so neighbours never overlap', async () => {
+    await page.viewport(414, 896);
+    const group = (variant: 'default' | 'segmented' | 'pill', isAttached = false): VNode =>
+      h(
+        ToggleGroup as Component,
+        { variant, isAttached, 'aria-label': `${variant}${isAttached ? ' attached' : ''}` },
+        () => ['a', 'b', 'c', 'd'].map((value) => h(ToggleGroupItem, { value, label: value.toUpperCase() })),
+      );
+    expect(
+      await placeUnderBothPointers(() =>
+        h('div', { class: 'flex w-80 flex-col items-start gap-8 p-6' }, [
+          group('pill'),
+          group('default'),
+          group('default', true),
+          group('segmented'),
+        ]),
+      ),
+    ).toEqual([]);
+    const groups = [...document.querySelectorAll<HTMLElement>('[aria-label]:has(> button)')];
+    expect(groups).toHaveLength(4);
+    for (const root of groups) {
+      const items = [...root.querySelectorAll<HTMLElement>(':scope > button')];
+      expect(items).toHaveLength(4);
+      const hits = items.map(hitAreaOf);
+      hits.forEach((hit, index) => {
+        const name = `${root.getAttribute('aria-label')} item ${index + 1}`;
+        const box = items[index]!.getBoundingClientRect();
+        expect(hit.width, `${name} hit width`).toBeGreaterThanOrEqual(box.width - 2.5);
+        expect(hit.height, `${name} hit height`).toBeGreaterThanOrEqual(Floor);
+        const next = hits[index + 1];
+        if (next !== undefined) expect(hit.right, `${name} overlaps the next`).toBeLessThanOrEqual(next.left + 0.25);
+      });
+    }
+  });
+
+  it('grows a chip select and a date range picker to 44px with 16px text, as declared', async () => {
+    await page.viewport(414, 896);
+    expect(
+      await placeUnderBothPointers(
+        () =>
+          h('div', { class: 'flex w-72 flex-col gap-6 p-6' }, [
+            h(ChipSelect as Component, {
+              label: 'Status',
+              options: [
+                { value: 'open', label: 'Open' },
+                { value: 'closed', label: 'Closed' },
+              ],
+            }),
+            h(DateRangePicker as Component, { 'aria-label': 'Period' }),
+            h('p', null, 'After the fields'),
+          ]),
+        { declared: ['[aria-haspopup]'], resized: ['[aria-haspopup] span'] },
+      ),
+    ).toEqual([]);
+    const triggers = [...document.querySelectorAll<HTMLElement>('[aria-haspopup]')];
+    expect(triggers).toHaveLength(2);
+    for (const trigger of triggers) {
+      expect(Math.round(trigger.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
+      expect(getComputedStyle(trigger).fontSize).toBe('16px');
     }
   });
 

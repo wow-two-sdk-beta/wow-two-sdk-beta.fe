@@ -224,11 +224,16 @@ const rootClass = computed(() =>
     // own flex line" has no CSS selector (no `:has()` sees sibling geometry), and the review's
     // complaint is the overflow, not the attached seam.
     isHorizontal.value ? 'flex-row flex-wrap' : 'flex-col',
+    // The gap cap keeps each item's touch hit area (`CoarseHitArea`) off its neighbours': attached items touch, so
+    // theirs stops at the box along the row; detached ones sit 8px apart plus their two 1px borders. Only the axis
+    // the items line up on is capped, so a row's items keep their 44px height.
     attached.value
       ? isHorizontal.value
-        ? '[&>*]:rounded-none [&>*:first-child]:rounded-l-md [&>*:last-child]:rounded-r-md [&>*:not(:first-child)]:-ml-px'
-        : '[&>*]:rounded-none [&>*:first-child]:rounded-t-md [&>*:last-child]:rounded-b-md [&>*:not(:first-child)]:-mt-px'
-      : 'gap-2',
+        ? '[&>*]:rounded-none [&>*:first-child]:rounded-l-md [&>*:last-child]:rounded-r-md [&>*:not(:first-child)]:-ml-px [--coarse-hit-gap-x:0px]'
+        : '[&>*]:rounded-none [&>*:first-child]:rounded-t-md [&>*:last-child]:rounded-b-md [&>*:not(:first-child)]:-mt-px [--coarse-hit-gap-y:0px]'
+      : isHorizontal.value
+        ? 'gap-2 [--coarse-hit-gap-x:10px]'
+        : 'gap-2 [--coarse-hit-gap-y:10px]',
     // Segmented: muted track + reset segment chrome; active segment lifts to a `background` surface.
     isSegmented.value && [
       'rounded-md bg-muted p-1',

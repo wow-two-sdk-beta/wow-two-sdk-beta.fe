@@ -50,13 +50,13 @@ const rest = computed(() => {
 });
 
 /* Under a coarse pointer a row keeps its 36px box in a sidebar and a rail, which list rows with no gap between them:
-   a horizontal hit area (`CoarseHitArea.AfterX`) reaches 44px wide past a rail row, and the row stops clipping, which
-   would cut it. In a drawer (`data-sidebar-drawer`) the row grows to 44px tall, its content centred — declared in
-   the spec's `## Touch`. */
+   a horizontal hit area (`CoarseHitArea.AfterX`) reaches 44px wide past a rail row. The row never clips, under either
+   pointer, so nothing cuts it; the label truncates in its own span. In a drawer (`data-sidebar-drawer`) the row grows
+   to 44px tall, its content centred — declared in the spec's `## Touch`. */
 const classes = computed(() =>
   cn(
-    'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground',
-    'pointer-coarse:relative pointer-coarse:overflow-visible pointer-coarse:[[data-sidebar-drawer]_&]:h-11',
+    'group relative flex h-9 w-full min-w-0 items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-foreground',
+    'pointer-coarse:[[data-sidebar-drawer]_&]:h-11',
     CoarseHitArea.AfterX,
     'transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[active]:bg-primary-soft data-[active]:text-primary-soft-foreground',

@@ -14,6 +14,15 @@ Public import: `import { DateRangePicker } from '@wow-two-beta/fe/presentation/f
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| trigger box, sizes `sm` and `md` | 32px / 40px → at least 44px tall, text centred | visible height |
+| trigger text, sizes `sm` and `md` | 14px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into the field; `lg` is already 16px | text size |
+
 ## Props
 
 | Prop           | Type                                    | Required | Default               | Meaning                                                                                                          |

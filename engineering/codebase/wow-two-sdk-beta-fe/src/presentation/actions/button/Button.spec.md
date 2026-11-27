@@ -16,11 +16,15 @@ Public import: `import { Button } from '@wow-two-beta/fe/presentation/actions';`
 - Unavailable keeps the tab stop and sets `aria-disabled`; the activation guard swallows clicks, Enter, Space and
   presses, and an unavailable link does not navigate. Disabled, loading and skeleton states take precedence.
 - Unavailable draws a dashed border at reduced opacity; `square` and `circle` shapes add a diagonal slash.
-- Sizes `sm` and `md` (32px and 40px) reach a 44 x 44px hit area under a coarse pointer through an invisible `::before`
-  centred on the box (`CoarseHitArea.Before`), every shape and a short label included, so the box keeps its size and
-  its icon or label its place (`## Touch`). The button is `relative` (a caller's position class wins) and stops
-  clipping its content under a coarse pointer. `lg` and `xl` already exceed 44px, `xs` stays the dense step, and the
+- Every size reaches a 44 x 44px hit area under a coarse pointer through an invisible `::before` centred on the box
+  (`CoarseHitArea.Before`), every shape and a short label included, so the box keeps its size and its icon or label
+  its place (`## Touch`); a container's `--coarse-hit-gap` caps it so neighbours never share a tap. `lg` and `xl`
+  already exceed 44px, so theirs matches the box. The button is `relative` (a caller's position class wins), and the
   `link` variant keeps its text height and takes no hit area.
+- The button never clips its own overflow, under either pointer, so the hit area reaches past the box. A single-line
+  label (no `isMultiline`) clips inside its own span, which lays out its children as the button does and shrinks with
+  it; the button keeps shrinking below its label in a tight row (`min-w-0`, `xs` keeps its 24px floor). Under
+  `asChild` the merged element holds its own children, so its label does not clip.
 - `unavailableLabel` shows through `Tooltip` and is the accessible description: a hidden copy inside the element,
   referenced by `aria-describedby` and merged with the caller's ids, holds it without hovering.
 
@@ -30,7 +34,7 @@ Under a coarse pointer (a finger) at one viewport size, against a fine one (a mo
 
 | Element | Touch change | Kind |
 |---|---|---|
-| every size and shape | none: the box keeps its size, `sm` / `md` take an invisible 44px hit area | hit area |
+| every size and shape | none: the box keeps its size and its overflow, and takes an invisible hit area of at least 44px, capped by the container's gap | hit area |
 | `hover` slot | stays hidden: the default content shows; the hover content shows on hover and keyboard focus only | reveal |
 | hover states | each `hover:` colour pairs with the same pressed (`active:`) colour, so a tap shows feedback | state |
 

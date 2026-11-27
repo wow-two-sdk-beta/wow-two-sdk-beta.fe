@@ -13,6 +13,10 @@ Public import: `import { ToggleGroup } from '@wow-two-beta/fe/presentation/forms
 
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+- Under a coarse pointer each item keeps its box and takes the button's invisible hit area, capped by the group's gap
+  so neighbours never share a tap: attached items reach their own box along the row (`--coarse-hit-gap-x: 0`, or
+  `-y` in a column), detached ones the box plus their 8px gap and two borders (`10px`). Only the axis the items line
+  up on is capped, so a row's items keep a 44px tall reach.
 
 ## Props
 
