@@ -13,6 +13,7 @@ import Toast from '@src/presentation/feedback/toast/Toast.vue';
 import {
   ChipSelect,
   DateRangePicker,
+  FilterSummary,
   PasswordInput,
   SearchInput,
   SelectPicker,
@@ -447,6 +448,32 @@ describe.skipIf(!canEmulateCoarsePointer)('a coarse pointer moves nothing the re
     ).toEqual([]);
     for (const button of document.querySelectorAll<HTMLElement>('button')) {
       expectReach(button.getAttribute('aria-label') ?? 'a field button', reachOf(button));
+    }
+  });
+
+  it('grows a filter summary to 44px, as declared, and keeps its buttons, badge and count', async () => {
+    await page.viewport(414, 896);
+    expect(
+      await placeUnderBothPointers(
+        () =>
+          h('div', { class: 'flex w-80 items-center gap-2 p-6' }, [
+            h(FilterSummary, { matched: 12, total: 72, isFiltered: true, activeFilterCount: 2 }),
+          ]),
+        { declared: ['[data-filter-summary]'] },
+      ),
+    ).toEqual([]);
+    const pill = query('[data-filter-summary]');
+    expect(Math.round(pill.getBoundingClientRect().height)).toBe(44);
+    const edge = pill.getBoundingClientRect();
+    for (const selector of ['[data-filter-summary-filters]', '[data-filter-summary-clear]']) {
+      const button = query(selector);
+      const name = button.getAttribute('aria-label') ?? selector;
+      expectReach(name, reachOf(button));
+      const hit = hitAreaOf(button);
+      expect(hit.left, `${name} hit area stays in the pill`).toBeGreaterThanOrEqual(edge.left - 0.25);
+      expect(hit.right, `${name} hit area stays in the pill`).toBeLessThanOrEqual(edge.right + 0.25);
+      expect(hit.top, `${name} hit area stays in the pill`).toBeGreaterThanOrEqual(edge.top - 0.25);
+      expect(hit.bottom, `${name} hit area stays in the pill`).toBeLessThanOrEqual(edge.bottom + 0.25);
     }
   });
 

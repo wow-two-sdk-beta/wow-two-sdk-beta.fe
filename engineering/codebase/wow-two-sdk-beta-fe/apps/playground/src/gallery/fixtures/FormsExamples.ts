@@ -89,6 +89,7 @@ import {
   ReactionPicker,
   RecurrenceEditor,
   SearchInput,
+  FilterSummary,
   SelectPicker,
   SelectPickerContent,
   SelectPickerItem,
@@ -202,6 +203,8 @@ export const formsExamples: readonly SmokeCase[] = [
   smokeCase('PasswordInput', PasswordInput, {}),
 
   smokeCase('SearchInput', SearchInput, {}),
+
+  smokeCase('FilterSummary', FilterSummary, { matched: 12, total: 72, isFiltered: true, activeFilterCount: 2 }),
 
   smokeCase('TextAreaInput', TextAreaInput, {}),
 

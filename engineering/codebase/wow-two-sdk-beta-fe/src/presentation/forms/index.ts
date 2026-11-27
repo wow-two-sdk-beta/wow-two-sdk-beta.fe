@@ -94,3 +94,4 @@ export * from './typedConfirmField';
 export * from './rowsField';
 export * from './countryPicker';
 export * from './chipSelect';
+export * from './filterSummary';
