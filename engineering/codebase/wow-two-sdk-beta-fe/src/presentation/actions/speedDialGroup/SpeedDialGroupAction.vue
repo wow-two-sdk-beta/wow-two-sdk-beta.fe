@@ -84,7 +84,7 @@ const passthroughAttrs = computed(() =>
 
 const buttonClass = computed(() =>
   cn(
-    'inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-card-foreground shadow-md transition-all hover:shadow-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-card-foreground shadow-md transition-all hover:shadow-lg active:shadow-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as ClassValue,
   ),
 );

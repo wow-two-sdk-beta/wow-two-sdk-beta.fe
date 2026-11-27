@@ -42,7 +42,7 @@ const rootClass = computed(() =>
   props.asChild
     ? cn(attrs.class as ClassValue)
     : cn(
-        'inline-flex h-8 items-center justify-center rounded-sm px-2 text-sm transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex h-8 items-center justify-center rounded-sm px-2 text-sm transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
         attrs.class as ClassValue,
       ),
 );

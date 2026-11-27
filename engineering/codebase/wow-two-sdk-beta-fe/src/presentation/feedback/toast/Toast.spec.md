@@ -17,7 +17,7 @@ Public import: `import { Toast } from '@wow-two-beta/fe/presentation/feedback';`
   button. An explicit `isPinned` value shows a toggle whose accessible name stays stable when pressed.
 - Those buttons are 24px under either pointer; under a coarse one an invisible 44px square centred on each
   (`pointer-coarse:after:`) takes the tap, so the card keeps its height and the icons their place. The `details`
-  toggle reaches 44px high.
+  toggle and a compact toast's actions keep their box and take an invisible 44px hit area too.
 - The `details` slot adds a disclosure. Its scrollable content uses the full card width and stays available
   while the reader interacts with the card. The host may control it with `detailsOpen`.
 - `isCompact` reduces vertical spacing and lays out actions beside the text, with wrapping as needed.
@@ -35,6 +35,14 @@ Public import: `import { Toast } from '@wow-two-beta/fe/presentation/feedback';`
   `isCompact` draws a thinner bar. The host decides that a running toast stays up.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
+
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| close, delete, pin, `details` toggle, compact actions | none: invisible 44px hit areas | hit area |
 
 ## Props
 

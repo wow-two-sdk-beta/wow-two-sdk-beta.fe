@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<NotFoundProps>(), { homePath: '/' });
     <p class="font-mono text-sm text-muted-foreground">404</p>
     <h1 class="text-lg font-semibold text-foreground">Page not found</h1>
     <p class="max-w-md text-sm text-muted-foreground">That page doesn't exist or has moved.</p>
-    <RouterLink :to="props.homePath" class="mt-2 text-sm font-medium text-primary hover:underline">
+    <RouterLink :to="props.homePath" class="mt-2 text-sm font-medium text-primary hover:underline active:underline">
       Back to start
     </RouterLink>
   </div>

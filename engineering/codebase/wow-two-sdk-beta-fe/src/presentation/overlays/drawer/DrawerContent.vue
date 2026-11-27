@@ -59,7 +59,7 @@ const VerticalSize: Record<DrawerSize, string> = {
   md: 'max-h-[60vh]',
   lg: 'max-h-[75vh]',
   xl: 'max-h-[85vh]',
-  full: 'max-h-screen',
+  full: 'max-h-dvh',
 };
 
 /**

@@ -249,7 +249,7 @@ function chipStyle(e: EventCalendarViewerEvent): StyleValue {
    `min-height` only raises a shorter box, never shrinks a taller one. */
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'absolute max-sm:min-h-7 overflow-hidden rounded-sm border border-border/60 px-1 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95',
+    'absolute max-sm:min-h-7 overflow-hidden rounded-sm border border-border/60 px-1 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 active:brightness-95',
     !e.color && 'bg-primary text-primary-foreground',
   );
 }
@@ -285,7 +285,7 @@ function onEvent(ev: MouseEvent, e: EventCalendarViewerEvent): void {
           <li v-for="e in dayListEvents(d)" :key="e.id">
             <button
               type="button"
-              class="flex w-full items-start gap-2 rounded-md p-2 text-left transition-colors hover:bg-muted"
+              class="flex w-full items-start gap-2 rounded-md p-2 text-left transition-colors hover:bg-muted active:bg-muted"
               @click="onEvent($event, e)"
             >
               <span aria-hidden="true" class="mt-1 h-2 w-2 shrink-0 rounded-full" :style="chipStyle(e)" />

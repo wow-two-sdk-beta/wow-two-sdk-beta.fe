@@ -109,7 +109,7 @@ const radioProps = computed(() => {
 const rootClass = computed(() =>
   cn(
     'group relative block cursor-pointer rounded-lg border border-input bg-card text-card-foreground transition-colors',
-    'hover:border-border-strong has-[:checked]:border-primary has-[:checked]:bg-primary-soft/30',
+    'hover:border-border-strong active:border-border-strong has-[:checked]:border-primary has-[:checked]:bg-primary-soft/30',
     'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
     SizeClass[props.size] ?? SizeClass.md,
     attrs.class as ClassValue,

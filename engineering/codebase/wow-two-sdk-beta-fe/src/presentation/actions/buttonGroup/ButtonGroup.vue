@@ -47,9 +47,11 @@ const rootClass = computed(() =>
     isHorizontal.value ? 'flex-row' : 'flex-col',
     props.isAttached
       ? isHorizontal.value
-        ? '[&>*]:rounded-none [&>*:first-child]:rounded-l-md [&>*:last-child]:rounded-r-md [&>*:not(:first-child)]:-ml-px'
-        : '[&>*]:rounded-none [&>*:first-child]:rounded-t-md [&>*:last-child]:rounded-b-md [&>*:not(:first-child)]:-mt-px'
-      : 'gap-2',
+        ? '[&>*]:rounded-none [&>*:first-child]:rounded-l-md [&>*:last-child]:rounded-r-md [&>*:not(:first-child)]:-ml-px [--coarse-hit-gap-x:0px]'
+        : '[&>*]:rounded-none [&>*:first-child]:rounded-t-md [&>*:last-child]:rounded-b-md [&>*:not(:first-child)]:-mt-px [--coarse-hit-gap-y:0px]'
+      : isHorizontal.value
+        ? 'gap-2 [--coarse-hit-gap-x:0.5rem]'
+        : 'gap-2 [--coarse-hit-gap-y:0.5rem]',
     attrs.class as ClassValue,
   ),
 );

@@ -237,12 +237,15 @@ function onQueryInput(event: Event): void {
 
 function buttonClass(key: string): string {
   return cn(
-    'inline-flex items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'inline-flex items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     selected.value === key
-      ? 'border-primary bg-primary text-primary-foreground hover:bg-primary'
+      ? 'border-primary bg-primary text-primary-foreground hover:bg-primary active:bg-primary'
       : 'border-transparent',
-    readOnlyGrid.value && 'cursor-default hover:bg-transparent hover:text-muted-foreground',
-    readOnlyGrid.value && selected.value === key && 'hover:bg-primary hover:text-primary-foreground',
+    readOnlyGrid.value &&
+      'cursor-default hover:bg-transparent active:bg-transparent hover:text-muted-foreground active:text-muted-foreground',
+    readOnlyGrid.value &&
+      selected.value === key &&
+      'hover:bg-primary active:bg-primary hover:text-primary-foreground active:text-primary-foreground',
     readOnlyGrid.value && 'focus-visible:ring-1 focus-visible:ring-muted-foreground',
   );
 }

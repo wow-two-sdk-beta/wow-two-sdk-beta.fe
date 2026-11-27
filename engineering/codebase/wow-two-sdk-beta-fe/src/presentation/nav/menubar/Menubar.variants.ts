@@ -5,7 +5,7 @@ export const menubarVariants = tv({
 });
 
 export const menubarTriggerVariants = tv({
-  base: 'inline-flex select-none items-center rounded-sm px-3 py-1 text-sm font-medium text-foreground outline-hidden transition-colors hover:bg-muted focus-visible:bg-muted data-[state=open]:bg-muted',
+  base: 'inline-flex select-none items-center rounded-sm px-3 py-1 text-sm font-medium text-foreground outline-hidden transition-colors hover:bg-muted active:bg-muted focus-visible:bg-muted data-[state=open]:bg-muted',
 });
 
 export type MenubarVariants = VariantProps<typeof menubarVariants>;

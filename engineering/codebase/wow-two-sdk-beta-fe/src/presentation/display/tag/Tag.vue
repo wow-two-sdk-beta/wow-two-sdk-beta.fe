@@ -70,7 +70,7 @@ defineExpose({ el });
       v-if="hasClose()"
       type="button"
       :aria-label="props.closeLabel"
-      class="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-11 pointer-coarse:after:-translate-1/2"
+      class="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-11 pointer-coarse:after:-translate-1/2"
       @click="emit('close')"
     >
       <Icon :icon="CloseIcon" :size="12" />

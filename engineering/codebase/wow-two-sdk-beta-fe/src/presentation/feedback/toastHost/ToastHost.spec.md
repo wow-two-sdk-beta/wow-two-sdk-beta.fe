@@ -95,6 +95,16 @@ Component-only import: `@wow-two-beta/fe/presentation/feedback/toast-host` with 
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| overflow control ("N more") | 36px → at least 44px tall, label centred: a full-width row in a dense stack | visible height |
+
+- The collapsed capacity reads the pointer through `usePointerType()`, so the stack reserves the control's touch height.
+
 ## Props
 
 | Prop                | Type                                      | Required | Default                         | Meaning                                                                                  |

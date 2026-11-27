@@ -114,7 +114,7 @@ function timeLabel(e: EventCalendarViewerEvent): string {
         <li v-for="entry in group.events" :key="entry.event.id">
           <button
             type="button"
-            class="flex w-full items-start gap-3 rounded-md p-2 text-left transition-colors hover:bg-muted"
+            class="flex w-full items-start gap-3 rounded-md p-2 text-left transition-colors hover:bg-muted active:bg-muted"
             :title="String(entry.event.title ?? entry.event.id)"
             @click="emit('event-click', entry.event)"
           >

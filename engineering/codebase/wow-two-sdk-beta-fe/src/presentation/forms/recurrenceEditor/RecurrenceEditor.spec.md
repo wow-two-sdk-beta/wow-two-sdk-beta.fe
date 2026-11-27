@@ -14,6 +14,15 @@ Public import: `import { RecurrenceEditor } from '@wow-two-beta/fe/presentation/
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| fields and the frequency `<select>` (`InputStyles` `sm`) | 32px → at least 44px tall, text centred | visible height |
+| field and `<select>` text | → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into it on focus | text size |
+
 ## Props
 
 | Prop           | Type                 | Required | Default         | Meaning                                                                                    |

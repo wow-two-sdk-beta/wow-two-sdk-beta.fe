@@ -166,7 +166,7 @@ const locale = useLocale();
           :aria-labelledby="fieldLabelledBy"
           :aria-describedby="describedBy"
           :aria-invalid="fieldInvalid"
-          class="readonly:cursor-default readonly:text-muted-foreground readonly:hover:bg-transparent"
+          class="readonly:cursor-default readonly:text-muted-foreground readonly:hover:bg-transparent readonly:active:bg-transparent"
         >
           {{ triggerGlyph }}
         </Button>

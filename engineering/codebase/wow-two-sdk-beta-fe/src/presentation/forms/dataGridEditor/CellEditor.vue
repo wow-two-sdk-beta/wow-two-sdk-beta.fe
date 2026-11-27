@@ -11,7 +11,7 @@ export interface CellEditorProps {
 }
 
 const BaseClass =
-  'h-7 w-full rounded-sm border border-input bg-background px-2 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+  'h-7 w-full rounded-sm border border-input bg-background px-2 text-sm pointer-coarse:text-base outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
 </script>
 
 <script setup lang="ts">

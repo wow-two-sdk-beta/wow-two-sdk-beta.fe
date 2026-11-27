@@ -15,6 +15,16 @@ Public import: `import { PinInput } from '@wow-two-beta/fe/presentation/forms';`
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - Under a coarse pointer the `sm` cell takes the `md` size, a 44px square (`pointer-coarse:size-11`); the other sizes already reach it.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| field box, sizes `sm` and `md` | 32px / 40px → at least 44px tall, text centred | visible height |
+| field text, every size | 14px / 12px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into a focused field | text size |
+| cell, size `sm` | 36px → 44px square | visible size |
+
 ## Props
 
 | Prop           | Type           | Required | Default                | Meaning                                                                                             |

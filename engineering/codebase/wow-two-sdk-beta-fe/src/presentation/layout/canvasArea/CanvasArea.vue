@@ -485,7 +485,7 @@ const planeStyle = computed(() => ({
 
 const ControlClass =
   'inline-flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-xs text-muted-foreground ' +
-  'hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40 ' +
+  'hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground disabled:pointer-events-none disabled:opacity-40 ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 const ResetClass = cn(ControlClass, 'min-w-12 tabular-nums');
 

@@ -2,7 +2,7 @@
 import { ChevronDown, Pin, Trash2, X } from 'lucide-vue-next';
 
 import type { NoticeProgress } from '../../../feedback';
-import { cn, Severity } from '../../../foundation/styles';
+import { cn, CoarseHitArea, Severity } from '../../../foundation/styles';
 import { ToastSurface } from './ToastSurface';
 
 /** Defines props for the toast card. */
@@ -80,10 +80,13 @@ const GlassEdgeClass = 'data-[toast-surface=glass]:border-glass-edge';
  */
 const IconControlClass =
   'grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors ' +
-  'hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 ' +
+  'hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-1 ' +
   'focus-visible:ring-ring pointer-coarse:relative pointer-coarse:after:absolute ' +
   'pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-11 ' +
   'pointer-coarse:after:-translate-1/2';
+
+/* The details toggle keeps its xs box under a coarse pointer; an invisible hit area takes the tap. */
+const DetailsHitClass = `relative pointer-coarse:overflow-visible ${CoarseHitArea.Before}`;
 </script>
 
 <script setup lang="ts">
@@ -323,7 +326,7 @@ function fitGroupDetails(): void {
             v-if="slots.details"
             size="xs"
             variant="ghost"
-            class="pointer-coarse:min-h-11"
+            :class="DetailsHitClass"
             :aria-expanded="isDetailsOpen"
             :aria-controls="detailsId"
             @click="toggleDetails"

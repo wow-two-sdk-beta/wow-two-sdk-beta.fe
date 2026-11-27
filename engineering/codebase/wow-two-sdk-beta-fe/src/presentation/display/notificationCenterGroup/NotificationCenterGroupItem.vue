@@ -40,13 +40,13 @@ const DismissRestingClasses =
 
 /** @internal The dismiss button's hover / focus classes — the raised surface and the focus ring. */
 const DismissInteractionClasses =
-  'hover:bg-background hover:text-foreground focus-visible:opacity-100 ' +
+  'hover:bg-background active:bg-background hover:text-foreground active:text-foreground focus-visible:opacity-100 ' +
   'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
 
 /** @internal The delete button's classes. */
 const DeleteButtonClasses =
   'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground ' +
-  'hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+  'hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
 </script>
 
 <script setup lang="ts">
@@ -90,7 +90,7 @@ const classes = computed(() =>
   cn(
     'group/notif relative flex gap-3 rounded-md px-3 py-2.5 text-sm',
     isInteractive.value &&
-      'cursor-pointer hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+      'cursor-pointer hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     props.isUnread && 'bg-primary-soft/30',
     attrs.class as string | undefined,
   ),
@@ -203,7 +203,7 @@ function onDismissClick(event: MouseEvent): void {
       :class="
         cn(
           DismissRestingClasses,
-          'group-hover/notif:opacity-100 group-focus-within/notif:opacity-100',
+          'group-hover/notif:opacity-100 group-focus-within/notif:opacity-100 [@media(hover:none)]:opacity-100',
           DismissInteractionClasses,
         )
       "

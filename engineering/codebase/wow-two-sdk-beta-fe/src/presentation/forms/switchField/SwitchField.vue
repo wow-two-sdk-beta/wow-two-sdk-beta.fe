@@ -26,7 +26,7 @@ export interface SwitchFieldProps extends SwitchInputProps {
 <script setup lang="ts">
 import { computed, useAttrs, useSlots, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
-import { cn, Side as SideValue } from '../../../foundation/styles';
+import { cn, CoarseHitArea, Side as SideValue } from '../../../foundation/styles';
 import { useId } from '../../../foundation/identifiers';
 import { useFormControl } from '../../../foundation/primitives';
 import SwitchInput from '../switchInput/SwitchInput.vue';
@@ -78,9 +78,11 @@ const switchProps = computed(() => {
   return rest;
 });
 
+/* Under a coarse pointer the label keeps its box; an invisible hit area (`CoarseHitArea`) grows its reach to 44px. */
 const wrapperClass = computed(() =>
   cn(
-    'flex cursor-pointer items-start gap-3 pointer-coarse:py-3',
+    'relative flex cursor-pointer items-start gap-3',
+    CoarseHitArea.After,
     props.side === SideValue.Right && 'flex-row-reverse justify-between',
     props.wrapperClassName,
   ),

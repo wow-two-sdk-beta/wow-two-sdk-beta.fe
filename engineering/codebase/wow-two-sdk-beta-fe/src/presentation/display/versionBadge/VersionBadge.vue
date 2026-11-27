@@ -76,7 +76,7 @@ const classes = computed(() =>
   cn(
     'inline-flex max-w-full shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[11px] font-medium leading-4',
     isStale.value
-      ? 'bg-warning-soft text-warning-soft-foreground transition-colors hover:bg-warning/20 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none'
+      ? 'bg-warning-soft text-warning-soft-foreground transition-colors hover:bg-warning/20 active:bg-warning/20 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none'
       : 'bg-muted text-muted-foreground',
     attrs.class as ClassValue,
   ),

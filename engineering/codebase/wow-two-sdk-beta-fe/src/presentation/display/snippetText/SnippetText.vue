@@ -62,7 +62,7 @@ const codeClasses = computed(() => cn('flex-1 pr-10', props.variant === SnippetT
 
 const buttonClasses = computed(() =>
   cn(
-    'absolute right-2 grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'absolute right-2 grid h-7 w-7 place-items-center rounded text-muted-foreground transition-colors hover:bg-background active:bg-background hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     props.variant === SnippetTextVariant.Inline ? 'top-1/2 -translate-y-1/2' : 'top-2',
   ),
 );

@@ -198,7 +198,7 @@ const locale = useLocale();
       :disabled="finalDisabled"
       :aria-label="locale.t('SearchInput.clearSearch', undefined, 'Clear search')"
       :class="touchClearClass"
-      class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-subtle-foreground hover:bg-muted hover:text-muted-foreground"
+      class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-subtle-foreground hover:bg-muted active:bg-muted hover:text-muted-foreground active:text-muted-foreground"
       @click="handleClear"
     >
       <Icon :icon="ClearIcon" :size="14" />

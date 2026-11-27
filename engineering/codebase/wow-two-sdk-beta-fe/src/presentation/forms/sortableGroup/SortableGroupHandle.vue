@@ -40,7 +40,7 @@ function onKeydown(event: KeyboardEvent): void {
 
 const classes = computed(() =>
   cn(
-    'inline-flex cursor-grab touch-none items-center justify-center text-subtle-foreground transition-colors hover:text-muted-foreground active:cursor-grabbing',
+    'inline-flex cursor-grab touch-none items-center justify-center text-subtle-foreground transition-colors hover:text-muted-foreground active:text-muted-foreground active:cursor-grabbing',
     attrs.class as string | undefined,
   ),
 );

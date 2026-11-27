@@ -250,13 +250,14 @@ const wrapperClass = computed(() => cn('flex flex-col gap-3', attrs.class as Cla
 const zoneClass = computed(() =>
   cn(
     'flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-input bg-background px-6 py-10 text-center text-sm text-muted-foreground transition-colors',
-    'hover:border-border-strong hover:bg-muted/40',
+    'hover:border-border-strong active:border-border-strong hover:bg-muted/40 active:bg-muted/40',
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     dragState.value === 'over' && 'border-primary bg-primary-soft/30 text-foreground',
     showError.value && 'border-destructive bg-destructive-soft/30 text-destructive-soft-foreground',
-    finalDisabled.value && 'cursor-not-allowed opacity-60 hover:border-input hover:bg-background',
+    finalDisabled.value &&
+      'cursor-not-allowed opacity-60 hover:border-input active:border-input hover:bg-background active:bg-background',
     ReadOnlyLook,
-    !showError.value && 'readonly:hover:border-input',
+    !showError.value && 'readonly:hover:border-input readonly:active:border-input',
   ),
 );
 

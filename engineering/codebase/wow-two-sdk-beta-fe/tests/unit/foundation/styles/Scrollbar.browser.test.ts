@@ -68,15 +68,20 @@ function hoverFill(): string {
 }
 
 describe('themed scrollbar', () => {
-  it('applies on every device: no scrollbar rule sits under a pointer or hover media condition', () => {
+  /* A `:hover` rule alone waits for a hovering pointer, since a finger leaves `:hover` stuck after a tap; its pressed
+     twin (`:active`) and every other rule apply on every device. */
+  it('applies on every device: no scrollbar rule but a hover one sits under a pointer or hover media condition', () => {
     const rules = pageRules().filter(
       (rule) =>
         rule.selectorText.includes('::-webkit-scrollbar') || rule.style.getPropertyValue('scrollbar-width') !== '',
     );
     expect(rules.length).toBeGreaterThan(0);
     for (const rule of rules) {
-      expect(mediaConditions(rule).join(' '), rule.selectorText).not.toMatch(/pointer|hover/);
+      const conditions = mediaConditions(rule).join(' ');
+      if (rule.selectorText.endsWith(':hover')) expect(conditions, rule.selectorText).toBe('(hover: hover)');
+      else expect(conditions, rule.selectorText).not.toMatch(/pointer|hover/);
     }
+    expect(rules.some((rule) => rule.selectorText.endsWith('::-webkit-scrollbar-thumb:active'))).toBe(true);
   });
 
   describe.skipIf(!hasWebkitScrollbar)('::-webkit-scrollbar', () => {

@@ -132,7 +132,8 @@ function dayProps(date: Temporal.PlainDate): MonthGridDayProps {
     class: cn(
       'rounded-sm',
       isToday(date) && !isSelectedCell && 'border border-border',
-      isSelectedCell && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground',
+      isSelectedCell &&
+        'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/90 hover:text-primary-foreground active:text-primary-foreground',
     ),
   };
 }

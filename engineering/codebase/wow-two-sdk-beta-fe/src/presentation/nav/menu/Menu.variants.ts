@@ -3,15 +3,16 @@ import { tv, type VariantProps } from '../../../foundation/styles';
 export const menuVariants = tv({
   /* Layout only: fill, border, radius, padding and shadow come from the surface recipe, so the `variant`, `tone`,
      `radius`, `padding` and `elevation` props reach the panel. */
-  base: 'flex min-w-[8rem] flex-col gap-0.5 text-sm outline-hidden',
+  base: 'flex min-w-[8rem] flex-col gap-0.5 text-sm outline-hidden [--coarse-hit-gap-y:0.125rem]',
 });
 
 export const menuItemVariants = tv({
-  base: 'relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-hidden transition-colors pointer-coarse:min-h-11 focus:bg-muted focus:text-foreground hover:bg-muted hover:text-foreground',
+  base: 'relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-hidden transition-colors pointer-coarse:min-h-11 focus:bg-muted focus:text-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground',
   variants: {
     state: {
       default: 'text-popover-foreground',
-      destructive: 'text-destructive-soft-foreground focus:bg-destructive-soft hover:bg-destructive-soft',
+      destructive:
+        'text-destructive-soft-foreground focus:bg-destructive-soft hover:bg-destructive-soft active:bg-destructive-soft',
       disabled: 'pointer-events-none opacity-50',
     },
   },

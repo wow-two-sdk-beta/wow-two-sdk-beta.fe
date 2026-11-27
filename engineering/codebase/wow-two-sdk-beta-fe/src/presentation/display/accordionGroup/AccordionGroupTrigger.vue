@@ -47,7 +47,7 @@ function onClick(event: MouseEvent): void {
 
 const classes = computed(() =>
   cn(
-    'flex w-full items-center justify-between gap-2 px-3 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+    'flex w-full items-center justify-between gap-2 px-3 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
     attrs.class as string | undefined,
   ),
 );

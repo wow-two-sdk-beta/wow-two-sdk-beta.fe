@@ -239,7 +239,7 @@ function cellClass(date: Temporal.PlainDate, outOfMonth: boolean): string {
   const consumer = props.dayProps?.(date, { outOfMonth });
   return cn(
     'grid h-9 w-9 place-items-center text-sm transition-colors',
-    'hover:bg-primary/10 hover:text-foreground',
+    'hover:bg-primary/10 active:bg-primary/10 hover:text-foreground active:text-foreground',
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     outOfMonth && 'text-muted-foreground/60',
     dayDisabled(date) && 'pointer-events-none opacity-40',
@@ -285,7 +285,7 @@ const locale = useLocale();
       <button
         type="button"
         :aria-label="locale.t('MonthGrid.previousMonth', undefined, 'Previous month')"
-        class="grid h-7 w-7 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        class="grid h-7 w-7 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         @click="emit('update:viewMonth', addMonths(viewMonth, -1))"
       >
         <ChevronLeftIcon class="h-4 w-4" />
@@ -294,7 +294,7 @@ const locale = useLocale();
       <button
         type="button"
         :aria-label="locale.t('MonthGrid.nextMonth', undefined, 'Next month')"
-        class="grid h-7 w-7 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        class="grid h-7 w-7 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         @click="emit('update:viewMonth', addMonths(viewMonth, 1))"
       >
         <ChevronRightIcon class="h-4 w-4" />

@@ -345,7 +345,7 @@ const triggerClasses = computed(() =>
   cn(
     'group/account-menu inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-transparent',
     'py-1 ps-1 pe-2 text-foreground transition-colors motion-reduce:transition-none',
-    'hover:border-primary/15 hover:bg-primary-soft',
+    'hover:border-primary/15 active:border-primary/15 hover:bg-primary-soft active:bg-primary-soft',
     'data-[state=open]:border-primary/15 data-[state=open]:bg-primary-soft',
     'outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60',
     attrs.class as ClassValue,

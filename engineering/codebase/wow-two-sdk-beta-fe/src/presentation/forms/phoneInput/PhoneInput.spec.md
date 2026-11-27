@@ -53,6 +53,17 @@ Public import: `import { PhoneInput } from '@wow-two-beta/fe/presentation/forms'
 - `PhoneCountries` and `PhoneCountry` live in `foundation/phone`; this component's barrel re-exports them.
 - Under a coarse pointer the frame is 44px high (`pointer-coarse:h-11`) and its parts fill it; a fine pointer keeps the 40px frame.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| field box, sizes `sm` and `md` | 32px / 40px → at least 44px tall, text centred | visible height |
+| field text, every size | 14px / 12px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into a focused field | text size |
+| frame | 40px → 44px tall; the country select and the number field fill it | visible height |
+| country `<select>` text | 14px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into it on focus | text size |
+
 ## Props
 
 | Prop             | Type                    | Required | Default         | Meaning                                                                                                       |

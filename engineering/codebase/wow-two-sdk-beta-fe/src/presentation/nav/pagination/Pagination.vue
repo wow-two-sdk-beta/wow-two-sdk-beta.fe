@@ -90,7 +90,10 @@ function go(target: number): void {
 /* On a coarse pointer (a phone or tablet) a row too long for its container wraps onto the next line rather than run
    past the screen's edge; a row that fits lies as a mouse sees it. */
 const classes = computed(() =>
-  cn('inline-flex items-center gap-1 pointer-coarse:flex-wrap', attrs.class as string | undefined),
+  cn(
+    'inline-flex items-center gap-1 [--coarse-hit-gap-x:6px] [--coarse-hit-gap-y:14px] pointer-coarse:flex-wrap pointer-coarse:gap-y-3',
+    attrs.class as string | undefined,
+  ),
 );
 
 /** Everything but `class`, which is re-applied through `cn` above. */
@@ -109,7 +112,7 @@ defineExpose({ el });
       type="button"
       :aria-label="locale.t('Pagination.firstPage', undefined, 'First page')"
       :disabled="page <= 1"
-      :class="cn(BaseButton, 'hover:bg-muted')"
+      :class="cn(BaseButton, 'hover:bg-muted active:bg-muted')"
       @click="go(1)"
     >
       <Icon :icon="ChevronsLeft" :size="16" />
@@ -118,7 +121,7 @@ defineExpose({ el });
       type="button"
       :aria-label="locale.t('Pagination.previousPage', undefined, 'Previous page')"
       :disabled="page <= 1"
-      :class="cn(BaseButton, 'hover:bg-muted')"
+      :class="cn(BaseButton, 'hover:bg-muted active:bg-muted')"
       @click="go(page - 1)"
     >
       <Icon :icon="ChevronLeft" :size="16" />
@@ -130,7 +133,12 @@ defineExpose({ el });
         :key="p"
         type="button"
         :aria-current="p === page ? 'page' : undefined"
-        :class="cn(BaseButton, p === page ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted')"
+        :class="
+          cn(
+            BaseButton,
+            p === page ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted active:bg-muted',
+          )
+        "
         @click="go(p)"
       >
         {{ p }}
@@ -140,7 +148,7 @@ defineExpose({ el });
       type="button"
       :aria-label="locale.t('Pagination.nextPage', undefined, 'Next page')"
       :disabled="page >= total"
-      :class="cn(BaseButton, 'hover:bg-muted')"
+      :class="cn(BaseButton, 'hover:bg-muted active:bg-muted')"
       @click="go(page + 1)"
     >
       <Icon :icon="ChevronRight" :size="16" />
@@ -150,7 +158,7 @@ defineExpose({ el });
       type="button"
       :aria-label="locale.t('Pagination.lastPage', undefined, 'Last page')"
       :disabled="page >= total"
-      :class="cn(BaseButton, 'hover:bg-muted')"
+      :class="cn(BaseButton, 'hover:bg-muted active:bg-muted')"
       @click="go(total)"
     >
       <Icon :icon="ChevronsRight" :size="16" />

@@ -13,18 +13,19 @@ import { tv, type VariantProps } from '../../foundation/styles';
 export const inputBaseVariants = tv({
   base: 'flex w-full rounded-md bg-field text-foreground placeholder:text-subtle-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 readonly:cursor-default readonly:bg-muted readonly:text-muted-foreground readonly:focus-visible:ring-1',
   variants: {
-    /* sm and md lift to a 44px floor under a coarse pointer (a finger), leaving the fine-pointer box as is; lg is
-       already taller and xs is the deliberately dense step. Every control built on this recipe (the select
-       trigger, the pickers' inputs) inherits the floor. */
+    /* Declared touch changes (each field's spec, `## Touch`): sm and md lift to a visible 44px floor under a coarse
+       pointer (a finger), content centred, leaving the fine-pointer box as is; lg is already taller and xs is the
+       deliberately dense step. Every size takes 16px text under a coarse pointer, so iOS never zooms the page into a
+       focused field. Every control built on this recipe (the select trigger, the pickers' inputs) inherits both. */
     size: {
-      xs: 'h-7 px-2 text-xs',
-      sm: 'h-8 px-2.5 text-sm pointer-coarse:min-h-11',
-      md: 'h-10 px-3 text-sm pointer-coarse:min-h-11',
+      xs: 'h-7 px-2 text-xs pointer-coarse:text-base',
+      sm: 'h-8 px-2.5 text-sm pointer-coarse:min-h-11 pointer-coarse:text-base',
+      md: 'h-10 px-3 text-sm pointer-coarse:min-h-11 pointer-coarse:text-base',
       lg: 'h-12 px-4 text-base',
     },
     state: {
       default:
-        'border-input hover:border-border-strong readonly:hover:border-input readonly:focus-visible:ring-muted-foreground',
+        'border-input hover:border-border-strong active:border-border-strong readonly:hover:border-input readonly:active:border-input readonly:focus-visible:ring-muted-foreground',
       invalid: 'border-destructive-soft-foreground focus-visible:ring-destructive-soft-foreground',
     },
     /* Border weight — scale like `size`/`radius`; default `sm` (1px). */
@@ -63,7 +64,7 @@ export type InputBaseVariants = VariantProps<typeof inputBaseVariants>;
  * own resting border, which the hover would otherwise replace.
  */
 export const ReadOnlyLook =
-  'readonly:cursor-default readonly:bg-muted readonly:text-muted-foreground readonly:hover:bg-muted readonly:focus-visible:ring-1 readonly:focus-visible:ring-muted-foreground';
+  'readonly:cursor-default readonly:bg-muted readonly:text-muted-foreground readonly:hover:bg-muted readonly:active:bg-muted readonly:focus-visible:ring-1 readonly:focus-visible:ring-muted-foreground';
 
 /** Defines the size step of a form input control. */
 export const InputSize = {

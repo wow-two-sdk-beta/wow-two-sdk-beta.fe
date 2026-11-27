@@ -75,7 +75,7 @@ export const buttonVariants = tv({
       reveal: 'bg-transparent border-transparent',
       // An inline text link keeps its text height and takes no hit area under a coarse pointer (the touch compounds
       // below skip it): it sits in a line of prose, which WCAG 2.5.8 exempts from the target size.
-      link: 'bg-transparent h-auto! p-0! rounded-none! underline-offset-4 hover:underline focus-visible:ring-offset-0',
+      link: 'bg-transparent h-auto! p-0! rounded-none! underline-offset-4 hover:underline active:underline focus-visible:ring-offset-0',
       // Base = neutral/default tone: dark image-overlay wash + blur. Non-neutral tones resolve
       // through the shared `Tones.glass` palette via compoundVariants below (so tone + color
       // overrides apply). `backdrop-blur-md` stays here for every tone.
@@ -269,31 +269,31 @@ export const buttonVariants = tv({
       variant: 'reveal',
       tone: 'primary',
       class:
-        'text-primary-soft-foreground/70 hover:border-border hover:bg-background hover:text-primary-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-primary-soft-foreground active:bg-muted/70',
+        'text-primary-soft-foreground/70 hover:border-border active:border-border hover:bg-background hover:text-primary-soft-foreground active:text-primary-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-primary-soft-foreground active:bg-muted/70',
     },
     {
       variant: 'reveal',
       tone: 'neutral',
       class:
-        'text-muted-foreground hover:border-border hover:bg-background hover:text-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-foreground active:bg-muted/70',
+        'text-muted-foreground hover:border-border active:border-border hover:bg-background hover:text-foreground active:text-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-foreground active:bg-muted/70',
     },
     {
       variant: 'reveal',
       tone: 'danger',
       class:
-        'text-destructive-soft-foreground/70 hover:border-border hover:bg-background hover:text-destructive-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-destructive-soft-foreground active:bg-muted/70',
+        'text-destructive-soft-foreground/70 hover:border-border active:border-border hover:bg-background hover:text-destructive-soft-foreground active:text-destructive-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-destructive-soft-foreground active:bg-muted/70',
     },
     {
       variant: 'reveal',
       tone: 'success',
       class:
-        'text-success-soft-foreground/70 hover:border-border hover:bg-background hover:text-success-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-success-soft-foreground active:bg-muted/70',
+        'text-success-soft-foreground/70 hover:border-border active:border-border hover:bg-background hover:text-success-soft-foreground active:text-success-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-success-soft-foreground active:bg-muted/70',
     },
     {
       variant: 'reveal',
       tone: 'warning',
       class:
-        'text-warning-soft-foreground/70 hover:border-border hover:bg-background hover:text-warning-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-warning-soft-foreground active:bg-muted/70',
+        'text-warning-soft-foreground/70 hover:border-border active:border-border hover:bg-background hover:text-warning-soft-foreground active:text-warning-soft-foreground focus-visible:border-border focus-visible:bg-background focus-visible:text-warning-soft-foreground active:bg-muted/70',
     },
 
     // === LINK × tone (h/padding/radius cleared by variant) ===
@@ -308,7 +308,7 @@ export const buttonVariants = tv({
     {
       variant: ['glass', 'glass-surface'],
       tone: 'neutral',
-      class: 'bg-black/45 text-white/70 hover:bg-black/65 hover:text-white active:bg-black/75',
+      class: 'bg-black/45 text-white/70 hover:bg-black/65 hover:text-white active:text-white active:bg-black/75',
     },
     // Every other tone resolves through the shared `Tones.glass` palette (`bg-{tone}/30 text-{tone}-foreground`)
     // so `tone="success"` and per-instance `color` apply, plus a tone-matched hover / active wash.
@@ -341,18 +341,11 @@ export const buttonVariants = tv({
     // === COARSE POINTER === sm and md reach 44 x 44px without moving what they show: an invisible `::before`
     // (`::after` is the unavailable slash) centred on the box takes the tap, so the box and its icon keep their size
     // and place. `relative` anchors it and yields to a caller's own position class through `cn`; the box stops
-    // clipping, which would cut the hit area. A text button also grows to 44px tall, its label centred; an icon
-    // shape keeps its box, since `aspect-square` would turn the height into width.
+    // clipping, which would cut the hit area. A text button keeps its box too: no shape changes size under touch.
     {
       variant: ['solid', 'soft', 'surface', 'outline', 'ghost', 'reveal', 'glass', 'glass-surface'],
       size: ['sm', 'md'],
       class: `relative pointer-coarse:overflow-visible ${CoarseHitArea.Before}`,
-    },
-    {
-      variant: ['solid', 'soft', 'surface', 'outline', 'ghost', 'reveal', 'glass', 'glass-surface'],
-      size: ['sm', 'md'],
-      shape: 'default',
-      class: 'pointer-coarse:min-h-11',
     },
 
     // === UNAVAILABLE === last, so the dashed border's colour beats every tone's own border colour.

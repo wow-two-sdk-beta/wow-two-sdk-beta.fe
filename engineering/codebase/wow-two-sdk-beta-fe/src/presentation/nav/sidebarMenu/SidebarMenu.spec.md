@@ -14,17 +14,15 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
   accessible names, trailing content becomes inert, and section headings fade into dividers. Size the rail's width
   on the caller's container. Parts outside a `SidebarMenu` render expanded.
 - Width, placement and scrolling belong to the caller (for example `AppShellSidebar`).
-- Under a coarse pointer the menu widens by 4px a side and pads its rows back (`pointer-coarse:-mx-1 px-1`), and clips
-  what spills past them: the rows and their icons stay where a mouse sees them, and each row's 44px-wide hit area fits
-  inside the menu, a caller's own scroll box on the menu included. A caller must not add its own inline margin or
-  padding under a coarse pointer, which would move the rail's icons.
+- Under a coarse pointer the menu keeps its box and padding; a caller must not add its own inline margin or padding
+  under a coarse pointer, which would move the rail's icons (`## Touch`).
 
 ### SidebarMenuItem
 
 - Renders `<li><a>` with an icon, a truncated label and a trailing slot. `isActive` sets `aria-current="page"` and `data-active` (tinted).
-- The row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`), its content centred. Under
-  a coarse pointer an invisible hit area at least 44px wide (`CoarseHitArea`) covers a rail row narrower than that,
-  so its icon keeps its place, and the row stops clipping its content, which the menu clips instead.
+- The row is 36px, its content centred. Under a coarse pointer a horizontal hit area at least 44px wide
+  (`CoarseHitArea.AfterX`) covers a rail row narrower than that, so its icon keeps its place, and the row stops
+  clipping its content. Inside a drawer (`data-sidebar-drawer`) the row is 44px tall under a coarse pointer.
 - `asChild` merges the row's classes and state onto the slotted router link. Mark the link's direct label child with
   `data-sidebar-menu-label` to use the same clipping and fade as the built-in label.
 - The icon is `aria-hidden`; fallthrough attributes and `class` reach the link; the exposed `el` is the link element.
@@ -34,13 +32,25 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 - A disclosure: the toggle row carries `aria-expanded` and `aria-controls`, and the nested list is named by `label`.
   The list animates in and out through `CollapsibleGroupContent` and stays mounted and inert when closed.
 - `open` / `update:open` and `defaultOpen` follow the shared controlled-state helper. Open the group that holds the active route through `defaultOpen`.
-- The toggle row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`), with the same
-  44px-wide hit area as a destination row.
+- The toggle row takes a destination row's sizes and hit area: 36px, 44px tall in a drawer under a coarse pointer.
 - In the rail a group shows only its toggle: the nested list stays hidden (`aria-expanded="false"`), and its open state applies once the menu expands.
 
 ### SidebarMenuSection
 
 - An always-open list under a small heading, named by that heading through `aria-labelledby`.
+
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| row and group toggle in a drawer (`data-sidebar-drawer`: `AppFrame`'s phone and tablet drawers) | 36px → 44px tall, content centred | visible height |
+| row and group toggle in a sidebar or rail | none: 36px rows with a horizontal-only hit area 44px wide | hit area |
+
+- The sidebar and rail list is dense: its rows sit 2px apart, so a vertical hit area would take its neighbour's
+  taps. Each row's vertical reach stays 36px, above the 24px of WCAG 2.5.8; a drawer, used by touch first, grows its
+  rows to 44px instead.
 
 ## Props
 

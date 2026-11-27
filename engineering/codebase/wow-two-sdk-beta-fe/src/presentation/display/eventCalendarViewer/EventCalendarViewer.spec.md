@@ -12,6 +12,15 @@ Public import: `import { EventCalendarViewer } from '@wow-two-beta/fe/presentati
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| Today, Previous, Next | none: invisible 44px hit areas | hit area |
+| month dates and event chips | at least 44px tall: rows of a dense grid with no room for a hit area between them | visible height |
+
 ## Props
 
 | Prop          | Type                                      | Required | Default                               | Meaning                                                                                                                 |
@@ -38,8 +47,7 @@ views in that canonical order, whatever order `views` is passed in; `month` is t
 - Prev, Next and the title follow the shown view: a year, month, week or day per step, and the agenda steps a day.
 - Previous and Next flank the period title. Below `sm`, the view switcher uses its own row.
 - The header's controls (Today, Previous, Next and the view switcher) are 44px tall below `sm` and 28px from it, and
-  reach 44 x 44px under a coarse pointer at any width: Today and the switcher grow to 44px tall, and Previous and
-  Next keep their box and take the tap across an invisible 44px square (`CoarseHitArea`), so the title stays put.
+  reach 44 x 44px under a coarse pointer at any width: Today, Previous and Next keep their box and take the tap across an invisible 44px square (`CoarseHitArea`), so the title stays put.
 - The views serve their phone layout (dots instead of chips, a day list instead of a time grid) when the device class
   an app root provided with `provideDeviceTargets` is phone, whatever the viewport; without a provider, below `sm`.
   The reading is `false` — the wide layout — on the server and in the first render, and corrects on mount.

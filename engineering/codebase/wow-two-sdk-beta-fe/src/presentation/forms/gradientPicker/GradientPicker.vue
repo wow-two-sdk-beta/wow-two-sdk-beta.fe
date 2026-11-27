@@ -180,7 +180,9 @@ function onStopPositionInput(index: number, event: Event): void {
 function kindClass(kind: GradientKind): string {
   return cn(
     'inline-flex h-6 items-center rounded px-2 text-xs font-medium transition-colors',
-    gradient.value.kind === kind ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+    gradient.value.kind === kind
+      ? 'bg-primary text-primary-foreground'
+      : 'text-muted-foreground hover:text-foreground active:text-foreground',
     readOnlyGroup.value && 'cursor-default',
   );
 }
@@ -315,7 +317,7 @@ const locale = useLocale();
           type="button"
           :aria-label="locale.t('GradientPicker.removeStop', undefined, 'Remove stop')"
           :disabled="inactive || gradient.stops.length <= 2"
-          class="inline-flex h-7 w-7 items-center justify-center rounded text-destructive-soft-foreground hover:bg-destructive-soft disabled:pointer-events-none disabled:opacity-40"
+          class="inline-flex h-7 w-7 items-center justify-center rounded text-destructive-soft-foreground hover:bg-destructive-soft active:bg-destructive-soft disabled:pointer-events-none disabled:opacity-40"
           @click="removeStop(i)"
         >
           <Icon :icon="TrashIcon" :size="12" />
@@ -326,7 +328,7 @@ const locale = useLocale();
     <button
       type="button"
       :disabled="inactive"
-      class="inline-flex h-8 w-full items-center justify-center gap-1 rounded-md border border-dashed border-border text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+      class="inline-flex h-8 w-full items-center justify-center gap-1 rounded-md border border-dashed border-border text-xs text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
       @click="addStop"
     >
       <Icon :icon="PlusIcon" :size="12" /> {{ locale.t('GradientPicker.addStop', undefined, 'Add stop') }}

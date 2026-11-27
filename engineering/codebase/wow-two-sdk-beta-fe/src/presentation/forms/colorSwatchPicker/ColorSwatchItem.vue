@@ -63,7 +63,7 @@ function handleKeydown(event: KeyboardEvent): void {
     :shape="shape"
     :is-selected="isSelected"
     :is-disabled="isDisabled"
-    :class="isReadOnly && 'cursor-default hover:shadow-none'"
+    :class="isReadOnly && 'cursor-default hover:shadow-none active:shadow-none'"
     :tabindex="roving.tabindex"
     :data-roving-focus-item="roving['data-roving-focus-item']"
     :aria-label="color"

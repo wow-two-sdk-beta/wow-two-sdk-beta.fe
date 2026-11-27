@@ -129,8 +129,8 @@ function onKeydown(event: KeyboardEvent, column: 'hour' | 'minute'): void {
 
 function cellClass(selected: boolean, active: boolean): string {
   return cn(
-    'grid h-8 w-12 shrink-0 place-items-center rounded-sm text-sm transition-colors hover:bg-primary/10 disabled:pointer-events-none disabled:opacity-40',
-    selected && 'bg-primary text-primary-foreground hover:bg-primary/90',
+    'grid h-8 w-12 shrink-0 place-items-center rounded-sm text-sm transition-colors hover:bg-primary/10 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-40',
+    selected && 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/90',
     active && 'ring-1 ring-inset ring-ring',
   );
 }

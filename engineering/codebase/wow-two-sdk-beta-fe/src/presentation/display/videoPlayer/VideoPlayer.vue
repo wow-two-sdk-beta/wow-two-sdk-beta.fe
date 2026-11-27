@@ -60,7 +60,7 @@ function formatTime(seconds: number): string {
 const IdleHideMs = 3000;
 
 const IconButtonClass =
-  'inline-flex h-7 w-7 items-center justify-center rounded text-white/80 hover:bg-white/20 hover:text-white';
+  'inline-flex h-7 w-7 items-center justify-center rounded text-white/80 hover:bg-white/20 active:bg-white/20 hover:text-white active:text-white';
 </script>
 
 <script setup lang="ts">
@@ -439,7 +439,7 @@ defineExpose({ el });
       v-if="!playing"
       type="button"
       :aria-label="locale.t('VideoPlayer.play', undefined, 'Play')"
-      class="absolute inset-0 grid place-items-center bg-black/30 transition-opacity hover:bg-black/40"
+      class="absolute inset-0 grid place-items-center bg-black/30 transition-opacity hover:bg-black/40 active:bg-black/40"
       @click="togglePlay"
     >
       <span class="grid h-16 w-16 place-items-center rounded-full bg-white/90 text-foreground shadow-lg">
@@ -454,7 +454,7 @@ defineExpose({ el });
         :aria-label="
           locale.t(playing ? 'VideoPlayer.pause' : 'VideoPlayer.play', undefined, playing ? 'Pause' : 'Play')
         "
-        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 active:bg-white/30"
         @click="togglePlay"
       >
         <Icon :icon="playing ? Pause : Play" :size="14" />
@@ -489,7 +489,7 @@ defineExpose({ el });
       <select
         v-model="speed"
         :aria-label="locale.t('VideoPlayer.playbackSpeed', undefined, 'Playback speed')"
-        class="h-7 rounded-sm border border-white/20 bg-black/40 px-1 text-xs"
+        class="h-7 rounded-sm border border-white/20 bg-black/40 px-1 text-xs pointer-coarse:text-base"
       >
         <option v-for="rate in PlaybackRates" :key="rate" :value="rate" class="text-foreground">{{ rate }}×</option>
       </select>

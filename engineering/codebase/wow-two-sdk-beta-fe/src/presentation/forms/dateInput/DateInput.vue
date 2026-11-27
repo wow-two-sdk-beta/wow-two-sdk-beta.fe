@@ -288,7 +288,7 @@ const locale = useLocale();
       <PopoverTrigger
         :aria-label="locale.t('DateInput.chooseDate', undefined, 'Choose date')"
         :disabled="finalDisabled || finalReadOnly"
-        class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+        class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
       >
         <CalendarIcon class="h-4 w-4" />
       </PopoverTrigger>

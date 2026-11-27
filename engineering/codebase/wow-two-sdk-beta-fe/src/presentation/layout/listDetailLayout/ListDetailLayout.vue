@@ -274,7 +274,7 @@ defineExpose({ el });
           <button
             type="button"
             data-list-detail-back
-            class="-ms-2 inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+            class="-ms-2 inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
             @click="back"
           >
             <ChevronLeft class="size-4 rtl:-scale-x-100" aria-hidden="true" />

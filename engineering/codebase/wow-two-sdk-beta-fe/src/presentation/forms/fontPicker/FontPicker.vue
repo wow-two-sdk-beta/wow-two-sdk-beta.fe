@@ -184,7 +184,7 @@ const search = useTemplateRef<HTMLInputElement>('search');
 
 function optionClass(option: FontOption): string {
   return cn(
-    'flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-sm transition-colors hover:bg-muted',
+    'flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-sm transition-colors hover:bg-muted active:bg-muted',
     option.family === family.value && 'bg-primary-soft text-primary-soft-foreground',
   );
 }
@@ -199,9 +199,9 @@ const passthroughAttrs = computed(() =>
 const wrapperClass = computed(() => cn('inline-block', attrs.class as ClassValue));
 
 const triggerClass = cn(
-  'inline-flex h-10 min-w-[14rem] items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
+  'inline-flex h-10 min-w-[14rem] items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
   ReadOnlyLook,
-  'readonly:hover:border-input',
+  'readonly:hover:border-input readonly:active:border-input',
 );
 
 const ChevronDownIcon = ChevronDown;

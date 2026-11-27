@@ -45,7 +45,7 @@ const tokens = computed(() => EmojiPickerSizes[props.size]);
 const isCircle = computed(() => props.shape === EmojiTileShapeValue.Circle);
 
 const stateClass = computed(() =>
-  props.isSelected ? 'border-primary bg-primary/10' : 'border-transparent hover:bg-muted',
+  props.isSelected ? 'border-primary bg-primary/10' : 'border-transparent hover:bg-muted active:bg-muted',
 );
 
 const tileClass = computed(

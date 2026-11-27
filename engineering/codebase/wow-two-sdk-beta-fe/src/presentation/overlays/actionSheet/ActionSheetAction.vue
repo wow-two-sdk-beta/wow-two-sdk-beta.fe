@@ -36,7 +36,7 @@ const el = useTemplateRef<HTMLButtonElement>('el');
 
 const classes = computed(() =>
   cn(
-    'flex h-12 w-full items-center justify-center bg-card px-4 text-base font-medium transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+    'flex h-12 w-full items-center justify-center bg-card px-4 text-base font-medium transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
     props.isDestructive ? 'text-destructive-soft-foreground' : 'text-foreground',
     attrs.class as string | undefined,
   ),

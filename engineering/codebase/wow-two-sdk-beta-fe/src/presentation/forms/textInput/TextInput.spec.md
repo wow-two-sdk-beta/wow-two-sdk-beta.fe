@@ -14,6 +14,18 @@ Public import: `import { TextInput } from '@wow-two-beta/fe/presentation/forms';
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - Under a coarse pointer (a finger) the field is at least 44px high at the `sm` and `md` sizes (`pointer-coarse:min-h-11` in the shared input recipe); a fine pointer keeps the compact box (32px, 40px). `lg` is already taller and `xs` stays the dense step. Every field built on that recipe — the select, combobox and tag triggers, the number, email, date and the other text fields — takes the same floor.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| field box, sizes `sm` and `md` | 32px / 40px → at least 44px tall, text centred | visible height |
+| field text, every size | 14px / 12px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into a focused field | text size |
+
+- The field is an `<input>`, which draws no pseudo-element, so it takes a visible touch height in place of a hit area.
+- Every field built on the shared input recipe (`InputStyles`) inherits both changes.
+
 ## Props
 
 | Prop           | Type               | Required | Default     | Meaning                                                                                       |

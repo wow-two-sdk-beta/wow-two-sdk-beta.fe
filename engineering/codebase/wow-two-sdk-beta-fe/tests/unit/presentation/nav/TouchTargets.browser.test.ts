@@ -2,6 +2,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import { page } from 'vitest/browser';
+import { reachOf } from '../../../support/TouchReach';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@src/presentation/nav/dropdownMenu';
 import {
   MenuCheckboxItem,
@@ -144,23 +145,27 @@ describe.skipIf(!canEmulateCoarsePointer)('menu rows and sidebar rows under a co
       }
     });
 
-    it(`gives every sidebar row 44px at ${size.width}px`, async () => {
+    it(`gives every sidebar row a 44px-wide reach at ${size.width}px`, async () => {
       await page.viewport(size.width, size.height);
       mountSidebar();
       expect(sidebarRows()).toHaveLength(2);
       for (const row of sidebarRows()) {
-        expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
-        expect(row.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
+        /* A sidebar row keeps its 36px and reaches 44px wide; the dense list's vertical reach is the row's own. */
+        expect(Math.round(row.getBoundingClientRect().height)).toBe(36);
+        expect(reachOf(row).width).toBeGreaterThanOrEqual(43.5);
+        expect(reachOf(row).height).toBeGreaterThanOrEqual(35.5);
       }
     });
 
-    it(`gives a sidebar group toggle and its nested row 44px at ${size.width}px`, async () => {
+    it(`gives a sidebar group toggle and its nested row a 44px-wide reach at ${size.width}px`, async () => {
       await page.viewport(size.width, size.height);
       mountSidebarWithGroup();
       expect(sidebarRows()).toHaveLength(1);
       for (const row of [groupToggle(), ...sidebarRows()]) {
-        expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
-        expect(row.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
+        /* A sidebar row keeps its 36px and reaches 44px wide; the dense list's vertical reach is the row's own. */
+        expect(Math.round(row.getBoundingClientRect().height)).toBe(36);
+        expect(reachOf(row).width).toBeGreaterThanOrEqual(43.5);
+        expect(reachOf(row).height).toBeGreaterThanOrEqual(35.5);
       }
     });
   }

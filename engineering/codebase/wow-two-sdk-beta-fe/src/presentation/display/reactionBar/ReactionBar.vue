@@ -95,7 +95,7 @@ const chipClasses = (reaction: Reaction): string =>
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     reaction.isReactedByMe
       ? 'border-primary bg-primary-soft text-primary-soft-foreground'
-      : 'border-border bg-background hover:bg-muted',
+      : 'border-border bg-background hover:bg-muted active:bg-muted',
   );
 
 const chipTitle = (reaction: Reaction): string | undefined =>
@@ -138,7 +138,7 @@ defineExpose({ el });
       v-if="hasAdd()"
       type="button"
       :aria-label="locale.t('ReactionBar.addReaction', undefined, 'Add reaction')"
-      class="inline-flex items-center justify-center rounded-full border border-dashed border-border px-2 py-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      class="inline-flex items-center justify-center rounded-full border border-dashed border-border px-2 py-0.5 text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       @click="emit('add')"
     >
       <SmilePlus class="h-3.5 w-3.5" />

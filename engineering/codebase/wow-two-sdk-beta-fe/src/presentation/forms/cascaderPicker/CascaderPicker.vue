@@ -259,8 +259,8 @@ function optionClass(column: number, option: CascaderOption): string {
   const isOnPath = browsed.value[column]?.value === option.value;
   return cn(
     'flex h-8 cursor-default items-center gap-2 rounded-sm px-2 text-sm outline-hidden transition-colors',
-    'hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring',
-    isOnPath && 'bg-primary-soft text-primary-soft-foreground hover:bg-primary-soft',
+    'hover:bg-muted active:bg-muted focus-visible:ring-2 focus-visible:ring-ring',
+    isOnPath && 'bg-primary-soft text-primary-soft-foreground hover:bg-primary-soft active:bg-primary-soft',
     option.isDisabled && 'pointer-events-none opacity-40',
   );
 }

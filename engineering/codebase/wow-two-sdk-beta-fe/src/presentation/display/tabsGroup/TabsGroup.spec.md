@@ -12,6 +12,14 @@ Public import: `import { TabsGroup } from '@wow-two-beta/fe/presentation/display
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| `TabsGroupTab` | none: the tab keeps its box; an invisible hit area reaches 44 x 44px | hit area |
+
 ## Props
 
 | Prop | Type | Required | Default | Meaning |

@@ -43,7 +43,7 @@ function handleKeydown(event: KeyboardEvent): void {
 
 const classes = computed(() =>
   cn(
-    'inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:underline-offset-2 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted active:bg-muted hover:underline-offset-2 active:underline-offset-2 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as string | undefined,
   ),
 );

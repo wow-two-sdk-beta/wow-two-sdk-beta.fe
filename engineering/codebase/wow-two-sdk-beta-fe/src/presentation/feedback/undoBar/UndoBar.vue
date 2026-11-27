@@ -204,7 +204,7 @@ const showCountdown = computed(() => props.hasCountdown && props.duration !== In
           <button
             v-if="hasUndo()"
             type="button"
-            class="font-medium text-primary-soft-foreground transition-colors hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-1"
+            class="font-medium text-primary-soft-foreground transition-colors hover:underline active:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-1"
             @click="onUndoClick"
           >
             {{ props.undoLabel }}

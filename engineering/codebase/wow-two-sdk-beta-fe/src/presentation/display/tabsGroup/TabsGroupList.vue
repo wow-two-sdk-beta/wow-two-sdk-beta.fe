@@ -24,7 +24,9 @@ const tabs = useTabsContext();
 const classes = computed(() =>
   cn(
     'inline-flex border-border',
-    tabs.orientation === Orientation.Vertical ? 'flex-col border-r' : 'flex-row border-b',
+    tabs.orientation === Orientation.Vertical
+      ? 'flex-col border-r [--coarse-hit-gap-y:0px]'
+      : 'flex-row border-b [--coarse-hit-gap-x:0px]',
     attrs.class as string | undefined,
   ),
 );

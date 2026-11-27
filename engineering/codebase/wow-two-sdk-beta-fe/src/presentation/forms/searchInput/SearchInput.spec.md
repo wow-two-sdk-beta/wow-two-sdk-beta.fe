@@ -17,6 +17,16 @@ Public import: `import { SearchInput } from '@wow-two-beta/fe/presentation/forms
   and stops short of that area (`pointer-coarse:pr-11`). A fine pointer keeps the 40px field. The `xs` step stays
   dense.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| field box, sizes `sm` and `md` | 32px / 40px → at least 44px tall, text centred | visible height |
+| field text, every size | 14px / 12px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into a focused field | text size |
+| text end | stops 44px short of the clear button (`pointer-coarse:pr-11`); the box and the text start stay | padding |
+
 ## Props
 
 | Prop           | Type               | Required | Default     | Meaning                                                                                       |

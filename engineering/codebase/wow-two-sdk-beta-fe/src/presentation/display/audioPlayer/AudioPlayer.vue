@@ -217,7 +217,7 @@ const DurationStyle = { minWidth: '3.5rem', textAlign: 'right' } as const;
 /** The play / pause toggle's size-independent classes — round primary surface plus the focus ring. */
 const PlayToggleClasses =
   'inline-flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground ' +
-  'transition-colors hover:bg-primary/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+  'transition-colors hover:bg-primary/90 active:bg-primary/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
 
 defineExpose({ el });
 </script>
@@ -285,7 +285,7 @@ defineExpose({ el });
     <button
       type="button"
       :aria-label="locale.t(muted ? 'AudioPlayer.unmute' : 'AudioPlayer.mute', undefined, muted ? 'Unmute' : 'Mute')"
-      class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+      class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
       @click="muted = !muted"
     >
       <Icon :icon="muted || volume === 0 ? VolumeX : Volume2" :size="14" />
@@ -293,7 +293,7 @@ defineExpose({ el });
     <select
       v-model="speed"
       :aria-label="locale.t('AudioPlayer.playbackSpeed', undefined, 'Playback speed')"
-      class="h-7 rounded-sm border border-input bg-background px-1 text-xs"
+      class="h-7 rounded-sm border border-input bg-background px-1 text-xs pointer-coarse:text-base"
     >
       <option v-for="rate in PlaybackRates" :key="rate" :value="rate">{{ rate }}×</option>
     </select>

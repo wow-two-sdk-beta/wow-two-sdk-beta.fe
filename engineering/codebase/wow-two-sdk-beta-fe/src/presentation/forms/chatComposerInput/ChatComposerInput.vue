@@ -196,7 +196,9 @@ const textareaClass = computed(() =>
 const sendButtonClass = computed(() =>
   cn(
     'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full self-end',
-    isEmpty.value ? 'bg-muted text-muted-foreground' : 'bg-primary text-primary-foreground hover:bg-primary/90',
+    isEmpty.value
+      ? 'bg-muted text-muted-foreground'
+      : 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/90',
     'disabled:cursor-not-allowed',
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
   ),

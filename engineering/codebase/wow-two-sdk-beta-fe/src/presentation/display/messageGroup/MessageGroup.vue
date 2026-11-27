@@ -145,7 +145,7 @@ defineExpose({ el, scrollToBottom, isAtBottom: isNearBottom });
       v-if="props.hasJumpToBottom && !atBottom"
       type="button"
       :aria-label="locale.t('MessageGroup.jumpToLatest', undefined, 'Jump to latest')"
-      class="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      class="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       @click="scrollToBottom('smooth')"
     >
       <ChevronDown class="h-4 w-4" />

@@ -655,7 +655,7 @@ defineExpose({ el, mainEl, isRail, isCollapsed, isBarHidden, toggleSidebar, clos
       :variant="props.variant"
       :class="[edgeClass, 'print:hidden', props.sidebarClass]"
     >
-      <div class="flex min-h-0 flex-1 flex-col" @click="onNavClick">
+      <div class="flex min-h-0 flex-1 flex-col" :data-sidebar-drawer="dataAttr(isPhoneLayout)" @click="onNavClick">
         <slot name="nav" :is-rail="isRail" :close="closeNavigation" />
       </div>
       <div
@@ -690,7 +690,7 @@ defineExpose({ el, mainEl, isRail, isCollapsed, isBarHidden, toggleSidebar, clos
   <Drawer v-if="hasSidebar && isTablet" :open="isDrawerOpen" side="left" @update:open="setDrawerOpen">
     <DrawerContent class="w-72 max-w-[80%]" :variant="menuVariant">
       <OverlayTitle class="sr-only">{{ props.navigationLabel }}</OverlayTitle>
-      <div class="flex min-h-0 flex-1 flex-col" @click="onNavClick">
+      <div class="flex min-h-0 flex-1 flex-col" data-sidebar-drawer @click="onNavClick">
         <slot name="nav" :is-rail="false" :close="closeNavigation" />
       </div>
       <div

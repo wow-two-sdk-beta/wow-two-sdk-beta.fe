@@ -213,15 +213,15 @@ function onTriggerClick(event: MouseEvent): void {
 
 const framedTriggerClass = computed(() =>
   cn(
-    'inline-flex items-center gap-2 rounded-md border border-border bg-background px-2 py-1 text-sm transition-colors hover:border-border-strong focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
+    'inline-flex items-center gap-2 rounded-md border border-border bg-background px-2 py-1 text-sm transition-colors hover:border-border-strong active:border-border-strong focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
     ReadOnlyLook,
-    'readonly:hover:border-border',
+    'readonly:hover:border-border readonly:active:border-border',
     attrs.class as ClassValue,
   ),
 );
 
 const swatchTriggerClass = computed(() =>
-  cn('readonly:cursor-default readonly:hover:shadow-none', attrs.class as ClassValue),
+  cn('readonly:cursor-default readonly:hover:shadow-none readonly:active:shadow-none', attrs.class as ClassValue),
 );
 
 const trigger = useTemplateRef<{ el: HTMLElement | null }>('trigger');

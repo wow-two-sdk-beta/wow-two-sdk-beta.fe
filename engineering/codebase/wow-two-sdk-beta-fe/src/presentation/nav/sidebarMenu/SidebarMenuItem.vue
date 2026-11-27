@@ -49,15 +49,16 @@ const rest = computed(() => {
   return others;
 });
 
-/* Under a coarse pointer the row grows to 44px tall, its content centred, and a 44px-wide hit area (`CoarseHitArea`)
-   covers a rail row narrower than that, so its icon keeps its place. The row then stops clipping, which would cut the
-   hit area; the menu clips instead (`SidebarMenu`). */
+/* Under a coarse pointer a row keeps its 36px box in a sidebar and a rail, which list rows with no gap between them:
+   a horizontal hit area (`CoarseHitArea.AfterX`) reaches 44px wide past a rail row, and the row stops clipping, which
+   would cut it. In a drawer (`data-sidebar-drawer`) the row grows to 44px tall, its content centred — declared in
+   the spec's `## Touch`. */
 const classes = computed(() =>
   cn(
-    'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground pointer-coarse:h-11',
-    'pointer-coarse:relative pointer-coarse:overflow-visible',
-    CoarseHitArea.After,
-    'transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground',
+    'pointer-coarse:relative pointer-coarse:overflow-visible pointer-coarse:[[data-sidebar-drawer]_&]:h-11',
+    CoarseHitArea.AfterX,
+    'transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[active]:bg-primary-soft data-[active]:text-primary-soft-foreground',
     '*:data-[sidebar-menu-label]:min-w-0 *:data-[sidebar-menu-label]:flex-1 *:data-[sidebar-menu-label]:truncate *:data-[sidebar-menu-label]:text-start',
     '*:data-[sidebar-menu-label]:motion-safe:transition-opacity *:data-[sidebar-menu-label]:motion-safe:duration-(--duration-base) *:data-[sidebar-menu-label]:motion-safe:ease-(--ease-out)',

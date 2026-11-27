@@ -81,6 +81,19 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   in the rail the mark stays at the rail's centre. The frame makes the link `relative` and takes its `::after`. The app
   switcher's trigger already reaches 44px.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| brand link, sidebar toggle | none: invisible 44px hit areas | hit area |
+| sidebar navigation in the phone and tablet drawers | marked `data-sidebar-drawer`, so `SidebarMenu` rows are 44px tall there | visible height |
+
+- The scroll region always scrolls (`overflow-y: scroll`) and contains its overscroll (`overscroll-behavior-y:
+  contain`); the page around it takes `overscroll-behavior: none` (`index.css`). Under either pointer the layout is the
+  same: WebKit, which ignores `scrollbar-gutter`, keeps the gutter, and no rubber band moves the shell.
+
 ## Props
 
 | Prop | Type | Required | Default | Meaning |

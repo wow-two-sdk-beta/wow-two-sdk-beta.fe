@@ -179,9 +179,11 @@ function dayProps(date: Temporal.PlainDate): MonthGridDayProps {
     class: cn(
       isToday(date) && !startCell && !endCell && 'border border-border rounded-sm',
       rangeCell &&
-        'bg-primary-soft text-primary-soft-foreground hover:bg-primary/25 hover:text-primary-soft-foreground',
-      startCell && 'bg-primary text-primary-foreground rounded-l-sm hover:bg-primary/90 hover:text-primary-foreground',
-      endCell && 'bg-primary text-primary-foreground rounded-r-sm hover:bg-primary/90 hover:text-primary-foreground',
+        'bg-primary-soft text-primary-soft-foreground hover:bg-primary/25 active:bg-primary/25 hover:text-primary-soft-foreground active:text-primary-soft-foreground',
+      startCell &&
+        'bg-primary text-primary-foreground rounded-l-sm hover:bg-primary/90 active:bg-primary/90 hover:text-primary-foreground active:text-primary-foreground',
+      endCell &&
+        'bg-primary text-primary-foreground rounded-r-sm hover:bg-primary/90 active:bg-primary/90 hover:text-primary-foreground active:text-primary-foreground',
       !startCell && !endCell && !rangeCell && 'rounded-sm',
     ),
   };

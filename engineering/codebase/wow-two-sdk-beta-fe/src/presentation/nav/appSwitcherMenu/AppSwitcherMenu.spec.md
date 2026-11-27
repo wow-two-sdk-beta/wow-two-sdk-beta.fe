@@ -22,8 +22,8 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
   popover for a tablet or desktop class, `lg` the popover for a desktop class alone — at any viewport width, so a
   landscape phone served the phone class gets the dialog. Any other `breakpoint`, and an app with no provider,
   follow the viewport. The menu reads the class with `inject` and never throws without one.
-- Tiles and site links are at least 44px tall under a coarse pointer (sites are 36px, and 40px below `lg`, under a fine
-  one).
+- Site links are 36px (40px below `lg`) under either pointer; under a coarse one an invisible hit area reaches 44 x
+  44px (`CoarseHitArea`). Tiles are already taller than 44px.
 - `kind: 'app'` items render as tiles — icon, label and a one-line `description` — in one column, two from `sm`. The
   icon is `icon`, else the label's first character.
 - `kind: 'site'` items render after a divider under the `sitesLabel` heading, as links that open a new tab
@@ -48,6 +48,14 @@ Public import: `import { AppSwitcherMenu, AppSwitcherKind } from '@wow-two-beta/
   classes to both panels.
 - Attributes and `class` land on the trigger button. Automatic attribute inheritance is disabled; the source
   explicitly forwards and merges supported fallthrough attributes.
+
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| site links | none: invisible 44px hit area | hit area |
 
 ## Props
 

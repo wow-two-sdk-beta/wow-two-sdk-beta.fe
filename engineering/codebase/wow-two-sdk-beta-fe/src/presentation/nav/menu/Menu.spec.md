@@ -14,6 +14,14 @@ Public import: `import { Menu } from '@wow-two-beta/fe/presentation/nav';`.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| item rows | at least 44px tall (`pointer-coarse:min-h-11`), content centred: a dense list's 44px row is the platform norm | visible height |
+
 ## Props
 
 | Prop        | Type                  | Required | Default          | Meaning                                                                                       |

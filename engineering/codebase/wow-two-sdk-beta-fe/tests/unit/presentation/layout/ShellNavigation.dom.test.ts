@@ -38,15 +38,15 @@ describe('app shell scrolling', () => {
     expect(root(wrapper).className).toContain('h-dvh');
     expect(root(wrapper).className).toContain('overflow-hidden');
     const main = wrapper.get('.main');
-    expect(main.classes()).toEqual(expect.arrayContaining(['min-h-0', 'overflow-y-auto']));
-    expect(wrapper.get('.content').classes()).not.toContain('overflow-y-auto');
+    expect(main.classes()).toEqual(expect.arrayContaining(['min-h-0', 'overflow-y-scroll']));
+    expect(wrapper.get('.content').classes()).not.toContain('overflow-y-scroll');
   });
 
   it('scrolls the document when asked, as a page does', () => {
     const wrapper = shell({ scroll: 'document' }, () => [h(AppShellMain, { class: 'main' }, () => 'Body')]);
     expect(root(wrapper).className).toContain('min-h-svh');
     expect(root(wrapper).className).not.toContain('overflow-hidden');
-    expect(wrapper.get('.main').classes()).not.toContain('overflow-y-auto');
+    expect(wrapper.get('.main').classes()).not.toContain('overflow-y-scroll');
   });
 
   it('reserves no sidebar column for a top-bar app', () => {
@@ -97,7 +97,7 @@ describe('app shell scrolling', () => {
   it('lets the main region render outside a shell with document scrolling', () => {
     const wrapper = mount(AppShellMain, { attrs: { class: 'loose' }, slots: { default: () => 'Body' } });
     wrappers.push(wrapper);
-    expect(wrapper.get('main').classes()).not.toContain('overflow-y-auto');
+    expect(wrapper.get('main').classes()).not.toContain('overflow-y-scroll');
   });
 });
 

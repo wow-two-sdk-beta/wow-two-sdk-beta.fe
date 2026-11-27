@@ -34,7 +34,7 @@ const passthroughAttrs = computed(() =>
 
 const rootClass = computed(() =>
   cn(
-    'inline-flex h-8 items-center justify-center rounded-sm px-2 text-sm text-foreground underline-offset-2 transition-colors hover:bg-muted hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'inline-flex h-8 items-center justify-center rounded-sm px-2 text-sm text-foreground underline-offset-2 transition-colors hover:bg-muted active:bg-muted hover:underline active:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as ClassValue,
   ),
 );

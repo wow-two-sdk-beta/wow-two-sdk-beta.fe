@@ -21,6 +21,15 @@ Public import: `import { NotificationCenterGroup } from '@wow-two-beta/fe/presen
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| pause `<select>` | at least 44px tall and 16px text (a native field: no pseudo-element; no iOS focus zoom) | visible height, text size |
+| item dismiss button | shown at rest under `(hover: none)`; with a mouse it shows on hover and focus | reveal |
+
 ## Props
 
 | Prop       | Type               | Required | Default           | Meaning                                                                                                                                                              |

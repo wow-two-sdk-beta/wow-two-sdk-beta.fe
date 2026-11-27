@@ -118,7 +118,7 @@ defineExpose({ el: content });
       <slot name="toggle" :open="isOpen" :toggle="toggle" :content-id="contentId">
         <button
           type="button"
-          class="mt-1 rounded-sm text-sm font-medium text-primary-soft-foreground hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+          class="mt-1 rounded-sm text-sm font-medium text-primary-soft-foreground hover:underline active:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
           :aria-expanded="isOpen"
           :aria-controls="contentId"
           @click="toggle"

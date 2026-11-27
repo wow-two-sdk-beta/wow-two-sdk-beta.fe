@@ -28,7 +28,7 @@ const el = useTemplateRef<HTMLButtonElement>('el');
 
 const classes = computed(() =>
   cn(
-    'mt-2 flex h-12 w-full items-center justify-center rounded-lg bg-card text-base font-semibold text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'mt-2 flex h-12 w-full items-center justify-center rounded-lg bg-card text-base font-semibold text-foreground shadow-sm transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as string | undefined,
   ),
 );

@@ -312,6 +312,36 @@ body {
   }
 }
 
+/* Touch — the browser changes nothing a mouse does not see (responsive.md § Layout rules).
+   - Every control takes `touch-action: manipulation`: a double tap on it never zooms the page, and pinch zoom stays.
+     A control that owns its gestures (`touch-none`, `touch-pan-*`) keeps its own utility, which outranks this layer.
+   - A page holding a region shell (`data-scroll-region`, `AppShell` / `AppFrame`) never rubber-bands as a whole; the
+     region keeps its own overscroll to itself (`AppShellMain`). */
+@layer base {
+  :where(
+    a[href],
+    button,
+    input,
+    select,
+    textarea,
+    label,
+    summary,
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [role='menuitem'],
+    [role='option'],
+    [role='checkbox'],
+    [role='radio'],
+    [role='switch']
+  ) {
+    touch-action: manipulation;
+  }
+  :where(html, body):has([data-scroll-region]) {
+    overscroll-behavior: none;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Scrollbars — a slim themed track and a pill-shaped thumb on every scroll container, always visible.
  *
@@ -365,7 +395,12 @@ body {
     border: var(--scrollbar-inset, 2px) solid transparent;
     border-radius: 9999px;
   }
-  :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:hover,
+  /* A finger leaves `:hover` stuck after a tap, so the hover arm waits for a hovering pointer. */
+  @media (hover: hover) {
+    :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:hover {
+      background-color: var(--scrollbar-thumb-hover, var(--color-muted-foreground));
+    }
+  }
   :where(*:not(.scrollbar-native))::-webkit-scrollbar-thumb:active {
     background-color: var(--scrollbar-thumb-hover, var(--color-muted-foreground));
   }

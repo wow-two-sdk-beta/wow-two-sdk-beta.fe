@@ -62,11 +62,11 @@ function onFocus(): void {
 
 const classes = computed(() =>
   cn(
-    /* Under a coarse pointer a tab grows to 44px tall, its label centred, and a hit area at least 44px wide
-       (`CoarseHitArea`) covers a tab narrower than that, so its label keeps its place. */
-    'inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors pointer-coarse:relative pointer-coarse:min-h-11',
+    /* Under a coarse pointer a tab keeps its box; an invisible hit area of at least 44 x 44px (`CoarseHitArea`)
+       takes the tap, so its label keeps its place. */
+    'inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors pointer-coarse:relative',
     CoarseHitArea.After,
-    'hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[state=active]:text-foreground data-[state=active]:border-primary',
     tabs.orientation === Orientation.Vertical
       ? 'border-r-2 border-transparent data-[state=active]:border-primary'

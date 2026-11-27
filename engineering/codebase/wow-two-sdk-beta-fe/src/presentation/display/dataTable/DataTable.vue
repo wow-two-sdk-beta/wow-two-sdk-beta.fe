@@ -339,7 +339,7 @@ const rows = computed(() =>
       class: cn(
         props.onRowClick &&
           'cursor-pointer focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
-        isRowSelected && 'bg-primary-soft/40 hover:bg-primary-soft/60',
+        isRowSelected && 'bg-primary-soft/40 hover:bg-primary-soft/60 active:bg-primary-soft/60',
       ),
     };
   }),
@@ -479,10 +479,10 @@ function expandIconClass(isExpanded: boolean): string {
 }
 
 const SortButtonClass =
-  'inline-flex items-center gap-1 rounded-sm transition-colors hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+  'inline-flex items-center gap-1 rounded-sm transition-colors hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
 
 const ExpandButtonClass =
-  'inline-flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
+  'inline-flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring';
 </script>
 
 <template>

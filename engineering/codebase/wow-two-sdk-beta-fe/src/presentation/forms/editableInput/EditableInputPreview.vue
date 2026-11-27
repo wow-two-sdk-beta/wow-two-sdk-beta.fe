@@ -46,9 +46,9 @@ const passthroughAttrs = computed(() =>
 
 const previewClass = computed(() =>
   cn(
-    'cursor-text rounded-sm px-1 py-0.5 text-sm text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'cursor-text rounded-sm px-1 py-0.5 text-sm text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     isEmpty.value && 'italic text-subtle-foreground',
-    !interactive.value && 'cursor-default hover:bg-transparent',
+    !interactive.value && 'cursor-default hover:bg-transparent active:bg-transparent',
     attrs.class as ClassValue,
   ),
 );

@@ -15,6 +15,14 @@ Public import: `import { NodeEditor } from '@wow-two-beta/fe/presentation/forms'
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| node `<select>` in the toolbar | inherited text → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into it on focus | text size |
+
 ## Props
 
 | Prop | Type | Required | Default | Meaning |

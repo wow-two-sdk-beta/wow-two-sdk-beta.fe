@@ -14,6 +14,14 @@ Public import: `import { ListboxPicker } from '@wow-two-beta/fe/presentation/for
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| option rows | at least 44px tall (`pointer-coarse:min-h-11`), content centred: a dense list's 44px row is the platform norm | visible height |
+
 ## Props
 
 | Prop           | Type                     | Required | Default     | Meaning                                                                             |

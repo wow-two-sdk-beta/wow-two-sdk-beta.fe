@@ -192,7 +192,7 @@ defineExpose<ConfettiOverlayHandle>({ fire });
     <svg
       aria-hidden="true"
       class="pointer-events-none fixed inset-0 z-toast"
-      :style="{ width: '100vw', height: '100vh' }"
+      :style="{ width: '100vw', height: '100dvh' }"
     >
       <template v-for="p in particles" :key="p.id">
         <rect

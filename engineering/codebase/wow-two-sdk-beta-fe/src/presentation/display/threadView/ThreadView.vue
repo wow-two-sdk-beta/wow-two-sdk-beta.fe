@@ -130,7 +130,7 @@ defineExpose({ el });
         v-if="hasClose()"
         type="button"
         :aria-label="locale.t('ThreadView.closeThread', undefined, 'Close thread')"
-        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         @click="emit('close')"
       >
         <CloseIcon class="h-4 w-4" />

@@ -29,14 +29,14 @@ const TileClass = `flex min-h-14 w-full items-center gap-3 rounded-xl px-2.5 py-
 const TileIconClass =
   'grid size-9 shrink-0 place-items-center rounded-lg border text-sm font-semibold forced-colors:border-[CanvasText]';
 
-const SiteClass = `inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors motion-reduce:transition-none max-lg:min-h-10 pointer-coarse:min-h-11 ${FocusClass}`;
+const SiteClass = `inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors motion-reduce:transition-none max-lg:min-h-10 relative ${CoarseHitArea.After} ${FocusClass}`;
 </script>
 
 <script setup lang="ts">
 import { ExternalLink } from 'lucide-vue-next';
 import { Icon } from '../../../foundation/icons';
 import { useId } from '../../../foundation/identifiers';
-import { cn } from '../../../foundation/styles';
+import { cn, CoarseHitArea } from '../../../foundation/styles';
 
 /** Renders the app switcher's body: the workspace apps as tiles, then the public sites as new-tab links. */
 defineOptions({ name: 'AppSwitcherMenuPanel', inheritAttrs: false });
@@ -97,7 +97,7 @@ function close(): void {
             >
           </span>
         </button>
-        <a v-else :href="app.href" :class="cn(TileClass, 'hover:bg-muted')" @click="pick(app, $event)">
+        <a v-else :href="app.href" :class="cn(TileClass, 'hover:bg-muted active:bg-muted')" @click="pick(app, $event)">
           <span
             aria-hidden="true"
             :class="cn(TileIconClass, 'border-primary/10 bg-primary-soft/70 text-primary-soft-foreground')"
@@ -123,7 +123,7 @@ function close(): void {
       <h3 :id="sitesId" class="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {{ props.sitesLabel }}
       </h3>
-      <ul role="list" :aria-labelledby="sitesId" class="flex flex-wrap gap-2 px-1">
+      <ul role="list" :aria-labelledby="sitesId" class="flex flex-wrap gap-2 px-1 [--coarse-hit-gap:10px]">
         <li v-for="site in props.sites" :key="site.key">
           <button
             v-if="site.key === props.current"
@@ -139,7 +139,12 @@ function close(): void {
             :href="site.href"
             target="_blank"
             rel="noopener noreferrer"
-            :class="cn(SiteClass, 'border-border text-muted-foreground hover:border-input hover:text-foreground')"
+            :class="
+              cn(
+                SiteClass,
+                'border-border text-muted-foreground hover:border-input active:border-input hover:text-foreground active:text-foreground',
+              )
+            "
             @click="pick(site, $event)"
             >{{ site.label }}<Icon :icon="ExternalLink" :size="14" /><span class="sr-only">{{
               ` ${props.newTabLabel}`

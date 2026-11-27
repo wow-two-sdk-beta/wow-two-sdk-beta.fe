@@ -33,7 +33,7 @@ export const carouselNavVariants = tv({
   base: 'absolute top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none',
   variants: {
     variant: {
-      surface: 'bg-background/80 text-foreground shadow ring-1 ring-border hover:bg-background',
+      surface: 'bg-background/80 text-foreground shadow ring-1 ring-border hover:bg-background active:bg-background',
       /* The image-overlay glass of the harvest console card: a fixed dark wash reads over any photo; without
          transparency the wash turns solid enough to carry the white glyph alone. */
       glass:

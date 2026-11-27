@@ -78,24 +78,50 @@ describe.skipIf(!canEmulateCoarsePointer)('tabs and pagination under a coarse po
     await useFinePointer();
   });
 
-  it.each(['horizontal', 'vertical'] as const)('gives every %s tab a 44 x 44px hit area', (orientation) => {
-    mountControl(() => tabs(orientation));
-    expect(tabButtons()).toHaveLength(TabLabels.length);
+  it('gives a tab in a row that does not scroll a 44px tall hit area', () => {
+    mountControl(() =>
+      h(TabsGroup, { defaultValue: 'overview' }, () =>
+        h(TabsGroupList, { 'aria-label': 'Sections' }, () =>
+          ['Overview', 'Posts'].map((label) => h(TabsGroupTab, { value: label.toLowerCase() }, () => label)),
+        ),
+      ),
+    );
     for (const tab of tabButtons()) {
-      const rect = tab.getBoundingClientRect();
-      expect(rect.height).toBeGreaterThanOrEqual(44);
-      expect(rect.width).toBeGreaterThanOrEqual(44);
+      expect(Math.round(tab.getBoundingClientRect().height)).toBe(38);
+      expect(reachOf(tab).height).toBeGreaterThanOrEqual(43.5);
     }
   });
 
-  it('gives every page button a 44 x 44px hit area on its own 32px box', () => {
+  /* Dense (TabsGroupList spec): the list's gap cap keeps each hit area off its neighbour along the strip, and a list
+     that scrolls clips it across to the tab's own 38px, since padding the scroll box out would move its border. */
+  it.each(['horizontal', 'vertical'] as const)(
+    'gives every %s tab in a scrolling list a dense hit area',
+    (orientation) => {
+      mountControl(() => tabs(orientation));
+      expect(tabButtons()).toHaveLength(TabLabels.length);
+      for (const tab of tabButtons()) {
+        tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        const box = tab.getBoundingClientRect();
+        const reach = reachOf(tab);
+        expect(reach.height).toBeGreaterThanOrEqual(24);
+        expect(reach.height).toBeLessThanOrEqual(box.height + 1);
+        expect(reach.width).toBeGreaterThanOrEqual(43.5);
+        expect(reach.width).toBeLessThanOrEqual(Math.max(44, box.width) + 1);
+      }
+    },
+  );
+
+  /* The row's 4px gap caps the hit area along it, so neighbours tile edge to edge and never share a tap. */
+  it('gives every page button a 44px tall hit area on its own 32px box, as wide as its box and gap', () => {
     mountControl(pages);
     expect(pageButtons().length).toBeGreaterThan(5);
     for (const button of pageButtons()) {
-      expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
+      const box = button.getBoundingClientRect();
+      expect(Math.round(box.height)).toBe(32);
       const reach = reachOf(button);
       expect(reach.height).toBeGreaterThanOrEqual(43.5);
-      expect(reach.width).toBeGreaterThanOrEqual(43.5);
+      expect(reach.width).toBeGreaterThanOrEqual(24);
+      expect(Math.abs(reach.width - Math.min(44, box.width + 4))).toBeLessThanOrEqual(1);
     }
   });
 

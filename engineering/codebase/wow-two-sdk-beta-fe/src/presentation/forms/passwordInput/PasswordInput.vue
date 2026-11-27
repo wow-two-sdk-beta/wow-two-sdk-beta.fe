@@ -194,7 +194,7 @@ defineExpose({ el: input });
       :aria-label="toggleLabel"
       :aria-pressed="visible"
       :class="touchToggleClass"
-      class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-muted-foreground hover:bg-muted disabled:opacity-50"
+      class="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded text-muted-foreground hover:bg-muted active:bg-muted disabled:opacity-50"
       @click="toggle"
     >
       <Icon :icon="toggleIcon" :size="16" />

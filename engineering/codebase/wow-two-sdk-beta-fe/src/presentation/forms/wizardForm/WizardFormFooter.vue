@@ -66,7 +66,7 @@ defineExpose({ el });
       v-if="hasPrev && showPrevButton"
       type="button"
       :disabled="ctx.isPending"
-      class="inline-flex h-9 items-center rounded-md border border-border bg-background px-4 text-sm font-medium hover:bg-muted disabled:opacity-50"
+      class="inline-flex h-9 items-center rounded-md border border-border bg-background px-4 text-sm font-medium hover:bg-muted active:bg-muted disabled:opacity-50"
       @click="ctx.back()"
     >
       <slot name="prevLabel">{{ prevLabel }}</slot>
@@ -75,7 +75,7 @@ defineExpose({ el });
     <button
       type="button"
       :disabled="ctx.isPending"
-      class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+      class="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:bg-primary/90 disabled:opacity-50"
       @click="onNext"
     >
       <template v-if="ctx.isPending">…</template>

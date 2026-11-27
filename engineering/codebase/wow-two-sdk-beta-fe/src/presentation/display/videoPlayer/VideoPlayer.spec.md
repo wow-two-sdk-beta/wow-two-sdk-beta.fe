@@ -17,6 +17,14 @@ Public import: `import { VideoPlayer } from '@wow-two-beta/fe/presentation/displ
 - Unmount disposes the subscriptions, listeners or timers registered by this implementation.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| playback-rate `<select>` | 12px → 16px text (`pointer-coarse:text-base`), so iOS never zooms the page into it on focus; the 28px box stays, its width follows the text | text size |
+
 ## Props
 
 | Prop                  | Type                        | Required | Default     | Meaning                                                                                 |

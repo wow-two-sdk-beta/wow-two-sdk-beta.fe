@@ -92,7 +92,7 @@ defineExpose({ el });
           <a
             v-if="item.href && i !== lastIndex"
             :href="UrlExtensions.safeNavigation(item.href)"
-            class="text-muted-foreground hover:text-foreground hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            class="text-muted-foreground hover:text-foreground active:text-foreground hover:underline active:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
           >
             <slot name="label" :item="item" :index="i">{{ item.label }}</slot>
           </a>

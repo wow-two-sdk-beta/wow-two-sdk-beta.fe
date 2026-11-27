@@ -63,7 +63,7 @@ const classes = computed(() =>
   cn(
     'group inline-flex items-center rounded-md font-medium text-foreground transition-colors',
     isInRow.value ? 'w-auto shrink-0 whitespace-nowrap' : 'w-full',
-    'hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[active]:bg-primary-soft data-[active]:text-primary-soft-foreground',
     SizeClass[props.size],
     attrs.class as string | undefined,

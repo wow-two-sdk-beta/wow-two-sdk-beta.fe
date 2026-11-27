@@ -67,7 +67,7 @@ function isActive(emoji: string): boolean {
 function emojiClass(emoji: string): string {
   return cn(
     'inline-flex items-center justify-center rounded-full leading-none transition-transform',
-    'hover:scale-125 hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'hover:scale-125 active:scale-125 hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     isActive(emoji) && 'bg-primary-soft',
     SizeClass[props.size] ?? SizeClass.md,
   );
@@ -76,7 +76,7 @@ function emojiClass(emoji: string): string {
 const moreClass = computed(() =>
   cn(
     'inline-flex items-center justify-center rounded-full text-muted-foreground transition-colors',
-    'hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     SizeClass[props.size],
   ),
 );

@@ -75,7 +75,7 @@ function tabClass(step: StepInfo, index: number): string {
     isCurrent
       ? 'bg-primary text-primary-foreground'
       : wasVisited
-        ? 'bg-muted text-foreground hover:bg-muted/70'
+        ? 'bg-muted text-foreground hover:bg-muted/70 active:bg-muted/70'
         : 'text-muted-foreground',
     !canJump(step) && 'cursor-default',
   );

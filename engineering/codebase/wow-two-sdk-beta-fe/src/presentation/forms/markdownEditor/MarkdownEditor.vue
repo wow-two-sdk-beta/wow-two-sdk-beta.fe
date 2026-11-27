@@ -336,7 +336,9 @@ const textareaClass = computed(() =>
 function viewButtonClass(v: MarkdownEditorView): string {
   return cn(
     'inline-flex h-6 items-center rounded px-2 text-xs font-medium transition-colors',
-    mode.value === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+    mode.value === v
+      ? 'bg-primary text-primary-foreground'
+      : 'text-muted-foreground hover:text-foreground active:text-foreground',
   );
 }
 
@@ -366,7 +368,7 @@ const locale = useLocale();
           type="button"
           :aria-label="locale.t(`MarkdownEditor.${a.key}`, undefined, a.label)"
           :disabled="finalDisabled || finalReadOnly"
-          class="inline-flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+          class="inline-flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
           @click="applyAction(a)"
         >
           <Icon :icon="a.icon" :size="14" />

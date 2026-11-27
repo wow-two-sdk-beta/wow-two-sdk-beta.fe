@@ -38,7 +38,7 @@ export const colorSwatchVariants = tv({
       circle: 'rounded-full',
     },
     interactive: {
-      true: 'cursor-pointer transition-shadow focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 hover:shadow-sm',
+      true: 'cursor-pointer transition-shadow focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 hover:shadow-sm active:shadow-sm',
       false: '',
     },
     isSelected: {

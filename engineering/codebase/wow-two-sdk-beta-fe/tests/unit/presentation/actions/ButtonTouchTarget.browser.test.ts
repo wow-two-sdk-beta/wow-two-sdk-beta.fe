@@ -59,12 +59,13 @@ describe.skipIf(!canEmulateCoarsePointer)('Button under a coarse pointer', () =>
 
   it.each(['sm', 'md'] as const)('lifts size %s to a 44 x 44px hit area, short label included', (size) => {
     const button = mountButton({ size }, 'Day');
-    expect(box(button).height).toBeGreaterThanOrEqual(44);
+    expect(box(button).height).toBeLessThan(44);
+    expect(reachOf(button).height).toBeGreaterThanOrEqual(43.5);
     expect(reachOf(button).width).toBeGreaterThanOrEqual(43.5);
   });
 
   it('lifts the default size, which is md', () => {
-    expect(box(mountButton()).height).toBeGreaterThanOrEqual(44);
+    expect(reachOf(mountButton()).height).toBeGreaterThanOrEqual(43.5);
   });
 
   it.each([
@@ -94,7 +95,7 @@ describe.skipIf(!canEmulateCoarsePointer)('Button under a coarse pointer', () =>
   });
 
   it('lifts an md button whose caller shortens it with a class', () => {
-    expect(box(mountButton({ class: 'h-8' })).height).toBeGreaterThanOrEqual(44);
+    expect(reachOf(mountButton({ class: 'h-8' })).height).toBeGreaterThanOrEqual(43.5);
   });
 
   it('leaves xs, lg and xl at their own sizes', () => {

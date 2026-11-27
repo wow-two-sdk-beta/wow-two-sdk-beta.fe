@@ -57,7 +57,7 @@ const props = withDefaults(defineProps<MediaCardProps>(), {
 /* The card draws the focus ring while its link is focused; the panel's link spans the whole card, see `PanelClass`. */
 const RootClass =
   'group/media-card relative isolate flex min-w-0 flex-col justify-end overflow-hidden rounded-2xl border ' +
-  'border-border bg-muted transition-colors has-[[data-card-link]]:hover:border-primary/40 ' +
+  'border-border bg-muted transition-colors has-[[data-card-link]]:hover:border-primary/40 has-[[data-card-link]]:active:border-primary/40 ' +
   'has-[[data-card-link]:focus-visible]:outline-2 has-[[data-card-link]:focus-visible]:outline-offset-2 ' +
   'has-[[data-card-link]:focus-visible]:outline-ring';
 

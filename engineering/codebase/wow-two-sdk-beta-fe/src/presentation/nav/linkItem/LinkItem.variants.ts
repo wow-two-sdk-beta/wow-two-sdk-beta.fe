@@ -34,10 +34,11 @@ export const linkVariants = tv({
          whatever surface hosts it — the pairing `--color-primary-soft-foreground` is toned for.
          `text-primary` measured 4.19:1 on `theme-smart-qr`'s own page background, under AA for
          body text. Same fix as `Button.variants.ts` and `foundation/styles/constants/Tones.ts`. */
-      default: 'text-primary-soft-foreground hover:text-primary-soft-foreground/85 hover:underline',
-      subtle: 'text-foreground hover:underline',
-      muted: 'text-muted-foreground hover:text-foreground hover:underline',
-      inherit: 'text-current underline-offset-2 hover:underline',
+      default:
+        'text-primary-soft-foreground hover:text-primary-soft-foreground/85 active:text-primary-soft-foreground/85 hover:underline active:underline',
+      subtle: 'text-foreground hover:underline active:underline',
+      muted: 'text-muted-foreground hover:text-foreground active:text-foreground hover:underline active:underline',
+      inherit: 'text-current underline-offset-2 hover:underline active:underline',
     },
     size: {
       sm: 'text-sm',

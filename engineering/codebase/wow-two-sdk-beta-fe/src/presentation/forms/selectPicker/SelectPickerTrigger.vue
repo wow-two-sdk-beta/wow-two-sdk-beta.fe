@@ -198,7 +198,7 @@ const clearButtonClass = computed(() =>
   cn(
     /* `min-h/min-w` floor the hit target at 24px (WCAG 2.2 SC 2.5.8) while the glyph box
        (`clearBoxClass`) stays visually small. */
-    'absolute top-1/2 grid min-h-6 min-w-6 -translate-y-1/2 place-items-center rounded-full text-subtle-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'absolute top-1/2 grid min-h-6 min-w-6 -translate-y-1/2 place-items-center rounded-full text-subtle-foreground transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     clearBoxClass.value,
     TriggerClearTouchClasses[sizeKey.value],
     clearOffsetClass.value,

@@ -144,7 +144,7 @@ defineExpose({ el });
               'block rounded-sm px-2 py-1 transition-colors',
               item.id === activeId
                 ? 'bg-muted font-medium text-foreground'
-                : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted/40 active:bg-muted/40 hover:text-foreground active:text-foreground',
             )
           "
         >

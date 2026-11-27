@@ -241,7 +241,7 @@ const triggerClasses = computed(() =>
   cn(
     'group/app-switcher inline-flex min-h-11 min-w-0 max-w-full shrink-0 items-center rounded-xl border p-1',
     'border-transparent text-start text-foreground motion-safe:transition-colors motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)',
-    'hover:border-primary/15 hover:bg-primary-soft data-[state=open]:border-primary/15 data-[state=open]:bg-primary-soft',
+    'hover:border-primary/15 active:border-primary/15 hover:bg-primary-soft active:bg-primary-soft data-[state=open]:border-primary/15 data-[state=open]:bg-primary-soft',
     'outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     attrs.class as ClassValue,
   ),

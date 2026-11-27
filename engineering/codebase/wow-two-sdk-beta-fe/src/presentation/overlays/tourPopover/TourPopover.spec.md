@@ -12,6 +12,14 @@ Public import: `import { TourPopover } from '@wow-two-beta/fe/presentation/overl
 - The committed state uses the shared controlled-state helper: supplied controlled state is read from props; user changes report intent. The default seeds uncontrolled state. External prop updates do not themselves emit user changes.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| skip and secondary buttons | none: their `:hover` colours apply only under `(hover: hover)` and pair with a pressed state, so a tap leaves no stuck hover | state |
+
 ## Props
 
 | Prop | Type | Required | Default | Meaning |

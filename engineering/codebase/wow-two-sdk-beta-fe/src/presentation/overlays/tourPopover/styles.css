@@ -67,7 +67,14 @@
 .tour-popover-skip {
   color: var(--tour-muted-foreground, var(--muted, #626b62));
 }
-.tour-popover-skip:hover {
+/* A finger leaves `:hover` stuck after a tap, so each hover rule waits for a hovering pointer and pairs with a pressed
+   state. */
+@media (hover: hover) {
+  .tour-popover-skip:hover {
+    color: var(--tour-popover-foreground, var(--ink, #18181b));
+  }
+}
+.tour-popover-skip:active {
   color: var(--tour-popover-foreground, var(--ink, #18181b));
 }
 .tour-popover-button {
@@ -83,7 +90,12 @@
   border: 1px solid var(--tour-border, var(--line, #e4e4e7));
   background: var(--tour-background, var(--paper, #fff));
 }
-.tour-popover-button-secondary:hover {
+@media (hover: hover) {
+  .tour-popover-button-secondary:hover {
+    background: var(--tour-muted, var(--wash, #f4f4f5));
+  }
+}
+.tour-popover-button-secondary:active {
   background: var(--tour-muted, var(--wash, #f4f4f5));
 }
 .tour-popover-button-primary {

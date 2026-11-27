@@ -125,9 +125,9 @@ const wrapperClass = computed(() => cn('inline-flex items-center gap-3', attrs.c
 
 const buttonClass = computed(() =>
   cn(
-    'inline-flex items-center gap-2 rounded-md border border-input bg-background font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+    'inline-flex items-center gap-2 rounded-md border border-input bg-background font-medium text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
     ReadOnlyLook,
-    'readonly:hover:border-input',
+    'readonly:hover:border-input readonly:active:border-input',
     SizeClass[props.size] ?? SizeClass.md,
   ),
 );

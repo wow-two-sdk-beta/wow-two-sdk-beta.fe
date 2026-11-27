@@ -53,6 +53,7 @@ export function reachOf(target: Element): Reach {
 
 /** Where one mark, icon or run of text sits on the x axis. */
 export interface Placement {
+  readonly element: Element;
   readonly name: string;
   readonly left: number;
   readonly right: number;
@@ -68,7 +69,12 @@ export function placementsIn(root: Element): Placement[] {
     if (element.parentElement?.closest('svg')) continue;
     const rect = element.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0 || !isShown(element)) continue;
-    found.push({ name: `<${element.tagName.toLowerCase()}> #${found.length}`, left: rect.left, right: rect.right });
+    found.push({
+      element,
+      name: `<${element.tagName.toLowerCase()}> #${found.length}`,
+      left: rect.left,
+      right: rect.right,
+    });
   }
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
@@ -79,19 +85,108 @@ export function placementsIn(root: Element): Placement[] {
     range.selectNodeContents(node);
     const rect = range.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) continue;
-    found.push({ name: `"${text.slice(0, 32)}"`, left: rect.left, right: rect.right });
+    found.push({ element: parent, name: `"${text.slice(0, 32)}"`, left: rect.left, right: rect.right });
   }
   return found;
 }
 
-/** The items of `after` that sit more than `tolerance` px sideways from where `before` had them, described. */
-export function movedSideways(before: Placement[], after: Placement[], tolerance = 0.5): string[] {
+/**
+ * Whether `element` may change under a coarse pointer because of a declared touch change: it matches one of
+ * `declared` (a field's touch height, its 16px text), holds one, sits inside one, or follows one in document order
+ * (what a taller field pushes down). Such an element may change vertically only.
+ */
+function isDeclared(element: Element, declared: readonly Element[]): boolean {
+  return declared.some(
+    (origin) =>
+      origin === element ||
+      origin.contains(element) ||
+      element.contains(origin) ||
+      (origin.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+  );
+}
+
+const declaredIn = (selectors: readonly string[]): Element[] =>
+  selectors.length > 0 ? [...document.querySelectorAll(selectors.join(','))] : [];
+
+/** Where one element's box sits. */
+export interface Box {
+  readonly element: Element;
+  readonly name: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+const describe = (element: Element, index: number): string => {
+  const label = element.getAttribute('aria-label') ?? element.textContent?.trim().slice(0, 24) ?? '';
+  return `#${index} <${element.tagName.toLowerCase()}>${label ? ` "${label}"` : ''}`;
+};
+
+/**
+ * The box of every visible element inside `root`, an SVG's own shapes left out. An invisible element (a native
+ * input's transparent hit overlay) shows nothing, so its box may grow under a coarse pointer.
+ */
+export function boxesIn(root: Element): Box[] {
+  return [...root.querySelectorAll('*')]
+    .filter((element) => !element.parentElement?.closest('svg') && isShown(element))
+    .map((element, index) => {
+      const rect = element.getBoundingClientRect();
+      return { element, name: describe(element, index), x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    });
+}
+
+/**
+ * The boxes of `after` that changed from `before` by more than `tolerance` px, described. An element tied to a
+ * `declared` touch change may change its height and top; it still keeps its left edge and width. An element inside a
+ * `resized` one (a field's 16px text, a trailing slot widened to 44px) may change in both axes.
+ */
+export function boxesChanged(
+  before: Box[],
+  after: Box[],
+  declared: readonly string[] = [],
+  resized: readonly string[] = [],
+  tolerance = 0.5,
+): string[] {
+  if (before.length !== after.length) {
+    return [`${before.length} elements under a fine pointer, ${after.length} under a coarse one`];
+  }
+  const origins = declaredIn(declared);
+  const free = declaredIn(resized);
+  return before.flatMap((box, index) => {
+    const moved = after[index]!;
+    if (free.some((element) => element.contains(moved.element))) return [];
+    const vertical = isDeclared(moved.element, origins);
+    const off = (a: number, b: number): boolean => Math.abs(a - b) > tolerance;
+    const changed =
+      off(box.x, moved.x) ||
+      off(box.width, moved.width) ||
+      (!vertical && (off(box.y, moved.y) || off(box.height, moved.height)));
+    const at = (b: Box): string => `${b.x.toFixed(1)},${b.y.toFixed(1)} ${b.width.toFixed(1)}x${b.height.toFixed(1)}`;
+    return changed ? [`${box.name} ${at(box)} -> ${at(moved)}`] : [];
+  });
+}
+
+/**
+ * The items of `after` that sit more than `tolerance` px sideways from where `before` had them, described. Text inside
+ * a `declared` touch change (a field's 16px text) keeps only its start.
+ */
+export function movedSideways(
+  before: Placement[],
+  after: Placement[],
+  tolerance = 0.5,
+  declared: readonly string[] = [],
+): string[] {
+  const origins = declaredIn(declared);
   if (before.length !== after.length) {
     return [`${before.length} visible items under a fine pointer, ${after.length} under a coarse one`];
   }
   return before.flatMap((item, index) => {
     const moved = after[index]!;
-    const dx = Math.max(Math.abs(moved.left - item.left), Math.abs(moved.right - item.right));
+    const startOnly = origins.some((origin) => origin.contains(moved.element));
+    const dx = startOnly
+      ? Math.abs(moved.left - item.left)
+      : Math.max(Math.abs(moved.left - item.left), Math.abs(moved.right - item.right));
     return moved.name !== item.name || dx > tolerance
       ? [
           `${item.name} ${item.left.toFixed(1)}..${item.right.toFixed(1)} -> ${moved.left.toFixed(1)}..${moved.right.toFixed(1)}`,

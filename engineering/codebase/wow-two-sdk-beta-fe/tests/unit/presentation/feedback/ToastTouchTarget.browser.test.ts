@@ -100,6 +100,7 @@ describe.skipIf(!canEmulateCoarsePointer)('toast card under a coarse pointer', (
     const toggle = [...document.querySelectorAll<HTMLButtonElement>('button')].find((button) =>
       button.textContent?.includes('Show details'),
     )!;
-    expect(toggle.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    expect(toggle.getBoundingClientRect().height).toBeLessThan(44);
+    expect(reachOf(toggle).height).toBeGreaterThanOrEqual(43.5);
   });
 });

@@ -133,7 +133,7 @@ const classes = computed(() =>
   cn(
     'flex flex-col gap-1',
     controlTag.value &&
-      'relative rounded-lg transition-colors hover:bg-muted/50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+      'relative rounded-lg transition-colors hover:bg-muted/50 active:bg-muted/50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
     attrs.class as string | undefined,
   ),
 );

@@ -265,7 +265,7 @@ const rootClass = computed(() =>
    rather than the pointer. */
 const selectClass = computed(() =>
   cn(
-    'h-full cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'h-full cursor-pointer border-r border-input bg-card pl-2 pr-1 text-sm pointer-coarse:text-base outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     readOnly.value && 'cursor-default bg-muted text-muted-foreground',
   ),
 );

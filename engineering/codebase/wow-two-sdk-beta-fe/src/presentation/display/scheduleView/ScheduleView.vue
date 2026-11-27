@@ -162,7 +162,7 @@ function bookingStyle(resource: ScheduleResource, booking: ScheduleBooking): Sty
 function bookingClass(resource: ScheduleResource, booking: ScheduleBooking): string {
   const color = booking.color ?? resource.color;
   return cn(
-    'absolute overflow-hidden rounded-md border border-border/60 px-2 py-1 text-left text-xs font-medium transition-colors hover:brightness-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'absolute overflow-hidden rounded-md border border-border/60 px-2 py-1 text-left text-xs font-medium transition-colors hover:brightness-95 active:brightness-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     !color && 'bg-primary-soft text-primary-soft-foreground',
   );
 }
@@ -226,7 +226,7 @@ defineExpose({ el: root });
             :key="i"
             type="button"
             :aria-label="slotLabel(i - 1)"
-            class="hover:bg-primary-soft/30"
+            class="hover:bg-primary-soft/30 active:bg-primary-soft/30"
             @click="onSlot(resource.id, i - 1)"
           />
         </div>

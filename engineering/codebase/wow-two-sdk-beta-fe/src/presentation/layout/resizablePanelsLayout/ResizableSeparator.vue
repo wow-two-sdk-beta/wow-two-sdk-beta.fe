@@ -99,10 +99,10 @@ const classes = computed(() =>
   cn(
     'flex shrink-0 items-center justify-center bg-border transition-colors',
     context.orientation === Orientation.Horizontal
-      ? 'w-1 cursor-col-resize hover:bg-border-strong data-[dragging]:bg-primary'
-      : 'h-1 cursor-row-resize hover:bg-border-strong data-[dragging]:bg-primary',
+      ? 'w-1 cursor-col-resize hover:bg-border-strong active:bg-border-strong data-[dragging]:bg-primary'
+      : 'h-1 cursor-row-resize hover:bg-border-strong active:bg-border-strong data-[dragging]:bg-primary',
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-    props.isDisabled && 'cursor-default opacity-50 hover:bg-border',
+    props.isDisabled && 'cursor-default opacity-50 hover:bg-border active:bg-border',
     attrs.class as string | undefined,
   ),
 );

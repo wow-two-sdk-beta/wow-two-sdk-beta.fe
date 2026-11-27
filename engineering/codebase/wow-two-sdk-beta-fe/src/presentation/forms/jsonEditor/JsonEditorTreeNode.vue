@@ -110,7 +110,7 @@ const chevronClass = computed(() => cn('transition-transform', open.value && 'ro
 const leafClass = computed(() =>
   cn(
     'cursor-text rounded-sm px-1 text-left transition-colors',
-    !editor.isDisabled && !editor.isReadOnly && 'hover:bg-muted',
+    !editor.isDisabled && !editor.isReadOnly && 'hover:bg-muted active:bg-muted',
     type.value === 'string' && 'text-info-soft-foreground',
     type.value === 'number' && 'text-warning-soft-foreground',
     type.value === 'boolean' && 'text-success-soft-foreground',
@@ -135,7 +135,7 @@ const locale = useLocale();
             ? locale.t('JsonEditorTreeNode.collapse', undefined, 'Collapse')
             : locale.t('JsonEditorTreeNode.expand', undefined, 'Expand')
         "
-        class="inline-flex h-5 w-5 items-center justify-center text-muted-foreground hover:text-foreground"
+        class="inline-flex h-5 w-5 items-center justify-center text-muted-foreground hover:text-foreground active:text-foreground"
         @click="open = !open"
       >
         <Icon :icon="ChevronIcon" :size="12" :class="chevronClass" />
@@ -161,7 +161,7 @@ const locale = useLocale();
       <button
         type="button"
         :aria-label="copyLabel"
-        class="ml-auto opacity-0 transition-opacity group-hover:opacity-100 inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        class="ml-auto opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100 inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
         @click="copyPath"
       >
         <Icon :icon="CopyIcon" :size="11" />

@@ -238,7 +238,7 @@ const renderColumns = computed(() =>
           'rounded-[2px] transition-colors',
           cell.inYear ? stepClass(bucket(cell.value)) : 'bg-transparent',
           isInteractive &&
-            'cursor-pointer hover:ring-1 hover:ring-ring focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+            'cursor-pointer hover:ring-1 active:ring-1 hover:ring-ring active:ring-ring focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         ),
       };
     }),

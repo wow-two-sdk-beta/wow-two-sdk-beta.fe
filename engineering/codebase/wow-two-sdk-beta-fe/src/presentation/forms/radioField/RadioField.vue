@@ -30,7 +30,7 @@ export interface RadioFieldProps extends RadioInputProps {
 <script setup lang="ts">
 import { computed, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
-import { cn } from '../../../foundation/styles';
+import { cn, CoarseHitArea } from '../../../foundation/styles';
 import { useId } from '../../../foundation/identifiers';
 import { FormControlProvider, useFormControl } from '../../../foundation/primitives';
 import { useRadioGroup } from '../radioGroup/RadioGroupContext';
@@ -102,8 +102,9 @@ const radioProps = computed(() => {
   return rest;
 });
 
+/* Under a coarse pointer the label keeps its box; an invisible hit area (`CoarseHitArea`) grows its reach to 44px. */
 const wrapperClass = computed(() =>
-  cn('flex items-start gap-2.5 cursor-pointer pointer-coarse:py-3', props.wrapperClassName),
+  cn('relative flex items-start gap-2.5 cursor-pointer', CoarseHitArea.After, props.wrapperClassName),
 );
 
 const radioClass = computed(() => attrs.class as ClassValue);

@@ -11,6 +11,18 @@ Public import: `import { TabsGroupList } from '@wow-two-beta/fe/presentation/dis
 - Mount within the owner supplying `useTabsContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse), nothing visible changes.
+The list sets the gap cap along its axis (`--coarse-hit-gap-x: 0px` in a row, `--coarse-hit-gap-y: 0px` in a
+column), so each tab's invisible hit area (`TabsGroupTab`) never reaches into its neighbour's:
+
+| Element | Touch change | Kind |
+|---|---|---|
+| tab hit area along the strip | the tab's own extent, never into the next tab | dense |
+| tab hit area across a list that does not scroll | 44px | hit area |
+| tab hit area across a list that scrolls (`overflow-x-auto` on the list) | the tab's own 38px: the scroll box clips it, and padding the box out would move the list's own border | dense, at least 24px |
+
 ## Props
 
 No declared props.

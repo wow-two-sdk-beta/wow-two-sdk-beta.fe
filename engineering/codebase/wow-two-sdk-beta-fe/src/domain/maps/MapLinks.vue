@@ -80,14 +80,15 @@ const LinkClass =
 /*
  * Two marks share one grid cell. At rest the monochrome one shows in the surrounding text color at `opacity-60`, so it
  * stays legible on a light page and on a dark card panel alike; on hover and keyboard focus the brand-colored one
- * replaces it. Fading opacity, not a gray filter, keeps the muted state tied to the text color, never to a fixed gray.
+ * replaces it, and under touch a press does (`group-active`). Fading opacity, not a gray filter, keeps the muted
+ * state tied to the text color, never to a fixed gray.
  */
 const RestMarkClass =
   'col-start-1 row-start-1 opacity-60 motion-safe:transition-opacity motion-safe:duration-150 ' +
-  'group-hover/map-link:opacity-0 group-focus-visible/map-link:opacity-0';
+  'group-hover/map-link:opacity-0 group-active/map-link:opacity-0 group-focus-visible/map-link:opacity-0';
 const ColorMarkClass =
   'col-start-1 row-start-1 opacity-0 motion-safe:transition-opacity motion-safe:duration-150 ' +
-  'group-hover/map-link:opacity-100 group-focus-visible/map-link:opacity-100';
+  'group-hover/map-link:opacity-100 group-active/map-link:opacity-100 group-focus-visible/map-link:opacity-100';
 
 const classes = computed(() => cn(RowClass, attrs.class as ClassValue));
 

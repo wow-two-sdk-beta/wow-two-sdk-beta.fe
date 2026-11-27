@@ -4,6 +4,14 @@ Source: [MapLinks.vue](MapLinks.vue), [MapBrandMark.vue](MapBrandMark.vue), [Map
 
 Renders an inline row of icon-only links that open a place in Yandex Maps and Google Maps, such as right after an event's location text. Each link searches the place's text in that map, so no geocoding is needed; the map decides what the text means and may find nothing. Flagging places neither map finds belongs to a later Locations domain, not here. First consumers: the SCFD console beside an extracted event's location, then Ocharo's event pages.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| brand-coloured mark | shows while the link is pressed (`group-active`); at rest the monochrome mark stays, as with a mouse | reveal |
+
 ## Props
 
 | Prop          | Type                         | Default                | Meaning                                                                                  |

@@ -81,7 +81,7 @@ const actionClasses = computed(() =>
     listItemVariants(),
     'w-full rounded-lg px-3 py-2 text-left transition-colors motion-reduce:transition-none',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
-    props.isSelected ? 'bg-primary-soft text-primary-soft-foreground' : 'hover:bg-muted',
+    props.isSelected ? 'bg-primary-soft text-primary-soft-foreground' : 'hover:bg-muted active:bg-muted',
   ),
 );
 

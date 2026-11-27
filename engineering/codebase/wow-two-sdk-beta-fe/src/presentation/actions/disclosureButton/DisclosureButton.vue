@@ -65,7 +65,7 @@ const chevronClass = computed(() => cn('transition-transform', open.value && 'ro
 
 const rootClass = computed(() =>
   cn(
-    'inline-flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+    'inline-flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
     attrs.class as ClassValue,
   ),
 );

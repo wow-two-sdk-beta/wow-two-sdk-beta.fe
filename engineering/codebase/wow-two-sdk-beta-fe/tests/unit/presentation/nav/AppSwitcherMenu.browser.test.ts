@@ -2,6 +2,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
 import { page, userEvent } from 'vitest/browser';
+import { reachOf } from '../../../support/TouchReach';
 import { AppSwitcherKind, AppSwitcherMenu, type AppSwitcherItem } from '@src/presentation/nav';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
 import '@src/index.css';
@@ -195,12 +196,15 @@ describe.skipIf(!canEmulateCoarsePointer)('AppSwitcherMenu panel under a coarse 
     it(`gives every tile and site link a 44px hit area at ${size.width}px`, async () => {
       await render(size);
       await openWithKeyboard();
+      /* The hit test runs on the screen, so the panel's zoom-in must finish first or it scales the reach down. */
+      await Promise.all(document.getAnimations().map((animation) => animation.finished));
       const found = targets();
       // The current app's button, two app links and the site link.
       expect(found).toHaveLength(4);
       for (const node of found) {
-        expect(node.offsetHeight).toBeGreaterThanOrEqual(44);
-        expect(node.offsetWidth).toBeGreaterThanOrEqual(44);
+        /* A tile shows its 44px; a site link reaches it through an invisible hit area. */
+        expect(Math.max(node.offsetHeight, reachOf(node).height)).toBeGreaterThanOrEqual(43.5);
+        expect(Math.max(node.offsetWidth, reachOf(node).width)).toBeGreaterThanOrEqual(43.5);
       }
     });
   }

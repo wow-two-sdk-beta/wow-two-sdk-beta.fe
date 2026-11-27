@@ -199,7 +199,7 @@ defineExpose({ el: root });
         type="button"
         :disabled="finalDisabled || finalReadOnly"
         :aria-label="props.decrementLabel"
-        class="grid h-7 w-6 place-items-center rounded text-muted-foreground hover:bg-muted disabled:opacity-50"
+        class="grid h-7 w-6 place-items-center rounded text-muted-foreground hover:bg-muted active:bg-muted disabled:opacity-50"
         @click="adjust(-1)"
       >
         <Icon :icon="MinusIcon" :size="14" />
@@ -208,7 +208,7 @@ defineExpose({ el: root });
         type="button"
         :disabled="finalDisabled || finalReadOnly"
         :aria-label="props.incrementLabel"
-        class="grid h-7 w-6 place-items-center rounded text-muted-foreground hover:bg-muted disabled:opacity-50"
+        class="grid h-7 w-6 place-items-center rounded text-muted-foreground hover:bg-muted active:bg-muted disabled:opacity-50"
         @click="adjust(1)"
       >
         <Icon :icon="PlusIcon" :size="14" />

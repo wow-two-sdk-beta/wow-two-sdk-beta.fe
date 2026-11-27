@@ -2,6 +2,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { h, type Component, type VNode } from 'vue';
 import { page } from 'vitest/browser';
+import { reachOf } from '../../../support/TouchReach';
 import { Calendar } from 'lucide-vue-next';
 import { Tag } from '@src/presentation/display/tag';
 import {
@@ -330,8 +331,10 @@ describe.skipIf(!canEmulateCoarsePointer)('form controls under a coarse pointer'
       expect(tapsLandOn(element)).toBe(true);
       return;
     }
-    expect(size.height).toBeGreaterThanOrEqual(44);
-    expect(size.width).toBeGreaterThanOrEqual(44);
+    /* A field shows its 44px; a button, a pill or a choice row reaches it through an invisible hit area. */
+    const reach = reachOf(element);
+    expect(Math.max(size.height, reach.height)).toBeGreaterThanOrEqual(43.5);
+    expect(Math.max(size.width, reach.width)).toBeGreaterThanOrEqual(43.5);
   });
 
   it('keeps the select clear button clear of the value text and the chevron', () => {

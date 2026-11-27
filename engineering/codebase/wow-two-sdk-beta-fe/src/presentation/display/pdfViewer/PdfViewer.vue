@@ -136,7 +136,7 @@ defineExpose({ el });
         type="button"
         :aria-label="locale.t('PdfViewer.previousPage', undefined, 'Previous page')"
         :disabled="activePage <= 1"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground disabled:opacity-40"
         @click="goPrev"
       >
         <Icon :icon="ChevronLeft" :size="14" />
@@ -150,7 +150,7 @@ defineExpose({ el });
         type="button"
         :aria-label="locale.t('PdfViewer.nextPage', undefined, 'Next page')"
         :disabled="pageCount != null && activePage >= pageCount"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground disabled:opacity-40"
         @click="goNext"
       >
         <Icon :icon="ChevronRight" :size="14" />
@@ -160,7 +160,7 @@ defineExpose({ el });
         type="button"
         :aria-label="locale.t('PdfViewer.zoomOut', undefined, 'Zoom out')"
         :disabled="activeZoom <= minZoom"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground disabled:opacity-40"
         @click="zoomOut"
       >
         <Icon :icon="ZoomOut" :size="14" />
@@ -170,7 +170,7 @@ defineExpose({ el });
         type="button"
         :aria-label="locale.t('PdfViewer.zoomIn', undefined, 'Zoom in')"
         :disabled="activeZoom >= maxZoom"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground disabled:opacity-40"
         @click="zoomIn"
       >
         <Icon :icon="ZoomIn" :size="14" />
@@ -181,7 +181,7 @@ defineExpose({ el });
           :href="UrlExtensions.safeResource(src)"
           download
           :aria-label="locale.t('PdfViewer.downloadPDF', undefined, 'Download PDF')"
-          class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+          class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
         >
           <Icon :icon="Download" :size="14" />
         </a>

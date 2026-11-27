@@ -87,7 +87,7 @@ const CloseIcon = X;
         role="button"
         :tabindex="-1"
         :aria-label="removeLabel(v)"
-        class="cursor-pointer rounded-sm p-0.5 hover:bg-border"
+        class="cursor-pointer rounded-sm p-0.5 hover:bg-border active:bg-border"
         @click="remove(v, $event)"
         @pointerdown.stop
       >

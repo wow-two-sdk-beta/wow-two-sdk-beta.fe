@@ -14,6 +14,14 @@ Public import: `import { TextAreaInput } from '@wow-two-beta/fe/presentation/for
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - Takes the shared input floor under a coarse pointer (at least 44px high, `pointer-coarse:min-h-11`); its row height already exceeds it.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| text | 14px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into the focused textarea | text size |
+
 ## Props
 
 | Prop           | Type               | Required | Default     | Meaning                                                                                       |

@@ -214,9 +214,9 @@ const passthroughAttrs = computed(() =>
 
 const buttonClass = computed(() =>
   cn(
-    'inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
+    'inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60',
     ReadOnlyLook,
-    'readonly:hover:border-input',
+    'readonly:hover:border-input readonly:active:border-input',
     recording.value && 'border-primary bg-primary-soft text-primary-soft-foreground',
     attrs.class as ClassValue,
   ),

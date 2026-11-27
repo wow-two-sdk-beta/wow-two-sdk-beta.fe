@@ -329,7 +329,7 @@ defineExpose({ el: root });
       <button
         type="button"
         :disabled="isShowingCurrentPeriod"
-        class="inline-flex h-11 shrink-0 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium enabled:hover:bg-muted disabled:opacity-50 sm:h-7 pointer-coarse:h-11"
+        class="inline-flex h-11 shrink-0 items-center rounded-md border border-border bg-background px-2.5 text-xs font-medium enabled:hover:bg-muted enabled:active:bg-muted disabled:opacity-50 sm:h-7 pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 pointer-coarse:after:-translate-1/2"
         @click="goToday"
       >
         {{ locale.t('EventCalendarViewer.today', undefined, 'Today') }}
@@ -341,7 +341,7 @@ defineExpose({ el: root });
         <button
           type="button"
           :aria-label="locale.t('EventCalendarViewer.previous', undefined, 'Previous')"
-          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:relative"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted active:bg-muted sm:size-7 pointer-coarse:relative"
           :class="CoarseHitArea.After"
           @click="goPrev"
         >
@@ -353,7 +353,7 @@ defineExpose({ el: root });
         <button
           type="button"
           :aria-label="locale.t('EventCalendarViewer.next', undefined, 'Next')"
-          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:relative"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted active:bg-muted sm:size-7 pointer-coarse:relative"
           :class="CoarseHitArea.After"
           @click="goNext"
         >
@@ -380,7 +380,7 @@ defineExpose({ el: root });
           :value="v"
           size="sm"
           tone="neutral"
-          class="h-11 min-w-0 flex-1 px-0.5 text-xs min-[360px]:px-1 sm:h-6 sm:flex-none sm:px-2 data-[pressed=false]:hover:text-foreground data-[pressed=false]:focus-visible:text-foreground"
+          class="h-11 min-w-0 flex-1 px-0.5 text-xs min-[360px]:px-1 sm:h-6 sm:flex-none sm:px-2 data-[pressed=false]:hover:text-foreground data-[pressed=false]:active:text-foreground data-[pressed=false]:focus-visible:text-foreground"
         >
           <span class="truncate">{{ locale.t('EventCalendarViewer.' + v, undefined, v) }}</span>
         </ToggleInput>

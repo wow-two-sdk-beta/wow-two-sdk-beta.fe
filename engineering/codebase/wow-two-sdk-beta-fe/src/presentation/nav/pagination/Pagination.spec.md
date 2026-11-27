@@ -11,10 +11,20 @@ Public import: `import { Pagination } from '@wow-two-beta/fe/presentation/nav';`
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
-- Page buttons are 32px under either pointer; under a coarse one an invisible 44 x 44px hit area centred on each
-  (`CoarseHitArea`) takes the tap, so the numbers keep their place, and buttons closer than 44px share the overlap. A
-  row too long for its container wraps onto the next line under a coarse pointer rather than run past it; a fine
-  pointer keeps one line.
+- Page buttons are 32px under either pointer; under a coarse one an invisible hit area centred on each
+  (`CoarseHitArea`) takes the tap, so the numbers keep their place. It is 44px tall and, along the row, the button
+  plus its 4px gap (`--coarse-hit-gap-x`), so neighbours tile edge to edge and never share a tap. A row too long for
+  its container wraps onto the next line under a coarse pointer, 12px apart, rather than run past it; a fine pointer
+  keeps one line.
+
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| page button | none visible: the 32px box stays; its hit area is 44px tall and the box plus 4px wide | dense along the row |
+| row too long for its container | wraps onto the next line, 12px between lines (`pointer-coarse:flex-wrap pointer-coarse:gap-y-3`), so a wrapped row's hit areas tile at 44px | layout |
 
 ## Props
 

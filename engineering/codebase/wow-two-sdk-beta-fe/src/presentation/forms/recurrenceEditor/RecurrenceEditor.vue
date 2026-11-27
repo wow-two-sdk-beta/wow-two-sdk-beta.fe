@@ -302,7 +302,7 @@ function weekdayClass(wd: RecurrenceWeekday): string {
     'inline-flex h-7 w-9 items-center justify-center rounded-md border text-xs font-medium transition-colors',
     isWeekdayChecked(wd)
       ? 'border-primary bg-primary text-primary-foreground'
-      : 'border-input bg-background text-muted-foreground hover:bg-muted',
+      : 'border-input bg-background text-muted-foreground hover:bg-muted active:bg-muted',
   );
 }
 

@@ -50,8 +50,8 @@ interface NoticeBarProgress {
  * area centred on each under a coarse one, so the icons keep their place.
  */
 const HeaderActionClasses = [
-  'relative inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted',
-  'hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+  'relative inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted active:bg-muted',
+  'hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
   CoarseHitArea.After,
 ];
 
@@ -64,7 +64,7 @@ const CountBadgeClasses = [
 /** @internal The classes of the pop-up pause select. */
 const PauseSelectClasses = [
   'min-w-0 max-w-full rounded-md border border-border bg-background px-2 py-1',
-  'focus-visible:outline-2 focus-visible:outline-ring pointer-coarse:min-h-11',
+  'focus-visible:outline-2 focus-visible:outline-ring pointer-coarse:min-h-11 pointer-coarse:text-base',
 ];
 
 /** @internal Renders a `NoticeNode` — either a plain string or a caller-built VNode. */

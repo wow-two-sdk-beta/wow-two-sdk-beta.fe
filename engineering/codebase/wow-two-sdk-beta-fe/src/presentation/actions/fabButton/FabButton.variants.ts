@@ -25,12 +25,12 @@ export const FabButtonSize = {
 export type FabButtonSize = (typeof FabButtonSize)[keyof typeof FabButtonSize];
 
 export const fabVariants = tv({
-  base: 'fixed inline-flex items-center justify-center rounded-full shadow-lg transition-all hover:shadow-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  base: 'fixed inline-flex items-center justify-center rounded-full shadow-lg transition-all hover:shadow-xl active:shadow-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
   variants: {
     variant: {
-      primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-      secondary: 'bg-card text-card-foreground border border-border hover:bg-muted',
-      destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+      primary: 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/90',
+      secondary: 'bg-card text-card-foreground border border-border hover:bg-muted active:bg-muted',
+      destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/90',
     },
     size: {
       sm: 'h-10 w-10',

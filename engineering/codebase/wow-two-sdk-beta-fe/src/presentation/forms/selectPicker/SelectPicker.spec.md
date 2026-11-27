@@ -16,6 +16,17 @@ Public import: `import { SelectPicker } from '@wow-two-beta/fe/presentation/form
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
 - A closed trigger shows the selected option's label on first client render, whichever way options arrive: `options`, slotted `SelectPickerItem`s (also inside groups, loaded late, or a key changed from outside), or `getOptionLabel`. The raw serialized key shows only when nothing labels the key.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| field box, sizes `sm` and `md` | 32px / 40px → at least 44px tall, text centred | visible height |
+| field text, every size | 14px / 12px → 16px (`pointer-coarse:text-base`), so iOS never zooms the page into a focused field | text size |
+| trigger value end | stops 44px short of the clear button (`pointer-coarse:w-11` on its slot); the value truncates earlier | width |
+| listbox rows | at least 44px tall, content centred (the `ListboxPicker` rows) | visible height |
+
 ## Props
 
 | Prop             | Type                                      | Required | Default              | Meaning                                                                                                                                                                                                                                                                                     |

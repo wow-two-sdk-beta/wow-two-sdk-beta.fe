@@ -52,7 +52,14 @@ defineSlots<{
           ? [
               'min-w-0 max-w-full gap-1.5 [&_a]:max-w-full [&_a]:whitespace-normal',
               '[&_button]:max-w-full [&_button]:whitespace-normal',
-              'pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_button]:min-h-11',
+              'pointer-coarse:[&_a]:relative pointer-coarse:[&_button]:relative',
+              'pointer-coarse:[&_a]:after:absolute pointer-coarse:[&_a]:after:top-1/2 pointer-coarse:[&_a]:after:left-1/2',
+              'pointer-coarse:[&_a]:after:size-full pointer-coarse:[&_a]:after:min-h-11 pointer-coarse:[&_a]:after:min-w-11',
+              'pointer-coarse:[&_a]:after:-translate-1/2',
+              'pointer-coarse:[&_button]:before:absolute pointer-coarse:[&_button]:before:top-1/2',
+              'pointer-coarse:[&_button]:before:left-1/2 pointer-coarse:[&_button]:before:size-full',
+              'pointer-coarse:[&_button]:before:min-h-11 pointer-coarse:[&_button]:before:min-w-11',
+              'pointer-coarse:[&_button]:before:-translate-1/2',
             ]
           : 'mt-2 gap-2'
       "

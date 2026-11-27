@@ -159,7 +159,7 @@ defineExpose({ el });
       <button
         v-if="hasReplies() && collapsed"
         type="button"
-        class="mt-1 inline-flex items-center gap-1 text-xs text-primary-soft-foreground hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded"
+        class="mt-1 inline-flex items-center gap-1 text-xs text-primary-soft-foreground hover:underline active:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded"
         @click="collapsed = false"
       >
         <ChevronRight class="h-3 w-3" />
@@ -174,7 +174,7 @@ defineExpose({ el });
       <button
         v-if="hasReplies() && !collapsed"
         type="button"
-        class="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded"
+        class="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded"
         @click="collapsed = true"
       >
         <ChevronDown class="h-3 w-3" /> {{ locale.t('Comment.collapse', undefined, 'Collapse') }}

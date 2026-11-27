@@ -173,7 +173,7 @@ function barStyle(task: GanttTimelineTask): StyleValue {
 
 function barClass(task: GanttTimelineTask): string {
   return cn(
-    'absolute overflow-hidden rounded-md border border-border/60 px-2 text-left text-[11px] font-medium transition-colors hover:brightness-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'absolute overflow-hidden rounded-md border border-border/60 px-2 text-left text-[11px] font-medium transition-colors hover:brightness-95 active:brightness-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     !task.color && 'bg-primary text-primary-foreground',
   );
 }

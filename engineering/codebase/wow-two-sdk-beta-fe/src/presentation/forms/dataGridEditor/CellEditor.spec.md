@@ -12,6 +12,14 @@ Internal implementation: compose through the family’s public exports in [index
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Undeclared attributes follow Vue fallthrough to the rendered root when the component has a single element root.
 
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| editor field and native `<select>` | 14px → 16px text (`pointer-coarse:text-base`), so iOS never zooms the page into it on focus; the 28px box stays | text size |
+
 ## Props
 
 | Prop | Type | Required | Default | Meaning |

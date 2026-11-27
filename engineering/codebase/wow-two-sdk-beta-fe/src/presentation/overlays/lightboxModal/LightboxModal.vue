@@ -47,7 +47,7 @@ const SwipeDistance = 48;
 /** @internal The step buttons' shared look. */
 const StepButtonClass =
   'absolute top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white ' +
-  'transition-colors hover:bg-black/70 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white ' +
+  'transition-colors hover:bg-black/70 active:bg-black/70 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white ' +
   'disabled:pointer-events-none disabled:opacity-30';
 </script>
 
@@ -235,7 +235,7 @@ const contentClass = computed(() =>
       <ModalTitle class="sr-only">{{ props.label }}</ModalTitle>
       <div class="flex min-h-11 shrink-0 items-center gap-2 text-sm text-white/80">
         <span v-if="hasMany" aria-hidden="true" data-counter>{{ counterText }}</span>
-        <ModalClose class="ms-auto size-11 text-white hover:bg-white/10" />
+        <ModalClose class="ms-auto size-11 text-white hover:bg-white/10 active:bg-white/10" />
       </div>
       <figure
         class="relative flex min-h-0 flex-1 touch-pan-y touch-pinch-zoom flex-col items-center justify-center gap-2"
@@ -289,7 +289,7 @@ const contentClass = computed(() =>
             :aria-label="locale.t('LightboxModal.showImage', { number: index + 1 }, 'Show image {number}')"
             :aria-current="index === current ? 'true' : undefined"
             :tabindex="index === current ? 0 : -1"
-            class="size-14 shrink-0 overflow-hidden rounded-lg border-2 border-transparent bg-white/10 p-0.5 opacity-70 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-[current=true]:border-white aria-[current=true]:opacity-100 sm:size-16"
+            class="size-14 shrink-0 overflow-hidden rounded-lg border-2 border-transparent bg-white/10 p-0.5 opacity-70 hover:opacity-100 active:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white aria-[current=true]:border-white aria-[current=true]:opacity-100 sm:size-16"
             @click="show(index)"
           >
             <img

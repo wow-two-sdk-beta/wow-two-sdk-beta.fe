@@ -97,7 +97,7 @@ const rowStyle = computed(() => ({ paddingLeft: `${(props.level - 1) * 16}px` })
 const classes = computed(() =>
   cn(
     'flex cursor-pointer items-center gap-1 rounded-sm px-2 py-1 transition-colors',
-    'hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     props.isSelected && 'bg-primary-soft text-primary-soft-foreground',
     props.isDisabled && 'pointer-events-none opacity-50',
   ),

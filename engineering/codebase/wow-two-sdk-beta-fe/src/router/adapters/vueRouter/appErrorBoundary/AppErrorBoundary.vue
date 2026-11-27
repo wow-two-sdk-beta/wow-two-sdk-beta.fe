@@ -108,7 +108,7 @@ const routeErrorComponent = computed<Component | undefined>(() => {
     <p v-if="status !== undefined" class="font-mono text-sm text-muted-foreground">{{ status }}</p>
     <h1 class="text-lg font-semibold text-foreground">Something went wrong</h1>
     <p class="max-w-md text-sm text-muted-foreground">{{ message }}</p>
-    <RouterLink :to="props.homePath" class="mt-2 text-sm font-medium text-primary hover:underline">
+    <RouterLink :to="props.homePath" class="mt-2 text-sm font-medium text-primary hover:underline active:underline">
       Back to start
     </RouterLink>
   </div>

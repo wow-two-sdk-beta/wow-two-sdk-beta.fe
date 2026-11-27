@@ -342,7 +342,7 @@ defineExpose({ el });
             fill="none"
             stroke="currentColor"
             :stroke-width="strokeWidth"
-            class="text-border-strong hover:text-primary"
+            class="text-border-strong hover:text-primary active:text-primary"
           />
           <text
             v-if="entry.edge.label"
@@ -384,6 +384,7 @@ defineExpose({ el });
       @pointerdown.stop
     >
       <select
+        class="pointer-coarse:text-base"
         :aria-label="labels.selectNode"
         :value="selectedNode?.id"
         @change="selectedNodeId = ($event.target as HTMLSelectElement).value"
@@ -400,7 +401,7 @@ defineExpose({ el });
       <button
         type="button"
         :aria-label="labels.zoomIn"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
         @click="zoomIn"
       >
         <Icon :icon="Plus" :size="14" />
@@ -408,7 +409,7 @@ defineExpose({ el });
       <button
         type="button"
         :aria-label="labels.zoomOut"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
         @click="zoomOut"
       >
         <Icon :icon="Minus" :size="14" />
@@ -416,7 +417,7 @@ defineExpose({ el });
       <button
         type="button"
         :aria-label="labels.fit"
-        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+        class="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground"
         @click="fitView"
       >
         <Icon :icon="Maximize" :size="12" />

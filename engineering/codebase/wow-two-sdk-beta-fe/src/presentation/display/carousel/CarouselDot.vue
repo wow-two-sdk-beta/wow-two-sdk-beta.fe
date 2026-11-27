@@ -36,8 +36,8 @@ function onClick(event: MouseEvent): void {
 
 const classes = computed(() =>
   cn(
-    'h-1.5 rounded-full bg-border transition-all hover:bg-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-    isActive.value ? 'w-6 bg-primary hover:bg-primary' : 'w-1.5',
+    'h-1.5 rounded-full bg-border transition-all hover:bg-muted-foreground active:bg-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    isActive.value ? 'w-6 bg-primary hover:bg-primary active:bg-primary' : 'w-1.5',
     attrs.class as string | undefined,
   ),
 );

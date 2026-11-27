@@ -1,5 +1,7 @@
 import { computed, nextTick, ref, watch, type Ref } from 'vue';
 
+import { PointerType, usePointerType } from '../../../foundation/device';
+
 import { compareOrder } from './ToastHostStore';
 import type { ToastOptions } from './ToastOptions';
 import type { VisibleToast } from './UseResolvedToasts';
@@ -35,6 +37,8 @@ export interface ToastCapacitySettings {
  */
 export function useToastCapacity(sources: ToastCapacitySources, settings: ToastCapacitySettings) {
   const { stack, overflowButton, cards, ordered } = sources;
+  /* The pointer is read through the shared hook, so a test's pointer override and the stack agree on one source. */
+  const pointer = usePointerType();
   const overflowOpen = ref(false);
   const fitCount = ref(Infinity);
   const needsScroll = ref(false);
@@ -56,10 +60,7 @@ export function useToastCapacity(sources: ToastCapacitySources, settings: ToastC
   function measureCapacity(): void {
     const host = stack.value;
     if (!host) return;
-    // `matchMedia` is missing from some test DOMs (jsdom); without it the pointer counts as fine.
-    const minButtonHeight = window.matchMedia?.('(pointer: coarse)').matches
-      ? TouchOverflowButtonHeight
-      : OverflowButtonHeight;
+    const minButtonHeight = pointer.value === PointerType.Coarse ? TouchOverflowButtonHeight : OverflowButtonHeight;
     const buttonHeight = Math.max(overflowButton()?.offsetHeight ?? 0, minButtonHeight);
     host.style.setProperty('--toast-overflow-control-height', `${buttonHeight}px`);
     // The collapsed capacity is measured from full cards. Compact rows can yield a different fit.
@@ -128,6 +129,7 @@ export function useToastCapacity(sources: ToastCapacitySources, settings: ToastC
   // The stack renders inside `Portal`'s slot, so the host's own `onUpdated` never sees a list change; an updated
   // card keeping its size gets its new nonce measured here.
   watch(visible, measureCapacity, { flush: 'post' });
+  watch(pointer, measureCapacity, { flush: 'post' });
 
   /** Opens the overflow list on the first hidden card, or closes it and returns focus to its button. */
   async function toggleOverflow(): Promise<void> {

@@ -127,7 +127,9 @@ const modes = Object.values(JsonEditorModeValue);
 function modeButtonClass(m: JsonEditorMode): string {
   return cn(
     'inline-flex h-6 items-center rounded px-2 text-xs font-medium transition-colors',
-    renderMode.value === m ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+    renderMode.value === m
+      ? 'bg-primary text-primary-foreground'
+      : 'text-muted-foreground hover:text-foreground active:text-foreground',
   );
 }
 

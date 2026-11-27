@@ -102,7 +102,7 @@ const passthroughAttrs = computed(() =>
 
 const rootClass = computed(() =>
   cn(
-    'fixed z-banner inline-flex items-center justify-center gap-2 rounded-full bg-card text-card-foreground shadow-lg ring-1 ring-border transition-all hover:shadow-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+    'fixed z-banner inline-flex items-center justify-center gap-2 rounded-full bg-card text-card-foreground shadow-lg ring-1 ring-border transition-all hover:shadow-xl active:shadow-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     hasLabel.value ? 'h-11 px-4 text-sm font-medium' : 'h-11 w-11',
     PositionClasses[props.position],
     attrs.class as ClassValue,

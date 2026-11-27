@@ -47,7 +47,7 @@ type TransferSide = 'source' | 'target';
 /** @internal The move buttons' shared look. */
 const MoveButtonClass =
   'grid size-8 place-items-center rounded-md border border-border bg-background text-muted-foreground ' +
-  'transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 ' +
+  'transition-colors hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:outline-hidden focus-visible:ring-2 ' +
   'focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40';
 </script>
 

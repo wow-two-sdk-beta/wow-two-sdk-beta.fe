@@ -11,7 +11,15 @@ Public import: `import { SwitchField } from '@wow-two-beta/fe/presentation/forms
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
-- Under a coarse pointer the row takes 12px of vertical padding (`pointer-coarse:py-3`), so the label row is at least 44px high and the next row's tap area does not overlap this one's; a fine pointer keeps the compact row.
+- Under a coarse pointer the `<label>` keeps its box and takes an invisible hit area of at least 44 x 44px (`CoarseHitArea`), so the row does not grow. A group whose rows sit closer than 44px sets `--coarse-hit-gap` to its gap, so neighbouring rows never share a tap.
+
+## Touch
+
+Under a coarse pointer (a finger) at one viewport size, against a fine one (a mouse):
+
+| Element | Touch change | Kind |
+|---|---|---|
+| `<label>` row | none: no padding is added; an invisible hit area reaches 44px | hit area |
 
 ## Props
 

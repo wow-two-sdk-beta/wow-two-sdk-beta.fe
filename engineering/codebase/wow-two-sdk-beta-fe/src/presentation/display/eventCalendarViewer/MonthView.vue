@@ -260,13 +260,13 @@ function dateButtonClass(cell: MonthCell): string {
     'pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:inset-y-0 pointer-coarse:after:start-0 pointer-coarse:after:w-full pointer-coarse:after:min-w-11',
     cell.outOfMonth ? 'text-muted-foreground' : 'text-foreground',
     isToday(cell.day) && 'bg-primary text-primary-foreground',
-    'hover:bg-muted',
+    'hover:bg-muted active:bg-muted',
   );
 }
 
 /* The phone's entire cell opens the sheet for that date. */
 function phoneCellButtonClass(): string {
-  return 'flex min-h-11 w-full flex-col items-center gap-0.5 pt-1 pb-0.5 transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
+  return 'flex min-h-11 w-full flex-col items-center gap-0.5 pt-1 pb-0.5 transition-colors hover:bg-muted active:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
 }
 
 /* The date number keeps its own small today-highlight, now inside the full-cell phone button rather
@@ -281,7 +281,7 @@ function phoneDateNumberClass(cell: MonthCell): string {
 
 function eventClass(e: EventCalendarViewerEvent): string {
   return cn(
-    'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10 pointer-coarse:min-h-11',
+    'truncate rounded-sm px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 active:brightness-95 sm:max-lg:min-h-10 pointer-coarse:min-h-11',
     !e.color && 'bg-primary-soft text-primary-soft-foreground',
   );
 }
@@ -304,7 +304,7 @@ function barClass(bar: BarSegment): string {
     );
   }
   return cn(
-    'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 sm:max-lg:min-h-10 pointer-coarse:min-h-11',
+    'mb-0.5 min-w-0 truncate py-0.5 text-left text-[11px] font-medium transition-colors hover:brightness-95 active:brightness-95 sm:max-lg:min-h-10 pointer-coarse:min-h-11',
     'px-1.5',
     !bar.event.color && 'bg-primary-soft text-primary-soft-foreground',
     bar.isStart ? 'ms-0.5 rounded-s-sm' : 'rounded-s-none',
@@ -462,7 +462,7 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
             type="button"
             aria-haspopup="dialog"
             :aria-label="`${dateLabel(column.day)}, ${eventCountLabel(column.eventCount)}`"
-            class="min-h-6 rounded-sm px-1 text-start text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:max-lg:min-h-10 pointer-coarse:min-h-11"
+            class="min-h-6 rounded-sm px-1 text-start text-[11px] text-muted-foreground hover:bg-muted active:bg-muted hover:text-foreground active:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:max-lg:min-h-10 pointer-coarse:min-h-11"
             @click="openDay($event, column.day)"
           >
             {{ locale.t('MonthView.more', { count: column.moreCount }, '+{count} more') }}
@@ -485,7 +485,7 @@ function dotStyle(e: EventCalendarViewerEvent): StyleValue {
             <li v-for="e in selectedDayEvents" :key="e.id">
               <button
                 type="button"
-                class="flex min-h-11 w-full items-start gap-2.5 rounded-md px-2 py-3 text-start transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                class="flex min-h-11 w-full items-start gap-2.5 rounded-md px-2 py-3 text-start transition-colors hover:bg-muted active:bg-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                 @click="onEvent($event, e)"
               >
                 <span aria-hidden="true" class="mt-1.5 h-2 w-2 shrink-0 rounded-full" :style="dotStyle(e)" />

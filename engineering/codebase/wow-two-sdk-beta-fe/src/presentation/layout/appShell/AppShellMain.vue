@@ -50,11 +50,13 @@ useScrollActivity(el, isAutoHiding);
 const regionAttrs = computed(() => (isRegion.value ? { [ScrollRegionAttribute]: '' } : {}));
 
 /* In a region shell this is the one scroll container; its gutter is reserved so opening a panel never shifts
-   the layout sideways. */
+   the layout sideways. WebKit ignores `scrollbar-gutter`, so the region always scrolls (`overflow-y-scroll`) and
+   keeps its bar's width whether or not its content overflows — a page grown under touch never narrows. Its
+   overscroll stays in it (`overscroll-y-contain`): the page around it never bounces. */
 const classes = computed(() =>
   cn(
     'flex flex-col [grid-area:main] focus:outline-hidden',
-    isRegion.value && 'min-h-0 overflow-y-auto [scrollbar-gutter:stable]',
+    isRegion.value && 'min-h-0 overflow-y-scroll overscroll-y-contain [scrollbar-gutter:stable]',
     isAutoHiding.value && 'scrollbar-auto-hide',
     attrs.class as string | undefined,
   ),
