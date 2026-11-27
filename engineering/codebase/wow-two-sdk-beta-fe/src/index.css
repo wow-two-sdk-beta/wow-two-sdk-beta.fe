@@ -491,6 +491,9 @@ body {
   --frame-sidebar-width: 15.5rem;
   --frame-rail-width: 4rem;
   --frame-content-max: 96rem;
+  /* The width of the brand's leading symbol; an app with another size sets it, so the expanded brand starts where
+     the rail centres it. */
+  --frame-brand-size: 1.75rem;
 }
 
 /* A glass theme's page backdrop — the coloured light its translucent surfaces blur. Themes without an

@@ -38,6 +38,9 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 ### SidebarMenuSection
 
 - An always-open list under a small heading, named by that heading through `aria-labelledby`.
+- `label` is optional. Without it the section draws no heading row in either state and keeps its start padding in the
+  rail, so its items keep their place when the menu collapses or expands; a first section without a label puts its
+  first item on the nav's own padding in both states. Its list has no name.
 
 ## Touch
 
@@ -75,9 +78,9 @@ Under a coarse pointer (a finger) at one viewport size, against a fine one (a mo
 
 ### SidebarMenuSection
 
-| Prop    | Type     | Required | Default | Meaning                                  |
-| ------- | -------- | -------- | ------- | ---------------------------------------- |
-| `label` | `string` | yes      | —       | The section heading and the list's name. |
+| Prop    | Type     | Required | Default | Meaning                                                           |
+| ------- | -------- | -------- | ------- | ----------------------------------------------------------------- |
+| `label` | `string` | no       | —       | The section heading and the list's name; omitted, no heading row. |
 
 ## Emits
 

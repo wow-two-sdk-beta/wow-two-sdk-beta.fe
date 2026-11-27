@@ -502,13 +502,15 @@ const brandLinkClasses =
   'pointer-coarse:[&_a]:after:min-w-11 pointer-coarse:[&_a]:after:-translate-1/2';
 
 /* In the rail the brand centres over the rail's icons. The end padding holds the centring box at the rail's width
-   while the cell narrows, so the mark does not slide, and is zero once it settles; `ps-px` balances the hairline. */
+   while the cell narrows, so the mark does not slide, and is zero once it settles; `ps-px` balances the hairline.
+   Expanded, the start padding puts a `--frame-brand-size` mark at that same rail-centred x, so the brand's leading
+   symbol does not move when the sidebar collapses or expands (shell.md § Bar). */
 const brandCellClasses = computed(() =>
   cn(
     'flex w-(--frame-sidebar-size) shrink-0 items-center overflow-hidden border-e',
     isRail.value
       ? 'justify-center ps-px pe-[calc(var(--frame-sidebar-size)-var(--frame-rail-width))]'
-      : 'ps-2.5 pe-1.5',
+      : 'ps-[calc((var(--frame-rail-width)-var(--frame-brand-size))/2)] pe-1.5',
     brandLinkClasses,
     edgeClass.value,
   ),

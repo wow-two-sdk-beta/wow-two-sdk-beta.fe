@@ -17,6 +17,10 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 - Dimensions come from the `--frame-*` tokens in `styles.css`, the same in every theme: `--frame-bar-height` (56px,
   hairline included), `--frame-sidebar-width` (248px), `--frame-rail-width` (64px) and `--frame-content-max` (1536px).
   An app offsets its own chrome by them (`top-(--frame-bar-height)`); it does not redefine them.
+- `--frame-brand-size` (default `1.75rem`, 28px) is the width of the brand's leading symbol, and the one frame
+  property an app may set (on `:root` or the frame). The rail centres the brand; expanded, the brand cell's start
+  padding is `calc((var(--frame-rail-width) - var(--frame-brand-size)) / 2)`, so a symbol of that width sits at the
+  same rail-centred x in both states (18px for the defaults) and does not move when the sidebar collapses or expands.
 - Edges are the theme's glass hairline (`border-glass-edge`, the border colour where a theme sets none): under the bar,
   between the brand cell and the bar, and beside the sidebar. `variant="glass"` paints the bar and sidebar with the
   theme's glass and its shadow over `surface-ambient`; `solid` paints them on the card colour.

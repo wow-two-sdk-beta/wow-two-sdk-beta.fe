@@ -65,8 +65,12 @@ function mountFrame(
     brand?: string;
     /** Brands the frame as SCFD does: a flex link around a 28px mark, named by its label alone. */
     logo?: boolean;
+    /** Adds a wordmark after the mark while the brand is not the rail's, as SCFD's lockup does. */
+    wordmark?: boolean;
     /** Lays the sidebar out as SCFD does: labelled sections of links. */
     sections?: ReadonlyArray<ReadonlyArray<string>>;
+    /** Leaves the first section without a label, as SCFD's home section is. */
+    isHomeUnlabelled?: boolean;
     /** Puts the brand behind the app switcher, whose compact trigger is the rail's brand. */
     apps?: boolean;
   } = {},
@@ -85,12 +89,15 @@ function mountFrame(
     },
     global: options.effective ? { provide: { [DeviceClassKey as symbol]: deviceState(options.effective) } } : {},
     slots: {
-      brand: () =>
+      brand: ({ isRail }) =>
         options.logo
           ? h(
               'a',
               { href: '/', 'data-test': 'brand-mark', class: 'flex shrink-0 items-center', 'aria-label': 'SCFD home' },
-              [h('img', { src: LogoMark, alt: '', width: 28, height: 28, class: 'size-7 rounded-md' })],
+              [
+                h('img', { src: LogoMark, alt: '', width: 28, height: 28, class: 'size-7 rounded-md' }),
+                options.wordmark && !isRail ? h('span', { class: 'ms-2 font-semibold' }, 'SCFD Console') : null,
+              ],
             )
           : h(
               'a',
@@ -101,10 +108,13 @@ function mountFrame(
         h(SidebarMenu, { isCollapsed: isRail }, () =>
           options.sections
             ? options.sections.map((links, index) =>
-                h(SidebarMenuSection, { label: `Section ${index + 1}` }, () =>
-                  links.map((link) =>
-                    h(SidebarMenuItem, { href: `#/${link}` }, { default: () => link, icon: () => h('span', '•') }),
-                  ),
+                h(
+                  SidebarMenuSection,
+                  options.isHomeUnlabelled && index === 0 ? {} : { label: `Section ${index + 1}` },
+                  () =>
+                    links.map((link) =>
+                      h(SidebarMenuItem, { href: `#/${link}` }, { default: () => link, icon: () => h('span', '•') }),
+                    ),
                 ),
               )
             : h(
@@ -327,11 +337,52 @@ describe('AppFrame rail', () => {
     expect(Math.abs(centreX(trigger) - 32)).toBeLessThanOrEqual(0.5);
   });
 
-  it('keeps the expanded brand at its inline padding', { timeout: 30_000 }, async () => {
+  it('starts the expanded brand mark at the rail-centred x', { timeout: 30_000 }, async () => {
     await page.viewport(1440, 900);
     mountFrame({ logo: true, sections: Sections });
     await expect.poll(() => width(sidebar()), Settled).toBe(248);
-    expect(Math.round(brand().querySelector('img')!.getBoundingClientRect().left)).toBe(10);
+    expect(Math.round(brand().querySelector('img')!.getBoundingClientRect().left)).toBe(18);
+  });
+
+  it('keeps the brand symbol and every menu icon still across collapse and expand', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ logo: true, wordmark: true, sections: Sections, isHomeUnlabelled: true });
+    /* The brand link's first child is its symbol; a menu link's first child is its leading icon box. */
+    const marks = (): HTMLElement[] =>
+      [brand().querySelector('a')!, ...links()].map((link) => link.firstElementChild as HTMLElement);
+    const boxes = (): number[][] =>
+      marks().map((mark) => {
+        const rect = mark.getBoundingClientRect();
+        return [rect.left, rect.top, rect.width, rect.height];
+      });
+    const largestShift = (from: number[][], to: number[][]): number =>
+      Math.max(...from.flatMap((box, index) => box.map((value, side) => Math.abs(value - to[index]![side]!))));
+
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    const expanded = boxes();
+    expect(expanded).toHaveLength(1 + Sections.flat().length);
+
+    await collapse();
+    expect(largestShift(expanded, boxes())).toBeLessThanOrEqual(0.5);
+
+    document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!.click();
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(largestShift(expanded, boxes())).toBeLessThanOrEqual(0.5);
+  });
+
+  it('draws no heading row for a section without a label', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ logo: true, sections: Sections, isHomeUnlabelled: true });
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    const home = sidebar().querySelector<HTMLElement>('nav > ul > li')!;
+    expect(home.querySelector(':scope > div')).toBeNull();
+    expect(home.querySelector('ul')!.hasAttribute('aria-labelledby')).toBe(false);
+    const barBottom = bar().getBoundingClientRect().bottom;
+    expect(Math.round(links()[0]!.getBoundingClientRect().top - barBottom)).toBe(12);
+    await collapse();
+    expect(Math.round(links()[0]!.getBoundingClientRect().top - barBottom)).toBe(12);
   });
 
   it('sets the first rail link 12px under the bar and centres every divider', { timeout: 30_000 }, async () => {
