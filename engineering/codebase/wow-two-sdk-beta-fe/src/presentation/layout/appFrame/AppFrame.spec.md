@@ -36,8 +36,8 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 - The `nav` slot receives `isRail` and `close`. A click on any link inside it closes the drawer. Growing to `lg`
   closes it too.
 - The toggle is a button named `collapseLabel`, `expandLabel` or `openNavigationLabel` by what it does, with
-  `aria-expanded` for the sidebar or the drawer. It is a 40 x 40px `Button` that reaches 44 x 44px under a coarse
-  pointer, the bar staying 56px.
+  `aria-expanded` for the sidebar or the drawer. It is a 40 x 40px `Button` whose hit area reaches 44 x 44px under a
+  coarse pointer while the box keeps its size, so the trail beside it does not move; the bar stays 56px.
 - `crumbs` render as a single-line `Breadcrumb` named `trailLabel`; a plain string is an item without a link. With
   `onNavigate`, a plain left click on a link whose `href` starts
   with one `/` is handed to the app's router; modified clicks and other origins keep the browser's behaviour. The
@@ -76,7 +76,10 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
   so the page grows into the space. `barClass` merges last and wins over these classes.
 - Attributes and `class` land on the frame root. Automatic attribute inheritance is disabled; the source explicitly
   forwards and merges supported fallthrough attributes.
-- Under a coarse pointer a link in the brand slot is at least 44 x 44px (`pointer-coarse:[&_a]:min-h-11`, `min-w-11`) while its mark keeps its size; the slotted link must be block-level or a flex item, as a link in a flex brand cell is. The app switcher's trigger already reaches 44px.
+- Under a coarse pointer a link in the brand slot takes the tap across an invisible 44 x 44px area centred on it (a
+  `::after` scoped to the slotted link, as `CoarseHitArea`), while the link and its mark keep their size and place —
+  in the rail the mark stays at the rail's centre. The frame makes the link `relative` and takes its `::after`. The app
+  switcher's trigger already reaches 44px.
 
 ## Props
 

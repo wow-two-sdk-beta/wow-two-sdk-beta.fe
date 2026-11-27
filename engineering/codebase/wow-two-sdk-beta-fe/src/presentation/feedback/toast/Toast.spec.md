@@ -15,9 +15,9 @@ Public import: `import { Toast } from '@wow-two-beta/fe/presentation/feedback';`
 - The `trailing` slot sits between the body and the close button — a countdown or a timestamp.
 - Close, Delete and Pin use circular icon buttons. `closeIndicator` draws a decorative ring inside the Close
   button. An explicit `isPinned` value shows a toggle whose accessible name stays stable when pressed.
-- Under a coarse pointer those buttons are 36px and an invisible 44px square centred on each (`pointer-coarse:after:`)
-  takes the tap, so the card keeps its height; the `details` toggle reaches 44px high. A fine pointer keeps the 24px
-  buttons.
+- Those buttons are 24px under either pointer; under a coarse one an invisible 44px square centred on each
+  (`pointer-coarse:after:`) takes the tap, so the card keeps its height and the icons their place. The `details`
+  toggle reaches 44px high.
 - The `details` slot adds a disclosure. Its scrollable content uses the full card width and stays available
   while the reader interacts with the card. The host may control it with `detailsOpen`.
 - `isCompact` reduces vertical spacing and lays out actions beside the text, with wrapping as needed.

@@ -25,6 +25,7 @@ export type {
   SurfaceAmbient,
 } from './SurfaceStyles';
 export { Layer, layerStyle, type LayerName } from './constants/Layers';
+export { CoarseHitArea } from './constants/HitAreas';
 export { Tone, Size, Radius, Padding } from './enums/StyleTokens';
 export type { Elevation } from './enums/StyleTokens';
 export { Tones, ToneFamily } from './constants/Tones';

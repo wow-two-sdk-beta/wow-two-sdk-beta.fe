@@ -1,4 +1,6 @@
 <script lang="ts">
+import { CoarseHitArea, cn } from '../../../foundation/styles';
+
 export interface PaginationProps {
   /** The total page count (1-based). */
   readonly total: number;
@@ -31,16 +33,18 @@ function buildPages(total: number, page: number, siblings: number): ReadonlyArra
   return pages;
 }
 
-/* 32px under a fine pointer, 44px under a coarse one (a finger). */
-const BaseButton =
-  'inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-transparent px-2 text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 pointer-coarse:h-11 pointer-coarse:min-w-11';
+/* 32px under either pointer; under a coarse one (a finger) an invisible 44px hit area centred on each button takes the
+   tap, so the numbers keep their place. Buttons closer than 44px share the overlap. */
+const BaseButton = cn(
+  'relative inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-transparent px-2 text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  CoarseHitArea.After,
+);
 </script>
 
 <script setup lang="ts">
 import { useLocale } from '../../../foundation/i18n';
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-vue-next';
-import { cn } from '../../../foundation/styles';
 import { Icon } from '../../../foundation/icons';
 
 const locale = useLocale();
@@ -83,7 +87,8 @@ function go(target: number): void {
   emit('update:page', next);
 }
 
-/* The taller, wider buttons of a coarse pointer wrap onto the next line rather than run past a phone's edge. */
+/* On a coarse pointer (a phone or tablet) a row too long for its container wraps onto the next line rather than run
+   past the screen's edge; a row that fits lies as a mouse sees it. */
 const classes = computed(() =>
   cn('inline-flex items-center gap-1 pointer-coarse:flex-wrap', attrs.class as string | undefined),
 );

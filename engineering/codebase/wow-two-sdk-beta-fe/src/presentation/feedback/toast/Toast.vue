@@ -75,13 +75,13 @@ const GlassClasses = [
 const GlassEdgeClass = 'data-[toast-surface=glass]:border-glass-edge';
 
 /**
- * @internal The classes shared by the card's icon-only controls: 24px under a fine pointer, 36px under a coarse one,
- * with an invisible 44px square centred on the button taking the tap, so the card keeps its height.
+ * @internal The classes shared by the card's icon-only controls: 24px under either pointer, with an invisible 44px
+ * square centred on the button taking a finger's tap, so the card keeps its height and the icons their place.
  */
 const IconControlClass =
   'grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors ' +
   'hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-1 ' +
-  'focus-visible:ring-ring pointer-coarse:relative pointer-coarse:size-9 pointer-coarse:after:absolute ' +
+  'focus-visible:ring-ring pointer-coarse:relative pointer-coarse:after:absolute ' +
   'pointer-coarse:after:top-1/2 pointer-coarse:after:left-1/2 pointer-coarse:after:size-11 ' +
   'pointer-coarse:after:-translate-1/2';
 </script>

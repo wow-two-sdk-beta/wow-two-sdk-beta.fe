@@ -131,6 +131,7 @@ const Cases: ReadonlyArray<TapCase> = [
     name: 'SearchInput clear button',
     render: () => h(SearchInput, { defaultValue: 'abc', 'aria-label': 'Search posts' }),
     selector: 'button',
+    byPoint: true,
     fineHeight: 32,
   },
   {
@@ -143,6 +144,7 @@ const Cases: ReadonlyArray<TapCase> = [
     name: 'PasswordInput reveal button',
     render: () => h(PasswordInput, { 'aria-label': 'Password' }),
     selector: 'button',
+    byPoint: true,
     fineHeight: 32,
   },
   {
@@ -161,6 +163,7 @@ const Cases: ReadonlyArray<TapCase> = [
     name: 'SelectPickerTrigger clear button',
     render: () => trigger(),
     selector: 'button:not([aria-haspopup])',
+    byPoint: true,
     fineHeight: 24,
   },
   {
@@ -291,7 +294,7 @@ function tapsLandOn(element: HTMLElement): boolean {
     [21, -21],
     [-21, 21],
     [21, 21],
-  ].every(([dx, dy]) => document.elementFromPoint(x + dx!, y + dy!) === element);
+  ].every(([dx, dy]) => element.contains(document.elementFromPoint(x + dx!, y + dy!)));
 }
 
 describe('form controls under a fine pointer', () => {

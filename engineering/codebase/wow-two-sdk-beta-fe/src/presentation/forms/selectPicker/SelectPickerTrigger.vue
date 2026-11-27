@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { SizeValue } from '../../../foundation/styles';
+import { CoarseHitArea, type SizeValue } from '../../../foundation/styles';
 import type { InputState } from '../InputStyles';
 import type { SelectPickerSize } from './SelectPicker.variants';
 
@@ -38,8 +38,9 @@ const TriggerClearBoxClasses = {
   lg: 'h-6 w-6',
 } as const;
 
-/** Contains the clear slot's extra width under a coarse pointer, so the slot holds the 44px button laid over it.
- *  `xs` is the dense step: its trigger and its clear button keep their own size. */
+/** Contains the clear slot's extra width under a coarse pointer, so the value text stops short of the clear button's
+ *  44px hit area; the slot is empty, so nothing shown moves. `xs` is the dense step: its trigger and its clear button
+ *  keep their own size. */
 const TriggerClearSlotClasses = {
   xs: '',
   sm: 'pointer-coarse:w-11',
@@ -47,12 +48,13 @@ const TriggerClearSlotClasses = {
   lg: 'pointer-coarse:w-11',
 } as const;
 
-/** Contains the clear button's 44 x 44px floor under a coarse pointer, filling the trigger's own 44px minimum. */
+/** Contains the clear button's invisible 44 x 44px hit area under a coarse pointer: the button and its icon keep their
+ *  size and place. */
 const TriggerClearTouchClasses = {
   xs: '',
-  sm: 'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
-  md: 'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
-  lg: 'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+  sm: CoarseHitArea.After,
+  md: CoarseHitArea.After,
+  lg: CoarseHitArea.After,
 } as const;
 
 /** Contains the vertical-divider height Tailwind classes per trigger size. */

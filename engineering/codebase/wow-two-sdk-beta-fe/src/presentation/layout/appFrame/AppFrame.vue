@@ -444,9 +444,13 @@ const headerClasses =
 /* A glass frame draws its lines in the theme's glass edge; a solid one in the border colour its bar already uses. */
 const edgeClass = computed(() => (isGlass.value ? 'border-glass-edge' : 'border-border'));
 
-/* The brand link is the app's own, often a small mark: under a coarse pointer it reaches a 44 x 44px hit area while
-   the mark inside keeps its size. */
-const brandLinkClasses = 'pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_a]:min-w-11';
+/* The brand link is the app's own, often a small mark: under a coarse pointer an invisible pseudo-element centred on it
+   (`CoarseHitArea`, scoped to the slotted link) reaches 44 x 44px, while the link and its mark keep their size and
+   place — a grown link would push a start-aligned mark off the rail's centre. */
+const brandLinkClasses =
+  'pointer-coarse:[&_a]:relative pointer-coarse:[&_a]:after:absolute pointer-coarse:[&_a]:after:top-1/2 ' +
+  'pointer-coarse:[&_a]:after:left-1/2 pointer-coarse:[&_a]:after:size-full pointer-coarse:[&_a]:after:min-h-11 ' +
+  'pointer-coarse:[&_a]:after:min-w-11 pointer-coarse:[&_a]:after:-translate-1/2';
 
 /* In the rail the brand centres over the rail's icons. The end padding holds the centring box at the rail's width
    while the cell narrows, so the mark does not slide, and is zero once it settles; `ps-px` balances the hairline. */

@@ -1,4 +1,4 @@
-import { tv, Tones, ColorTone, type VariantProps } from '../../../foundation/styles';
+import { tv, Tones, ColorTone, CoarseHitArea, type VariantProps } from '../../../foundation/styles';
 
 /** Defines the Button visual surface style. */
 export const ButtonVariant = {
@@ -73,9 +73,9 @@ export const buttonVariants = tv({
       // revealed (border + bg + foreground text). Per-tone reveal target set via
       // compoundVariants below. Pairs with `hoverSlot` for the icon-swap affordance.
       reveal: 'bg-transparent border-transparent',
-      // An inline text link keeps its text height under a coarse pointer too: it sits in a line of prose, which
-      // WCAG 2.5.8 exempts from the target size.
-      link: 'bg-transparent h-auto! p-0! rounded-none! underline-offset-4 hover:underline focus-visible:ring-offset-0 pointer-coarse:min-h-0! pointer-coarse:min-w-0!',
+      // An inline text link keeps its text height and takes no hit area under a coarse pointer (the touch compounds
+      // below skip it): it sits in a line of prose, which WCAG 2.5.8 exempts from the target size.
+      link: 'bg-transparent h-auto! p-0! rounded-none! underline-offset-4 hover:underline focus-visible:ring-offset-0',
       // Base = neutral/default tone: dark image-overlay wash + blur. Non-neutral tones resolve
       // through the shared `Tones.glass` palette via compoundVariants below (so tone + color
       // overrides apply). `backdrop-blur-md` stays here for every tone.
@@ -93,11 +93,11 @@ export const buttonVariants = tv({
       // min-h/min-w floor keeps the hit-target ≥ 24×24 (WCAG 2.2 SC 2.5.8) even when
       // --ui-density-scale < 1 would otherwise shrink it below the floor. Applies to
       // square/circle xs too (the min-h sets the box height; min-w the width).
-      // sm and md lift that floor to 44×44 under a coarse pointer (a finger), leaving the fine-pointer box as is;
-      // lg and xl are already taller, xs is the deliberately dense step.
+      // sm and md reach 44×44 under a coarse pointer (a finger) through the hit area in compoundVariants below,
+      // leaving the fine-pointer box as is; lg and xl are already taller, xs is the deliberately dense step.
       xs: 'h-[calc(1.5rem*var(--ui-density-scale,1))] min-h-6 min-w-6 px-[calc(0.5rem*var(--ui-density-scale,1))] text-xs rounded-sm gap-1',
-      sm: 'h-[calc(2rem*var(--ui-density-scale,1))] pointer-coarse:min-h-11 pointer-coarse:min-w-11 px-[calc(0.75rem*var(--ui-density-scale,1))] text-sm rounded-md gap-1.5',
-      md: 'h-[calc(2.5rem*var(--ui-density-scale,1))] pointer-coarse:min-h-11 pointer-coarse:min-w-11 px-[calc(1rem*var(--ui-density-scale,1))] text-sm rounded-md gap-2',
+      sm: 'h-[calc(2rem*var(--ui-density-scale,1))] px-[calc(0.75rem*var(--ui-density-scale,1))] text-sm rounded-md gap-1.5',
+      md: 'h-[calc(2.5rem*var(--ui-density-scale,1))] px-[calc(1rem*var(--ui-density-scale,1))] text-sm rounded-md gap-2',
       lg: 'h-[calc(3rem*var(--ui-density-scale,1))] px-[calc(1.5rem*var(--ui-density-scale,1))] text-base rounded-lg gap-2',
       xl: 'h-[calc(3.5rem*var(--ui-density-scale,1))] px-[calc(2rem*var(--ui-density-scale,1))] text-base rounded-lg gap-2.5',
     },
@@ -337,6 +337,23 @@ export const buttonVariants = tv({
     { variant: 'glass-surface', tone: 'danger', class: 'border-destructive/50' },
     { variant: 'glass-surface', tone: 'success', class: 'border-success/50' },
     { variant: 'glass-surface', tone: 'warning', class: 'border-warning/50' },
+
+    // === COARSE POINTER === sm and md reach 44 x 44px without moving what they show: an invisible `::before`
+    // (`::after` is the unavailable slash) centred on the box takes the tap, so the box and its icon keep their size
+    // and place. `relative` anchors it and yields to a caller's own position class through `cn`; the box stops
+    // clipping, which would cut the hit area. A text button also grows to 44px tall, its label centred; an icon
+    // shape keeps its box, since `aspect-square` would turn the height into width.
+    {
+      variant: ['solid', 'soft', 'surface', 'outline', 'ghost', 'reveal', 'glass', 'glass-surface'],
+      size: ['sm', 'md'],
+      class: `relative pointer-coarse:overflow-visible ${CoarseHitArea.Before}`,
+    },
+    {
+      variant: ['solid', 'soft', 'surface', 'outline', 'ghost', 'reveal', 'glass', 'glass-surface'],
+      size: ['sm', 'md'],
+      shape: 'default',
+      class: 'pointer-coarse:min-h-11',
+    },
 
     // === UNAVAILABLE === last, so the dashed border's colour beats every tone's own border colour.
     { unavailable: true, class: 'border-current/40' },

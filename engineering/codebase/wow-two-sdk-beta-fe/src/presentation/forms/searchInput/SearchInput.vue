@@ -53,7 +53,7 @@ import { useNativeFormReset } from '../UseNativeFormReset';
 import { computed, useAttrs, useTemplateRef } from 'vue';
 import type { ClassValue } from 'clsx';
 import { Search, X } from 'lucide-vue-next';
-import { cn } from '../../../foundation/styles';
+import { CoarseHitArea, cn } from '../../../foundation/styles';
 import { Icon } from '../../../foundation/icons';
 import { useControlled } from '../../../foundation/state';
 import { useFormControl } from '../../../foundation/primitives';
@@ -144,9 +144,10 @@ const passthroughAttrs = computed(() =>
 
 const wrapperClass = computed(() => cn('relative', attrs.class as ClassValue));
 
-/* Under a coarse pointer the clear button grows to the field's 44px floor and the text clears it; the dense `xs` field
-   keeps its own height, so its button stays as it is. */
-const touchClearClass = computed(() => (props.size === 'xs' ? '' : 'pointer-coarse:right-0 pointer-coarse:size-11'));
+/* Under a coarse pointer an invisible 44px hit area centred on the clear button takes the tap while the button and its
+   icon keep their place, and the text stops short of that area (`pointer-coarse:pr-11`: the text keeps its start, only
+   a long query cuts off sooner); the dense `xs` field keeps its own height, so its button stays as it is. */
+const touchClearClass = computed(() => (props.size === 'xs' ? '' : CoarseHitArea.After));
 
 const inputClass = computed(() =>
   cn(

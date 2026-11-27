@@ -11,7 +11,10 @@ Public import: `import { Pagination } from '@wow-two-beta/fe/presentation/nav';`
 - Each controlled axis has one Vue model name and one update event. Primary values use `modelValue` / `update:modelValue`; disclosure uses `open` / `update:open`. Named axes use their declared `update:*` event. Defaults seed uncontrolled state once; external updates do not emit intent.
 - Compose using the props, slots and events below. Preserve the rendered element’s native semantics and provide the required content/data.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
-- Under a coarse pointer every page button is at least 44 x 44px (`pointer-coarse:h-11`, `min-w-11`) and the row wraps onto the next line rather than past its container; a fine pointer keeps the 32px buttons in one line.
+- Page buttons are 32px under either pointer; under a coarse one an invisible 44 x 44px hit area centred on each
+  (`CoarseHitArea`) takes the tap, so the numbers keep their place, and buttons closer than 44px share the overlap. A
+  row too long for its container wraps onto the next line under a coarse pointer rather than run past it; a fine
+  pointer keeps one line.
 
 ## Props
 

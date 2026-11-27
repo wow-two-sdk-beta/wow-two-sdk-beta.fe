@@ -44,7 +44,7 @@ import { computed, onMounted, shallowRef, useAttrs, useSlots, useTemplateRef, wa
 import type { ClassValue } from 'clsx';
 import { Temporal as TemporalValue } from 'temporal-polyfill';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import { cn } from '../../../foundation/styles';
+import { CoarseHitArea, cn } from '../../../foundation/styles';
 import { useControlled } from '../../../foundation/state';
 import { Icon } from '../../../foundation/icons';
 import { addDays, nowZoned } from '../../forms/DateExtensions';
@@ -341,7 +341,8 @@ defineExpose({ el: root });
         <button
           type="button"
           :aria-label="locale.t('EventCalendarViewer.previous', undefined, 'Previous')"
-          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:size-11"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:relative"
+          :class="CoarseHitArea.After"
           @click="goPrev"
         >
           <Icon :icon="ChevronLeft" :size="16" />
@@ -352,7 +353,8 @@ defineExpose({ el: root });
         <button
           type="button"
           :aria-label="locale.t('EventCalendarViewer.next', undefined, 'Next')"
-          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:size-11"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted sm:size-7 pointer-coarse:relative"
+          :class="CoarseHitArea.After"
           @click="goNext"
         >
           <Icon :icon="ChevronRight" :size="16" />

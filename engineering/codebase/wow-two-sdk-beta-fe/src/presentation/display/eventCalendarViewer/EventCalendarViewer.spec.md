@@ -38,7 +38,8 @@ views in that canonical order, whatever order `views` is passed in; `month` is t
 - Prev, Next and the title follow the shown view: a year, month, week or day per step, and the agenda steps a day.
 - Previous and Next flank the period title. Below `sm`, the view switcher uses its own row.
 - The header's controls (Today, Previous, Next and the view switcher) are 44px tall below `sm` and 28px from it, and
-  reach 44 x 44px under a coarse pointer at any width.
+  reach 44 x 44px under a coarse pointer at any width: Today and the switcher grow to 44px tall, and Previous and
+  Next keep their box and take the tap across an invisible 44px square (`CoarseHitArea`), so the title stays put.
 - The views serve their phone layout (dots instead of chips, a day list instead of a time grid) when the device class
   an app root provided with `provideDeviceTargets` is phone, whatever the viewport; without a provider, below `sm`.
   The reading is `false` — the wide layout — on the server and in the first render, and corrects on mount.

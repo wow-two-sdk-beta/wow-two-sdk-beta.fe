@@ -14,11 +14,17 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
   accessible names, trailing content becomes inert, and section headings fade into dividers. Size the rail's width
   on the caller's container. Parts outside a `SidebarMenu` render expanded.
 - Width, placement and scrolling belong to the caller (for example `AppShellSidebar`).
+- Under a coarse pointer the menu widens by 4px a side and pads its rows back (`pointer-coarse:-mx-1 px-1`), and clips
+  what spills past them: the rows and their icons stay where a mouse sees them, and each row's 44px-wide hit area fits
+  inside the menu, a caller's own scroll box on the menu included. A caller must not add its own inline margin or
+  padding under a coarse pointer, which would move the rail's icons.
 
 ### SidebarMenuItem
 
 - Renders `<li><a>` with an icon, a truncated label and a trailing slot. `isActive` sets `aria-current="page"` and `data-active` (tinted).
-- The row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`).
+- The row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`), its content centred. Under
+  a coarse pointer an invisible hit area at least 44px wide (`CoarseHitArea`) covers a rail row narrower than that,
+  so its icon keeps its place, and the row stops clipping its content, which the menu clips instead.
 - `asChild` merges the row's classes and state onto the slotted router link. Mark the link's direct label child with
   `data-sidebar-menu-label` to use the same clipping and fade as the built-in label.
 - The icon is `aria-hidden`; fallthrough attributes and `class` reach the link; the exposed `el` is the link element.
@@ -28,7 +34,8 @@ Public import: `import { SidebarMenu, SidebarMenuItem, SidebarMenuGroup, Sidebar
 - A disclosure: the toggle row carries `aria-expanded` and `aria-controls`, and the nested list is named by `label`.
   The list animates in and out through `CollapsibleGroupContent` and stays mounted and inert when closed.
 - `open` / `update:open` and `defaultOpen` follow the shared controlled-state helper. Open the group that holds the active route through `defaultOpen`.
-- The toggle row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`), as a destination row is.
+- The toggle row is 36px under a fine pointer and 44px under a coarse one (`pointer-coarse:h-11`), with the same
+  44px-wide hit area as a destination row.
 - In the rail a group shows only its toggle: the nested list stays hidden (`aria-expanded="false"`), and its open state applies once the menu expands.
 
 ### SidebarMenuSection

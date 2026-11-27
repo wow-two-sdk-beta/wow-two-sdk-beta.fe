@@ -3,11 +3,12 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { h } from 'vue';
 import Toast from '@src/presentation/feedback/toast/Toast.vue';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
+import { reachOf } from '../../../support/TouchReach';
 import '@src/index.css';
 
 /**
- * Touch targets of the toast card: its icon-only buttons stay 24px (36px under a finger) and an invisible 44px square
- * centred on each takes the tap, so the card keeps its height; the details toggle reaches 44px.
+ * Touch targets of the toast card: its icon-only buttons stay 24px under either pointer and an invisible 44px square
+ * centred on each takes a finger's tap, so the card keeps its height; the details toggle reaches 44px.
  */
 
 let wrapper: VueWrapper | null = null;
@@ -83,12 +84,14 @@ describe.skipIf(!canEmulateCoarsePointer)('toast card under a coarse pointer', (
     await useFinePointer();
   });
 
-  it('gives the pin, delete and dismiss buttons a 44 x 44px tap area on a 36px button', () => {
+  it('gives the pin, delete and dismiss buttons a 44 x 44px tap area on their own 24px box', () => {
     mountCard();
     for (const button of iconButtons()) {
       const rect = button.getBoundingClientRect();
-      expect([Math.round(rect.width), Math.round(rect.height)]).toEqual([36, 36]);
-      expect(tapsLandOn(button)).toBe(true);
+      expect([Math.round(rect.width), Math.round(rect.height)]).toEqual([24, 24]);
+      const reach = reachOf(button);
+      expect(reach.width).toBeGreaterThanOrEqual(43.5);
+      expect(reach.height).toBeGreaterThanOrEqual(43.5);
     }
   });
 

@@ -18,7 +18,7 @@ import type { ClassValue } from 'clsx';
 import { ChevronRight } from 'lucide-vue-next';
 import { useId } from '../../../foundation/identifiers';
 import { useControlled } from '../../../foundation/state';
-import { cn } from '../../../foundation/styles';
+import { CoarseHitArea, cn } from '../../../foundation/styles';
 import CollapsibleGroup from '../../display/collapsibleGroup/CollapsibleGroup.vue';
 import CollapsibleGroupContent from '../../display/collapsibleGroup/CollapsibleGroupContent.vue';
 import { useSidebarMenuContext } from './SidebarMenuContext';
@@ -71,18 +71,19 @@ const rest = computed(() => {
 });
 
 const rootClasses = computed(() => cn('flex min-w-0 flex-col', attrs.class as ClassValue));
+
+/* The toggle row takes a destination row's coarse-pointer recipe: 44px tall, a 44px-wide hit area, no self-clipping. */
+const toggleClasses = cn(
+  'flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground transition-colors pointer-coarse:h-11 hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+  'pointer-coarse:relative pointer-coarse:overflow-visible',
+  CoarseHitArea.After,
+);
 </script>
 
 <template>
   <li v-bind="rest" :class="rootClasses" :data-state="isOpen ? 'open' : 'closed'">
     <CollapsibleGroup :open="isShown">
-      <button
-        type="button"
-        :aria-expanded="isShown"
-        :aria-controls="listId"
-        class="flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground transition-colors pointer-coarse:h-11 hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
-        @click="toggle"
-      >
+      <button type="button" :aria-expanded="isShown" :aria-controls="listId" :class="toggleClasses" @click="toggle">
         <span
           v-if="$slots.icon"
           class="inline-flex size-5 shrink-0 items-center justify-center text-muted-foreground"

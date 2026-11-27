@@ -5,6 +5,7 @@ import { page } from 'vitest/browser';
 import { TabsGroup, TabsGroupList, TabsGroupTab } from '@src/presentation/display/tabsGroup';
 import { Pagination } from '@src/presentation/nav/pagination';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
+import { reachOf } from '../../../support/TouchReach';
 import '@src/index.css';
 
 /**
@@ -87,17 +88,18 @@ describe.skipIf(!canEmulateCoarsePointer)('tabs and pagination under a coarse po
     }
   });
 
-  it('gives every page button a 44 x 44px hit area', () => {
+  it('gives every page button a 44 x 44px hit area on its own 32px box', () => {
     mountControl(pages);
     expect(pageButtons().length).toBeGreaterThan(5);
     for (const button of pageButtons()) {
-      const rect = button.getBoundingClientRect();
-      expect(rect.height).toBeGreaterThanOrEqual(44);
-      expect(rect.width).toBeGreaterThanOrEqual(44);
+      expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
+      const reach = reachOf(button);
+      expect(reach.height).toBeGreaterThanOrEqual(43.5);
+      expect(reach.width).toBeGreaterThanOrEqual(43.5);
     }
   });
 
-  it('keeps the taller page row inside its frame by wrapping it', () => {
+  it('keeps a page row too long for its frame inside it by wrapping it', () => {
     mountControl(pages);
     const frame = document.querySelector<HTMLElement>('[data-frame]')!.getBoundingClientRect();
     for (const button of pageButtons()) {

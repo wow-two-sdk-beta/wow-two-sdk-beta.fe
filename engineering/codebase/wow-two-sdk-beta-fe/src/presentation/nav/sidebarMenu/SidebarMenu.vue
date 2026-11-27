@@ -44,7 +44,15 @@ const rest = computed(() => {
   return others;
 });
 
-const classes = computed(() => cn('flex flex-col', attrs.class as ClassValue));
+/* Under a coarse pointer each row's hit area reaches 44px past a narrow rail's row (`CoarseHitArea`). The menu clips
+   what spills past its rows, so it widens by 4px a side and pads them back: the rows stay put, the hit areas fit
+   inside the clip, and a caller's own scroll box on this element keeps them too. */
+const classes = computed(() =>
+  cn(
+    'flex flex-col pointer-coarse:-mx-1 pointer-coarse:overflow-x-clip pointer-coarse:px-1',
+    attrs.class as ClassValue,
+  ),
+);
 </script>
 
 <template>

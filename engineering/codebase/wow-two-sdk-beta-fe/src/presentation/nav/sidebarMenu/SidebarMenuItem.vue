@@ -17,7 +17,7 @@ import { computed, useAttrs, useTemplateRef, type ComponentPublicInstance } from
 import type { ClassValue } from 'clsx';
 import { dataAttr, resolveElement } from '../../../foundation/dom';
 import { Primitive, Slottable } from '../../../foundation/primitives';
-import { cn } from '../../../foundation/styles';
+import { CoarseHitArea, cn } from '../../../foundation/styles';
 import Tooltip from '../../overlays/tooltip/Tooltip.vue';
 import { useSidebarMenuContext } from './SidebarMenuContext';
 
@@ -49,9 +49,14 @@ const rest = computed(() => {
   return others;
 });
 
+/* Under a coarse pointer the row grows to 44px tall, its content centred, and a 44px-wide hit area (`CoarseHitArea`)
+   covers a rail row narrower than that, so its icon keeps its place. The row then stops clipping, which would cut the
+   hit area; the menu clips instead (`SidebarMenu`). */
 const classes = computed(() =>
   cn(
     'group flex h-9 w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-sm font-medium text-foreground pointer-coarse:h-11',
+    'pointer-coarse:relative pointer-coarse:overflow-visible',
+    CoarseHitArea.After,
     'transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[active]:bg-primary-soft data-[active]:text-primary-soft-foreground',
     '*:data-[sidebar-menu-label]:min-w-0 *:data-[sidebar-menu-label]:flex-1 *:data-[sidebar-menu-label]:truncate *:data-[sidebar-menu-label]:text-start',

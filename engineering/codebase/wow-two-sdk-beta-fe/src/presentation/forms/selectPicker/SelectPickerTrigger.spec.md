@@ -12,7 +12,10 @@ Public import: `import { SelectPickerTrigger } from '@wow-two-beta/fe/presentati
   button, while the wrapper the clear control is positioned against keeps its own width.
 - Mount within the owner supplying `useSelectContext`; a compound part is not an independent root.
 - Automatic attribute inheritance is disabled; the source explicitly forwards and merges supported fallthrough attributes.
-- Under a coarse pointer the trigger is at least 44px high (the shared input floor), and the clear button reaches 44 x 44px inside the slot the trigger reserves for it, clear of the value and the chevron; a fine pointer keeps the 40px trigger and 24px button. The `xs` step stays dense.
+- Under a coarse pointer the trigger is at least 44px high (the shared input floor), and the 24px clear button takes the
+  tap across an invisible 44 x 44px area centred on it (`CoarseHitArea`), so the button and its icon keep their place;
+  the empty slot the trigger reserves widens to 44px, so the value stops short of that area. A fine pointer keeps the
+  40px trigger. The `xs` step stays dense.
 
 ## Props
 

@@ -251,9 +251,13 @@ function cellClass(cell: MonthCell): string {
   );
 }
 
+/* Under a coarse pointer the date grows to 44px tall, its number centred, and an invisible hit area at least 44px wide
+   runs from its start into the empty rest of its cell, so the number keeps its place and the first column's area is not
+   cut at the grid's edge. */
 function dateButtonClass(cell: MonthCell): string {
   return cn(
-    'mx-1 mb-1 mt-1 self-start justify-self-start rounded-sm px-1 text-xs tabular-nums transition-colors sm:max-lg:min-h-10 sm:max-lg:min-w-10 pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+    'mx-1 mb-1 mt-1 self-start justify-self-start rounded-sm px-1 text-xs tabular-nums transition-colors sm:max-lg:min-h-10 sm:max-lg:min-w-10 pointer-coarse:min-h-11',
+    'pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:inset-y-0 pointer-coarse:after:start-0 pointer-coarse:after:w-full pointer-coarse:after:min-w-11',
     cell.outOfMonth ? 'text-muted-foreground' : 'text-foreground',
     isToday(cell.day) && 'bg-primary text-primary-foreground',
     'hover:bg-muted',

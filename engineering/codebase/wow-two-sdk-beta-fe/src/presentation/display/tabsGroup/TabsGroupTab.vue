@@ -9,7 +9,7 @@ export interface TabsGroupTabProps {
 
 <script setup lang="ts">
 import { computed, mergeProps, shallowRef, useAttrs } from 'vue';
-import { cn, Orientation } from '../../../foundation/styles';
+import { CoarseHitArea, cn, Orientation } from '../../../foundation/styles';
 import { dataAttr } from '../../../foundation/dom';
 import { useRovingFocusItem } from '../../../foundation/primitives';
 import { useSkeletonState } from '../../feedback/skeletonState/SkeletonStateContext';
@@ -62,7 +62,10 @@ function onFocus(): void {
 
 const classes = computed(() =>
   cn(
-    'inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+    /* Under a coarse pointer a tab grows to 44px tall, its label centred, and a hit area at least 44px wide
+       (`CoarseHitArea`) covers a tab narrower than that, so its label keeps its place. */
+    'inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors pointer-coarse:relative pointer-coarse:min-h-11',
+    CoarseHitArea.After,
     'hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
     'data-[state=active]:text-foreground data-[state=active]:border-primary',
     tabs.orientation === Orientation.Vertical

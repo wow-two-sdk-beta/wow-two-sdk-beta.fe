@@ -15,6 +15,7 @@ import {
 } from 'vue';
 
 import type { FeedbackBus, NoticeNode, NoticeProgress, PublishedNotice, ToastPauseUntil } from '../../../feedback';
+import { CoarseHitArea, cn, surfaceVariants } from '../../../foundation/styles';
 
 /** Defines props for the notification center panel. */
 export interface NotificationCenterGroupProps {
@@ -44,11 +45,14 @@ interface NoticeBarProgress {
   label?: string;
 }
 
-/** @internal The classes shared by the header's icon buttons. */
+/**
+ * @internal The classes shared by the header's icon buttons: 28px under either pointer, with an invisible 44px hit
+ * area centred on each under a coarse one, so the icons keep their place.
+ */
 const HeaderActionClasses = [
-  'inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted',
+  'relative inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted',
   'hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-  'pointer-coarse:size-11',
+  CoarseHitArea.After,
 ];
 
 /** @internal The classes of the title's count badge. */
@@ -77,7 +81,6 @@ import { Bell, CheckCheck, ListX, X } from 'lucide-vue-next';
 import { useLocale, useLocaleDefaults } from '../../../foundation/i18n';
 import { Icon } from '../../../foundation/icons';
 import { renderableChildren } from '../../../foundation/primitives';
-import { cn, surfaceVariants } from '../../../foundation/styles';
 import ProgressBar from '../../feedback/progressBar/ProgressBar.vue';
 import ReportAction from '../../feedback/reportAction/ReportAction.vue';
 import RelativeTime from '../relativeTime/RelativeTime.vue';

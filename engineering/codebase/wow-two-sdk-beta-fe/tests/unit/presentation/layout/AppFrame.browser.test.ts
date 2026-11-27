@@ -7,6 +7,7 @@ import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppFrame } from '@src/presentation/layout';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuSection } from '@src/presentation/nav';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
+import { reachOf } from '../../../support/TouchReach';
 import '@src/index.css';
 
 const Cases = [
@@ -372,13 +373,14 @@ describe.skipIf(!canEmulateCoarsePointer)('AppFrame under a coarse pointer', () 
     await useFinePointer();
   });
 
-  it('gives the collapse control a 44 x 44px hit area at 1280px', { timeout: 30_000 }, async () => {
+  it('gives the collapse control a 44 x 44px hit area on its 40px box at 1280px', { timeout: 30_000 }, async () => {
     await page.viewport(1280, 800);
     mountFrame();
     const toggle = document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!;
-    await expect.poll(() => toggle.getBoundingClientRect().height, Settled).toBeGreaterThanOrEqual(44);
+    await expect.poll(() => reachOf(toggle).height, Settled).toBeGreaterThanOrEqual(43.5);
     expect(toggle.getAttribute('aria-label')).toBe('Collapse sidebar');
-    expect(toggle.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
+    expect(reachOf(toggle).width).toBeGreaterThanOrEqual(43.5);
+    expect(Math.round(toggle.getBoundingClientRect().width)).toBe(40);
     expect(bar().getBoundingClientRect().height).toBe(56);
   });
 
@@ -394,9 +396,9 @@ describe.skipIf(!canEmulateCoarsePointer)('AppFrame under a coarse pointer', () 
       await page.viewport(320, 640);
       mountFrame({ logo: true });
       await expect.poll(() => document.querySelector('[data-app-frame-brand] a'), Settled).not.toBeNull();
-      const rect = brandLink().getBoundingClientRect();
-      expect(rect.height).toBeGreaterThanOrEqual(44);
-      expect(rect.width).toBeGreaterThanOrEqual(44);
+      const reach = reachOf(brandLink());
+      expect(reach.height).toBeGreaterThanOrEqual(43.5);
+      expect(reach.width).toBeGreaterThanOrEqual(43.5);
       expect(bar().getBoundingClientRect().height).toBe(56);
       expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
     });
@@ -405,10 +407,19 @@ describe.skipIf(!canEmulateCoarsePointer)('AppFrame under a coarse pointer', () 
       await page.viewport(800, 800);
       mountFrame({ logo: true });
       await expect.poll(() => width(brand()), Settled).toBe(64);
-      const rect = brandLink().getBoundingClientRect();
-      expect(rect.height).toBeGreaterThanOrEqual(44);
-      expect(rect.width).toBeGreaterThanOrEqual(44);
+      const reach = reachOf(brandLink());
+      expect(reach.height).toBeGreaterThanOrEqual(43.5);
+      expect(reach.width).toBeGreaterThanOrEqual(43.5);
       expect(brand().scrollWidth).toBeLessThanOrEqual(brand().clientWidth);
+    });
+
+    it('keeps the brand mark at the rail centre in the rail of a tablet', { timeout: 30_000 }, async () => {
+      await page.viewport(800, 800);
+      mountFrame({ logo: true });
+      await expect.poll(() => width(brand()), Settled).toBe(64);
+      const mark = brandLink().querySelector('img')!.getBoundingClientRect();
+      expect(Math.abs(mark.left + mark.width / 2 - 32)).toBeLessThanOrEqual(0.5);
+      expect(Math.round(brandLink().getBoundingClientRect().width)).toBe(28);
     });
 
     it('keeps the mark itself at 28 x 28px', { timeout: 30_000 }, async () => {

@@ -5,6 +5,7 @@ import { Temporal } from 'temporal-polyfill';
 import EventCalendarViewer from '@src/presentation/display/eventCalendarViewer/EventCalendarViewer.vue';
 import type { EventCalendarViewerEvent } from '@src/presentation/display/eventCalendarViewer/EventCalendarViewerTypes';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
+import { reachOf } from '../../../support/TouchReach';
 import '@src/index.css';
 
 const at = (text: string): Temporal.ZonedDateTime => Temporal.ZonedDateTime.from(text + '[UTC]');
@@ -86,10 +87,14 @@ describe.skipIf(!canEmulateCoarsePointer)('EventCalendarViewer under a coarse po
       expect(buttons.some((button) => button.textContent?.includes('+1 more'))).toBe(true);
       expect(buttons.some((button) => button.hasAttribute('data-event-bar'))).toBe(true);
       expect(buttons.length).toBeGreaterThan(50);
+      // Read by tapping around each button: the arrows and the dates keep their box and take the tap on an
+      // invisible hit area, so their marks stay where a mouse sees them. The month scrolls inside its body, so each
+      // button is brought into view first.
       for (const button of buttons) {
-        const { width, height } = box(button);
-        expect(width, `${button.outerHTML.slice(0, 120)} is ${width} x ${height}`).toBeGreaterThanOrEqual(44);
-        expect(height, `${button.outerHTML.slice(0, 120)} is ${width} x ${height}`).toBeGreaterThanOrEqual(44);
+        button.scrollIntoView({ block: 'center', inline: 'center' });
+        const { width, height } = reachOf(button);
+        expect(width, `${button.outerHTML.slice(0, 120)} takes ${width} x ${height}`).toBeGreaterThanOrEqual(43.5);
+        expect(height, `${button.outerHTML.slice(0, 120)} takes ${width} x ${height}`).toBeGreaterThanOrEqual(43.5);
       }
     });
   }
