@@ -24,7 +24,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@src/presentation/forms';
-import { AppFrame } from '@src/presentation/layout';
+import { AppFrame, LockedHeadLayout } from '@src/presentation/layout';
 import { Pagination } from '@src/presentation/nav/pagination';
 import { SidebarMenu, SidebarMenuItem, SidebarMenuSection } from '@src/presentation/nav';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../support/CoarsePointer';
@@ -549,5 +549,23 @@ describe.skipIf(!canEmulateCoarsePointer)('a coarse pointer moves nothing the re
       ),
     ).toEqual([]);
     expectReach('the close button', reachOf(query('button[aria-label="Close notifications"]')));
+  });
+
+  it('keeps the head and the body of a locked-head page in an AppFrame at 1024 x 742', async () => {
+    await page.viewport(1024, 742);
+    const lockedPage = (): VNode =>
+      h(AppFrame, { version: '0.4.2', isCollapsedByDefault: true }, () =>
+        h(
+          LockedHeadLayout,
+          {},
+          {
+            head: () => h('div', { style: 'height: 120px' }, 'Banner and tabs'),
+            default: () => Array.from({ length: 30 }, (_, index) => h('p', { style: 'height: 48px' }, `Row ${index}`)),
+          },
+        ),
+      );
+    expect(await placeUnderBothPointers(lockedPage)).toEqual([]);
+    expect(query('main').hasAttribute('data-page-locked')).toBe(true);
+    expect(query('[data-locked-body]').hasAttribute('data-scroll-region')).toBe(true);
   });
 });

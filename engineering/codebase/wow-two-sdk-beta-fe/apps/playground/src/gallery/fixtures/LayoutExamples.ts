@@ -1,5 +1,6 @@
 import {
   AppFrame,
+  LockedHeadLayout,
   FieldsetLayout,
   InputAddonLayout,
   InputGroup,
@@ -115,6 +116,8 @@ export const layoutExamples: readonly SmokeCase[] = [
     },
     { slot: true },
   ),
+
+  smokeCase('LockedHeadLayout', LockedHeadLayout, {}, { slot: true }),
 
   smokeCase('AppShell', AppShell, {}, { slot: true }),
 

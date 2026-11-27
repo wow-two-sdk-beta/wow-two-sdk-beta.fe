@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { AccountMenuProps } from '../../nav/accountMenu/AccountMenu.vue';
 import type { AppSwitcherItem, AppSwitcherMenuProps } from '../../nav/appSwitcherMenu/AppSwitcherMenu.vue';
-import type { HTMLAttributes } from 'vue';
+import type { HTMLAttributes, InjectionKey, Ref } from 'vue';
 import type { SizeValue } from '../../../foundation/styles';
 import type { BreadcrumbItem } from '../../nav/breadcrumb/Breadcrumb.vue';
 import type { ContainerLayoutSize } from '../containerLayout/ContainerLayout.variants';
@@ -184,6 +184,36 @@ export interface AppFrameNavSlotProps {
   readonly close: () => void;
 }
 
+/** What a frame offers the page that owns its scrolling (`LockedHeadLayout`). */
+export interface AppFramePageContext {
+  /** True while a page is registered and the frame serves the tablet or desktop layout. */
+  readonly isLocked: Readonly<Ref<boolean>>;
+
+  /** The end padding the page column gives up while locked; the page's scroll region pads its end by it. */
+  readonly endClass: Readonly<Ref<string | undefined>>;
+
+  /** Registers a page that owns its scrolling; returns the call that unregisters it. */
+  readonly register: () => () => void;
+}
+
+/** Injects an `AppFrame`'s page context; absent outside a frame. */
+export const appFramePageKey: InjectionKey<AppFramePageContext> = Symbol('AppFramePage');
+
+/**
+ * @internal While a page is locked, main keeps its size and scrolls nothing: no scroll, no gutter, no end padding of
+ * its own.
+ */
+const LockedMainClass = 'overflow-hidden pb-0 [scrollbar-gutter:auto]';
+
+/**
+ * @internal While a page is locked, the page column and its width container are flex columns that give the page the
+ * height main leaves; the column's end padding moves to the page's scroll region (`LockedEndClass`).
+ */
+const LockedColumnClass = 'flex min-h-0 flex-col pb-0 sm:pb-0 xl:pb-0 *:flex *:min-h-0 *:flex-1 *:flex-col';
+
+/** @internal The page column's end padding, the `lg` gutter's bottom side. */
+const LockedEndClass = 'pb-3 sm:pb-6 xl:pb-8';
+
 /** @internal The default slot of the collapse choice in `localStorage`. */
 const DefaultCollapseStorageKey = 'wow-two.app-frame.sidebar-collapsed';
 
@@ -194,7 +224,7 @@ function decodeCollapsed(stored: unknown): boolean | undefined {
 </script>
 
 <script setup lang="ts">
-import { computed, inject, onBeforeUpdate, shallowRef, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, inject, onBeforeUpdate, provide, shallowRef, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import type { ClassValue } from 'clsx';
 import { PanelLeft } from 'lucide-vue-next';
 import {
@@ -344,6 +374,25 @@ const isPhoneLayout = computed(
 
 /** A forced phone is never also a desktop, however wide the viewport. */
 const isDesktop = computed(() => isViewportDesktop.value && !isPhoneLayout.value);
+
+/* Pages that own their scrolling, counted: a page entering before the last one leaves keeps the lock. A phone keeps
+   main scrolling the page. */
+const lockedPages = shallowRef(0);
+const isPageLocked = computed(() => lockedPages.value > 0 && !isPhoneLayout.value);
+
+provide(appFramePageKey, {
+  isLocked: isPageLocked,
+  endClass: computed(() => (props.contentWidth === AppFrameContentWidth.Default ? LockedEndClass : undefined)),
+  register: () => {
+    lockedPages.value += 1;
+    let isRegistered = true;
+    return () => {
+      if (!isRegistered) return;
+      isRegistered = false;
+      lockedPages.value -= 1;
+    };
+  },
+});
 
 /* The stored choice is read as the ref is created, so a collapsed sidebar never animates in from the open one. */
 const isCollapsed = createPersistentRef<boolean>(props.collapseStorageKey, props.isCollapsedByDefault, {
@@ -667,12 +716,16 @@ defineExpose({ el, mainEl, isRail, isCollapsed, isBarHidden, toggleSidebar, clos
         <slot name="nav-footer" :is-rail="isRail" />
       </div>
     </AppShellSidebar>
-    <AppShellMain ref="main" :class="['min-w-0 print:block print:overflow-visible', props.mainClass]">
+    <AppShellMain
+      ref="main"
+      :data-page-locked="dataAttr(isPageLocked)"
+      :class="['min-w-0 print:block print:overflow-visible', props.mainClass, isPageLocked && LockedMainClass]"
+    >
       <AppShellContent
         v-if="props.contentWidth === 'default'"
         gutter="lg"
         :max-width="props.contentMaxWidth ?? 'var(--frame-content-max)'"
-        :class="['print:p-0 print:*:max-w-none', props.contentClass]"
+        :class="['print:p-0 print:*:max-w-none', props.contentClass, isPageLocked && LockedColumnClass]"
       >
         <slot name="notice" />
         <slot />

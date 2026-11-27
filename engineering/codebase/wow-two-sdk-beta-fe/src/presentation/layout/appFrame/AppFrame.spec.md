@@ -10,6 +10,10 @@ Public import: `import { AppFrame } from '@wow-two-beta/fe/presentation/layout';
 ## Contract
 
 - The frame composes `AppShell`: the bar, the sidebar and a phone's bottom bar hold still and the main region scrolls.
+- A page that owns its scrolling registers through `appFramePageKey` (`LockedHeadLayout` does). While one is
+  registered and the frame does not serve the phone layout, main carries `data-page-locked`, scrolls nothing and
+  drops its end padding, and main and the page column become flex columns with `min-h-0`, so the page fills the
+  height main leaves it. The column's end padding moves to the page's scroll region. CSS only: nothing is measured.
 - Dimensions come from the `--frame-*` tokens in `styles.css`, the same in every theme: `--frame-bar-height` (56px,
   hairline included), `--frame-sidebar-width` (248px), `--frame-rail-width` (64px) and `--frame-content-max` (1536px).
   An app offsets its own chrome by them (`top-(--frame-bar-height)`); it does not redefine them.
