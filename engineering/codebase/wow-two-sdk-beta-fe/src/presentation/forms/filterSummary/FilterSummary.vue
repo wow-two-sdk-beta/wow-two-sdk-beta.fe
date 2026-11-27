@@ -22,6 +22,9 @@ export interface FilterSummaryProps {
   readonly isCounting?: boolean;
   /** The advanced filters in effect; above 0 the filters button carries a badge with the number. Default 0. */
   readonly activeFilterCount?: number;
+  /** The filters state: an app with no advanced filters sets it false, which drops the filters button and the
+   *  `filters-trigger` slot. Default true. */
+  readonly hasFilters?: boolean;
   /** The words of the summary; see `FilterSummaryLabels`. */
   readonly labels?: FilterSummaryLabels;
 }
@@ -51,6 +54,7 @@ defineOptions({ name: 'FilterSummary', inheritAttrs: false });
 const props = withDefaults(defineProps<FilterSummaryProps>(), {
   isCounting: false,
   activeFilterCount: 0,
+  hasFilters: true,
   labels: undefined,
 });
 
@@ -62,7 +66,8 @@ const emit = defineEmits<{
 }>();
 
 defineSlots<{
-  /** Replaces the filters button, so an app can wrap `FilterSummaryFiltersButton` in a trigger with `as-child`. */
+  /** Replaces the filters button, so an app can wrap `FilterSummaryFiltersButton` in a trigger with `as-child`; not
+   *  rendered while `hasFilters` is false. */
   'filters-trigger'?(): unknown;
 }>();
 
@@ -122,7 +127,7 @@ function onClear(event: MouseEvent): void {
 
 <template>
   <div role="group" :aria-label="groupLabel" data-filter-summary="" v-bind="passthroughAttrs" :class="rootClass">
-    <Tooltip :content="filtersLabel">
+    <Tooltip v-if="props.hasFilters" :content="filtersLabel">
       <slot name="filters-trigger">
         <FilterSummaryFiltersButton @click="emit('open-filters')" />
       </slot>

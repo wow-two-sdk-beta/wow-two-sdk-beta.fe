@@ -23,6 +23,8 @@ Public import: `import { FilterSummary, FilterSummaryFiltersButton } from '@wow-
   `FilterSummaryFiltersButton` in its own trigger with `as-child` (a `ModalTrigger` for a sheet, a `PopoverTrigger`
   for a panel). The button reads `activeFilterCount` and the filters label from the summary around it, and its root is
   the button element, so the trigger's attributes and handlers land on it.
+- `hasFilters` false renders no filters button and no `filters-trigger` slot: an app with no advanced filters gets a
+  pill of the count and the clear button only.
 - Above 0 active filters the filters button carries a badge (`99+` above 99), hidden from assistive tech; the
   accessible name becomes `{filters} ({count})`.
 - The group is `role="group"` named `Filter results` by default; a fallthrough `aria-label` replaces the name.
@@ -59,6 +61,7 @@ pill's outer edge: the two hit areas never meet (the count sits between them) an
 | `isFiltered` | `boolean` | yes | — | The filtered state; the clear button is disabled without it. |
 | `isCounting` | `boolean` | no | `false` | The counting state: a quiet placeholder over the kept count box. |
 | `activeFilterCount` | `number` | no | `0` | The advanced filters in effect; above 0 the filters button shows a badge. |
+| `hasFilters` | `boolean` | no | `true` | The filters state; `false` renders no filters button and no `filters-trigger` slot. |
 | `labels` | `FilterSummaryLabels` | no | — | The words; each one left out falls back to the locale, then to English. |
 
 `FilterSummaryLabels`, with locale keys `FilterSummary.{clear,filters,match,compactMatch}` and `FilterSummary.group`
@@ -84,7 +87,7 @@ for the group name:
 
 | Slot | Props | Meaning |
 |---|---|---|
-| `filters-trigger` | — | Replaces the filters button; wrap `FilterSummaryFiltersButton` in a trigger with `as-child`. |
+| `filters-trigger` | — | Replaces the filters button; wrap `FilterSummaryFiltersButton` in a trigger with `as-child`. Not rendered while `hasFilters` is false. |
 
 ## Exposed handle
 

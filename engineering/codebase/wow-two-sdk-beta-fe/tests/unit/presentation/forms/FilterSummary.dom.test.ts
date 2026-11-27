@@ -85,6 +85,25 @@ describe('FilterSummary', () => {
     expect(wrapper.emitted('open-filters')).toHaveLength(1);
   });
 
+  it('renders no filters button and no filters-trigger slot when hasFilters is false', () => {
+    const wrapper = mount(
+      {
+        render: () =>
+          h(
+            FilterSummary,
+            { matched: 3, total: 9, isFiltered: true, hasFilters: false },
+            { 'filters-trigger': () => h('button', { 'data-app-trigger': '' }, 'Open') },
+          ),
+      },
+      { attachTo: document.body },
+    );
+    wrappers.push(wrapper);
+    expect(wrapper.find('[data-filter-summary-filters]').exists()).toBe(false);
+    expect(wrapper.find('[data-app-trigger]').exists()).toBe(false);
+    expect(wrapper.find('[data-filter-summary-count]').exists()).toBe(true);
+    expect(wrapper.find('[data-filter-summary-clear]').exists()).toBe(true);
+  });
+
   it('badges the filters button above 0 active filters and names the count', async () => {
     const wrapper = render({ activeFilterCount: 0 });
     expect(wrapper.find('[data-filter-summary-badge]').exists()).toBe(false);
