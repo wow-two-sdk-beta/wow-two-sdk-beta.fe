@@ -5,7 +5,7 @@ import { page } from 'vitest/browser';
 import { DeviceClass, DeviceClassKey, type DeviceClassState } from '@src/foundation/device';
 import { getTheme, themeToCss } from '@src/foundation/themes';
 import { AppFrame } from '@src/presentation/layout';
-import { SidebarMenu, SidebarMenuItem } from '@src/presentation/nav';
+import { SidebarMenu, SidebarMenuItem, SidebarMenuSection } from '@src/presentation/nav';
 import { canEmulateCoarsePointer, useCoarsePointer, useFinePointer } from '../../../support/CoarsePointer';
 import '@src/index.css';
 
@@ -64,12 +64,22 @@ function mountFrame(
     brand?: string;
     /** Brands the frame as SCFD does: a flex link around a 28px mark, named by its label alone. */
     logo?: boolean;
+    /** Lays the sidebar out as SCFD does: labelled sections of links. */
+    sections?: ReadonlyArray<ReadonlyArray<string>>;
+    /** Puts the brand behind the app switcher, whose compact trigger is the rail's brand. */
+    apps?: boolean;
   } = {},
 ): void {
   wrapper = mount(AppFrame, {
     props: {
       version: options.version ?? '0.4.2',
       ...(options.runningVersion === undefined ? {} : { runningVersion: options.runningVersion }),
+      ...(options.apps
+        ? {
+            apps: [{ key: 'console', label: 'Console', href: 'https://console.example.com/', kind: 'app' as const }],
+            currentApp: 'console',
+          }
+        : {}),
       crumbs: [{ label: 'Operations', href: '/ops' }, { label: 'Release 42' }],
     },
     global: options.effective ? { provide: { [DeviceClassKey as symbol]: deviceState(options.effective) } } : {},
@@ -88,14 +98,22 @@ function mountFrame(
             ),
       nav: ({ isRail }) =>
         h(SidebarMenu, { isCollapsed: isRail }, () =>
-          h(
-            SidebarMenuItem,
-            { href: '#/one' },
-            {
-              default: () => 'One',
-              icon: () => h('span', { 'data-test': 'nav-mark' }, '1'),
-            },
-          ),
+          options.sections
+            ? options.sections.map((links, index) =>
+                h(SidebarMenuSection, { label: `Section ${index + 1}` }, () =>
+                  links.map((link) =>
+                    h(SidebarMenuItem, { href: `#/${link}` }, { default: () => link, icon: () => h('span', '•') }),
+                  ),
+                ),
+              )
+            : h(
+                SidebarMenuItem,
+                { href: '#/one' },
+                {
+                  default: () => 'One',
+                  icon: () => h('span', { 'data-test': 'nav-mark' }, '1'),
+                },
+              ),
         ),
       default: () => 'Page',
       ...(options.hasPhoneNav
@@ -244,6 +262,105 @@ describe('AppFrame brand cell', () => {
     expect(badgeInsideCell()).toBe(true);
     expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth);
     expect(text.textContent).toBe('v0.4.2');
+  });
+});
+
+describe('AppFrame rail', () => {
+  /** SCFD's sidebar: a home section, then two more, each drawn as a divider in the rail. */
+  const Sections = [['Home'], ['Orders', 'Returns'], ['Settings']] as const;
+
+  afterAll(async () => {
+    await page.viewport(414, 896);
+  });
+
+  const links = (): HTMLElement[] => Array.from(sidebar().querySelectorAll<HTMLElement>('a[href]'));
+  const dividers = (): HTMLElement[] =>
+    Array.from(sidebar().querySelectorAll<HTMLElement>('li > div > span[aria-hidden="true"]')).filter(
+      (divider) => getComputedStyle(divider).display !== 'none',
+    );
+  const centreX = (element: Element): number => {
+    const rect = element.getBoundingClientRect();
+    return rect.left + rect.width / 2;
+  };
+
+  /** Collapses a desktop frame and waits until the rail and its section rows have settled. */
+  async function collapse(): Promise<void> {
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!.click();
+    await expect.poll(() => width(sidebar()), Settled).toBe(64);
+    await expect.poll(() => width(brand()), Settled).toBe(64);
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
+
+  it('centres the brand mark over the rail at 1440px', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ logo: true, sections: Sections });
+    await collapse();
+    const mark = brand().querySelector('img')!;
+    const icon = links()[0]!.querySelector('span')!;
+    expect(Math.abs(centreX(mark) - 32)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(centreX(mark) - centreX(icon))).toBeLessThanOrEqual(0.5);
+    expect(brand().scrollWidth).toBeLessThanOrEqual(brand().clientWidth);
+  });
+
+  it('holds the brand mark at the rail centre while the cell narrows', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ logo: true, sections: Sections });
+    document.querySelector<HTMLElement>('[data-app-frame]')!.style.setProperty('--duration-base', '800ms');
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    document.querySelector<HTMLButtonElement>('[data-app-frame-toggle]')!.click();
+    await expect
+      .poll(() => {
+        const current = width(brand());
+        return current > 70 && current < 240;
+      }, Settled)
+      .toBe(true);
+    expect(Math.abs(centreX(brand().querySelector('img')!) - 32)).toBeLessThanOrEqual(0.5);
+  });
+
+  it('centres the compact app switcher over the rail at 1440px', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ apps: true, sections: Sections });
+    await collapse();
+    const trigger = brand().querySelector('[data-app-switcher-mark]')!;
+    expect(Math.abs(centreX(trigger) - 32)).toBeLessThanOrEqual(0.5);
+  });
+
+  it('keeps the expanded brand at its inline padding', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ logo: true, sections: Sections });
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    expect(Math.round(brand().querySelector('img')!.getBoundingClientRect().left)).toBe(10);
+  });
+
+  it('sets the first rail link 12px under the bar and centres every divider', { timeout: 30_000 }, async () => {
+    await page.viewport(1440, 900);
+    mountFrame({ logo: true, sections: Sections });
+    await expect.poll(() => width(sidebar()), Settled).toBe(248);
+    const sections = Array.from(sidebar().querySelectorAll<HTMLElement>('nav > ul > li'));
+    const expanded = sections.map((section) => section.getBoundingClientRect().height);
+    await collapse();
+
+    const barBottom = bar().getBoundingClientRect().bottom;
+    expect(Math.round(links()[0]!.getBoundingClientRect().top - barBottom)).toBe(12);
+
+    const rows = dividers();
+    expect(rows).toHaveLength(Sections.length - 1);
+    for (const divider of rows) {
+      const line = divider.getBoundingClientRect();
+      const below = divider.closest('li')!.querySelector('a[href]')!.getBoundingClientRect();
+      const above = links()
+        .map((link) => link.getBoundingClientRect())
+        .filter((rect) => rect.bottom <= line.top)
+        .at(-1)!;
+      const gapAbove = line.top - above.bottom;
+      const gapBelow = below.top - line.bottom;
+      expect(Math.abs(gapAbove - gapBelow)).toBeLessThanOrEqual(1);
+    }
+    // Every section after the first keeps its height, so the toggle moves no link but the first section's.
+    sections.slice(1).forEach((section, index) => {
+      expect(Math.round(section.getBoundingClientRect().height)).toBe(Math.round(expanded[index + 1]!));
+    });
   });
 });
 

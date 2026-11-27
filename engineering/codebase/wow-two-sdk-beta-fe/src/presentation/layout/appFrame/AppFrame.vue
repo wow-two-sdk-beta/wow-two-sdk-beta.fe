@@ -448,9 +448,14 @@ const edgeClass = computed(() => (isGlass.value ? 'border-glass-edge' : 'border-
    the mark inside keeps its size. */
 const brandLinkClasses = 'pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_a]:min-w-11';
 
+/* In the rail the brand centres over the rail's icons. The end padding holds the centring box at the rail's width
+   while the cell narrows, so the mark does not slide, and is zero once it settles; `ps-px` balances the hairline. */
 const brandCellClasses = computed(() =>
   cn(
-    'flex w-(--frame-sidebar-size) shrink-0 items-center overflow-hidden border-e ps-2.5 pe-1.5',
+    'flex w-(--frame-sidebar-size) shrink-0 items-center overflow-hidden border-e',
+    isRail.value
+      ? 'justify-center ps-px pe-[calc(var(--frame-sidebar-size)-var(--frame-rail-width))]'
+      : 'ps-2.5 pe-1.5',
     brandLinkClasses,
     edgeClass.value,
   ),
@@ -548,11 +553,12 @@ defineExpose({ el, mainEl, isRail, isCollapsed, isBarHidden, toggleSidebar, clos
             <template v-if="slots.brand" #mark><slot name="brand" :is-rail="true" /></template>
           </AppSwitcherMenu>
           <slot v-else name="brand" :is-rail="isRail" />
+          <!-- In the rail the version takes no width at once, so the centred brand does not drift while it folds. -->
           <div
             v-if="props.version"
             :inert="isRail"
             class="grid min-w-0 motion-safe:transition-[grid-template-columns,opacity] motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
-            :class="isRail ? 'grid-cols-[0fr] opacity-0' : 'grid-cols-[1fr]'"
+            :class="isRail ? 'max-w-0 grid-cols-[0fr] opacity-0' : 'grid-cols-[1fr]'"
           >
             <div class="min-w-0 overflow-hidden">
               <VersionBadge

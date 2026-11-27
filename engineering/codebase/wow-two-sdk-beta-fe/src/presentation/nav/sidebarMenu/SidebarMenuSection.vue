@@ -30,14 +30,32 @@ const rest = computed(() => {
   return others;
 });
 
+const Motion = 'motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)';
+
+/* In the rail the heading row grows to the padding it replaces, so a section keeps its height, and its divider sits
+   18px from the item above and below. The first section has no divider: its row and the gap under it close, so the
+   first item sits on the nav's own padding. */
 const classes = computed(() =>
-  cn('group/sidebar-section flex min-w-0 flex-col gap-0.5 pt-3 first:pt-0', attrs.class as ClassValue),
+  cn(
+    'group/sidebar-section flex min-w-0 flex-col gap-0.5 motion-safe:transition-[padding-top]',
+    Motion,
+    context.isCollapsed ? 'pt-0' : 'pt-3 first:pt-0',
+    attrs.class as ClassValue,
+  ),
+);
+
+const headingClasses = computed(() =>
+  cn(
+    'relative overflow-hidden motion-safe:transition-[height,margin-bottom]',
+    Motion,
+    context.isCollapsed ? 'h-8 group-first/sidebar-section:-mb-0.5 group-first/sidebar-section:h-0' : 'h-5',
+  ),
 );
 </script>
 
 <template>
   <li v-bind="rest" :class="classes">
-    <div class="relative h-5">
+    <div :class="headingClasses">
       <span
         :id="labelId"
         class="block truncate px-2.5 pb-1 text-xs font-medium text-muted-foreground motion-safe:transition-opacity motion-safe:duration-(--duration-base) motion-safe:ease-(--ease-out)"
