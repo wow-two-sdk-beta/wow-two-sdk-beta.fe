@@ -55,8 +55,11 @@
 //  - The scroll container itself — that is `foundation/primitives`' `ScrollViewport` (see above).
 //  - Grid/2D windowing and sticky headers — this is the primitive they would build on.
 //
-// PAGING, NOT WINDOWING: `useAdaptiveList` loads the next cursor page when a sentinel after the last item nears the
-// viewport. It never removes an item from the DOM; pair it with `useVirtualList` over its `items` for a long feed.
+// PAGING: `useLoadMore` is the one mechanism for every long grid, list, table or feed — the first page, a
+// `Show more` button (`presentation/actions` `LoadMoreButton`) at its end, then every later page loads by itself as
+// the end nears, sized and timed by the reader's scroll speed (`useAdaptiveWindow`), windowed in automatic mode.
+// Sources come from `cursorPaging` / `offsetPaging`; live arrivals wait behind `NewItemsButton`.
+// `useAdaptiveList` is deprecated: it pages from a sentinel with no gate and no windowing.
 
 export {
   buildMeasurements,
@@ -82,7 +85,30 @@ export {
 } from './Windowing';
 
 export { useVirtualList, type UseVirtualListOptions, type VirtualItem, type VirtualList } from './UseVirtualList';
-export { continuationSize, useAdaptiveWindow, type UseAdaptiveWindowOptions } from './UseAdaptiveWindow';
+export {
+  continuationSize,
+  useAdaptiveWindow,
+  MaxKeptWindowItems,
+  type AdaptiveRange,
+  type AdaptiveWindow,
+  type UseAdaptiveWindowOptions,
+} from './UseAdaptiveWindow';
+
+export {
+  LoadMoreState,
+  type DataRegionBinding,
+  type LoadMorePage,
+  type LoadMorePhase,
+  type LoadMoreRequest,
+  type LoadMoreRow,
+  type LoadMoreSnapshot,
+  type LoadMoreSource,
+  type LoadMoreWindow,
+  type PageSizeBounds,
+} from './LoadMoreModels';
+export { clampPageSizes, cursorPaging, offsetPaging } from './LoadMorePaging';
+export { LoadMorePageExtensions } from './LoadMorePageExtensions';
+export { DefaultPageSizes, loadMoreQueryKey, useLoadMore, type LoadMore, type UseLoadMoreOptions } from './UseLoadMore';
 
 export {
   useAdaptiveList,

@@ -84,7 +84,12 @@ export interface AdaptiveList<TItem> {
   readonly reset: () => Promise<void>;
 }
 
-/** Returns a cursor-paged list that loads its next page before the sentinel after the last item scrolls into view. */
+/**
+ * Returns a cursor-paged list that loads its next page before the sentinel after the last item scrolls into view.
+ *
+ * @deprecated Use `useLoadMore` with `LoadMoreButton` — the `Show more` gate, speed-sized pages, windowing and live
+ * data. Kept while fe-events `EventsFeed.vue` and the playground still call it; removed once they migrate.
+ */
 export function useAdaptiveList<TItem, TCursor = string>(
   options: UseAdaptiveListOptions<TItem, TCursor>,
 ): AdaptiveList<TItem> {

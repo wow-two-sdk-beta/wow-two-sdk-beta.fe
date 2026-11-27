@@ -143,7 +143,7 @@ Every shipped component in `@wow-two-beta/ui`, grouped by presentation group + f
 | [`ProgressBar`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/progressBar/) | Linear progress. |
 | [`ProgressCircle`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/progressCircle/) | Circular progress indicator. |
 | [`ProgressSteps`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/progressSteps/) | Visual N-of-M step indicator with connectors. |
-| [`Skeleton`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/skeleton/) | Pulsing placeholder block during loading. |
+| [`Skeleton`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/skeleton/) | Placeholders shaped like content that has not arrived. |
 | [`Spinner`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/spinner/) | Indeterminate loading spinner. |
 | [`StatusIndicator`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/statusIndicator/) | Two-line status block — colored dot + label + helper. |
 | [`Toast`](../codebase/wow-two-front-beta-sdk/src/presentation/feedback/toast/) | Slotted toast — visual only. |

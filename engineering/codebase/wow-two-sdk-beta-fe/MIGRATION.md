@@ -1,10 +1,29 @@
 # @wow-two-beta/fe migration
 
-*Last updated: 2026-11-17*
+*Last updated: 2026-11-27*
 
 Consumer-facing changes per published version, newest first. The package was `@wow-two-beta/ui-vue` through
 `0.0.17`; `@wow-two-beta/fe` continues the same `0.0.y` sequence. React is parked and has a different public API;
 importing the Vue package is not a symbol-for-symbol package swap.
+
+## `0.0.72` — load more
+
+New in `foundation/virtualization`: `useLoadMore` (first page, `Show more` gate, then pages by scroll speed; live
+inserts, failure episodes, snapshot / restore), `cursorPaging`, `offsetPaging`, `fromTokenPage`, `fromOffsetPage`,
+`clampPageSizes`, `DefaultPageSizes`, `LoadMoreState` and the load-more models. New in `presentation/actions`:
+`LoadMoreButton` and `NewItemsButton`. Contracts:
+[UseLoadMore.spec.md](src/foundation/virtualization/UseLoadMore.spec.md).
+
+Breaks:
+
+| Was (`0.0.71`) | Now |
+|---|---|
+| `useAdaptiveWindow(list, { enabled, … })` | `isWindowed` replaces `enabled`; it only switches DOM windowing — requests follow `canLoad` alone, so turn `canLoad` off to hold them |
+| `useAdaptiveWindow(…)` returned the range (`ComputedRef<{ start, end, paddingStart, paddingEnd }>`) | returns `{ range, columns, viewport, scroller, scrollListTo, anchor }`; read `.range.value` |
+| grid rows were `cardWidth / cardAspectRatio` + gap | rendered grid rows are measured (tallest card + gap); the ratio is the estimate for rows not rendered yet |
+
+Deprecated, not removed: `useAdaptiveList` — move to `useLoadMore` + `LoadMoreButton`; it is removed after its last
+consumers (fe-events `EventsFeed.vue`, the playground) migrate.
 
 ## Next release — notifications overhaul
 

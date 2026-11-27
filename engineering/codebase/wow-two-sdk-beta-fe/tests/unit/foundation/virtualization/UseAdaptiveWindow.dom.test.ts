@@ -198,11 +198,11 @@ async function mountWindow(options: Options = {}) {
   });
   const load = vi.fn<Load>(options.load?.(state) ?? (() => new Promise<boolean>(() => undefined)));
   const listRef = shallowRef<HTMLElement | null>(null);
-  let range!: ReturnType<typeof useAdaptiveWindow>;
+  let range!: ReturnType<typeof useAdaptiveWindow>['range'];
   const hookOptions: UseAdaptiveWindowOptions = {
     count: () => state.count,
     grid: () => state.grid,
-    enabled: () => state.enabled,
+    isWindowed: () => state.enabled,
     canLoad: () => state.canLoad,
     pageSizes: () => ({ minimum: state.minimum, maximum: state.maximum }),
     load,
@@ -215,7 +215,7 @@ async function mountWindow(options: Options = {}) {
   const wrapper = mount(
     defineComponent({
       setup() {
-        range = useAdaptiveWindow(listRef, hookOptions);
+        range = useAdaptiveWindow(listRef, hookOptions).range;
         return () =>
           h(
             'div',
@@ -257,10 +257,10 @@ describe('useAdaptiveWindow range', () => {
     const scope = effectScope();
     scope.run(() => {
       const state = reactive({ count: 30 });
-      const range = useAdaptiveWindow(shallowRef<HTMLElement | null>(null), {
+      const { range } = useAdaptiveWindow(shallowRef<HTMLElement | null>(null), {
         count: () => state.count,
         grid: () => false,
-        enabled: () => true,
+        isWindowed: () => true,
         canLoad: () => false,
         pageSizes: () => ({ minimum: 10, maximum: 50 }),
         load: async () => false,
@@ -427,8 +427,14 @@ describe('useAdaptiveWindow continuation', () => {
     expect(load).not.toHaveBeenCalled();
   });
 
-  it('loads nothing while the window is disabled', async () => {
-    const { load } = await mountWindow({ state: { count: 6, canLoad: true, enabled: false } });
+  it('still requests while windowing is off, because requests follow canLoad alone', async () => {
+    const { load, range } = await mountWindow({ state: { count: 6, canLoad: true, enabled: false } });
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(range()).toEqual({ start: 0, end: 6, paddingStart: 0, paddingEnd: 0 });
+  });
+
+  it('loads nothing while canLoad is false', async () => {
+    const { load } = await mountWindow({ state: { count: 6, canLoad: false } });
     expect(load).not.toHaveBeenCalled();
   });
 

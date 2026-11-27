@@ -4,6 +4,9 @@ Returns a cursor-paged list that loads its next page before the reader reaches t
 
 Public import: `import { useAdaptiveList } from '@wow-two-beta/fe/foundation/virtualization';`.
 
+> **Deprecated** since `0.0.72`: use [`useLoadMore`](UseLoadMore.spec.md) with `LoadMoreButton`. It stays until its
+> last consumers (fe-events `EventsFeed.vue`, the playground `FormsGroup.vue`) move, then it is removed.
+
 ## Contract
 
 - Headless and network-free: the consumer supplies `load(cursor, signal)`, binds `sentinel` to an empty element after the last item and renders `items`.
@@ -19,26 +22,26 @@ Public import: `import { useAdaptiveList } from '@wow-two-beta/fe/foundation/vir
 
 ## Options
 
-| Option       | Type                                                      | Required | Default               | Meaning                                                              |
-| ------------ | --------------------------------------------------------- | -------- | --------------------- | -------------------------------------------------------------------- |
-| `load`       | `(cursor: TCursor \| null, signal: AbortSignal) => Promise<AdaptiveListPage<TItem, TCursor>>` | yes | — | Loads one page.                                                      |
-| `root`       | `MaybeRefOrGetter<Element \| Document \| null \| undefined>` | no     | the viewport          | The scroll container the sentinel is measured against.               |
-| `rootMargin` | `string`                                                  | no       | `'0px 0px 75% 0px'`   | The margin that starts a load before the sentinel is visible.        |
-| `isEnabled`  | `MaybeRefOrGetter<boolean>`                               | no       | `true`                | Suspends loading, the first page included, while `false`.            |
+| Option       | Type                                                                                          | Required | Default             | Meaning                                                       |
+| ------------ | --------------------------------------------------------------------------------------------- | -------- | ------------------- | ------------------------------------------------------------- |
+| `load`       | `(cursor: TCursor \| null, signal: AbortSignal) => Promise<AdaptiveListPage<TItem, TCursor>>` | yes      | —                   | Loads one page.                                               |
+| `root`       | `MaybeRefOrGetter<Element \| Document \| null \| undefined>`                                  | no       | the viewport        | The scroll container the sentinel is measured against.        |
+| `rootMargin` | `string`                                                                                      | no       | `'0px 0px 75% 0px'` | The margin that starts a load before the sentinel is visible. |
+| `isEnabled`  | `MaybeRefOrGetter<boolean>`                                                                   | no       | `true`              | Suspends loading, the first page included, while `false`.     |
 
 `TItem` is the item type and `TCursor` the cursor type (default `string`).
 
 ## Returns
 
-| Member      | Type                          | Meaning                                                                 |
-| ----------- | ----------------------------- | ----------------------------------------------------------------------- |
-| `items`     | `Readonly<Ref<ReadonlyArray<TItem>>>` | Every item loaded so far. Replaced on each page, never mutated. |
-| `isLoading` | `Readonly<Ref<boolean>>`      | Whether a page is loading.                                              |
-| `error`     | `Readonly<Ref<unknown>>`      | What the last `load` rejected with, or `null`.                          |
-| `hasMore`   | `Readonly<Ref<boolean>>`      | Whether another page may follow.                                        |
-| `sentinel`  | `Ref<HTMLElement \| null>`    | The element to bind after the last item: `<div ref="sentinel" />`.      |
-| `loadMore`  | `() => Promise<void>`         | Loads the next page now; the retry after an `error`.                    |
-| `reset`     | `() => Promise<void>`         | Starts over from the first page.                                        |
+| Member      | Type                                  | Meaning                                                            |
+| ----------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `items`     | `Readonly<Ref<ReadonlyArray<TItem>>>` | Every item loaded so far. Replaced on each page, never mutated.    |
+| `isLoading` | `Readonly<Ref<boolean>>`              | Whether a page is loading.                                         |
+| `error`     | `Readonly<Ref<unknown>>`              | What the last `load` rejected with, or `null`.                     |
+| `hasMore`   | `Readonly<Ref<boolean>>`              | Whether another page may follow.                                   |
+| `sentinel`  | `Ref<HTMLElement \| null>`            | The element to bind after the last item: `<div ref="sentinel" />`. |
+| `loadMore`  | `() => Promise<void>`                 | Loads the next page now; the retry after an `error`.               |
+| `reset`     | `() => Promise<void>`                 | Starts over from the first page.                                   |
 
 ## Verification
 

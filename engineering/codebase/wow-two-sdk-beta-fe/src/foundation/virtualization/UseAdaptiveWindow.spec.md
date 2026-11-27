@@ -11,22 +11,26 @@ Public import: `import { useAdaptiveWindow, continuationSize } from '@wow-two-be
   children are the rows (a list) or the cards (a grid), renders the items from `start` up to but not including `end`,
   pads the rest with `paddingStart` and `paddingEnd` pixels, and supplies `load` to fetch and append the next page.
 - Nothing is read until `list` holds an element, so a server render, or any render before the first measurement, gets
-  the whole list: `start` `0`, `end` `count`, no padding. It does the same while `enabled()` is `false`.
+  the whole list: `start` `0`, `end` `count`, no padding. It does the same while `isWindowed()` is `false`; requests
+  then still follow `canLoad()` alone. `useLoadMore` builds on this hook; prefer it for a new paged collection.
 - The scroller is the nearest ancestor whose computed `overflow-y` is `auto`, `scroll` or `overlay`; with none, the page
   scrolls and the viewport is the document's. The list may start anywhere inside it: the offset is the part of the list
   already scrolled past, and the viewport is the part of the scroller below the list's top.
 - A read happens in an animation frame, after any of: a scroll of the scroller (or the window), a window resize, a
-  resize of the list or the scroller, a change of `count`, `enabled` or `canLoad`, or a new range. One read measures
+  resize of the list or the scroller, a change of `count`, `isWindowed` or `canLoad`, or a new range. One read measures
   the layout, the viewport and the scroll speed, and decides whether to ask for a page.
 - **List** (`grid()` is `false`): one item per row. Each child of the list that `rowIndex` maps to a row is measured
   with `getBoundingClientRect().height`; a row that never rendered keeps `estimatedRowHeight`. The window is six rows
   past the viewport on each side. Measurements are dropped when the list's width changes, and when the list or `grid`
   changes.
-- **Grid** (`grid()` is `true`): the columns are the tracks of the list's computed `grid-template-columns`, and a row
-  is `cardWidth / cardAspectRatio` plus the row gap, where `cardWidth` is the list's width less the gaps, shared by the
-  columns. Nothing is measured per row. The window is two rows past the viewport on each side, and `start` is always
-  a multiple of the column count, `end` the end of a row or `count`.
-- A page is requested when `enabled()` and `canLoad()` are true, no request is in flight, the scroller has a height,
+- **Grid** (`grid()` is `true`): the columns are the tracks of the list's computed `grid-template-columns`. A rendered
+  row is as tall as its tallest card plus the row gap (each child `rowIndex` maps is measured); a row never rendered is
+  `cardWidth / cardAspectRatio` plus the row gap, where `cardWidth` is the list's width less the gaps, shared by the
+  columns. The window is two rows past the viewport on each side, and `start` is always a multiple of the column
+  count, `end` the end of a row or `count`.
+- `keepIndex()` names an item to keep rendered (the focused one): the window widens to its row while the widened
+  window holds at most `MaxKeptWindowItems` (200) items; past that the item leaves the window.
+- A page is requested when `canLoad()` is true, no request is in flight, the scroller has a height,
   the list's top is above the viewport's bottom and the list's bottom is no farther below the viewport's bottom than
   the lookahead:
   `min(4 viewports, 0.75 viewport + speed * (latency + 150ms))`. The `speed` is the downward scroll speed in px/ms,
@@ -52,7 +56,8 @@ Public import: `import { useAdaptiveWindow, continuationSize } from '@wow-two-be
 | -------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `count`              | `() => number`                               | How many items are loaded.                                                                  |
 | `grid`               | `() => boolean`                              | Whether the list is a grid of cards rather than a column of rows.                           |
-| `enabled`            | `() => boolean`                              | Turns windowing and requests off while `false`; the range covers every item.                |
+| `isWindowed`         | `() => boolean`                              | `true` renders only the window; `false` covers every item. Requests follow `canLoad` alone. |
+| `keepIndex`          | `() => number \| undefined`                  | Optional. An item kept rendered (the focused one), up to `MaxKeptWindowItems` items.        |
 | `canLoad`            | `() => boolean`                              | Whether a next page exists and may be requested: turn it off for the end and for a failure. |
 | `pageSizes`          | `() => { minimum: number; maximum: number }` | The smallest and the largest page to request; the maximum wins if it is lower.              |
 | `load`               | `(limit: number) => Promise<boolean>`        | Requests and appends a page of about `limit` items; resolves `true` when it appended.       |
@@ -65,8 +70,20 @@ The function options are read when they are needed, so a reactive source behind 
 
 ## Arguments and returns
 
-`useAdaptiveWindow(list, options)` takes `list: Ref<HTMLElement | null>` and returns a `ComputedRef` of
-`{ start, end, paddingStart, paddingEnd }`.
+`useAdaptiveWindow(list, options)` takes `list: Ref<HTMLElement | null>` and returns an `AdaptiveWindow`:
+`{ range, columns, viewport, scroller, scrollListTo, anchor }`. Before `0.0.72` it returned the range itself; read
+`.range.value` now.
+
+| Member         | Type                                    | Meaning                                                                         |
+| -------------- | --------------------------------------- | ------------------------------------------------------------------------------- |
+| `range`        | `ComputedRef<AdaptiveRange>`            | The window, below.                                                              |
+| `columns`      | `ComputedRef<number>`                   | The grid's column count; 1 for a list.                                          |
+| `viewport`     | `ShallowRef<{ offset, height }>`        | Pixels of the list scrolled past, and the list's visible height.                |
+| `scroller`     | `ShallowRef<HTMLElement \| null>`       | The nearest scrolling ancestor; `null` for the document.                        |
+| `scrollListTo` | `(offset, behavior) => void`            | Scrolls so `offset` px of the list sit above the viewport top.                  |
+| `anchor`       | `(keyAt) => () => Promise<void>`        | Records the first visible item; the restore keeps its on-screen top after a DOM change. |
+
+`AdaptiveRange`:
 
 | Member         | Type     | Meaning                                                |
 | -------------- | -------- | ------------------------------------------------------ |
