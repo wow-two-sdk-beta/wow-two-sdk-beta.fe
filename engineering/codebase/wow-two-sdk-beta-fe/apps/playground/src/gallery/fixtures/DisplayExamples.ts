@@ -382,7 +382,30 @@ export const displayExamples: readonly SmokeCase[] = [
 
   smokeCase('CellsGlyph', CellsGlyph, { cornerRx: 0.3 }),
 
-  smokeCase('HeatmapCalendarGrid', HeatmapCalendarGrid, { values: new Map<Temporal.PlainDate, number>() }),
+  smokeCase('HeatmapCalendarGrid', HeatmapCalendarGrid, {
+    from: Temporal.PlainDate.from('2026-06-01'),
+    to: Temporal.PlainDate.from('2026-11-28'),
+    today: Temporal.PlainDate.from('2026-11-28'),
+    selected: Temporal.PlainDate.from('2026-11-24'),
+    cells: [
+      { date: Temporal.PlainDate.from('2026-11-23'), tone: 'success', level: 2, label: 'Mon, Nov 23: 3 done' },
+      {
+        date: Temporal.PlainDate.from('2026-11-24'),
+        tone: 'warning',
+        level: 3,
+        mark: 'half',
+        split: 'success',
+        label: 'Tue, Nov 24: 4 done · 2 flagged',
+      },
+      {
+        date: Temporal.PlainDate.from('2026-11-28'),
+        tone: 'danger',
+        level: 1,
+        mark: 'cross',
+        label: 'Today: 1 failed',
+      },
+    ],
+  }),
 
   smokeCase('AudioWaveformPreview', AudioWaveformPreview, { peaks: [0.2, 0.8, 0.4] }),
 

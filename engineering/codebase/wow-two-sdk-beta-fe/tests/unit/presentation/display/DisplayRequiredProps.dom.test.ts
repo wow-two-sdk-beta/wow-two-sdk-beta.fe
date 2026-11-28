@@ -66,7 +66,7 @@ const cases: readonly GuardCase[] = [
   guardCase('DiffViewer', DiffViewer, 'left'),
   guardCase('EventCalendarViewer', EventCalendarViewer, 'events'),
   guardCase('GanttTimeline', GanttTimeline, 'tasks'),
-  guardCase('HeatmapCalendarGrid', HeatmapCalendarGrid, 'values'),
+  guardCase('HeatmapCalendarGrid', HeatmapCalendarGrid, 'cells'),
   guardCase('ReactionBar', ReactionBar, 'reactions'),
   guardCase('TourPopover', TourPopover, 'steps'),
   /* The same defect in numeric clothing: an absent number reached an SVG geometry

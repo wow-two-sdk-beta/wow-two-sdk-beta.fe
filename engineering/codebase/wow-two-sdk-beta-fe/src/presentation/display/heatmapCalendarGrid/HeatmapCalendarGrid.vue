@@ -1,336 +1,526 @@
 <script lang="ts">
 import type { Temporal } from 'temporal-polyfill';
+import { AriaAttribute, Key } from '../../../foundation/dom';
 
-// HeatmapCalendarGrid is a date-only surface → its public API is keyed by
-// `Temporal.PlainDate` (calendar math, no time zone). Internally the lookup is
-// keyed by each date's ISO `.toString()` ("YYYY-MM-DD") so cell values resolve
-// in O(1); no native `Date`/raw-string leaks into the API.
-
-/** Defines the HeatmapCalendarGrid color ramp tone. */
+/** Defines the fill tone of a day. */
 export const HeatmapCalendarGridTone = {
-  /** Refers to the primary brand ramp. */
-  Brand: 'brand',
-  /** Refers to the positive / confirmation ramp. */
+  /** Refers to the positive fill. */
   Success: 'success',
-  /** Refers to the caution ramp. */
+  /** Refers to the caution fill. */
   Warning: 'warning',
-  /** Refers to the destructive / error ramp. */
+  /** Refers to the destructive fill. */
   Danger: 'danger',
-  /** Refers to the muted ramp. */
-  Muted: 'muted',
 } as const;
 
 export type HeatmapCalendarGridTone = (typeof HeatmapCalendarGridTone)[keyof typeof HeatmapCalendarGridTone];
 
-const ToneClasses: Record<HeatmapCalendarGridTone, ReadonlyArray<string>> = {
-  brand: ['bg-muted/50', 'bg-primary/20', 'bg-primary/40', 'bg-primary/70', 'bg-primary'],
-  success: ['bg-muted/50', 'bg-success/20', 'bg-success/40', 'bg-success/70', 'bg-success'],
-  warning: ['bg-muted/50', 'bg-warning/20', 'bg-warning/40', 'bg-warning/70', 'bg-warning'],
-  danger: ['bg-muted/50', 'bg-destructive/20', 'bg-destructive/40', 'bg-destructive/70', 'bg-destructive'],
-  muted: ['bg-muted/30', 'bg-muted', 'bg-muted-foreground/30', 'bg-muted-foreground/60', 'bg-muted-foreground'],
+/** Defines the inner mark of a day, so colour is never the only signal. */
+export const HeatmapCalendarGridMark = {
+  /** Refers to a half-filled dot. */
+  Half: 'half',
+  /** Refers to a cross. */
+  Cross: 'cross',
+} as const;
+
+export type HeatmapCalendarGridMark = (typeof HeatmapCalendarGridMark)[keyof typeof HeatmapCalendarGridMark];
+
+/** Defines the fill steps of a day, from none (0) to full (4). */
+export const HeatmapCalendarGridLevels = [0, 1, 2, 3, 4] as const;
+
+export type HeatmapCalendarGridLevel = (typeof HeatmapCalendarGridLevels)[number];
+
+/** Maps each tone to its fill class per level, level 0 first; a caller's key reads them so it never drifts. */
+export const HeatmapCalendarGridFills: Readonly<Record<HeatmapCalendarGridTone, ReadonlyArray<string>>> = {
+  success: ['bg-muted', 'bg-success/30', 'bg-success/55', 'bg-success/80', 'bg-success'],
+  warning: ['bg-muted', 'bg-warning/35', 'bg-warning/60', 'bg-warning/85', 'bg-warning'],
+  danger: ['bg-muted', 'bg-destructive/30', 'bg-destructive/55', 'bg-destructive/80', 'bg-destructive'],
 };
 
-export interface HeatmapCalendarGridProps {
-  /** The per-day counts, keyed by calendar date. */
-  readonly values: Map<Temporal.PlainDate, number>;
-  /** The rendered calendar year. Defaults to the current ISO year. */
-  readonly year?: number;
-  /** The first weekday of a column — `0` Sunday, `1` Monday. Default `0`. */
-  readonly weekStart?: 0 | 1;
-  /** The cell edge length in px. Default `12`. */
-  readonly cellSize?: number;
-  /** The gap between cells in px. Default `2`. */
-  readonly gap?: number;
-  /**
-   * The intensity buckets (min 2, clamped). Default 5. Buckets map proportionally
-   * onto the fixed 5-step tone palette, so buckets past 5 share palette classes.
-   */
-  readonly levels?: number;
-  /** The color ramp tone. Default `brand`. */
+/** Represents one day of the grid as the caller computed it. */
+export interface HeatmapCalendarGridCell {
+  /** The calendar day. */
+  readonly date: Temporal.PlainDate;
+  /** The fill tone; omitted, the day reads empty. */
   readonly tone?: HeatmapCalendarGridTone;
-  /**
-   * Fires with the clicked day and its value.
-   *
-   * Kept a prop rather than an emit because its *presence* is load-bearing — it
-   * decides whether an in-year cell renders as a `<button>` or an inert `<div>`,
-   * and Vue strips declared emit listeners out of `useAttrs()`.
-   */
-  readonly onCellClick?: (date: Temporal.PlainDate, value: number) => void;
-  /** The 12 month labels, January first. */
+  /** The fill step, 0 to 4. Default 0, the empty fill whatever the tone. */
+  readonly level?: HeatmapCalendarGridLevel;
+  /** The inner mark drawn over the fill. */
+  readonly mark?: HeatmapCalendarGridMark;
+  /** The tone of the lower-right half, for a day split between two outcomes; it takes the day's level. */
+  readonly split?: HeatmapCalendarGridTone;
+  /** The tooltip text and the day's accessible name. */
+  readonly label: string;
+}
+
+/** Defines props for the per-day activity calendar. */
+export interface HeatmapCalendarGridProps {
+  /** The days that carry activity; a range day without one draws empty, named by its date. */
+  readonly cells: ReadonlyArray<HeatmapCalendarGridCell>;
+  /** The first day drawn. Defaults to the day after the same date a year before `to`. */
+  readonly from?: Temporal.PlainDate;
+  /** The last day drawn. Defaults to `today`. */
+  readonly to?: Temporal.PlainDate;
+  /** The day that wears the today ring. Defaults to the current ISO date in the runtime's time zone. */
+  readonly today?: Temporal.PlainDate;
+  /** The chosen day, controlled; `null` chooses none. Omitted, the grid keeps its own choice. */
+  readonly selected?: Temporal.PlainDate | null;
+  /** The live state: today's ring pulses, and holds still under reduced motion. */
+  readonly isLive?: boolean;
+  /** The first weekday of a column — `0` Sunday, `1` Monday. Default `1`. */
+  readonly weekStart?: 0 | 1;
+  /** The 12 month labels, January first. Defaults to the locale's short month names. */
   readonly monthLabels?: ReadonlyArray<string>;
-  /** The 7 weekday labels, Sunday first. */
+  /** The 7 weekday labels, Sunday first. Defaults to the locale's short weekday names. */
   readonly weekdayLabels?: ReadonlyArray<string>;
-  /** The legend state. Default `true`. */
-  readonly hasLegend?: boolean;
 }
 
-interface HeatmapCell {
-  date: Temporal.PlainDate;
-  key: string;
-  inYear: boolean;
-  value: number;
+/** @internal The fill of a day with no tone or no level. */
+const EmptyFill = 'bg-muted';
+
+/** @internal The mark colour on a faint fill, in either theme. */
+const FaintMark = 'text-foreground/65';
+
+/** @internal The mark colour per tone on a strong fill (levels 3-4) and on the middle fill (level 2). */
+const MarkColours: Readonly<Record<HeatmapCalendarGridTone, readonly [string, string]>> = {
+  success: ['text-success-foreground/90', 'text-foreground/65 dark:text-success-foreground/90'],
+  warning: ['text-warning-foreground/90', 'text-foreground/65 dark:text-warning-foreground/90'],
+  danger: ['text-destructive-foreground/90', 'text-foreground/65 dark:text-destructive-foreground/90'],
+};
+
+/** @internal The days an arrow key moves the focus, left to right: a week per column, a day per row. */
+const ArrowSteps: Readonly<Record<string, number>> = {
+  [Key.ArrowLeft]: -7,
+  [Key.ArrowRight]: 7,
+  [Key.ArrowUp]: -1,
+  [Key.ArrowDown]: 1,
+};
+
+/** @internal The pointer type of a finger. */
+const TouchPointer = 'touch';
+
+/** @internal One drawn day. */
+interface GridDay {
+  readonly key: string;
+  readonly date: Temporal.PlainDate;
+  readonly column: number;
+  readonly row: number;
+  readonly label: string;
+  readonly fill: string;
+  readonly split: string | undefined;
+  readonly mark: HeatmapCalendarGridMark | undefined;
+  readonly markColour: string;
 }
 
+/** @internal A month label and the columns it spans. */
 interface MonthMarker {
-  month: number;
-  col: number;
+  readonly key: string;
+  readonly month: number;
+  readonly column: number;
+  readonly span: number;
+}
+
+/** @internal The day the shared tooltip describes, and the cell it points at. */
+interface Hint {
+  readonly key: string;
+  readonly label: string;
+  readonly anchor: HTMLElement;
 }
 </script>
 
 <script setup lang="ts">
-import { useLocale } from '../../../foundation/i18n';
-import { computed, useAttrs, useTemplateRef } from 'vue';
+import { computed, nextTick, onMounted, shallowRef, useAttrs, useTemplateRef, watch } from 'vue';
 import { Temporal as TemporalRuntime } from 'temporal-polyfill';
-import { AriaAttribute } from '../../../foundation/dom';
-import { cn } from '../../../foundation/styles';
-
-const locale = useLocale();
+import { useLocale, useLocaleFormatters } from '../../../foundation/i18n';
+import { AnchoredPositioner, Direction, Portal, useDirection } from '../../../foundation/primitives';
+import { useEscape } from '../../../foundation/shortcuts';
+import { useControlled } from '../../../foundation/state';
+import { CoarseHitArea, cn } from '../../../foundation/styles';
 
 /**
- * Renders a year-long heatmap — 53 week columns x 7 weekday rows, tinted per day.
- *
- * Cell intensity comes from `values[YYYY-MM-DD]`, bucketed into `levels` steps.
+ * Renders per-day activity as week columns over weekday rows, month labels above, one button per day.
+ * Every day's tone, level, mark, split and label come from `cells`; the grid holds no rule of its own.
  */
 defineOptions({ name: 'HeatmapCalendarGrid', inheritAttrs: false });
 
 const props = withDefaults(defineProps<HeatmapCalendarGridProps>(), {
-  /* `values` stays declared-required — Vue still warns when it is missing — but a
-     default keeps an absent (or transiently-undefined) value out of the `for...of`
-     below, which threw `props.values is not iterable` and took the whole page down. */
-  values: () => new Map<Temporal.PlainDate, number>(),
-  // `year` stays undefined so the current-year fallback is evaluated lazily —
-  // `withDefaults` would freeze a module-eval-time value into the options object.
-  year: undefined,
-  weekStart: 0,
-  cellSize: 12,
-  gap: 2,
-  levels: 5,
-  tone: 'brand',
-  onCellClick: undefined,
-  hasLegend: true,
+  /* `cells` stays declared-required, so Vue still warns when it is missing, but an absent value draws the empty
+     range rather than throwing in the walk below. */
+  cells: () => [],
+  from: undefined,
+  to: undefined,
+  today: undefined,
+  selected: undefined,
+  isLive: false,
+  weekStart: 1,
+  monthLabels: undefined,
+  weekdayLabels: undefined,
 });
 
-const monthLabels = computed(
-  () =>
-    props.monthLabels ??
-    Array.from({ length: 12 }, (_, i) =>
-      TemporalRuntime.PlainDate.from({ year: 2024, month: i + 1, day: 1 }).toLocaleString(locale.locale.value, {
-        month: 'short',
-      }),
-    ),
-);
-const weekdayLabels = computed(
-  () =>
-    props.weekdayLabels ??
-    Array.from({ length: 7 }, (_, i) =>
-      TemporalRuntime.PlainDate.from('2024-01-07')
-        .add({ days: i })
-        .toLocaleString(locale.locale.value, { weekday: 'short' }),
-    ),
-);
+const emit = defineEmits<{
+  /** Fires when the reader toggles a day: that day, or `null` when it was already the chosen one. */
+  select: [date: Temporal.PlainDate | null];
+}>();
 
 const attrs = useAttrs();
+const locale = useLocale();
+const formatters = useLocaleFormatters();
+const direction = useDirection();
 const el = useTemplateRef<HTMLDivElement>('el');
+const scroller = useTemplateRef<HTMLDivElement>('scroller');
 
-const year = computed(() => props.year ?? TemporalRuntime.Now.plainDateISO().year);
+const { value: selected, setValue: setSelected } = useControlled<Temporal.PlainDate | null>({
+  controlled: () => props.selected,
+  default: null,
+  onChange: (next) => emit('select', next),
+});
 
-// Re-key the PlainDate-keyed API onto ISO strings ("YYYY-MM-DD") for O(1)
-// lookup during the grid walk (PlainDate is not usable as a Map identity key).
-const valueMap = computed(() => {
-  const map = new Map<string, number>();
-  for (const [date, value] of props.values) map.set(date.toString(), value);
+/** The day that holds the tab stop once the reader moved it. */
+const activeKey = shallowRef<string | null>(null);
+
+/** The shared tooltip, while a day shows it. */
+const hint = shallowRef<Hint | null>(null);
+
+/** The pointer type of the last press on a day, so a tap can show the day's label. */
+let pressedPointer = '';
+
+/** The day that wears the today ring. */
+const todayDate = computed(() => props.today ?? TemporalRuntime.Now.plainDateISO());
+
+/** The drawn range, first day to last, in order whichever way round the props came. */
+const range = computed(() => {
+  const last = props.to ?? todayDate.value;
+  const first = props.from ?? last.subtract({ years: 1 }).add({ days: 1 });
+  return TemporalRuntime.PlainDate.compare(first, last) <= 0 ? { first, last } : { first: last, last: first };
+});
+
+/** The caller's cells by ISO date; a later cell for the same day wins. */
+const cellByDay = computed(() => {
+  const map = new Map<string, HeatmapCalendarGridCell>();
+  for (const cell of props.cells) map.set(cell.date.toString(), cell);
   return map;
 });
 
-const grid = computed(() => {
-  const lookup = valueMap.value;
-  const start = TemporalRuntime.PlainDate.from({ year: year.value, month: 1, day: 1 });
-  const end = TemporalRuntime.PlainDate.from({ year: year.value, month: 12, day: 31 });
-  // Walk back to first weekStart day before/at year start.
-  // Temporal `dayOfWeek`: 1 (Mon) … 7 (Sun); map to a Sunday=0 index.
-  const sundayIdx = start.dayOfWeek % 7;
-  const offset = (sundayIdx - props.weekStart + 7) % 7;
-  let cur = start.subtract({ days: offset });
-
-  const cols: Array<Array<HeatmapCell>> = [];
-  let column: Array<HeatmapCell> = [];
-  const months: Array<MonthMarker> = [];
-  let lastSeenMonth = -1;
-  let max = 0;
-
-  while (TemporalRuntime.PlainDate.compare(cur, end) <= 0 || column.length > 0) {
-    const inYear = cur.year === year.value;
-    const key = cur.toString();
-    const value = lookup.get(key) ?? 0;
-    if (value > max) max = value;
-    column.push({ date: cur, key, inYear, value });
-
-    // Temporal `month` is 1-indexed; keep the 0-indexed marker the labels expect.
-    if (inYear && cur.month - 1 !== lastSeenMonth) {
-      lastSeenMonth = cur.month - 1;
-      months.push({ month: cur.month - 1, col: cols.length });
-    }
-
-    if (column.length === 7) {
-      cols.push(column);
-      column = [];
-    }
-    cur = cur.add({ days: 1 });
-    if (TemporalRuntime.PlainDate.compare(cur, end) > 0 && column.length === 0) break;
+/** The days, the week count and the month labels; a label too close to the next one gives way to it. */
+const layout = computed(() => {
+  const { first, last } = range.value;
+  const lookup = cellByDay.value;
+  // Temporal `dayOfWeek` runs Monday 1 to Sunday 7; `% 7` makes it Sunday 0.
+  const offset = ((first.dayOfWeek % 7) - props.weekStart + 7) % 7;
+  const days: Array<GridDay> = [];
+  const markers: Array<{ month: number; column: number }> = [];
+  let index = offset;
+  for (let date = first; TemporalRuntime.PlainDate.compare(date, last) <= 0; date = date.add({ days: 1 })) {
+    const column = Math.floor(index / 7);
+    const isMonthStart = date.day === 1 || days.length === 0;
+    if (isMonthStart && !markers.some((marker) => marker.column === column))
+      markers.push({ month: date.month, column });
+    days.push(drawDay(date, column, index % 7, lookup.get(date.toString())));
+    index += 1;
   }
-  if (column.length > 0) cols.push(column);
-  return { columns: cols as ReadonlyArray<ReadonlyArray<HeatmapCell>>, monthMarkers: months, maxValue: max };
+  const weeks = Math.floor((index - 1) / 7) + 1;
+  const months: Array<MonthMarker> = markers
+    .filter((marker, at) => (markers[at + 1]?.column ?? Infinity) - marker.column >= 3)
+    .map((marker) => ({
+      ...marker,
+      key: `${marker.month}-${marker.column}`,
+      span: Math.max(1, Math.min(3, weeks - marker.column)),
+    }));
+  return { days, weeks, months };
 });
 
-const toneSteps = computed(() => ToneClasses[props.tone]);
+/** The 12 month labels, January first. */
+const monthNames = computed(
+  () => props.monthLabels ?? Array.from({ length: 12 }, (_unused, at) => formatters.value.monthName(at + 1, 'short')),
+);
 
-/* Clamp to ≥2 so the zero step plus at least one filled step always exist. */
-const levelCount = computed(() => Math.max(2, Math.floor(props.levels)));
-
-function bucket(value: number): number {
-  const max = grid.value.maxValue;
-  if (value <= 0 || max === 0) return 0;
-  const idx = Math.ceil((value / max) * (levelCount.value - 1));
-  return Math.min(levelCount.value - 1, idx);
-}
-
-/* The palette is a fixed 5-step ramp; map any bucket count onto it proportionally.
-   0 → empty step, top bucket → full tone; a nonzero bucket never returns the empty step. */
-function stepClass(level: number): string {
-  const steps = toneSteps.value;
-  if (level === 0) return steps[0]!;
-  const idx = Math.round((level / (levelCount.value - 1)) * (steps.length - 1));
-  return steps[Math.max(1, idx)]!;
-}
-
-const totalWidth = computed(() => grid.value.columns.length * (props.cellSize + props.gap));
-const colHeight = computed(() => 7 * (props.cellSize + props.gap));
-
-// Order weekdays from weekStart; the weekday number keys the row, since labels can repeat.
-const weekdayOrder = computed(() =>
-  Array.from({ length: 7 }, (_unused, i) => {
-    const day = (i + props.weekStart) % 7;
-    return { day, label: weekdayLabels.value[day]! };
+/** The weekday labels, top row first; every other row stays blank to avoid clutter. */
+const weekdayRows = computed(() =>
+  Array.from({ length: 7 }, (_unused, row) => {
+    const day = (row + props.weekStart) % 7;
+    const label = props.weekdayLabels?.[day] ?? formatters.value.weekdayName(day === 0 ? 7 : day, 'short');
+    return { day, row, label: row % 2 === 0 ? label : '' };
   }),
 );
 
-/**
- * Per-cell render model. `attrs` carries only the bindings the cell actually
- * needs, so a non-interactive cell never gets a click listener.
- */
-const renderColumns = computed(() =>
-  grid.value.columns.map((col, colIdx) => ({
-    key: colIdx,
-    cells: col.map((cell) => {
-      const isInteractive = cell.inYear && props.onCellClick != null;
-      return {
-        key: cell.key,
-        tag: isInteractive ? 'button' : 'div',
-        attrs: {
-          type: isInteractive ? 'button' : undefined,
-          // Value lives in the label; aria-value* is reserved for
-          // range widgets and is invalid on button/generic cells.
-          role: isInteractive ? undefined : 'img',
-          [AriaAttribute.Label]: `${cell.key}: ${cell.value}`,
-          onClick: isInteractive ? (): void => props.onCellClick?.(cell.date, cell.value) : undefined,
-        },
-        class: cn(
-          'rounded-[2px] transition-colors',
-          cell.inYear ? stepClass(bucket(cell.value)) : 'bg-transparent',
-          isInteractive &&
-            'cursor-pointer hover:ring-1 active:ring-1 hover:ring-ring active:ring-ring focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-        ),
-      };
-    }),
-  })),
+/** The chosen day as an ISO date. */
+const selectedKey = computed(() => selected.value?.toString() ?? null);
+
+/** Today as an ISO date. */
+const todayKey = computed(() => todayDate.value.toString());
+
+/** The day that holds the tab stop: the moved-to day, else the chosen day, else today, else the last day. */
+const tabStopKey = computed(() => {
+  const first = range.value.first.toString();
+  const last = range.value.last.toString();
+  const isWithin = (key: string | null): key is string => key !== null && key >= first && key <= last;
+  const wanted = activeKey.value ?? selectedKey.value ?? (isWithin(todayKey.value) ? todayKey.value : last);
+  return isWithin(wanted) ? wanted : last;
+});
+
+/** The group's accessible name: the caller's `aria-label`, else the localized range. */
+const groupLabel = computed(
+  () =>
+    (attrs[AriaAttribute.Label] as string | undefined) ??
+    locale.t(
+      'HeatmapCalendarGrid.label',
+      { from: rangeDate(range.value.first), to: rangeDate(range.value.last) },
+      'Activity per day, {from} to {to}',
+    ),
 );
 
-/** Vue does not append `px` to a numeric `:style` value — every length is spelled out. */
-const cellStyle = computed(() => ({
-  width: `${props.cellSize}px`,
-  height: `${props.cellSize}px`,
+/** The grid tracks: the weekday column, then one column per week. */
+const gridStyle = computed(() => ({
+  gridTemplateColumns: `1.75rem repeat(${layout.value.weeks}, var(--heatmap-cell))`,
+  gridTemplateRows: 'auto repeat(7, var(--heatmap-cell))',
 }));
 
-const monthRowStyle = computed(() => ({
-  height: `${props.cellSize}px`,
-  width: `${totalWidth.value}px`,
-}));
+const classes = computed(() => cn('relative w-max max-w-full min-w-0', attrs.class as string | undefined));
 
-const gapStyle = computed(() => ({ gap: `${props.gap}px` }));
-
-const weekdayColumnStyle = computed(() => ({
-  width: '28px',
-  gap: `${props.gap}px`,
-  height: `${colHeight.value}px`,
-}));
-
-const weekdayLabelStyle = computed(() => ({
-  height: `${props.cellSize}px`,
-  lineHeight: `${props.cellSize}px`,
-}));
-
-function monthMarkerStyle(marker: MonthMarker): Record<string, string> {
-  return { left: `${marker.col * (props.cellSize + props.gap)}px` };
-}
-
-const classes = computed(() => cn('inline-block', attrs.class as string | undefined));
-
-/** Everything but `class`, which is re-applied through `cn` above. */
+/** Everything but `class` and `aria-label`, which land on the root's classes and on the group. */
 const rest = computed(() => {
-  const { class: _class, ...others } = attrs;
+  const { class: _class, [AriaAttribute.Label]: _label, ...others } = attrs;
   return others;
 });
+
+/** Scrolls the newest week into view whenever the range gains or loses weeks. */
+watch(() => layout.value.weeks, scrollToNewest, { flush: 'post' });
+
+/** Hides the tooltip on a press outside the grid — on a touch screen a tap elsewhere moves no focus. */
+watch(
+  () => hint.value !== null,
+  (isShown, _wasShown, onCleanup) => {
+    const page = el.value?.ownerDocument;
+    if (!isShown || !page) return;
+    const onPress = (event: PointerEvent): void => {
+      if (!el.value?.contains(event.target as Node | null)) hide();
+    };
+    page.addEventListener('pointerdown', onPress, true);
+    onCleanup(() => page.removeEventListener('pointerdown', onPress, true));
+  },
+);
+
+/* Escape hides the tooltip without moving focus. */
+useEscape(hide, () => hint.value !== null);
+
+onMounted(scrollToNewest);
+
+/** Formats a day for the range label. */
+function rangeDate(date: Temporal.PlainDate): string {
+  return formatters.value.date(Date.UTC(date.year, date.month - 1, date.day), { dateStyle: 'medium', timeZone: 'UTC' });
+}
+
+/** Formats a day for the label of a day the caller left out. */
+function dayName(date: Temporal.PlainDate): string {
+  return formatters.value.date(Date.UTC(date.year, date.month - 1, date.day), {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+/** Resolves a day's drawing from its cell. */
+function drawDay(
+  date: Temporal.PlainDate,
+  column: number,
+  row: number,
+  cell: HeatmapCalendarGridCell | undefined,
+): GridDay {
+  const level = cell?.level ?? 0;
+  const tone = cell?.tone;
+  return {
+    key: date.toString(),
+    date,
+    column,
+    row,
+    label: cell?.label ?? dayName(date),
+    fill: (tone && HeatmapCalendarGridFills[tone][level]) || EmptyFill,
+    split: cell?.split ? (HeatmapCalendarGridFills[cell.split][level] ?? EmptyFill) : undefined,
+    mark: cell?.mark,
+    markColour: markColour(tone, level),
+  };
+}
+
+/** Resolves a mark colour readable on its fill in either theme. */
+function markColour(tone: HeatmapCalendarGridTone | undefined, level: number): string {
+  if (!tone || level <= 1) return FaintMark;
+  const [strong, middle] = MarkColours[tone];
+  return level >= 3 ? strong : middle;
+}
+
+/** Scrolls the grid sideways to its newest week. */
+function scrollToNewest(): void {
+  const element = scroller.value;
+  if (!element) return;
+  element.scrollLeft = direction.value === Direction.Rtl ? -element.scrollWidth : element.scrollWidth;
+}
+
+/** Shows the shared tooltip at a day's cell. */
+function show(event: Event, day: GridDay): void {
+  const anchor = event.currentTarget as HTMLElement | null;
+  if (anchor) hint.value = { key: day.key, label: day.label, anchor };
+}
+
+/** Hides the shared tooltip. */
+function hide(): void {
+  hint.value = null;
+}
+
+/** Shows a day's tooltip under a hovering pointer; a finger shows it by tapping instead. */
+function enter(event: PointerEvent, day: GridDay): void {
+  if (event.pointerType !== TouchPointer) show(event, day);
+}
+
+/** Hides the tooltip when a hovering pointer leaves; a finger leaves at the end of every tap. */
+function leave(event: PointerEvent): void {
+  if (event.pointerType !== TouchPointer) hide();
+}
+
+/** Records the pointer that pressed a day. */
+function press(event: PointerEvent): void {
+  pressedPointer = event.pointerType;
+}
+
+/** Toggles a day, moves the tab stop to it, and shows its label after a tap. */
+function choose(event: MouseEvent, day: GridDay): void {
+  activeKey.value = day.key;
+  setSelected(selectedKey.value === day.key ? null : day.date);
+  if (pressedPointer === TouchPointer) show(event, day);
+  pressedPointer = '';
+}
+
+/** Resolves the day an arrow key moves to; left and right swap under a right-to-left direction. */
+function stepped(date: Temporal.PlainDate, key: string): Temporal.PlainDate | null {
+  const step = ArrowSteps[key];
+  if (step === undefined) return null;
+  const isMirrored = direction.value === Direction.Rtl && Math.abs(step) === 7;
+  return date.add({ days: isMirrored ? -step : step });
+}
+
+/** Moves the tab stop and the focus by arrow keys, Home and End, inside the range. */
+async function move(event: KeyboardEvent, day: GridDay): Promise<void> {
+  const { first, last } = range.value;
+  const next = event.key === Key.Home ? first : event.key === Key.End ? last : stepped(day.date, event.key);
+  if (!next) return;
+  event.preventDefault();
+  if (TemporalRuntime.PlainDate.compare(next, first) < 0 || TemporalRuntime.PlainDate.compare(next, last) > 0) return;
+  activeKey.value = next.toString();
+  await nextTick();
+  const target = el.value?.querySelector<HTMLElement>(`[data-date="${activeKey.value}"]`);
+  target?.focus();
+  target?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+}
 
 defineExpose({ el });
 </script>
 
 <template>
   <div ref="el" v-bind="rest" :class="classes">
-    <!-- Month labels -->
-    <div class="relative ml-8" :style="monthRowStyle">
-      <span
-        v-for="marker in grid.monthMarkers"
-        :key="marker.month"
-        class="absolute text-[10px] uppercase text-muted-foreground"
-        :style="monthMarkerStyle(marker)"
-        >{{ monthLabels[marker.month] }}</span
+    <div ref="scroller" class="overflow-x-auto overscroll-x-contain pb-1" tabindex="-1">
+      <!-- 22px cells with 3px gaps below md, 20px with 4px gaps from md; a finger's reach grows by half a gap. -->
+      <div
+        role="group"
+        :aria-label="groupLabel"
+        class="grid w-max gap-[3px] p-1.5 [--coarse-hit-gap:3px] [--heatmap-cell:1.375rem] md:gap-1 md:[--coarse-hit-gap:4px] md:[--heatmap-cell:1.25rem]"
+        :style="gridStyle"
       >
-    </div>
-    <div class="flex" :style="gapStyle">
-      <!-- Weekday labels — show every other to avoid clutter. -->
-      <div class="flex flex-col text-[10px] uppercase text-muted-foreground" :style="weekdayColumnStyle">
         <span
-          v-for="(weekday, index) in weekdayOrder"
+          v-for="month in layout.months"
+          :key="month.key"
+          aria-hidden="true"
+          class="row-start-1 overflow-visible text-[0.6875rem] whitespace-nowrap text-muted-foreground"
+          :style="{ gridColumn: `${month.column + 2} / span ${month.span}` }"
+          >{{ monthNames[month.month - 1] }}</span
+        >
+        <span
+          v-for="weekday in weekdayRows"
           :key="weekday.day"
-          :class="index % 2 === 0 ? 'opacity-0' : ''"
-          :style="weekdayLabelStyle"
+          aria-hidden="true"
+          class="sticky start-0 z-[1] col-start-1 flex items-center bg-card pe-1 text-[0.6875rem] text-muted-foreground"
+          :style="{ gridRow: weekday.row + 2 }"
           >{{ weekday.label }}</span
         >
-      </div>
-      <!-- Grid -->
-      <div class="flex" :style="gapStyle">
-        <div v-for="column in renderColumns" :key="column.key" class="flex flex-col" :style="gapStyle">
-          <component
-            :is="cell.tag"
-            v-for="cell in column.cells"
-            :key="cell.key"
-            v-bind="cell.attrs"
-            :style="cellStyle"
-            :class="cell.class"
+        <button
+          v-for="day in layout.days"
+          :key="day.key"
+          type="button"
+          :data-date="day.key"
+          :tabindex="day.key === tabStopKey ? 0 : -1"
+          :aria-label="day.label"
+          :aria-pressed="day.key === selectedKey"
+          :aria-current="day.key === todayKey ? 'date' : undefined"
+          class="relative flex size-(--heatmap-cell) items-center justify-center rounded-[3px] transition-[outline-color] forced-colors:forced-color-adjust-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary"
+          :class="[
+            day.fill,
+            day.key === selectedKey && 'ring-2 ring-primary ring-offset-1 ring-offset-card',
+            CoarseHitArea.After,
+          ]"
+          :style="{ gridColumn: day.column + 2, gridRow: day.row + 2 }"
+          @pointerenter="enter($event, day)"
+          @pointerleave="leave"
+          @pointerdown="press"
+          @click="choose($event, day)"
+          @keydown="move($event, day)"
+          @focus="show($event, day)"
+          @blur="hide"
+        >
+          <span
+            v-if="day.split"
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-0 rounded-[3px] [clip-path:polygon(100%_0,100%_100%,0_100%)]"
+            :class="day.split"
           />
-        </div>
+          <svg
+            v-if="day.mark === 'cross'"
+            viewBox="0 0 8 8"
+            aria-hidden="true"
+            data-mark="cross"
+            class="relative size-2"
+            :class="day.markColour"
+          >
+            <path d="M1.5 1.5l5 5M6.5 1.5l-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <svg
+            v-else-if="day.mark === 'half'"
+            viewBox="0 0 8 8"
+            aria-hidden="true"
+            data-mark="half"
+            class="relative size-2"
+            :class="day.markColour"
+          >
+            <circle cx="4" cy="4" r="3" fill="none" stroke="currentColor" stroke-width="1.2" />
+            <path d="M4 1a3 3 0 0 1 0 6z" fill="currentColor" />
+          </svg>
+          <template v-if="day.key === todayKey">
+            <span
+              v-if="day.key === selectedKey"
+              aria-hidden="true"
+              data-today="dot"
+              class="pointer-events-none absolute -end-1 -top-1 size-[7px] rounded-full bg-foreground shadow-[0_0_0_1.5px_var(--color-card)]"
+              :class="isLive && 'motion-safe:animate-pulse'"
+            />
+            <span
+              v-else
+              aria-hidden="true"
+              data-today="ring"
+              class="pointer-events-none absolute inset-0 rounded-[3px] outline-[1.5px] outline-offset-[1.5px] outline-dashed outline-muted-foreground"
+              :class="isLive && 'motion-safe:animate-pulse'"
+            />
+          </template>
+        </button>
       </div>
     </div>
-    <div v-if="hasLegend" class="mt-2 flex items-center justify-end gap-1.5 text-[10px] text-muted-foreground">
-      <span>{{ locale.t('HeatmapCalendarGrid.less', undefined, 'Less') }}</span>
-      <span
-        v-for="stepCls in toneSteps"
-        :key="stepCls"
-        aria-hidden="true"
-        :style="cellStyle"
-        :class="cn('rounded-[2px]', stepCls)"
-      />
-      <span>{{ locale.t('HeatmapCalendarGrid.more', undefined, 'More') }}</span>
-    </div>
+    <Portal v-if="hint">
+      <!-- One tooltip for every day, in the top layer, flipped and shifted to stay inside the viewport. -->
+      <AnchoredPositioner :anchor="hint.anchor" placement="top" :offset="6" class="pointer-events-none z-tooltip">
+        <div
+          role="tooltip"
+          class="max-w-[calc(100vw-1rem)] rounded-md bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background shadow-md"
+        >
+          {{ hint.label }}
+        </div>
+      </AnchoredPositioner>
+    </Portal>
   </div>
 </template>

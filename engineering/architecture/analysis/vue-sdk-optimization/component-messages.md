@@ -123,8 +123,7 @@ in their capability specifications and are not inferred by this catalogue.
 | `GradientPicker.stopPosition` | Stop position | [GradientPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/gradientPicker/GradientPicker.vue) |
 | `GradientText.pauseLabel` | Pause animation | [GradientText.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/gradientText/GradientText.vue) |
 | `GradientText.resumeLabel` | Resume animation | [GradientText.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/gradientText/GradientText.vue) |
-| `HeatmapCalendarGrid.less` | Less | [HeatmapCalendarGrid.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/heatmapCalendarGrid/HeatmapCalendarGrid.vue) |
-| `HeatmapCalendarGrid.more` | More | [HeatmapCalendarGrid.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/heatmapCalendarGrid/HeatmapCalendarGrid.vue) |
+| `HeatmapCalendarGrid.label` | Activity per day, {from} to {to} | [HeatmapCalendarGrid.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/display/heatmapCalendarGrid/HeatmapCalendarGrid.vue) |
 | `IconPicker.icons` | Icons | [IconPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/iconPicker/IconPicker.vue) |
 | `IconPicker.noIconsMatch` | No icons match. | [IconPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/iconPicker/IconPicker.vue) |
 | `IconPicker.placeholder` | Search icons… | [IconPicker.vue](../../../codebase/wow-two-sdk-beta-fe/src/presentation/forms/iconPicker/IconPicker.vue) |

@@ -69,10 +69,14 @@ describe('component locale ownership', () => {
   });
 
   it('reformats calendar headings reactively without replacing explicit labels', async () => {
-    const values = new Map([[Temporal.PlainDate.from('2024-01-01'), 1]]);
+    const range = {
+      from: Temporal.PlainDate.from('2024-01-01'),
+      to: Temporal.PlainDate.from('2024-12-31'),
+      cells: [{ date: Temporal.PlainDate.from('2024-01-01'), tone: 'success' as const, level: 1 as const, label: '1' }],
+    };
     const wrapper = mount(LocaleProvider, {
       props: { locale: 'de-DE' },
-      slots: { default: () => h(HeatmapCalendarGrid, { values, year: 2024 }) },
+      slots: { default: () => h(HeatmapCalendarGrid, range) },
     });
     wrappers.push(wrapper);
     expect(wrapper.text()).toContain('Mär');
@@ -83,8 +87,7 @@ describe('component locale ownership', () => {
       slots: {
         default: () =>
           h(HeatmapCalendarGrid, {
-            values,
-            year: 2024,
+            ...range,
             monthLabels: Array.from({ length: 12 }, (_, i) => `Month-${i}`),
           }),
       },
