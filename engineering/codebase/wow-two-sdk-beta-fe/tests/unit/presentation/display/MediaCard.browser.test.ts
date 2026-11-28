@@ -291,6 +291,45 @@ describe.skipIf(isForcedColors)('MediaCard content blur', () => {
     expect(getComputedStyle(panel).overflow).toBe('visible');
   });
 
+  /** A pill row, a two-line title and a meta line: three rows, well inside any card at 280px. */
+  function threeRows() {
+    return [...pillsAndTitle(), h('span', { class: 'text-[13px] leading-snug' }, 'Opens at ten, closes at six')];
+  }
+
+  it.each([{ href: '/posts/7' }, {}])(
+    'shows the whole first row under a panelHeight of 100%%, a share of the card: %o',
+    async (props) => {
+      const { cardElement, panel, blur, firstRow } = await mountFoot(threeRows, { ...props, panelHeight: '100%' });
+      const text = panel.querySelector<HTMLElement>('[data-media-card-text]')!;
+      const textTop = text.getBoundingClientRect().top;
+      expect(firstRow.getBoundingClientRect().top).toBeGreaterThanOrEqual(textTop - 0.5);
+      expect(panel.getBoundingClientRect().height).toBeLessThan(cardElement.getBoundingClientRect().height / 2);
+      expect(
+        Math.abs(blur.getBoundingClientRect().top - (firstRow.getBoundingClientRect().top - feather)),
+      ).toBeLessThanOrEqual(1);
+    },
+  );
+
+  it('caps the panel at a percentage of the card, not of the panel itself', async () => {
+    const { cardElement, panel, firstRow } = await mountFoot(overflowing, { panelHeight: '30%' });
+    const text = panel.querySelector<HTMLElement>('[data-media-card-text]')!;
+    const cardContent = cardElement.clientHeight;
+    expect(Math.abs(panel.getBoundingClientRect().height - cardContent * 0.3)).toBeLessThanOrEqual(1);
+    expect(firstRow.getBoundingClientRect().top).toBeLessThan(text.getBoundingClientRect().top);
+  });
+
+  it('still cuts three rows under a small fixed cap', async () => {
+    const { panel, blur, firstRow } = await mountFoot(threeRows, { panelHeight: '4rem' });
+    const text = panel.querySelector<HTMLElement>('[data-media-card-text]')!;
+    expect(panel.getBoundingClientRect().height).toBeLessThanOrEqual(64 + 1);
+    expect(firstRow.getBoundingClientRect().top).toBeLessThan(text.getBoundingClientRect().top - 1);
+    expect(
+      Math.abs(blur.getBoundingClientRect().top - (text.getBoundingClientRect().top - feather)),
+    ).toBeLessThanOrEqual(1);
+    expect(getComputedStyle(text).overflow).toBe('hidden');
+    expect(getComputedStyle(panel).overflow).toBe('visible');
+  });
+
   it('blurs the media: no ancestor of the blur makes a backdrop root of its own', async () => {
     const { blur } = await mountFoot(pillsAndTitle, { href: '/posts/7', isDimmed: true });
     for (let node = blur.parentElement; node && node !== document.documentElement; node = node.parentElement) {

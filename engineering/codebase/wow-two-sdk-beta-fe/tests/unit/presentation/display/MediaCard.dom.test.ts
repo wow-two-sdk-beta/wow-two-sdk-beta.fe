@@ -100,17 +100,29 @@ describe('MediaCard link', () => {
 });
 
 describe('MediaCard layout', () => {
-  it('holds the 4 / 5 ratio and lets the text take at most 8.5rem of the panel by default', () => {
+  it('holds the 4 / 5 ratio and caps the panel, not the text, at 8.5rem by default', () => {
     const card = mountCard();
     expect((card.element as HTMLElement).style.aspectRatio).toMatch(/^0\.8( \/ 1)?$/u);
-    expect(card.get<HTMLElement>('[data-media-card-text]').element.style.maxHeight).toBe('calc(8.5rem - 1rem)');
-    expect(card.get<HTMLElement>('[data-media-card-panel]').element.style.height).toBe('');
+    const panel = card.get<HTMLElement>('[data-media-card-panel]').element;
+    expect(panel.style.maxHeight).toBe('8.5rem');
+    expect(panel.style.height).toBe('');
+    expect(card.get<HTMLElement>('[data-media-card-text]').element.style.maxHeight).toBe('');
   });
 
   it('takes a ratio and a panel height, and lets a caller style win', () => {
     const card = mountCard({ ratio: 12 / 5, panelHeight: '6rem', style: { aspectRatio: '1' } });
     expect((card.element as HTMLElement).style.aspectRatio).toMatch(/^1( \/ 1)?$/u);
-    expect(card.get<HTMLElement>('[data-media-card-text]').element.style.maxHeight).toBe('calc(6rem - 1rem)');
+    expect(card.get<HTMLElement>('[data-media-card-panel]').element.style.maxHeight).toBe('6rem');
+  });
+
+  it('puts a percentage panel height on the panel, the card child it resolves against', () => {
+    const card = mountCard({ href: '/posts/7', panelHeight: '100%' });
+    const panel = card.get<HTMLElement>('[data-media-card-panel]');
+    expect(panel.element.parentElement).toBe(card.element);
+    expect(panel.element.style.maxHeight).toBe('100%');
+    const text = card.get<HTMLElement>('[data-media-card-text]');
+    expect(text.element.style.maxHeight).toBe('');
+    expect(text.classes()).toEqual(expect.arrayContaining(['min-h-0', 'overflow-hidden', 'justify-end']));
   });
 
   it('draws the panel as a dark stage under white text', () => {
