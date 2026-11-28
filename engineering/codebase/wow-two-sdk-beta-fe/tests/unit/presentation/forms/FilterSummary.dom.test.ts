@@ -104,6 +104,45 @@ describe('FilterSummary', () => {
     expect(wrapper.find('[data-filter-summary-clear]').exists()).toBe(true);
   });
 
+  it('renders the actions slot between the count and the clear button, and nothing while it is empty', () => {
+    const isOrHolds = (element: Element | null, selector: string) =>
+      element !== null && (element.matches(selector) || element.querySelector(selector) !== null);
+    const wrapper = mount(
+      {
+        render: () =>
+          h(
+            FilterSummary,
+            { matched: 3, total: 9, isFiltered: true },
+            { actions: () => h('button', { type: 'button', 'aria-label': 'Refresh posts', 'data-app-action': '' }) },
+          ),
+      },
+      { attachTo: document.body },
+    );
+    wrappers.push(wrapper);
+    const group = wrapper.get('[role="group"]');
+    const order = [
+      ...group.element.querySelectorAll(
+        '[data-filter-summary-filters], [data-filter-summary-count], [data-app-action], [data-filter-summary-clear]',
+      ),
+    ].map((element) =>
+      ['filterSummaryFilters', 'filterSummaryCount', 'appAction', 'filterSummaryClear'].find(
+        (key) => key in (element as HTMLElement).dataset,
+      ),
+    );
+    expect(order).toEqual(['filterSummaryFilters', 'filterSummaryCount', 'appAction', 'filterSummaryClear']);
+    const action = count(wrapper).element.nextElementSibling;
+    expect(isOrHolds(action, '[data-app-action]')).toBe(true);
+    expect(isOrHolds(action!.nextElementSibling, '[data-filter-summary-clear]')).toBe(true);
+    // An action sits 4px from clear, so the hit areas' width is capped and the two never share a tap.
+    expect(group.classes()).toContain('[--coarse-hit-gap-x:6px]');
+
+    const plain = render();
+    const plainGroup = plain.get('[role="group"]');
+    expect(isOrHolds(count(plain).element.nextElementSibling, '[data-filter-summary-clear]')).toBe(true);
+    expect(plainGroup.element.childElementCount).toBe(group.element.childElementCount - 1);
+    expect(plainGroup.classes()).not.toContain('[--coarse-hit-gap-x:6px]');
+  });
+
   it('badges the filters button above 0 active filters and names the count', async () => {
     const wrapper = render({ activeFilterCount: 0 });
     expect(wrapper.find('[data-filter-summary-badge]').exists()).toBe(false);

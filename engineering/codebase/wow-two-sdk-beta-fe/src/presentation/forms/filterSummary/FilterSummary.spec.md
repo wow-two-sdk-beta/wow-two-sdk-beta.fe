@@ -1,7 +1,7 @@
 # FilterSummary
 
-Renders the result pill of a filtered collection: the filters button, the "{matched} out of {total}" count and the
-clear button, left to right, in one rounded strip that sits in a tab's filter row.
+Renders the result pill of a filtered collection: the filters button, the "{matched} out of {total}" count, any
+`actions` and the clear button, left to right, in one rounded strip that sits in a tab's filter row.
 
 Source: [FilterSummary.vue](FilterSummary.vue), [FilterSummaryFiltersButton.vue](FilterSummaryFiltersButton.vue).
 
@@ -12,6 +12,9 @@ Public import: `import { FilterSummary, FilterSummaryFiltersButton } from '@wow-
 - The layout is fixed: the filters button (sliders icon) on the left, the count in the middle, the clear button (X) on
   the right. The pill is `h-10 rounded-full border border-input bg-field px-1.5`; both buttons are 32px ghost circles
   with a tooltip.
+- The `actions` slot renders between the count and the clear button, for controls that act on the shown results,
+  such as refresh, so they read as one control with the pill. Each is a 32px ghost circle with a tooltip, like the
+  pill's own buttons. An empty slot renders nothing: no wrapper, and the pill keeps its three parts.
 - The count uses the body step of the type ramp (14px `text-sm`), `tabular-nums` and `whitespace-nowrap`, in the muted
   foreground. The badge uses the micro step (10px). Numbers go through the locale's number formatter.
 - The count is one polite, atomic live region (`role="status"`). Both forms render inside it; CSS hides the one the
@@ -48,9 +51,12 @@ Under a coarse pointer (a finger) at one viewport size, against a fine one (a mo
 |---|---|---|
 | pill | 40px → 44px tall (`pointer-coarse:h-11`), like the fields beside it in a filter row; width and contents keep their x | visible height |
 | filters and clear buttons | none: the 32px box stays; an invisible 44 x 44px hit area (`CoarseHitArea`, through `Button`) takes the tap | hit area |
+| every button, with `actions` | none: the 32px box stays; its hit area is 36px wide and 44px tall | hit area |
 
 The pill sets `--coarse-hit-gap: 14px` (twice its 6px padding plus its 1px border), which caps each hit area at the
 pill's outer edge: the two hit areas never meet (the count sits between them) and never reach a neighbour of the pill.
+With `actions`, the last action sits 4px from the clear button, so the pill also sets `--coarse-hit-gap-x: 6px` (the
+4px gap plus two 1px borders): each hit area reaches 2px past its box sideways and no two buttons share a tap.
 
 ## Props
 
@@ -88,6 +94,7 @@ for the group name:
 | Slot | Props | Meaning |
 |---|---|---|
 | `filters-trigger` | — | Replaces the filters button; wrap `FilterSummaryFiltersButton` in a trigger with `as-child`. Not rendered while `hasFilters` is false. |
+| `actions` | — | Controls that act on the shown results, such as refresh, between the count and the clear button. Nothing renders while it is empty. |
 
 ## Exposed handle
 

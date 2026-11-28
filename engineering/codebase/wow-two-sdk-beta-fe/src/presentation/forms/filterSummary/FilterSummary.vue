@@ -45,9 +45,10 @@ import FilterSummaryFiltersButton from './FilterSummaryFiltersButton.vue';
 const ClearIcon = X;
 
 /**
- * Renders the result pill of a filtered collection: the filters button, the "{matched} out of {total}" count and the
- * clear button, left to right, in one rounded field-height strip. The count reads "{matched} / {total}" in a container
- * narrower than 300px (a container query on the nearest `@container` ancestor, never the device).
+ * Renders the result pill of a filtered collection: the filters button, the "{matched} out of {total}" count, any
+ * `actions` and the clear button, left to right, in one rounded field-height strip. The count reads
+ * "{matched} / {total}" in a container narrower than 300px (a container query on the nearest `@container` ancestor,
+ * never the device).
  */
 defineOptions({ name: 'FilterSummary', inheritAttrs: false });
 
@@ -69,6 +70,9 @@ defineSlots<{
   /** Replaces the filters button, so an app can wrap `FilterSummaryFiltersButton` in a trigger with `as-child`; not
    *  rendered while `hasFilters` is false. */
   'filters-trigger'?(): unknown;
+  /** Holds controls that act on the shown results, such as refresh, between the count and the clear button: 32px
+   *  ghost circles with a tooltip, like the pill's own buttons. Nothing renders while it is empty. */
+  actions?(): unknown;
 }>();
 
 const attrs = useAttrs();
@@ -110,14 +114,18 @@ const passthroughAttrs = computed(() =>
 
 /* One visible height per pointer: 40px under a mouse, 44px under a finger like the fields beside it (spec § Touch).
    The 32px buttons sit 6px from the outer edge on every side under a finger, and `--coarse-hit-gap` (twice the 6px
-   padding plus the 1px border) caps each 44px hit area at that edge, so no hit area reaches a neighbour of the pill. */
-const rootClass = computed(() =>
-  cn(
+   padding plus the 1px border) caps each 44px hit area at that edge, so no hit area reaches a neighbour of the pill.
+   With `actions`, an action sits 4px from the clear button, so `--coarse-hit-gap-x` (the 4px gap plus two 1px
+   borders) caps every hit area's width at 36px and the two never share a tap. Read per render, not cached: a slot's
+   presence is not reactive. */
+function rootClass(hasActions: boolean): string {
+  return cn(
     'relative inline-flex h-10 shrink-0 items-center gap-1 rounded-full border border-input bg-field px-1.5',
     'pointer-coarse:h-11 [--coarse-hit-gap:14px]',
+    hasActions && '[--coarse-hit-gap-x:6px]',
     attrs.class as ClassValue,
-  ),
-);
+  );
+}
 
 function onClear(event: MouseEvent): void {
   if (event.defaultPrevented || !props.isFiltered) return;
@@ -126,7 +134,13 @@ function onClear(event: MouseEvent): void {
 </script>
 
 <template>
-  <div role="group" :aria-label="groupLabel" data-filter-summary="" v-bind="passthroughAttrs" :class="rootClass">
+  <div
+    role="group"
+    :aria-label="groupLabel"
+    data-filter-summary=""
+    v-bind="passthroughAttrs"
+    :class="rootClass(Boolean($slots.actions))"
+  >
     <Tooltip v-if="props.hasFilters" :content="filtersLabel">
       <slot name="filters-trigger">
         <FilterSummaryFiltersButton @click="emit('open-filters')" />
@@ -151,6 +165,7 @@ function onClear(event: MouseEvent): void {
         class="absolute inset-x-1 top-1/2 h-2 -translate-y-1/2 rounded-full bg-muted motion-safe:animate-pulse"
       />
     </span>
+    <slot name="actions" />
     <Tooltip :content="clearLabel">
       <Button
         :variant="ButtonVariant.Ghost"
